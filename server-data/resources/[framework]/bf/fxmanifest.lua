@@ -9,11 +9,18 @@ version '0.0.1'
 ui_page 'hud/index.html'
 ui_page_preload 'yes'
 
+-- load screen
+loadscreen 'loadscreen/index.html'
+
 dependencies {
     'mysql-async',
 }
 
 files {
+    'loadscreen/index.html',
+    'loadscreen/keks.css',
+    'loadscreen/bankgothic.ttf',
+    'loadscreen/loadscreen.jpg',
     'hud/app.css',
     'hud/app.js',
     'hud/index.html',
@@ -39,3 +46,4 @@ shared_scripts {
     'framework/shared/events.lua',
     'framework/shared/main.lua',
 }
+

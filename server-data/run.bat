@@ -1,0 +1,1 @@
+D:\Dev\Bro-serv\server\FXServer.exe +exec server.cfg

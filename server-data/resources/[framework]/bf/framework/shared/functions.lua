@@ -1,3 +1,47 @@
+local __print = print
+
+_print = function(...)
+
+  local args = {...}
+  local str  = '[^4BF^7'
+
+  for i=1, #args, 1 do
+    if i == 1 then
+      str = str .. '' .. tostring(args[i])
+    else
+      str = str .. ' ' .. tostring(args[i])
+    end
+  end
+
+  __print(str)
+
+end
+
+print = function(...)
+
+  local args = {...}
+  local str  = ']'
+
+  for i=1, #args, 1 do
+    str = str .. ' ' .. tostring(args[i])
+  end
+
+  _print(str)
+
+end
+
+local tableIndexOf = function(t, val)
+
+  for i=1, #t, 1 do
+    if t[i] == val then
+      return i
+    end
+  end
+
+  return -1
+
+end
+
 -- Main Variables
 BF = {}
 BF.loaded = false
@@ -20,6 +64,7 @@ BF.evalfile = function (resource, file, env)
     local fn      = load(code, '@' .. resource .. ':' .. file, 't', env)
     local success = true
   
+
     local status, result = xpcall(fn, function(err)
       success = false
       BF.printError(err, trace, '@' .. resource .. ':' .. file)
@@ -36,48 +81,43 @@ local module = BF.modules['boot']
 local resName = GetCurrentResourceName()
 local modType = IsDuplicityVersion() and 'server' or 'client'
 
---module.groupNames        = {"framework", "base", "user"}
-module.groupNames        = {}
+module.groupNames        = {"core", "base", "user"}
 module.groups            = {}
 module.entries           = {}
 module.entriesOrders     = {}
 
 for i=1, #module.groupNames, 1 do
+
   local groupName        = module.groupNames[i]
   local modules          = json.decode(LoadResourceFile(resName, 'modules/' .. groupName .. '/modules.json'))
   module.groups[groupName] = modules
 
   for j=1, #modules, 1 do
-    local modName           = modules[j]
+    local modName = modules[j]
     module.entries[modName] = groupName
   end
-
 end
 
 module.getEntryPoints = function(name, group)
-
-    local prefix          = '/ ' .. group .. '/'
+    local prefix          = group .. '/'
     local shared, current = false, false
 
-    if LoadResourceFile(resName, 'modules/' .. prefix .. name .. '/shared/functions.lua') ~= nil then
+    if LoadResourceFile(resName, 'modules/' .. prefix .. name .. '/shared/main.lua') ~= nil then
         shared = true
     end
-    
-    if LoadResourceFile(resName, 'modules/' .. prefix .. name .. '/' .. modType .. '/functions.lua') ~= nil then
+    if LoadResourceFile(resName, 'modules/' .. prefix .. name .. '/' .. modType .. '/main.lua') ~= nil then
         current = true
     end
-
     return shared, current
-
 end
 
-module.isFramework = function(name)
-    return module.table[name] == "framework"
+module.isModuleInGroup = function(name, group)
+  return module.entries[name] ~= nil
 end
   
 
 module.getModuleGroup = function(name)
-    return module.table[name]
+    return module.entries[name]
 end
 
 module.hasEntryPoints = function(name, group)
@@ -99,7 +139,7 @@ module.createEnv = function(name, group)
     env.__DIR__      = 'modules/__' .. group .. '__/' .. name
     env.run          = function(file, _env) return BF.evalfile(env.__RESOURCE__, env.__DIR__ .. '/' .. file, _env or env) end
     env.module       = {}
-    env.M            = module.LoadModule
+    env.M            = module.loadModule
   
     env.print = function(...)
   
@@ -124,39 +164,35 @@ end
 
 
 module.loadModule = function(name)
-
-if BF.Modules[name] == nil then
-
+  if BF.modules[name] == nil then
     local group = module.getModuleGroup(name)
-
     if group == nil then
-      BF.printError('module [' .. name .. '] is not declared in modules.json', '@' .. resName .. ':modules/__core__/__main__/functions.lua')
+      BF.printError('module [' .. name .. '] is not declared in modules.json', '@' .. resName .. ':modules/core/main/functions.lua')
     end
 
     local prefix = '' .. group .. '/'
 
     module.entriesOrders[group] = module.entriesOrders[group] or {}
-
     TriggerEvent('BF:module:load:before', name, group)
 
     local menv            = module.createEnv(name, group)
     local shared, current = module.getEntryPoints(name, group)
 
+    print(shared, current)
     local env, success, _success = nil, true, false
-
     if shared then
-
     env, _success = BF.evalfile(resName, 'modules/' .. prefix .. name .. '/shared/functions.lua', menv)
-
     if _success then
         env, _success = BF.evalfile(resName, 'modules/' .. prefix .. name .. '/shared/events.lua', menv)
     else
+      print("falseSucess1")
         success = false
     end
 
     if _success then
         menv, _success = BF.evalfile(resName, 'modules/' .. prefix .. name .. '/shared/main.lua', menv)
     else
+      print("falseSucess2")
         success = false
     end
 
@@ -169,12 +205,15 @@ if BF.Modules[name] == nil then
     if _success then
         env, _success = BF.evalfile(resName, 'modules/' .. prefix .. name .. '/' .. modType .. '/events.lua', menv)
     else
+      print("falseSucess3")
+
         success = false
     end
 
     if _success then
         env, _success = BF.evalfile(resName, 'modules/' .. prefix .. name .. '/' .. modType .. '/main.lua', menv)
     else
+      print("falseSucess4")
         success = false
     end
 
@@ -182,7 +221,7 @@ if BF.Modules[name] == nil then
 
     if success then
 
-    BF.Modules[name] = menv['module']
+    BF.modules[name] = menv['module']
 
     module.entriesOrders[group][#module.entriesOrders[group] + 1] = name
 
@@ -190,28 +229,27 @@ if BF.Modules[name] == nil then
 
     else
 
-    BF.printError('module [' .. name .. '] does not exist', '@' .. resName .. ':modules/framework/main/functions.lua')
+    BF.printError('module [' .. name .. '] does not exist')
     TriggerEvent('BF:module:load:error', name, group)
 
     return nil, true
 
     end
 
-end
+  end
 
-return BF.Modules[name], false
-
+  return BF.modules[name], false
 end
 
 module.boot = function()
 
-    for i=1, #module.groupNames, 1 do
-  
-      local groupName = module.groupNames[i]
-      local group     = module.groups[groupName]
-  
+  for i=1, #module.groupNames, 1 do
+
+    local groupName = module.groupNames[i]
+    local group     = module.groups[groupName]
+    if(group ~= nil) then
       for j=1, #group, 1 do
-  
+
         local name = group[j]
   
         if module.hasEntryPoints(name, groupName) then
@@ -219,16 +257,17 @@ module.boot = function()
         end
   
       end
-  
     end
+
+  end
   
-   -- on('bf:ready', function()
-    --  print('^2ready')
-   -- end)
+  on('bf:ready', function()
+    print('^2ready')
+  end)
   
-    BF.Loaded = true
+  BF.loaded = true
   
-    --emit('bf:load')
+  emit('bf:load')
   
   end
   

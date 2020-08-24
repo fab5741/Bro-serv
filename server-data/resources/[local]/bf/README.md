@@ -1,8 +1,3 @@
-# ESX fork
-Hard fork of https://github.com/esx-framework/es_extended/tree/develop
-
-Due to lack of Doc and chaotic structure
-
 # Techs
 
 ## NUI page

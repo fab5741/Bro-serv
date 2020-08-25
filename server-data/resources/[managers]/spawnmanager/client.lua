@@ -135,7 +135,7 @@ end
 local spawned = false
 
 Citizen.CreateThread(function()
-    -- main loop thing
+    -- wait for player to be spawned
     while not spawned do
         Citizen.Wait(0)
         if NetworkIsPlayerActive(PlayerId()) then
@@ -143,5 +143,13 @@ Citizen.CreateThread(function()
             spawnPlayer()
             spawned = true
         end 
+    end
+
+    -- le player est spawn, on check des events
+    while spawned do
+        Citizen.Wait(2000)
+        if(IsPedDeadOrDying(GetPlayerPed(-1)) and not isDead)then
+            TriggerEvent("player:dead")
+        end
     end
 end)

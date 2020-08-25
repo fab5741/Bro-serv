@@ -71,7 +71,12 @@ end)
 
 
 
+
 RegisterCommand("revive", function(source)
     print("REVIVING")
     TriggerClientEvent('ambulance:revive', GetPlayerPed(-1))
+end)
+
+RegisterCommand("money:add", function(source, args)
+    TriggerServerEvent('account:money:add', GetPlayerPed(-1), args[1])
 end)

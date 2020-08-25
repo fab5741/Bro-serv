@@ -5,21 +5,21 @@ Citizen.CreateThread(function()
 
   SendNUIMessage({
     type = 'createMenu',
-    text = 'Mon super menu'
+    text = 'Menu Personnel'
   })
   SendNUIMessage({
     type = 'createMenuLine',
-    text = 'TEst'
-  })
-
-  SendNUIMessage({
-    type = 'createMenuLine',
-    text = 'TEst2'
+    text = 'Portefeuille'
   })
 
   SendNUIMessage({
     type = 'createMenuLine',
-    text = 'TEs3'
+    text = 'Actions'
+  })
+
+  SendNUIMessage({
+    type = 'createMenuLine',
+    text = 'Options'
   })
 
 
@@ -54,4 +54,42 @@ local inputActivating = false
         end
       end
   end
+
+  GUI.Time = 0
+
+  Citizen.CreateThread(function()
+		while true do
+			Citizen.Wait(10)
+
+			if IsControlPressed(0, 18) and IsInputDisabled(0) and (GetGameTimer() - GUI.Time) > 150 then
+				SendNUIMessage({action = 'controlPressed', control = 'ENTER'})
+				GUI.Time = GetGameTimer()
+			end
+
+			if IsControlPressed(0, 177) and IsInputDisabled(0) and (GetGameTimer() - GUI.Time) > 150 then
+				SendNUIMessage({action  = 'controlPressed', control = 'BACKSPACE'})
+				GUI.Time = GetGameTimer()
+			end
+
+			if IsControlPressed(0, 27) and IsInputDisabled(0) and (GetGameTimer() - GUI.Time) > 200 then
+				SendNUIMessage({action  = 'controlPressed', control = 'TOP'})
+				GUI.Time = GetGameTimer()
+			end
+
+			if IsControlPressed(0, 173) and IsInputDisabled(0) and (GetGameTimer() - GUI.Time) > 200 then
+				SendNUIMessage({action  = 'controlPressed', control = 'DOWN'})
+				GUI.Time = GetGameTimer()
+			end
+
+			if IsControlPressed(0, 174) and IsInputDisabled(0) and (GetGameTimer() - GUI.Time) > 150 then
+				SendNUIMessage({action  = 'controlPressed', control = 'LEFT'})
+				GUI.Time = GetGameTimer()
+			end
+
+			if IsControlPressed(0, 175) and IsInputDisabled(0) and (GetGameTimer() - GUI.Time) > 150 then
+				SendNUIMessage({action  = 'controlPressed', control = 'RIGHT'})
+				GUI.Time = GetGameTimer()
+			end
+		end
+	end)
 end)

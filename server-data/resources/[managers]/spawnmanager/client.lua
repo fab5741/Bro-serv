@@ -37,7 +37,7 @@ end
 local spawnLock = false
 
 -- spawns the current player at a certain spawn point index (or a random one, for that matter)
-function spawnPlayer()     
+function spawnPlayer(x, y, z)     
     if spawnLock then
         return
     end
@@ -55,9 +55,6 @@ function spawnPlayer()
         -- freeze the local player
         freezePlayer(PlayerId(), true)
         local model = "a_m_y_vindouche_01"
-        local x = -1038.709;
-        local y = -2683.085;
-        local z = 15;
         RequestModel(model)
 
         -- load the model for this spawn
@@ -78,6 +75,7 @@ function spawnPlayer()
 				N_0x283978a15512b2fe(PlayerPedId(), true)
             end
 
+            print("spawn at ",x,y,z)
         -- preload collisions for the spawnpoint
         RequestCollisionAtCoord(x, y, z)
 
@@ -139,8 +137,7 @@ Citizen.CreateThread(function()
     while not spawned do
         Citizen.Wait(0)
         if NetworkIsPlayerActive(PlayerId()) then
-            print("Spawn player")
-            spawnPlayer()
+            TriggerServerEvent("player:spawnPlayerFromLastPos")
             spawned = true
         end 
     end
@@ -152,4 +149,28 @@ Citizen.CreateThread(function()
             TriggerEvent("player:dead")
         end
     end
+end)
+
+RegisterNetEvent("player:saveCoords")
+
+-- source is global here, don't add to function
+AddEventHandler('player:saveCoords', function ()
+    print("piong")
+    TriggerServerEvent("player:saveCoordsServer", GetPlayerName(PlayerId()),GetEntityCoords(GetPlayerPed(-1)))
+end)
+
+-- boucle pour sauvegarder toutes les X s
+Citizen.CreateThread(function()
+    while true do
+        Wait(1000)
+        TriggerEvent("player:saveCoords")
+    end
+end)
+
+
+RegisterNetEvent("player:spawnLastPos")
+
+-- source is global here, don't add to function
+AddEventHandler('player:spawnLastPos', function (x,y,z)
+    spawnPlayer(x, y, z)
 end)

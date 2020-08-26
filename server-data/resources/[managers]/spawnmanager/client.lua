@@ -162,7 +162,7 @@ end)
 -- boucle pour sauvegarder toutes les X s
 Citizen.CreateThread(function()
     while true do
-        Wait(1000)
+        Wait(10000)
         TriggerEvent("player:saveCoords")
     end
 end)

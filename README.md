@@ -8,3 +8,9 @@ https://github.com/Itokoyamato/TokoVOIP_TS3
 
 ## Fuel system
 Fr fuel
+
+## no reticule addon
+https://github.com/ToastinYou/NoReticle
+
+## car hud
+https://github.com/bepo13/FiveM-SimpleCarHUD

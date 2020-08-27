@@ -3,25 +3,7 @@ Citizen.CreateThread(function()
   SetNuiFocus(false)
   Wait(0)
 
-  SendNUIMessage({
-    type = 'createMenu',
-    text = 'Menu Personnel'
-  })
-  SendNUIMessage({
-    type = 'createMenuLine',
-    text = 'Portefeuille'
-  })
-
-  SendNUIMessage({
-    type = 'createMenuLine',
-    text = 'Actions'
-  })
-
-  SendNUIMessage({
-    type = 'createMenuLine',
-    text = 'Options'
-  })
-
+  print("menu")
 
 local f1Menu = false
 local inputActivating = false
@@ -92,4 +74,30 @@ local inputActivating = false
 			end
 		end
 	end)
+end)
+
+Citizen.CreateThread(function() 
+  while true do
+
+    Citizen.Wait(0)
+    HideHudComponentThisFrame(1);
+    HideHudComponentThisFrame(2);
+    HideHudComponentThisFrame(3);
+    HideHudComponentThisFrame(4);
+    HideHudComponentThisFrame(5);
+    HideHudComponentThisFrame(6);
+    HideHudComponentThisFrame(7);
+    HideHudComponentThisFrame(8);
+    HideHudComponentThisFrame(9);
+    HideHudComponentThisFrame(11);
+    HideHudComponentThisFrame(12);
+    HideHudComponentThisFrame(13);
+    HideHudComponentThisFrame(14);
+    HideHudComponentThisFrame(15);
+    HideHudComponentThisFrame(17);
+    HideHudComponentThisFrame(18);
+    HideHudComponentThisFrame(20);
+    HideHudComponentThisFrame(21);
+    HideHudComponentThisFrame(22);
+  end
 end)

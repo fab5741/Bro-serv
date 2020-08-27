@@ -1,100 +1,42 @@
 local config = {
-    hospitals = {
-
-        CentralLosSantos = {
+    hospitals = {	
+		CentralLosSantos = {
 
             Blip = {
-                coords = vector3(307.7, -1433.4, 28.9),
+                coords = vector3(340.73, -584.6, 28.79),
                 sprite = 61,
                 scale  = 1.2,
-                color  = 2
+                color  = 8
             },
 
-            AmbulanceActions = {
-                vector3(270.5, -1363.0, 23.5)
+            lsmsActions = {
             },
 
             Pharmacies = {
-                vector3(230.1, -1366.1, 38.5)
-            },
+			},
+			
+			lockers = {
+				coords = vector3(336.25, -579.45, 27.6),
+				blip = {
+					coords = vector3(336.25, -579.45, 27.6),
+					sprite = 73,
+					scale  = 0.5,
+					color  = 2
+				},
+			},
 
             Vehicles = {
-                {
-                    Spawner = vector3(307.7, -1433.4, 30.0),
-                    InsideShop = vector3(446.7, -1355.6, 43.5),
-                    Marker = {type = 36, x = 1.0, y = 1.0, z = 1.0, r = 100, g = 50, b = 200, a = 100, rotate = true},
-                    SpawnPoints = {
-                        {coords = vector3(297.2, -1429.5, 29.8), heading = 227.6, radius = 4.0},
-                        {coords = vector3(294.0, -1433.1, 29.8), heading = 227.6, radius = 4.0},
-                        {coords = vector3(309.4, -1442.5, 29.8), heading = 227.6, radius = 6.0}
-                    }
-                }
+				coords = vector3(341.25, -562.98,28.24)
             },
 
             Helicopters = {
-                {
-                    Spawner = vector3(317.5, -1449.5, 46.5),
-                    InsideShop = vector3(305.6, -1419.7, 41.5),
-                    Marker = {type = 34, x = 1.5, y = 1.5, z = 1.5, r = 100, g = 150, b = 150, a = 100, rotate = true},
-                    SpawnPoints = {
-                        {coords = vector3(313.5, -1465.1, 46.5), heading = 142.7, radius = 10.0},
-                        {coords = vector3(299.5, -1453.2, 46.5), heading = 142.7, radius = 10.0}
-                    }
-                }
+				coords = vector3(55.25, -562.98,28.74)
             },
 
             FastTravels = {
-                {
-                    From = vector3(294.7, -1448.1, 29.0),
-                    To = {coords = vector3(272.8, -1358.8, 23.5), heading = 0.0},
-                    Marker = {type = 1, x = 2.0, y = 2.0, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false}
-                },
-
-                {
-                    From = vector3(275.3, -1361, 23.5),
-                    To = {coords = vector3(295.8, -1446.5, 28.9), heading = 0.0},
-                    Marker = {type = 1, x = 2.0, y = 2.0, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false}
-                },
-
-                {
-                    From = vector3(247.3, -1371.5, 23.5),
-                    To = {coords = vector3(333.1, -1434.9, 45.5), heading = 138.6},
-                    Marker = {type = 1, x = 1.5, y = 1.5, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false}
-                },
-
-                {
-                    From = vector3(335.5, -1432.0, 45.50),
-                    To = {coords = vector3(249.1, -1369.6, 23.5), heading = 0.0},
-                    Marker = {type = 1, x = 2.0, y = 2.0, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false}
-                },
-
-                {
-                    From = vector3(234.5, -1373.7, 20.9),
-                    To = {coords = vector3(320.9, -1478.6, 28.8), heading = 0.0},
-                    Marker = {type = 1, x = 1.5, y = 1.5, z = 1.0, r = 102, g = 0, b = 102, a = 100, rotate = false}
-                },
-
-                {
-                    From = vector3(317.9, -1476.1, 28.9),
-                    To = {coords = vector3(238.6, -1368.4, 23.5), heading = 0.0},
-                    Marker = {type = 1, x = 1.5, y = 1.5, z = 1.0, r = 102, g = 0, b = 102, a = 100, rotate = false}
-                }
             },
 
             FastTravelsPrompt = {
-                {
-                    From = vector3(237.4, -1373.8, 26.0),
-                    To = {coords = vector3(251.9, -1363.3, 38.5), heading = 0.0},
-                    Marker = {type = 1, x = 1.5, y = 1.5, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false},
-                    Prompt = 'voyage rapide'
-                },
-
-                {
-                    From = vector3(256.5, -1357.7, 36.0),
-                    To = {coords = vector3(235.4, -1372.8, 26.3), heading = 0.0},
-                    Marker = {type = 1, x = 1.5, y = 1.5, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false},
-                    Prompt = 'voyage rapide'
-                }
             }
         }
 	}
@@ -115,25 +57,25 @@ config.RespawnPoint = {coords = vector3(341.0, -1397.3, 32.5), heading = 48.5}
 
 config.AuthorizedVehicles = {
 	car = {
-		ambulance = {
-			{model = 'ambulance', price = 5000}
+		lsms = {
+			{model = 'lsms', price = 5000}
 		},
 
 		doctor = {
-			{model = 'ambulance', price = 4500}
+			{model = 'lsms', price = 4500}
 		},
 
 		chief_doctor = {
-			{model = 'ambulance', price = 3000}
+			{model = 'lsms', price = 3000}
 		},
 
 		boss = {
-			{model = 'ambulance', price = 2000}
+			{model = 'lsms', price = 2000}
 		}
 	},
 
 	helicopter = {
-		ambulance = {},
+		lsms = {},
 
 		doctor = {
 			{model = 'buzzard2', price = 150000}
@@ -151,7 +93,9 @@ config.AuthorizedVehicles = {
 	}
 }
 
-RegisterNetEvent("ambulance:revive")
+local onDuty
+
+RegisterNetEvent("lsms:revive")
 
 
 -- Create blips
@@ -167,7 +111,18 @@ Citizen.CreateThread(function()
 		BeginTextCommandSetBlipName('STRING')
 		AddTextComponentSubstringPlayerName('Hopital')
 		EndTextCommandSetBlipName(blip)
+
+		local blip = AddBlipForCoord(v.lockers.blip.coords)
+		SetBlipSprite(blip, v.lockers.blip.sprite)
+		SetBlipScale(blip, v.lockers.blip.scale)
+		SetBlipColour(blip, v.lockers.blip.color)
+		SetBlipAsShortRange(blip, true)
+
+		BeginTextCommandSetBlipName('STRING')
+		AddTextComponentSubstringPlayerName('Hopital')
+		EndTextCommandSetBlipName(blip)
 	end
+
 end)
 
 -- local values
@@ -223,7 +178,7 @@ function SendDistressSignal()
 
     print("Appel envoyé")
 	--ESX.ShowNotification(_U('distress_sent'))
-	TriggerServerEvent('ambulance:distress', playerPed)
+	TriggerServerEvent('lsms:distress', playerPed)
 end
 
 
@@ -256,7 +211,7 @@ end
 AddEventHandler('player:dead', function(data)
     if(not isDead) then
         isDead = true
-        --TriggerServerEvent('esx_ambulancejob:setDeathStatus', true)
+        --TriggerServerEvent('lsms:setDeathStatus', true)
 
         StartDeathTimer()
         StartDistressSignal()
@@ -265,7 +220,7 @@ AddEventHandler('player:dead', function(data)
     end
 end)
 
-AddEventHandler('ambulance:revive', function(noAmbulancies)
+AddEventHandler('lsms:revive', function(noAmbulancies)
     isDead=false
     if(noAmbulancies) then 
         Citizen.CreateThread(function()
@@ -311,7 +266,7 @@ AddEventHandler('ambulance:revive', function(noAmbulancies)
 end)
 
 -- ESX job part
-function OpenAmbulanceActionsMenu()
+function OpenlsmsActionsMenu()
 
 end
 
@@ -349,7 +304,7 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
-        -- TODO if job is ambulance
+        -- TODO if job is lsms
         if true then
             DrawMarker(0, 117.14, -1950.29, 20,7513, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.75, 0.75, 0.75, 204, 204, 0, 100, false, true, 2, false, false, false, false)
 
@@ -358,8 +313,8 @@ Citizen.CreateThread(function()
 			local currentHospital, currentPart, currentPartNum
 
             for hospitalNum,hospital in pairs(config.hospitals) do
-				-- Ambulance Actions
-				for k,v in ipairs(hospital.AmbulanceActions) do
+				-- lsms Actions
+				for k,v in ipairs(hospital.lsmsActions) do
 					local distance = #(playerCoords - v)
 
 					if distance < config.DrawDistance then
@@ -367,14 +322,25 @@ Citizen.CreateThread(function()
 						letSleep = false
 
 						if distance < config.Marker.x then
-							isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'AmbulanceActions', k
+							isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'lsmsActions', k
 						end
+					end
+				end
+
+				-- lsmss lockers
+				local distance = #(playerCoords - hospital.lockers.coords)
+
+				if distance < config.DrawDistance then
+					DrawMarker(config.Marker.type, hospital.lockers.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
+					letSleep = false
+					if distance < config.Marker.x then
+						isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'lockers', 1
 					end
 				end
 
 				-- Pharmacies
 				for k,v in ipairs(hospital.Pharmacies) do
-					local distance = #(playerCoords - v)
+					local distance = #(playerCoords - v.coords)
 
 					if true then
 						DrawMarker(config.Marker.type, v, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
@@ -387,30 +353,23 @@ Citizen.CreateThread(function()
 				end
 
 				-- Vehicle Spawners
-				for k,v in ipairs(hospital.Vehicles) do
-					local distance = #(playerCoords - v.Spawner)
+				local distance = #(playerCoords - hospital.Vehicles.coords)
 
-					if distance < config.DrawDistance then
-						DrawMarker(v.Marker.type, v.Spawner, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.Marker.x, v.Marker.y, v.Marker.z, v.Marker.r, v.Marker.g, v.Marker.b, v.Marker.a, false, false, 2, v.Marker.rotate, nil, nil, false)
-						letSleep = false
-
-						if distance < v.Marker.x then
-							isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'Vehicles', k
-						end
+				if distance < config.DrawDistance then
+					DrawMarker(config.Marker.type, hospital.Vehicles.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
+					letSleep = false
+					if distance < config.Marker.x then
+						isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'Vehicles', 1
 					end
 				end
-
 				-- Helicopter Spawners
-				for k,v in ipairs(hospital.Helicopters) do
-					local distance = #(playerCoords - v.Spawner)
+				local distance = #(playerCoords - hospital.Helicopters.coords)
 
-					if distance < config.DrawDistance then
-						DrawMarker(v.Marker.type, v.Spawner, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.Marker.x, v.Marker.y, v.Marker.z, v.Marker.r, v.Marker.g, v.Marker.b, v.Marker.a, false, false, 2, v.Marker.rotate, nil, nil, false)
-						letSleep = false
-
-						if distance < v.Marker.x then
-							isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'Helicopters', k
-						end
+				if distance < config.DrawDistance then
+					DrawMarker(config.Marker.type, hospital.Helicopters.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
+					letSleep = false
+					if distance < config.Marker.x then
+						isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'Helicopters', 1
 					end
 				end
 
@@ -435,18 +394,17 @@ Citizen.CreateThread(function()
 					(LastHospital ~= nil and LastPart ~= nil and LastPartNum ~= nil) and
 					(LastHospital ~= currentHospital or LastPart ~= currentPart or LastPartNum ~= currentPartNum)
 				then
-					TriggerEvent('esx_ambulancejob:hasExitedMarker', LastHospital, LastPart, LastPartNum)
+					TriggerEvent('lsms:hasExitedMarker', LastHospital, LastPart, LastPartNum)
 					hasExited = true
 				end
 
 				HasAlreadyEnteredMarker, LastHospital, LastPart, LastPartNum = true, currentHospital, currentPart, currentPartNum
-
-				TriggerEvent('esx_ambulancejob:hasEnteredMarker', currentHospital, currentPart, currentPartNum)
+				TriggerEvent('lsms:hasEnteredMarker', currentHospital, currentPart, currentPartNum)
 			end
 
 			if not hasExited and not isInMarker and HasAlreadyEnteredMarker then
 				HasAlreadyEnteredMarker = false
-				TriggerEvent('esx_ambulancejob:hasExitedMarker', LastHospital, LastPart, LastPartNum)
+				TriggerEvent('lsms:hasExitedMarker', LastHospital, LastPart, LastPartNum)
 			end
 
 			if letSleep then
@@ -486,10 +444,11 @@ Citizen.CreateThread(function()
 	end
 end)
 
+local skinChanged = false
 
-AddEventHandler('ambulance:hasEnteredMarker', function(hospital, part, partNum)
-    print("marker")
-	if part == 'AmbulanceActions' then
+AddEventHandler('lsms:hasEnteredMarker', function(hospital, part, partNum)
+	print(part)
+	if part == 'lsmsActions' then
 		CurrentAction = part
 		CurrentActionMsg = _U('actions_prompt')
 		CurrentActionData = {}
@@ -498,23 +457,108 @@ AddEventHandler('ambulance:hasEnteredMarker', function(hospital, part, partNum)
 		CurrentActionMsg = _U('open_pharmacy')
 		CurrentActionData = {}
 	elseif part == 'Vehicles' then
-		CurrentAction = part
-		CurrentActionMsg = _U('garage_prompt')
-		CurrentActionData = {hospital = hospital, partNum = partNum}
+		print("vehicle")
+		-- account for the argument not being passed
+		local vehicleName = 'ambulance'
+	
+		-- check if the vehicle actually exists
+		if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+			TriggerEvent('chat:addMessage', {
+				args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
+			})
+	
+			return
+		end
+	
+		-- load the model
+		RequestModel(vehicleName)
+	
+		-- wait for the model to load
+		while not HasModelLoaded(vehicleName) do
+			Wait(500) -- often you'll also see Citizen.Wait
+		end
+	
+		-- get the player's position
+		local playerPed = PlayerPedId() -- get the local player ped
+		local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
+	
+		-- create the vehicle
+		local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+	
+		-- set the player ped into the vehicle's driver seat
+		SetPedIntoVehicle(playerPed, vehicle, -1)
+	
+		-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+		SetEntityAsNoLongerNeeded(vehicle)
+	
+		-- release the model
+		SetModelAsNoLongerNeeded(vehicleName)
 	elseif part == 'Helicopters' then
-		CurrentAction = part
-		CurrentActionMsg = _U('helicopter_prompt')
-		CurrentActionData = {hospital = hospital, partNum = partNum}
+		-- account for the argument not being passed
+		local vehicleName = 'polmav'
+
+		-- check if the vehicle actually exists
+		if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+			TriggerEvent('chat:addMessage', {
+				args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
+			})
+
+			return
+		end
+
+		-- load the model
+		RequestModel(vehicleName)
+
+		-- wait for the model to load
+		while not HasModelLoaded(vehicleName) do
+			Wait(500) -- often you'll also see Citizen.Wait
+		end
+
+		-- get the player's position
+		local playerPed = PlayerPedId() -- get the local player ped
+		local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
+
+		-- create the vehicle
+		local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+
+		-- set the player ped into the vehicle's driver seat
+		SetPedIntoVehicle(playerPed, vehicle, -1)
+
+		-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+		SetEntityAsNoLongerNeeded(vehicle)
+
+		-- release the model
+		SetModelAsNoLongerNeeded(vehicleName)
 	elseif part == 'FastTravelsPrompt' then
 		local travelItem = config.hospitals[hospital][part][partNum]
 
 		CurrentAction = part
 		CurrentActionMsg = travelItem.Prompt
 		CurrentActionData = {to = travelItem.To.coords, heading = travelItem.To.heading}
-	end
+	elseif part == 'lockers' then
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			if skinChanged then
+				print("not on duty")
+				TriggerEvent('skinchanger:loadSkin', skin)
+				TriggerEvent('skinchanger:loadClothes', {})
+				skinChanged =false
+				onDuty = false
+			else
+				if skin.sex == 0 then
+					TriggerEvent('skinchanger:loadClothes', 
+					{tshirt_2=0,hair_color_1=5,glasses_2=3,shoes=9,torso_2=3,hair_color_2=0,pants_1=24,glasses_1=4,hair_1=2,sex=0,decals_2=0,tshirt_1=15,helmet_1=8,helmet_2=0,arms=92,face=19,decals_1=60,torso_1=13,hair_2=0,skin=34,pants_2=5})
+				else
+					TriggerEvent('skinchanger:loadClothes', 
+					{tshirt_2=3,decals_2=0,glasses=0,hair_1=2,torso_1=73,shoes=1,hair_color_2=0,glasses_1=19,skin=13,face=6,pants_2=5,tshirt_1=75,pants_1=37,helmet_1=57,torso_2=0,arms=14,sex=1,glasses_2=0,decals_1=0,hair_2=0,helmet_2=0,hair_color_1=0})
+				end
+				skinChanged = true
+				onDuty = true
+			end
+		end)
+	end	
 end)
 
-AddEventHandler('ambulance:hasExitedMarker', function(hospital, part, partNum)
+AddEventHandler('lsms:hasExitedMarker', function(hospital, part, partNum)
     -- close menu
 
 	CurrentAction = nil
@@ -529,8 +573,8 @@ Citizen.CreateThread(function()
 			--ESX.ShowHelpNotification(CurrentActionMsg)
 
 			if IsControlJustReleased(0, 38) then
-				if CurrentAction == 'AmbulanceActions' then
-					OpenAmbulanceActionsMenu()
+				if CurrentAction == 'lsmsActions' then
+					OpenlsmsActionsMenu()
 				elseif CurrentAction == 'Pharmacy' then
 					OpenPharmacyMenu()
                 elseif CurrentAction == 'Vehicles' then
@@ -568,29 +612,19 @@ Citizen.CreateThread(function()
     SetEntityAsNoLongerNeeded(vehicle)
 
     -- release the model
-    SetModelAsNoLongerNeeded(vehicleName)
+	SetModelAsNoLongerNeeded(vehicleName)
+	
+		OpenVehicleSpawnerMenu('car', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
+	elseif CurrentAction == 'Helicopters' then
+		OpenVehicleSpawnerMenu('helicopter', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
+	elseif CurrentAction == 'FastTravelsPrompt' then
+		FastTravel(CurrentActionData.to, CurrentActionData.heading)
+	end
 
-    -- tell the player
-    TriggerEvent('chat:addMessage', {
-		args = { 'Woohoo! Enjoy your new ^*' .. vehicleName .. '!' }
-	})
-					OpenVehicleSpawnerMenu('car', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
-				elseif CurrentAction == 'Helicopters' then
-					OpenVehicleSpawnerMenu('helicopter', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
-				elseif CurrentAction == 'FastTravelsPrompt' then
-					FastTravel(CurrentActionData.to, CurrentActionData.heading)
-				end
-
-				CurrentAction = nil
-			end
-
-        -- TODO test if ambulance
-		elseif true and not isDead then
-			if IsControlJustReleased(0, 167) then
-				OpenMobileAmbulanceActionsMenu()
-			end
-		else
+	CurrentAction = nil
+end
 			Citizen.Wait(500)
 		end
 	end
 end)
+

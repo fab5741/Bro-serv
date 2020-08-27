@@ -38,10 +38,10 @@ RegisterNetEvent("player:spawnPlayerFromLastPos")
 AddEventHandler('player:spawnPlayerFromLastPos', function()
     local sourceValue = source
     MySQL.ready(function ()
-        MySQL.Async.fetchAll('select x,y,z from players WHERE fivem = @fivem',
+        MySQL.Async.fetchAll('select x,y,z, skin from players WHERE fivem = @fivem',
         {['fivem'] =  GetPlayerIdentifiers(sourceValue)[5]}, function(res)
             if(res[1]) then
-                TriggerClientEvent("player:spawnLastPos", sourceValue, res[1].x, res[1].y, res[1].z)
+                TriggerClientEvent("player:spawnLastPos", sourceValue, res[1].x, res[1].y, res[1].z, res[1].skin)
             else
                 TriggerClientEvent("player:spawnLastPos", sourceValue, -1038.709, -2683.085, 15)
             end

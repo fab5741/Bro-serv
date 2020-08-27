@@ -480,8 +480,9 @@ AddEventHandler('ambulance:hasEnteredMarker', function(hospital, part, partNum)
 	elseif part == 'lockers' then
 		TriggerEvent('skinchanger:getSkin', function(skin)
 			if skinChanged then
-				-- Todo load my old skin
+				print("not on duty")
 				TriggerEvent('skinchanger:loadSkin', skin)
+				TriggerEvent('skinchanger:loadClothes', {})
 				skinChanged =false
 				onDuty = false
 			else

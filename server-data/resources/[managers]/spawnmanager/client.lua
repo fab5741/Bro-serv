@@ -37,7 +37,7 @@ end
 local spawnLock = false
 
 -- spawns the current player at a certain spawn point index (or a random one, for that matter)
-function spawnPlayer(x, y, z)     
+function spawnPlayer(x, y, z, skin)     
     if spawnLock then
         return
     end
@@ -68,14 +68,47 @@ function spawnPlayer(x, y, z)
         SetPlayerModel(PlayerId(), model)
 
         -- release the player model
-        SetModelAsNoLongerNeeded(model)      
-
-            -- RDR3 player model bits
-            if N_0x283978a15512b2fe then
-				N_0x283978a15512b2fe(PlayerPedId(), true)
-            end
-
-            print("spawn at ",x,y,z)
+        SetModelAsNoLongerNeeded(model)     
+        if(skin == nil) then
+            skin ={
+                sex          = 0,
+                face         = 0,
+                skin         = 0,
+                beard_1      = 0,
+                beard_2      = 0,
+                beard_3      = 0,
+                beard_4      = 0,
+                hair_1       = 0,
+                hair_2       = 0,
+                hair_color_1 = 0,
+                hair_color_2 = 0,
+                tshirt_1     = 0,
+                tshirt_2     = 0,
+                torso_1      = 0,
+                torso_2      = 0,
+                decals_1     = 0,
+                decals_2     = 0,
+                arms         = 0,
+                pants_1      = 0,
+                pants_2      = 0,
+                shoes_1      = 0,
+                shoes_2      = 0,
+                mask_1       = 0,
+                mask_2       = 0,
+                bproof_1     = 0,
+                bproof_2     = 0,
+                chain_1      = 0,
+                chain_2      = 0,
+                helmet_1     = 0,
+                helmet_2     = 0,
+                glasses_1    = 0,
+                glasses_2    = 0,
+            }
+        else
+            skin = json.decode(skin)
+        end
+        TriggerEvent('skinchanger:loadSkin', skin)
+       
         -- preload collisions for the spawnpoint
         RequestCollisionAtCoord(x, y, z)
 
@@ -170,6 +203,6 @@ end)
 RegisterNetEvent("player:spawnLastPos")
 
 -- source is global here, don't add to function
-AddEventHandler('player:spawnLastPos', function (x,y,z)
-    spawnPlayer(x, y, z)
+AddEventHandler('player:spawnLastPos', function (x,y,z, skin)
+    spawnPlayer(x, y, z, skin)
 end)

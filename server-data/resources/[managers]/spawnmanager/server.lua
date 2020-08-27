@@ -37,7 +37,6 @@ RegisterNetEvent("player:spawnPlayerFromLastPos")
 -- source is global here, don't add to function
 AddEventHandler('player:spawnPlayerFromLastPos', function()
     local sourceValue = source
-    print(GetPlayerIdentifiers(sourceValue)[5])
     MySQL.ready(function ()
         MySQL.Async.fetchAll('select x,y,z from players WHERE fivem = @fivem',
         {['fivem'] =  GetPlayerIdentifiers(sourceValue)[5]}, function(res)

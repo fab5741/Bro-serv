@@ -9,3 +9,4 @@ AddEventHandler('ambulance:distress', function(player)
     else
     end
 end)
+

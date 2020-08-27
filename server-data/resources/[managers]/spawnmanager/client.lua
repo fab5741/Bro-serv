@@ -54,7 +54,7 @@ function spawnPlayer(x, y, z)
 
         -- freeze the local player
         freezePlayer(PlayerId(), true)
-        local model = "a_m_y_vindouche_01"
+        local model = "mp_m_freemode_01"
         RequestModel(model)
 
         -- load the model for this spawn
@@ -83,7 +83,7 @@ function spawnPlayer(x, y, z)
         local ped = PlayerPedId()
 
         -- V requires setting coords as well
-        for height = 1, 1000 do
+        for height = z, 1000 do
             SetPedCoordsKeepVehicle(PlayerPedId(), x, y, height + 0.0)
 
             local foundGround, zPos = GetGroundZFor_3dCoord(x, y, height + 0.0)
@@ -155,7 +155,6 @@ RegisterNetEvent("player:saveCoords")
 
 -- source is global here, don't add to function
 AddEventHandler('player:saveCoords', function ()
-    print("piong")
     TriggerServerEvent("player:saveCoordsServer", GetPlayerName(PlayerId()),GetEntityCoords(GetPlayerPed(-1)))
 end)
 

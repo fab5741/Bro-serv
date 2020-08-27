@@ -1,11 +1,11 @@
-RegisterNetEvent("ambulance:distress")
+RegisterNetEvent("lsms:distress")
 
-AddEventHandler('ambulance:distress', function(player)
+AddEventHandler('lsms:distress', function(player)
     --check le nombre d'ambulanciers présent
     print("appel recu de " .. player)
 
     if true then
-        TriggerClientEvent('ambulance:revive', -1, true)
+        TriggerClientEvent('lsms:revive', -1, true)
     else
     end
 end)

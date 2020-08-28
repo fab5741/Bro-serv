@@ -49,3 +49,33 @@ Citizen.CreateThread(function()
         end)
     end
 end)
+
+RegisterNetEvent("jobs:sell")
+
+AddEventHandler('jobs:sell', function (type, amount, price, shop)
+    local source = source
+    MySQL.Async.fetchAll('select id, amount from players, player_item where fivem = @fivem and player_item.item = @type and player_item.player = players.id',
+    {['fivem'] =  GetPlayerIdentifiers(source)[5],
+    ['amount'] = amount,
+    ['type'] = type},
+    function(res)
+        if res and res[1] and res[1].amount > 0 then
+            MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
+            {['id'] = res[1].id,
+            ['amount'] = amount,
+            ['type'] = type},
+            function(affectedRows)
+                    MySQL.Async.execute('UPDATE shops SET amount=amount+@amount WHERE type=@shop and item = @item',
+                    {['id'] = res[1].id,
+                    ['item'] = type,
+                    ['amount'] = amount,
+                    ['shop'] = shop},
+                    function(res)
+                        TriggerClientEvent("job:sell", source, true)
+                    end)
+            end)
+        else
+            TriggerClientEvent("job:sell", source, false)
+        end
+    end)
+end)

@@ -19,8 +19,8 @@ files({
 client_script {
     'config.lua',
     'client/cloackroom.lua',
-    'client/garage.lua',
-    'client/menu.lua',
+    'client/functions.lua',
+    'client/events.lua',
     'client/client.lua',
 }
 

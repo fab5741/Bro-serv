@@ -1,5 +1,10 @@
 local job = "Chomeur"
 local grade = "Chomeur"
+anyMenuOpen = {
+	menuName = "",
+	isActive = false
+}
+
 
 Citizen.CreateThread(function()
     TriggerEvent("job:set", 4)
@@ -7,124 +12,127 @@ Citizen.CreateThread(function()
     while true do
         Wait(30)
 
-        SetTextFont(0)
-        SetTextScale(0.0, 0.3)
-        SetTextColour(128, 128, 128, 255)
-        SetTextDropshadow(0, 0, 0, 0, 255)
-        SetTextEdge(0, 1, 0, 0, 255)
-        SetTextDropShadow()
-        SetTextOutline()
-        SetTextEntry("STRING")
-        AddTextComponentString("Job : ".. job)
-        DrawText(0.90, 0.95)
-        SetTextFont(0)
-        SetTextScale(0.0, 0.3)
-        SetTextColour(128, 128, 128, 255)
-        SetTextDropshadow(0, 0, 0, 0, 255)
-        SetTextEdge(0, 1, 0, 0, 255)
-        SetTextDropShadow()
-        SetTextOutline()
-        SetTextEntry("STRING")
-        AddTextComponentString("Grade : ".. grade)
-        DrawText(0.90, 0.975)
+        DrawTextOnSCreen(0.90,0.95, "Job : " .. job)
+        DrawTextOnSCreen(0.90, 0.975, "Grade : ".. grade)
      end
 
 end)
 
-RegisterNetEvent("job:draw")
-
--- source is global here, don't add to function
-AddEventHandler('job:draw', function (jobe, gradee)
-    if(not jobe or not gradee) then
-        TriggerServerEvent("job:get")
-        return
-    end
-    job = jobe
-    grade = gradee
-end)
-
-
-RegisterNetEvent("job:set")
-
--- source is global here, don't add to function
-AddEventHandler('job:set', function (grade)
-    print(grade)
-    TriggerServerEvent("job:set", grade)
-end)
-
-
-
--- Create blips
-Citizen.CreateThread(function()
-	for k,v in pairs(config.jobs) do
-        local blip = AddBlipForCoord(v.collect.coords)
-        SetBlipSprite(blip, v.collect.blip.sprite)
-        SetBlipScale(blip, v.collect.blip.scale)
-        SetBlipColour(blip, v.collect.blip.color)
-        SetBlipAsShortRange(blip, true)
-
-        BeginTextCommandSetBlipName('STRING')
-        AddTextComponentSubstringPlayerName('Collect')
-        EndTextCommandSetBlipName(blip)
-    end
-end)
-
-
-AddEventHandler('job:hasEnteredMarker', function(station, part, partNum)
-	if part == 'collect' then
-        print("collect that ?")
-	end	
-end)
-
-AddEventHandler('job:hasExitedMarker', function(station, part, partNum)
-    -- close menu
-
-	CurrentAction = nil
-end)
-
-
 -- Draw markers & Marker logic
 Citizen.CreateThread(function()
+    -- Draw blips
+	for k,v in pairs(config.jobs) do
+		for k, v in pairs(v.lockers) do
+			print("v",  v)
+			drawBlip(v)
+		end
+		for k, v in pairs(v.collect) do
+			drawBlip(v)
+		end
+		for k, v in pairs(v.process) do
+			drawBlip(v)
+		end
+		for k, v in pairs(v.sell) do
+			drawBlip(v)
+		end
+    end
 	while true do
         Citizen.Wait(0)
         local playerCoords = GetEntityCoords(PlayerPedId())
         local letSleep, isInMarker, hasExited = true, false, false
         local currentstation, currentPart, currentPartNum
 
-        for k,v in pairs(config.jobs) do
-            local distance = #(playerCoords - v.collect.coords)
-
-            if distance < config.DrawDistance then
-                DrawMarker(config.Marker.type,  v.collect.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
-                letSleep = false
-                if distance < config.Marker.x then
-                    isInMarker, currentstation, currentPart, currentPartNum = true, k, 'collect', 1
-                end
-            end
-        end
-        -- Logic for exiting & entering markers
-        if isInMarker and not HasAlreadyEnteredMarker or (isInMarker and (Laststation ~= currentstation or LastPart ~= currentPart or LastPartNum ~= currentPartNum)) then
-            if
-                (Laststation ~= nil and LastPart ~= nil and LastPartNum ~= nil) and
-                (Laststation ~= currentstation or LastPart ~= currentPart or LastPartNum ~= currentPartNum)
-            then
-                TriggerEvent('job:hasExitedMarker', Laststation, LastPart, LastPartNum)
-                hasExited = true
-            end
-
-            HasAlreadyEnteredMarker, Laststation, LastPart, LastPartNum = true, currentstation, currentPart, currentPartNum
-
-            TriggerEvent('job:hasEnteredMarker', currentstation, currentPart, currentPartNum)
-        end
-
-        if not hasExited and not isInMarker and HasAlreadyEnteredMarker then
-            HasAlreadyEnteredMarker = false
-            TriggerEvent('job:hasExitedMarker', Laststation, LastPart, LastPartNum)
-        end
-
-        if letSleep then
-            Citizen.Wait(500)
+		for k,job in pairs(config.jobs) do
+			for k, v in pairs(job.lockers) do
+				DrawMyMarker(playerCoords, v, job)
+			end
+			for k, v in pairs(job.collect) do
+				DrawMyMarker(playerCoords, v, job)
+			end
+			for k, v in pairs(job.process) do
+				DrawMyMarker(playerCoords, v, job)
+			end
+			for k, v in pairs(job.sell) do
+				DrawMyMarker(playerCoords, v, job)
+			end
         end
 	end
 end)
 
+
+RegisterNUICallback('sendAction', function(data, cb)
+	_G[data.action](data.params)
+    cb('ok')
+end)
+
+--
+--Threads
+--
+
+local alreadyDead = false
+local playerStillDragged = false
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(5)	
+
+		if(anyMenuOpen.isActive) then
+			DisableControlAction(1, 21)
+			DisableControlAction(1, 140)
+			DisableControlAction(1, 141)
+			DisableControlAction(1, 142)
+
+			SetDisableAmbientMeleeMove(PlayerPedId(), true)
+
+			if (IsControlJustPressed(1,172)) then
+				SendNUIMessage({
+					action = "keyup"
+				})
+				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+			elseif (IsControlJustPressed(1,173)) then
+				SendNUIMessage({
+					action = "keydown"
+				})
+				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+			elseif (anyMenuOpen.menuName == "cloackroom") then
+				if IsControlJustPressed(1, 176) then
+					SendNUIMessage({
+						action = "keyenter"
+					})
+
+					PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+					Citizen.Wait(500)
+					CloseMenu()
+				end
+			elseif (IsControlJustPressed(1,176)) then
+				SendNUIMessage({
+					action = "keyenter"
+				})
+				PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+			elseif (IsControlJustPressed(1,177)) then
+				if(anyMenuOpen.menuName == "cloackroom") then
+					CloseMenu()
+				end
+			end
+		else
+			EnableControlAction(1, 21)
+			EnableControlAction(1, 140)
+			EnableControlAction(1, 141)
+			EnableControlAction(1, 142)
+		end
+	
+		--Control death events
+		if(config.useModifiedEmergency == false) then
+			if(IsPlayerDead(PlayerId())) then
+				if(alreadyDead == false) then
+					if(isInService) then
+						ServiceOff()
+					end
+					alreadyDead = true
+				end
+			else
+				alreadyDead = false
+			end
+		end
+    end
+end)

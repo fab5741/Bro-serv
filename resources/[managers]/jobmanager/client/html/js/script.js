@@ -2,7 +2,6 @@ $(document).ready(function(){
 	
 	window.addEventListener('message', (event) => {
 		if(event.data.action == "setAndOpen"){
-			
 			$(".header").append(event.data.title);
 			$(".subheader").append(event.data.subtitle);
 
@@ -72,7 +71,7 @@ $(document).ready(function(){
 		if(event.data.action == "keyenter"){
 			let action = $(".active").attr("function");
 			let params = $(".active").attr("params");
-			$.post('http://lspd/sendAction', JSON.stringify({
+			$.post('http://jobmanager/sendAction', JSON.stringify({
 				 action: action,
 				 params: params
 			}));

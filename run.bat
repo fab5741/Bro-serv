@@ -1,1 +1,1 @@
-D:\Dev\Bro-serv\server\FXServer.exe +exec server.cfg
+D:\Dev\GTA-dev\server\FXServer.exe +exec server.cfg

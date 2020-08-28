@@ -6,7 +6,7 @@ local screenPosY = 0.882                    -- Y coordinate (top left corner of 
 local enableController = true               -- Enable controller inputs
 
 -- SPEEDOMETER PARAMETERS
-local speedLimit = 100.0                    -- Speed limit for changing speed color
+local speedLimit = 80.0                    -- Speed limit for changing speed color
 local speedColorText = {255, 255, 255}      -- Color used to display speed label text
 local speedColorUnder = {255, 255, 255}     -- Color used to display speed when under speedLimit
 local speedColorOver = {255, 96, 96}        -- Color used to display speed when over speedLimit

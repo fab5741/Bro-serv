@@ -127,6 +127,35 @@ config = {
                     action = "sell",
                 }
             }
+        },
+        mechanic = {
+            label = "Mécaniciens",
+            id = 'mechanic',
+            coords = vector3(-362.1,-129.6,37.6),
+            blip = {
+            sprite = 446,
+            scale  = 1.8,
+            color  = 5,
+            string = "Mécanicien",
+            },
+            lockers = {
+                {
+                    coords = vector3(-342.291, -133.370, 38.009),
+                    blip = {
+                    sprite = 496,
+                    scale  = 0.4,
+                    color  = 5,
+                    string = "locker",
+                    },
+                    action = "lockers",
+                }
+            },
+            collect = {
+            },
+            process = {
+            },
+            sell = {
+            }
         }
     }
 }

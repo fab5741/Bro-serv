@@ -9,10 +9,6 @@ RegisterNetEvent("job:draw")
 
 -- source is global here, don't add to function
 AddEventHandler('job:draw', function (jobe, gradee)
-    if(not jobe or not gradee) then
-        TriggerServerEvent("job:get")
-        return
-    end
     job = jobe
     grade = gradee
 end)

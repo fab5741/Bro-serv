@@ -1,13 +1,15 @@
 function drawBlip(location)
-    local blip = AddBlipForCoord(location.coords)
-    SetBlipSprite(blip, location.blip.sprite)
-    SetBlipScale(blip, location.blip.scale)
-    SetBlipColour(blip, location.blip.color)
-    SetBlipAsShortRange(blip, true)
+    if location.blip and location.coords then
+        local blip = AddBlipForCoord(location.coords)
+        SetBlipSprite(blip, location.blip.sprite)
+        SetBlipScale(blip, location.blip.scale)
+        SetBlipColour(blip, location.blip.color)
+        SetBlipAsShortRange(blip, true)
 
-    BeginTextCommandSetBlipName('STRING')
-    AddTextComponentSubstringPlayerName(location.string)
-    EndTextCommandSetBlipName(blip)
+        BeginTextCommandSetBlipName('STRING')
+        AddTextComponentSubstringPlayerName(location.string)
+        EndTextCommandSetBlipName(blip)
+    end
 end
 
 function DrawTextOnSCreen(x, y, string)

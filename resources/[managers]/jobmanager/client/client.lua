@@ -7,8 +7,9 @@ anyMenuOpen = {
 
 
 Citizen.CreateThread(function()
-    TriggerEvent("job:set", 4)
-    Wait(5000)
+	TriggerServerEvent("job:get")
+    TriggerEvent("job:draw")
+    Wait(0)
     while true do
         Wait(30)
 
@@ -22,8 +23,8 @@ end)
 Citizen.CreateThread(function()
     -- Draw blips
 	for k,v in pairs(config.jobs) do
+			drawBlip(v)
 		for k, v in pairs(v.lockers) do
-			print("v",  v)
 			drawBlip(v)
 		end
 		for k, v in pairs(v.collect) do

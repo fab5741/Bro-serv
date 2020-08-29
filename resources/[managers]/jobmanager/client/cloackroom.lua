@@ -6,9 +6,8 @@ function load_cloackroom(job)
 	end
 
     for k, data in pairs(config.skins) do
- 			if(v.job == job) then
-				buttons[#buttons+1] = {name = tostring(v.name), func = "clockIn", params = tostring(v.model)}
-			end			
+		if(v.job == job) then
+			buttons[#buttons+1] = {name = tostring(v.name), func = "clockIn", params = tostring(v.model)}
 		end			
     end
 
@@ -36,7 +35,6 @@ function clockOut()
 end
 
 function SetCopModel(model)
-	print("set model")
 	SetMaxWantedLevel(0)
 	SetWantedLevelMultiplier(0.0)
 	SetRelationshipBetweenGroups(0, GetHashKey("police"), GetHashKey("PLAYER"))

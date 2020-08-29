@@ -6,8 +6,10 @@ AddEventHandler('job:get', function ()
         MySQL.Async.fetchAll('SELECT jobs.name as job, job_grades.label as grade from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and fivem = @fivem',
         {['fivem'] =  GetPlayerIdentifiers(sourceValue)[5]}, function(res)
             if(res[1]) then
+                print(res[1].grade)
              TriggerClientEvent("job:draw", sourceValue, res[1].job, res[1].grade)
             else
+                print("fail")
               TriggerClientEvent("job:draw", sourceValue, "Chomeur", "Chomeur")
             end
             end)

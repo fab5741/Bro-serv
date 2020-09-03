@@ -262,7 +262,11 @@ AddEventHandler('lsms:revive', function(noAmbulancies)
     SetPlayerInvincible(ped, false)
     ClearPedBloodDamage(ped)
     StopScreenEffect('DeathFailOut')
-    DoScreenFadeIn(800)
+	DoScreenFadeIn(800)
+	
+	
+	TriggerServerEvent("player:spawned")
+	TriggerServerEvent("needs:spawned")
 end)
 
 -- ESX job part

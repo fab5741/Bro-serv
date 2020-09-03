@@ -7,15 +7,15 @@ anyMenuOpen = {
 
 
 Citizen.CreateThread(function()
-	TriggerServerEvent("job:get")
-    TriggerEvent("job:draw")
-    Wait(0)
-    while true do
-        Wait(30)
-
-        DrawTextOnSCreen(0.90,0.95, "Job : " .. job)
-        DrawTextOnSCreen(0.90, 0.975, "Grade : ".. grade)
-     end
+--	TriggerServerEvent("job:get")
+   -- TriggerEvent("job:draw")
+   -- Wait(0)
+ --   while true do
+   --     Wait(30)
+--
+  --      DrawTextOnSCreen(0.90,0.95, "Job : " .. job)
+    --    DrawTextOnSCreen(0.90, 0.975, "Grade : ".. grade)
+    -- end
 
 end)
 

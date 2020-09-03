@@ -161,7 +161,8 @@ function spawnPlayer(x, y, z, skin)
         ShutdownLoadingScreenNui()
 
         TriggerServerEvent("player:spawned")
-
-      spawnLock = false
+        TriggerServerEvent("needs:spawned")
+        
+       spawnLock = false
     end)
 end

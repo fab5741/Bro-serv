@@ -31,3 +31,27 @@ AddEventHandler("menu:delete", function(name)
     })
 
 end)
+
+RegisterNetEvent("menu:progress:create")
+
+
+AddEventHandler("menu:progress:create", function(name)
+    SendNUIMessage({
+        name = name,
+        type = "progress",
+        action = "setAndOpen",
+    })
+end)
+
+
+RegisterNetEvent("menu:progress:update")
+
+
+AddEventHandler("menu:progress:udpate", function(name, value)
+    SendNUIMessage({
+        name = name,
+        type = "progress",
+        value = value,
+        action = "update",
+    })
+end)

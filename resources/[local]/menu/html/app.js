@@ -62,6 +62,9 @@ window.onload = function(e){
 						});  
 												  
 				}
+				else if (event.data.type == "progress") {
+					$("#progresses").append('<li id="'+event.data.name+'"><progress  "class="progress" value="100" max="100"></progress></li<')
+				}
 				else {
 					$("#menus").append(
 						"<div id='"+event.data.name+"'  class='menu align-top-left'>"+
@@ -108,6 +111,12 @@ window.onload = function(e){
 
 			case 'delete': {
 				$('#'+event.data.name).remove()
+			}
+
+			case 'update': {
+				if (event.data.type == "progress") {
+					$('#'+event.data.name+' progress').val(event.data.value)
+				}
 			}
 		}
 	});

@@ -3,8 +3,6 @@ Citizen.CreateThread(function()
   SetNuiFocus(false)
   Wait(0)
 
-  print("menu")
-
 local f1Menu = false
 local inputActivating = false
 

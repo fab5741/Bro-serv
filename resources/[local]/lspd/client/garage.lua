@@ -20,8 +20,6 @@ function load_garage()
 	for k in ipairs (buttons) do
 		buttons [k] = nil
 	end
-
-	print(dept)
 	for k, data in pairs(vehicles) do
 		if config.useCopWhitelist then
 			if dept == k then

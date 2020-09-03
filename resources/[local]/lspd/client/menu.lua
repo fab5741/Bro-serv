@@ -275,7 +275,7 @@ function DropVehicle()
 		if DoesEntityExist(vehicleHandle) and IsEntityAVehicle(vehicleHandle) then
 			DeleteEntity(vehicleHandle)
 		else
-			drawNotification"no_veh_near_ped")
+			drawNotification("no_veh_near_ped")
 		end
 	end)
 end

@@ -389,7 +389,6 @@ AddEventHandler('lspd:hasEnteredMarker', function(station, part, partNum)
 	elseif part == 'lockers' then
 		TriggerEvent('skinchanger:getSkin', function(skin)
 			if skinChanged then
-				print("not on duty")
 				TriggerEvent('skinchanger:loadSkin', skin)
 				TriggerEvent('skinchanger:loadClothes', {})
 				skinChanged =false
@@ -1050,12 +1049,8 @@ Citizen.CreateThread(function()
 		SetMaxWantedLevel(5)
 		SetWantedLevelMultiplier(1.0)
 	end
-
-	print(config.stationBlipsEnabled)
-
 	if config.stationBlipsEnabled then
 		for _, item in pairs(clockInStation) do
-			print(item.x, item.y)
 			item.blip = AddBlipForCoord(item.x, item.y, item.z)
 			SetBlipSprite(item.blip, 60)
 			SetBlipScale(item.blip, 0.8)

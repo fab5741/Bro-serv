@@ -48,7 +48,6 @@ end
 function clockIn(model)
     if model then	    	
 		if IsModelValid(model) and IsModelInCdimage(model) then
-			print("setcopmodel")
     		ServiceOn()
     		SetCopModel(model)
 

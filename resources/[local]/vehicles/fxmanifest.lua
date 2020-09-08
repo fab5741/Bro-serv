@@ -1,7 +1,7 @@
 fx_version 'bodacious'
 game 'gta5'
 
-description '- Bro - Needs'
+description '- Bro - Vehicles'
 
 version '0.0.1'
 
@@ -10,7 +10,6 @@ client_script {
 }
 
 server_script {
+    '@mysql-async/lib/MySQL.lua',
     'server.lua'
 }
-
-dependency  'menu'

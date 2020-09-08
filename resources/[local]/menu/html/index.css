@@ -16,9 +16,10 @@ html {
 .menu {
 	font-family: bankgothic;
 	min-width: 400px;
-	color: #fff;
 	box-shadow: 0px 0px 50px 0px #000;
 	position: absolute;
+	background-color: white;
+	color:black;
 }
 
 .align-left {
@@ -70,35 +71,6 @@ html {
 	top: 50%;
 	transform: translate(-50%, -50%);
 }
-
-.menu .head {
-	background-color: #506be6;
-	text-align: center;
-	height: 40px;
-	line-height: 40px;
-}
-
-.menu .menu-items {
-	max-height: 600px;
-	overflow-y: auto;
-}
-
-.menu .menu-items .menu-item {
-	height: 40px;
-	display: block;
-	background-color: #f1f1f1;
-	box-shadow: inset 1px 0px 0px 1px #b8b8b8;
-	height: 32px;
-	line-height: 32px;
-	color: #3A3A3A;
-	text-align: center;
-}
-
-.menu .menu-items .menu-item.selected {
-	background-color: #d0d0d0;
-}
-/* forms */
-
 form {
 	font-family: bankgothic;
 	min-width: 400px;
@@ -138,8 +110,3 @@ form {
 #progresses {
 	position: absolute;
 }
-ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-  }

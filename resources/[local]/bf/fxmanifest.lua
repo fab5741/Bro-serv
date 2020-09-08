@@ -23,3 +23,6 @@ files {
    'loadscreen/bankgothic.ttf',
    'loadscreen/loadscreen.jpg',
 }
+
+
+dependency  'menu'

@@ -7,3 +7,10 @@ AddEventHandler('account:money:add', function(player, money)
     })
   end)
 end)
+
+RegisterNetEvent("account:liquid")
+
+AddEventHandler('account:liquid', function()
+  print("mon liquide est de")
+  return("yo")
+end)

@@ -23,16 +23,6 @@ Citizen.CreateThread(function()
       waitAction = 1
       PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     end
-
-    if IsControlPressed(0, 174) then
-    --  SendNUIMessage({action  = 'controlPressed', control = 'LEFT'})
-
-    end
-
-    if IsControlPressed(0, 175)then
-     -- SendNUIMessage({action  = 'controlPressed', control = 'RIGHT'})
-    end
-
     if waitAction then
       Citizen.Wait(500)
       waitAction = 0

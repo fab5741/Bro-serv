@@ -1,2 +1,4 @@
 *.cfg
 /cache/
+
+node_modules

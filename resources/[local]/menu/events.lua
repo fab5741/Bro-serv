@@ -4,6 +4,7 @@ AddEventHandler("menu:create", function(name, title, type, subtitle, items, posi
     if type == "form" then
         SetNuiFocus(true, true)
     end
+    currentMenu = name
 
     SendNUIMessage({
         name = name,

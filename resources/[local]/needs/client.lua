@@ -5,7 +5,7 @@ TriggerEvent("menu:progress:create", "thirsty")
 local hunger = 100
 local thirsty = 100
 
-local thirstTickRate = 216 * 1000
+local thirstTickRate = 216 * 1000 
 
 Citizen.CreateThread(function()
 	while true do
@@ -37,6 +37,27 @@ RegisterNetEvent("needs:spawned")
 AddEventHandler('needs:spawned', function()
     hunger = 100
     thirsty = 100
+    TriggerEvent("menu:progress:udpate", "hunger", hunger) 
+    TriggerEvent("menu:progress:udpate", "thirsty", thirsty) 
+end)
+
+RegisterNetEvent("needs:change")
+
+
+-- source is global here, don't add to function
+AddEventHandler('needs:change', function(isHunger, amount)
+    print("CHANGE NEEDS",  isHunger, amount)
+    if(isHunger == 1) then
+        hunger = hunger + amount
+    else
+        thirsty = thirsty + amount
+    end
+    if(hunger >100) then
+        hunger = 100
+    end
+    if thirsty >100 then
+        thirsty = 100
+    end
     TriggerEvent("menu:progress:udpate", "hunger", hunger) 
     TriggerEvent("menu:progress:udpate", "thirsty", thirsty) 
 end)

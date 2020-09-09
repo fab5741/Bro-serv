@@ -64,3 +64,17 @@ AddEventHandler("items:process", function (type, amount, typeTo, amountTo)
         end
     end)
 end)
+
+
+
+RegisterNetEvent("items:get")
+
+-- source is global here, don't add to function
+AddEventHandler("items:get", function (cb)
+    local sourceValue = source
+    MySQL.Async.fetchAll('SELECT item, amount, label FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and fivem = @fivem and player_item.amount > 0',
+    {['fivem'] =  GetPlayerIdentifiers(source)[5]},
+    function(res)
+        TriggerClientEvent(cb, sourceValue, res)
+    end)
+end)

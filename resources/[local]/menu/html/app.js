@@ -52,7 +52,6 @@ window.onload = function(e){
 								
 							$('#'+event.data.name).submit(function(e){  
 								e.preventDefault();  
-								console.log($(this).serializeArray())
 								values = $(this).serializeArray()
 								var checkboxes = $('#'+event.data.name+' input:checkbox').map(function() {
 									return { name: this.name, value: this.checked ? this.value : "false" };
@@ -89,29 +88,24 @@ window.onload = function(e){
 							selected = 1
 							$('#'+event.data.name+" .menu-list li:nth-child("+selected+") a").addClass("is-active")
 							items = JSON.parse(event.data.items)
+							currentmenu = event.data.name
 					}
-					currentmenu = event.data.name
 					open(event.data.name)
 				}
 
 				break;
 			}
 			case 'delete': {
-				console.log("delete")
 				$('#'+event.data.name).remove()
 			}
 
 			case 'update': {
-				console.log("update")
-
 				if (event.data.type == "progress") {
 					$('#'+event.data.name+' progress').val(event.data.value)
 				}
 			}
 
 			case 'controlPressed': {
-				console.log(event.data.control)
-
 				switch (event.data.control) {
 					case 'TOP': {
 						if(selected > 1 && currentmenu) {
@@ -132,19 +126,40 @@ window.onload = function(e){
 					}
 					
 					case 'ENTER': {
-						if(items[selected-1].items){
-							console.log('#'+event.data.name+" .menu-list li")
-							$('#'+event.data.name+" .menu-list li").remove()
-							items[selected-1].items.forEach(el =>$('#'+event.data.name+" .menu-list").append(
-								"<li><a>"+
-								 el.label+
-								"</a></li>")
-							)
-							selected = 1
-							$('#'+event.data.name+" .menu-list li:nth-child("+selected+") a").addClass("is-active")	
-							menuDepth = menuDepth + 1
+												// if amount, its usable !
+						if(menuDepth == 1 && items[0].items[selected-1].amount && items[0].items[selected-1].amount > 0) {
+							// send callback tu use item
+							fetch(`https://items/use`, {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json; charset=UTF-8',
+								},
+								body: JSON.stringify(
+									items[0].items[selected-1]
+								)
+							});
 						} else {
-							console.log(items[selected-1].action)
+							if(items[selected-1].items){
+								$('#'+event.data.name+" .menu-list li").remove()
+								items[selected-1].items.forEach(function(el) { 
+								if(el.amount) {
+									$('#'+event.data.name+" .menu-list").append(
+										"<li><a>"+
+										 el.label+
+										" ("+ el.amount + ")</a></li>")
+								} else {
+									$('#'+event.data.name+" .menu-list").append(
+										"<li><a>"+
+										 el.label+
+										"</a></li>")
+								}
+								})
+
+								selected = 1
+								$('#'+event.data.name+" .menu-list li:nth-child("+selected+") a").addClass("is-active")	
+								menuDepth = menuDepth + 1
+							} else {
+							}
 						}
 						break;
 					}

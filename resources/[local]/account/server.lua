@@ -10,7 +10,11 @@ end)
 
 RegisterNetEvent("account:liquid")
 
-AddEventHandler('account:liquid', function()
-  print("mon liquide est de")
-  return("yo")
+AddEventHandler('account:liquid', function(cb)
+  local sourceValue = source
+  MySQL.Async.fetchScalar('SELECT liquid from players where fivem = @fivem', {
+    ['fivem'] = GetPlayerIdentifiers(sourceValue)[5]
+  }, function(result)
+    TriggerClientEvent(cb, sourceValue, result)
+  end)
 end)

@@ -1,45 +1,32 @@
+local liquid = 0
 Citizen.CreateThread(function()
-    while true do
-      Citizen.Wait(0)
+  while true do
+    Citizen.Wait(0)
 
-      if (IsControlJustPressed(1, 288)) then
-        liquid = 50.0
-        function cb(res)then
-          print(res)
-        end
-        TriggerServerEvent("account:liquid")
-
-        items = {
-          {name = "inventaire", label =  'Inventaire', items= {
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'}
-          }},
-          {name = "wallet", label =  'Portefeuille', items= {
-            {name = "liquid", label =  'Liquide :'..liquid.." $"},
-          }},
-          {name = "job",  label =  'Travail', items= {
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'}
-          }},
-          {name = "cards",  label =  'Permis', items= {
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'},
-            {name = "inventaire", label =  'Inventaire'}
-          }},
-      }
-        TriggerEvent(
-            "menu:create", "player", "Joueur", "list",
-            "", items, "align-top-right", "", ""
-        ) 
-      end
+    if (IsControlJustPressed(1, 288)) then
+      TriggerServerEvent("account:liquid", "bf:liquid")
     end
-  end)
-  
+  end
+end)
+
+RegisterNetEvent('bf:liquid')
+
+AddEventHandler("bf:liquid", function(liquide) 
+  liquid = liquide
+  TriggerServerEvent("items:get", "bf:items")
+end)
+
+RegisterNetEvent('bf:items')
+
+AddEventHandler("bf:items", function(inventory) 
+  items = {
+    {name = "inventaire", label =  'Inventaire', items= inventory},
+    {name = "wallet", label =  'Portefeuille', items= {
+      {name = "liquid", label =  'Liquide :'..liquid.." $"},
+    }},
+    }
+  TriggerEvent(
+      "menu:create", "player", "Joueur", "list",
+      "", items, "align-top-right", "", ""
+  ) 
+end)

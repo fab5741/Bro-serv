@@ -1,19 +1,3 @@
---[[
-            Cops_FiveM - A cops script for FiveM RP servers.
-              Copyright (C) 2018 FiveM-Scripts
-              
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-You should have received a copy of the GNU Affero General Public License
-along with Cops_FiveM in the file "LICENSE". If not, see <http://www.gnu.org/licenses/>.
-]]
-
 local buttons = {}
 
 function load_cloackroom()
@@ -35,14 +19,7 @@ function load_cloackroom()
 		end
 	end
 
-	buttons[#buttons+1] = {name = "cloackroom_break_service_title", func = "clockOut", params = ""}
-
-	if(config.enableOutfits == true) then
-		if(rank <= 0) then
-			buttons[#buttons+1] = {name = "cloackroom_add_yellow_vest_title", func = "cloackroom_add_yellow_vest", params = ""}
-			buttons[#buttons+1] = {name = "cloackroom_remove_yellow_vest_title", func = "cloackroom_rem_yellow_vest", params = ""}
-		end
-	end
+	buttons[#buttons+1] = {name = "Quitter le service", func = "clockOut", params = ""}
 end
 
 function clockIn(model)
@@ -51,10 +28,9 @@ function clockIn(model)
     		ServiceOn()
     		SetCopModel(model)
 
-    		drawNotification("now_in_service_notification")
-    		drawNotification("help_open_menu_notification")
+    		drawNotification("En service")
     	else
-    		drawNotification("This model is ~r~invalid~w~.")
+    		drawNotification("Le model est invalide")
     	end
     end
 end
@@ -62,105 +38,242 @@ end
 function clockOut()
 	ServiceOff()
 	removeUniforme()
-	drawNotification("break_service_notification")
-end
-
-function cloackroom_add_yellow_vest()
-	Citizen.CreateThread(function()
-		if(GetEntityModel(PlayerPedId()) == hashSkin) then
-			SetPedComponentVariation(PlayerPedId(), 8, 59, 0, 2)
-		else
-			SetPedComponentVariation(PlayerPedId(), 8, 36, 0, 2)
-		end
-	end)
-end
-
-function cloackroom_rem_yellow_vest()
-	Citizen.CreateThread(function()
-		if(GetEntityModel(PlayerPedId()) == hashSkin) then
-			SetPedComponentVariation(PlayerPedId(), 8, 58, 0, 2)
-		else
-			SetPedComponentVariation(PlayerPedId(), 8, 35, 0, 2)
-		end
-	end)
+	drawNotification("Quitter le service")
 end
 
 function SetCopModel(model)
-	print("set model")
-	SetMaxWantedLevel(0)
-	SetWantedLevelMultiplier(0.0)
 	SetRelationshipBetweenGroups(0, GetHashKey("police"), GetHashKey("PLAYER"))
     SetRelationshipBetweenGroups(0, GetHashKey("PLAYER"), GetHashKey("police"))	
 
-	modelHash = GetHashKey(model)
+	local skin ={
+		sex          = 0,
+		face         = 0,
+		skin         = 0,
+		beard_1      = 0,
+		beard_2      = 0,
+		beard_3      = 0,
+		beard_4      = 0,
+		hair_1       = 0,
+		hair_2       = 0,
+		hair_color_1 = 0,
+		hair_color_2 = 0,
+		tshirt_1     = 0,
+		tshirt_2     = 0,
+		torso_1      = 0,
+		torso_2      = 0,
+		decals_1     = 0,
+		decals_2     = 0,
+		arms         = 0,
+		pants_1      = 0,
+		pants_2      = 0,
+		shoes_1      = 0,
+		shoes_2      = 0,
+		mask_1       = 0,
+		mask_2       = 0,
+		bproof_1     = 0,
+		bproof_2     = 0,
+		chain_1      = 0,
+		chain_2      = 0,
+		helmet_1     = 0,
+		helmet_2     = 0,
+		glasses_1    = 0,
+		glasses_2    = 0,
+	}
 
-	RequestModel(modelHash)
-	while not HasModelLoaded(modelHash) do
-		Citizen.Wait(0)
-	end
-
-	if model == "s_m_y_cop_01" then
-		if (config.enableOutfits == true) then
-			if(GetEntityModel(PlayerPedId()) == GetHashKey("mp_m_freemode_01")) then
-			    SetPedPropIndex(PlayerPedId(), 1, 5, 0, 2)             --Sunglasses
-			    SetPedPropIndex(PlayerPedId(), 2, 0, 0, 2)             --Bluetoothn earphone
-			    SetPedComponentVariation(PlayerPedId(), 11, 55, 0, 2)  --Shirt
-			    SetPedComponentVariation(PlayerPedId(), 8, 58, 0, 2)   --Nightstick decoration
-			    SetPedComponentVariation(PlayerPedId(), 4, 35, 0, 2)   --Pants
-			    SetPedComponentVariation(PlayerPedId(), 6, 24, 0, 2)   --Shooes
-			    SetPedComponentVariation(PlayerPedId(), 10, 8, config.rank.outfit_badge[rank], 2) --rank
-			else
-			    SetPedPropIndex(PlayerPedId(), 1, 11, 3, 2)           --Sunglasses
-			    SetPedPropIndex(PlayerPedId(), 2, 0, 0, 2)            --Bluetoothn earphone
-			    SetPedComponentVariation(PlayerPedId(), 3, 14, 0, 2)  --Non buggy tshirt
-			    SetPedComponentVariation(PlayerPedId(), 11, 48, 0, 2) --Shirt
-			    SetPedComponentVariation(PlayerPedId(), 8, 35, 0, 2)  --Nightstick decoration
-			    SetPedComponentVariation(PlayerPedId(), 4, 34, 0, 2)  --Pants
-			    SetPedComponentVariation(PlayerPedId(), 6, 29, 0, 2)  --Shooes
-			    SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2) --rank
-			end
-		else
-			SetPlayerModel(PlayerId(), modelHash)
-		end
-	elseif model == "s_m_y_hwaycop_01" then
-			SetPlayerModel(PlayerId(), modelHash)
-			SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2)
-	elseif model == "s_m_y_sheriff_01" then
-		    SetPlayerModel(PlayerId(), modelHash)
-		    SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2)
-	elseif model == "s_m_y_ranger_01" then
-		SetPlayerModel(PlayerId(), modelHash)
-		SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2)
-	elseif model == "a_m_y_genstreet_01" then
+	local clothes = {
+		recruit = {
+			male = {
+				tshirt_1 = 59,  tshirt_2 = 1,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = 46,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 36,  tshirt_2 = 1,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = 45,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
 	
-	else
-		 SetPlayerModel(PlayerId(), modelHash)
-	end
-
+		officer = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		sergeant = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 8,   decals_2 = 1,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 7,   decals_2 = 1,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		lieutenant = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 8,   decals_2 = 2,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 7,   decals_2 = 2,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		boss = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 8,   decals_2 = 3,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 7,   decals_2 = 3,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		bullet_wear = {
+			male = {
+				bproof_1 = 11,  bproof_2 = 1
+			},
+			female = {
+				bproof_1 = 13,  bproof_2 = 1
+			}
+		},
+	
+		gilet_wear = {
+			male = {
+				tshirt_1 = 59,  tshirt_2 = 1
+			},
+			female = {
+				tshirt_1 = 36,  tshirt_2 = 1
+			}
+		}
+	}
+	TriggerEvent('skinchanger:loadClothes', skin, clothes.recruit.male)
 	giveBasicKit()
-	SetModelAsNoLongerNeeded(modelHash)
 end
 
 function removeUniforme()
-	if(config.enableOutfits == true) then
-		RemoveAllPedWeapons(PlayerPedId())
-		TriggerServerEvent("skin_customization:SpawnPlayer")
-	else
-		local model = GetHashKey("a_m_y_mexthug_01")
-		RequestModel(model)
-		while not HasModelLoaded(model) do
-			Citizen.Wait(0)
-		end
-		 
-		SetPlayerModel(PlayerId(), model)
-		SetModelAsNoLongerNeeded(model)
+	RemoveAllPedWeapons(PlayerPedId())
 
-		SetMaxWantedLevel(5)
-		SetWantedLevelMultiplier(1.0)
+	-- release the player model
+	SetModelAsNoLongerNeeded(model)  
+	skin ={
+		sex          = 0,
+		face         = 0,
+		skin         = 0,
+		beard_1      = 0,
+		beard_2      = 0,
+		beard_3      = 0,
+		beard_4      = 0,
+		hair_1       = 0,
+		hair_2       = 0,
+		hair_color_1 = 0,
+		hair_color_2 = 0,
+		tshirt_1     = 0,
+		tshirt_2     = 0,
+		torso_1      = 0,
+		torso_2      = 0,
+		decals_1     = 0,
+		decals_2     = 0,
+		arms         = 0,
+		pants_1      = 0,
+		pants_2      = 0,
+		shoes_1      = 0,
+		shoes_2      = 0,
+		mask_1       = 0,
+		mask_2       = 0,
+		bproof_1     = 0,
+		bproof_2     = 0,
+		chain_1      = 0,
+		chain_2      = 0,
+		helmet_1     = 0,
+		helmet_2     = 0,
+		glasses_1    = 0,
+		glasses_2    = 0,
+	}
+
+	local clothes = {
+	}
+	TriggerEvent('skinchanger:loadClothes', skin, clothes)
 		
-		SetRelationshipBetweenGroups(3, GetHashKey("police"), GetHashKey("PLAYER"))
-		SetRelationshipBetweenGroups(3, GetHashKey("PLAYER"), GetHashKey("police"))	
-	end
+	SetRelationshipBetweenGroups(3, GetHashKey("police"), GetHashKey("PLAYER"))
+	SetRelationshipBetweenGroups(3, GetHashKey("PLAYER"), GetHashKey("police"))	
 end
 
 function OpenCloackroom()

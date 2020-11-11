@@ -1201,7 +1201,7 @@ Citizen.CreateThread(function()
         if(isCop) then
 			if(isNearTakeService()) then
 				if not (anyMenuOpen.isActive) then
-				    DisplayHelpText("help_text_open_cloackroom".. GetLabelText("collision_8vlv02g"),0,1,0.5,0.8,0.6,255,255,255,255)
+				    DisplayHelpText("Vestiaire".. GetLabelText("collision_8vlv02g"),0,1,0.5,0.8,0.6,255,255,255,255)
 				    if IsControlJustPressed(1,config.bindings.interact_position) then
 				    	load_cloackroom()
 				    	OpenCloackroom()

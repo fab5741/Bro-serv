@@ -1,4 +1,4 @@
-TriggerEvent("menu:progress:create", "hunger", "orange") 
+TriggerEvent("menu:progress:create", "hunger") 
 TriggerEvent("menu:progress:create", "thirsty") 
 
 local hunger = 100

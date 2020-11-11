@@ -5,7 +5,7 @@ AddEventHandler('atm:deposit', function(amount)
 	local amounte = tonumber(amount)
 
 	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		print(v)
+		
 			
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
@@ -47,7 +47,7 @@ AddEventHandler('atm:withdraw', function(amount)
 	local amounte = tonumber(amount)
 
 	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		print(v)
+		
 			
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v

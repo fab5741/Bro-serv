@@ -1,106 +1,115 @@
 <template>
-  <div class="home" v-bind:style="{background: 'url(' + backgroundURL +')'}">
+  <div class="home">
     <InfoBare />
-    <span class="warningMess" v-if="messages.length >= warningMessageCount">
-      <div class="warningMess_icon"><i class="fa fa-warning"></i></div>
+   <!--<span class="warningMess" v-if="messages.length >= warningMessageCount">
+      <div class="warningMess_icon">
+        <i class="fa fa-warning"></i>
+      </div>
       <span class="warningMess_content">
-        <span class="warningMess_title">{{ IntlString('PHONE_WARNING_MESSAGE') }}</span><br>
-        <span class="warningMess_mess">{{messages.length}} / {{warningMessageCount}} {{IntlString('PHONE_WARNING_MESSAGE_MESS')}}</span>
+        <span class="warningMess_title">{{ IntlString('PHONE_WARNING_MESSAGE') }}</span>
+        <br />
+        <span
+          class="warningMess_mess"
+        >
+      {{messages.length}} / {{warningMessageCount}}
+      {{IntlString('PHONE_WARNING_MESSAGE_MESS')}}</span>
       </span>
-    </span>
-    <div class='home_buttons'>
-        <button class="app_btn"
-            v-for="(but, key) of AppsHome" 
-            v-bind:key="but.name" 
-            v-bind:class="{ select: key === currentSelect}"
-            @click="openApp(but)"
-            v-bind:style="{background: but.color}"
-           >
-            <div class='app_btn_img'
-            v-bind:style="{backgroundImage: 'url(' + but.icons +')'}"
-            ></div>
-            <span class="puce" v-if="but.puce !== undefined && but.puce !== 0">{{but.puce}}</span>
-        </button>
-      <div class="btn_menu_ctn">
-        <button 
+    </span>-->
+    <div class="home_buttons">
+        <button
+        class="app_btn"
+        v-for="(but, key) of AppsHome"
+        v-bind:key="but.name"
+        v-bind:class="{ select: key === currentSelect}"
+        @click="openApp(but)"
+        v-bind:style="{backgroundImage:`url('${but.icons}')`}">
+      >
+        <span class="puce" v-if="but.puce !== undefined && but.puce !== 0">{{but.puce}}</span>
+      </button>
+      <!--<div class="btn_menu_ctn">
+        <button
           class="btn_menu"
           :class="{ select: AppsHome.length === currentSelect}"
-          v-bind:style="{backgroundImage: 'url(' + '/html/static/img/icons_app/menu.png' +')'}"
           @click="openApp({routeName: 'menu'})"
-          >
-        </button>
-      </div>
-    </div> 
+        ></button>
+      </div>-->
+    </div>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import InfoBare from './InfoBare'
+import { mapGetters, mapActions } from 'vuex';
+import InfoBare from './InfoBare.vue';
 
 export default {
   components: {
-    InfoBare
+    InfoBare,
   },
-  data () {
+  data() {
     return {
-      currentSelect: 0
-    }
+      currentSelect: 0,
+    };
   },
   computed: {
-    ...mapGetters(['IntlString', 'useMouse', 'nbMessagesUnread', 'backgroundURL', 'messages', 'AppsHome', 'warningMessageCount'])
+    ...mapGetters([
+      'useMouse',
+      'nbMessagesUnread',
+      'backgroundURL',
+      'messages',
+      'AppsHome',
+      'warningMessageCount',
+    ]),
   },
   methods: {
     ...mapActions(['closePhone', 'setMessages']),
-    onLeft () {
-      this.currentSelect = (this.currentSelect + this.AppsHome.length) % (this.AppsHome.length + 1)
+    onLeft() {
+      this.currentSelect = (this.currentSelect + this.AppsHome.length)
+      % (this.AppsHome.length + 1);
     },
-    onRight () {
-      this.currentSelect = (this.currentSelect + 1) % (this.AppsHome.length + 1)
+    onRight() {
+      this.currentSelect = (this.currentSelect + 1) % (this.AppsHome.length + 1);
     },
-    onUp () {
-      this.currentSelect = Math.max(this.currentSelect - 4, 0)
+    onUp() {
+      this.currentSelect = Math.max(this.currentSelect - 4, 0);
     },
-    onDown () {
-      this.currentSelect = Math.min(this.currentSelect + 4, this.AppsHome.length)
+    onDown() {
+      this.currentSelect = Math.min(
+        this.currentSelect + 4,
+        this.AppsHome.length,
+      );
     },
-    openApp (app) {
-      this.$router.push({ name: app.routeName })
+    openApp(app) {
+      alert('salut');
+      this.$router.push({ name: app.routeName });
     },
-    onEnter () {
-      this.openApp(this.AppsHome[this.currentSelect] || {routeName: 'menu'})
+    onEnter() {
+      this.openApp(this.AppsHome[this.currentSelect] || { routeName: 'menu' });
     },
-    onBack () {
-      this.closePhone()
-    }
+    onBack() {
+      this.closePhone();
+    },
   },
-  created () {
-    if (!this.useMouse) {
-      this.$bus.$on('keyUpArrowLeft', this.onLeft)
-      this.$bus.$on('keyUpArrowRight', this.onRight)
-      this.$bus.$on('keyUpArrowDown', this.onDown)
-      this.$bus.$on('keyUpArrowUp', this.onUp)
-      this.$bus.$on('keyUpEnter', this.onEnter)
-    } else {
-      this.currentSelect = -1
-    }
-    this.$bus.$on('keyUpBackspace', this.onBack)
+  created() {
+    this.$bus.$on('keyUpArrowLeft', this.onLeft);
+    this.$bus.$on('keyUpArrowRight', this.onRight);
+    this.$bus.$on('keyUpArrowDown', this.onDown);
+    this.$bus.$on('keyUpArrowUp', this.onUp);
+    this.$bus.$on('keyUpEnter', this.onEnter);
+    this.$bus.$on('keyUpBackspace', this.onBack);
   },
-  beforeDestroy () {
-    this.$bus.$off('keyUpArrowLeft', this.onLeft)
-    this.$bus.$off('keyUpArrowRight', this.onRight)
-    this.$bus.$off('keyUpArrowDown', this.onDown)
-    this.$bus.$off('keyUpArrowUp', this.onUp)
-    this.$bus.$off('keyUpEnter', this.onEnter)
-    this.$bus.$off('keyUpBackspace', this.onBack)
-  }
-}
+  beforeDestroy() {
+    this.$bus.$off('keyUpArrowLeft', this.onLeft);
+    this.$bus.$off('keyUpArrowRight', this.onRight);
+    this.$bus.$off('keyUpArrowDown', this.onDown);
+    this.$bus.$off('keyUpArrowUp', this.onUp);
+    this.$bus.$off('keyUpEnter', this.onEnter);
+    this.$bus.$off('keyUpBackspace', this.onBack);
+  },
+};
 </script>
 
 <style scoped="true">
-
-
-.home{
+.home {
   background-size: cover !important;
   background-position: center !important;
   position: relative;
@@ -112,8 +121,9 @@ export default {
   align-content: center;
   justify-content: center;
   color: gray;
+  background: url("../assets/img/background/back001.jpg")
 }
-.warningMess{
+.warningMess {
   background-color: white;
   position: absolute;
   left: 12px;
@@ -123,9 +133,10 @@ export default {
   display: flex;
   padding: 12px;
   border-radius: 4px;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
-.warningMess .warningMess_icon{
+.warningMess .warningMess_icon {
   display: flex;
   width: 16%;
   align-items: center;
@@ -137,9 +148,9 @@ export default {
 }
 .warningMess .warningMess_icon .fa {
   text-align: center;
-  color: #F94B42;
+  color: #f94b42;
 }
-.warningMess .warningMess_content{
+.warningMess .warningMess_content {
   padding-left: 12px;
 }
 .warningMess_title {
@@ -149,9 +160,9 @@ export default {
   font-size: 16px;
 }
 
-.home_buttons{
+.home_buttons {
   display: flex;
-  padding: 0 16px; 
+  padding: 0 16px;
   width: 100%;
   bottom: 10px;
   position: absolute;
@@ -163,8 +174,7 @@ export default {
   transition: all 0.5s ease-in-out;
 }
 
-
-.app_btn{
+.app_btn {
   outline: none;
   position: relative;
   margin: 10px;
@@ -183,7 +193,6 @@ export default {
   text-align: center;
 }
 
-
 .app_btn_img {
   padding-top: 60px;
   background-position: 9px 16px;
@@ -191,16 +200,16 @@ export default {
   background-repeat: no-repeat;
   background-size: 30px 30px;
   margin-top: -60px;
-  transition: .1s;
+  transition: 0.1s;
 }
 
-button:hover, button.select {
-  transform: scale(1.15);
-  transition: .1s;
+button:hover,
+button.select {
+  transform:scale(1.15);
+  transition: 0.1s;
 }
 
-
-button .puce{
+button .puce {
   position: absolute;
   display: block;
   background-color: #2c3e50;
@@ -215,7 +224,7 @@ button .puce{
   right: -10px;
 }
 
-.btn_menu_ctn{
+.btn_menu_ctn {
   width: 100%;
   display: flex;
   height: 80px;
@@ -226,7 +235,7 @@ button .puce{
 .btn_menu {
   outline: none;
   height: 50px;
-    position: relative;
+  position: relative;
   margin: 10px;
   border: none;
   width: 60px;
@@ -240,11 +249,9 @@ button .puce{
   font-size: 14px;
   padding-top: 60px;
   font-weight: 700;
-  text-shadow: -1px 0 0 rgba(0,0,0, 0.8), 
-             1px 0 0 rgba(0,0,0, 0.8),
-             0 -1px 0 rgba(0,0,0, 0.8),
-             0 1px 0 rgba(0,0,0, 0.8);
+  text-shadow: -1px 0 0 rgba(0, 0, 0, 0.8), 1px 0 0 rgba(0, 0, 0, 0.8),
+    0 -1px 0 rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 0.8);
   text-align: center;
+  background: url("../assets/img/icons_app/menu.png")
 }
-
 </style>

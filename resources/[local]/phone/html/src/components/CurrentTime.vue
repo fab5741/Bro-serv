@@ -4,31 +4,31 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       time: '',
-      myInterval: 0
-    }
+      myInterval: 0,
+    };
   },
   methods: {
-    updateTime: function () {
-      var time = new Date()
-      var minutes = time.getMinutes()
-      minutes = minutes > 9 ? minutes : '0' + minutes
-      var heure = time.getHours()
-      heure = heure > 9 ? heure : '0' + heure
-      var datestring = heure + ':' + minutes
-      this.time = datestring
-    }
+    updateTime: function update() {
+      const time = new Date();
+      let minutes = time.getMinutes();
+      minutes = minutes > 9 ? minutes : `0${minutes}`;
+      let heure = time.getHours();
+      heure = heure > 9 ? heure : `0${heure}`;
+      const datestring = `${heure}:${minutes}`;
+      this.time = datestring;
+    },
   },
-  created: function () {
-    this.updateTime()
-    this.myInterval = setInterval(this.updateTime, 1000)
+  created: function created() {
+    this.updateTime();
+    this.myInterval = setInterval(this.updateTime, 1000);
   },
-  beforeDestroy: function () {
-    clearInterval(this.myInterval)
-  }
-}
+  beforeDestroy: function before() {
+    clearInterval(this.myInterval);
+  },
+};
 </script>
 
 <style scoped>

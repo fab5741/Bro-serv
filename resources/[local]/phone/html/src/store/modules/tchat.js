@@ -50,7 +50,7 @@ const actions = {
   tchatRemoveChannel ({ commit }, { channel }) {
     commit('TCHAT_REMOVES_CHANNELS', { channel })
   },
-  tchatGetMessagesChannel ({ channel }) {
+  tchatGetMessagesChannel ({ commit }, { channel }) {
     PhoneAPI.tchatGetMessagesChannel(channel)
   },
   tchatSendMessage (state, { channel, message }) {

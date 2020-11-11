@@ -69,9 +69,6 @@ RegisterCommand("kill", function(source)
     SetEntityHealth(PlayerPedId(),0)
 end)
 
-
-
-
 RegisterCommand("revive", function(source)
     print("REVIVING")
     TriggerClientEvent('ambulance:revive', GetPlayerPed(-1))

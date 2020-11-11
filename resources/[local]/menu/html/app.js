@@ -70,7 +70,7 @@ window.onload = function(e){
 													  
 					}
 					else if (event.data.type == "progress") {
-						$("#progresses").append('<li id="'+event.data.name+'"><progress  "class="progress" value="100" max="100"></progress></li<')
+						$("#progresses").append('<li id="'+event.data.name+'"><progress  class="progress" value="100" max="100"></progress></li>')
 					}
 					else {
 						$("#menus").append(

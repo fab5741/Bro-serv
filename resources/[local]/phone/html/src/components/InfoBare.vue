@@ -1,6 +1,6 @@
 <template>
   <div class='phone_infoBare barre-header'>
-    <span class='reseau'>{{config.reseau}}</span>
+    <span class='reseau'>Bro mobile</span>
     <span class="time">
       <current-time></current-time>
     </span>
@@ -13,14 +13,13 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import CurrentTime from './CurrentTime'
+import CurrentTime from './CurrentTime.vue';
+
 export default {
-  computed: mapGetters(['config']),
   components: {
-    CurrentTime
-  }
-}
+    CurrentTime,
+  },
+};
 </script>
 <style scoped>
 .barre-header {
@@ -75,8 +74,6 @@ export default {
     float: right;
     padding-right: 12px;
 }
-
-
 .batterie1 {
     height: 10px;
     width: 7px;

@@ -31,7 +31,7 @@ const getters = {
     }
     return state.appelsInfo.transmitter_num
   },
-  isInitiatorCall (state) {
+  isInitiatorCall (state, getters) {
     if (state.appelsInfo === null) {
       return false
     }
@@ -40,7 +40,7 @@ const getters = {
 }
 
 const actions = {
-  startCall ({ numero }) {
+  startCall ({ commit }, { numero }) {
     PhoneAPI.startCall(numero)
   },
   acceptCall ({ state }) {

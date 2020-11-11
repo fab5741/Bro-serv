@@ -6,5 +6,3 @@ files {
 }
 
 client_script "frfuel.net.dll"
-
-server_script "server.lua"

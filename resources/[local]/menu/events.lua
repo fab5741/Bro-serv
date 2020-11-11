@@ -36,14 +36,14 @@ end)
 RegisterNetEvent("menu:progress:create")
 
 
-AddEventHandler("menu:progress:create", function(name)
+AddEventHandler("menu:progress:create", function(name, color)
     SendNUIMessage({
         name = name,
         type = "progress",
         action = "setAndOpen",
+        color = color,
     })
 end)
-
 
 RegisterNetEvent("menu:progress:update")
 

@@ -110,3 +110,7 @@ form {
 #progresses {
 	position: absolute;
 }
+
+.orange {
+	background-color: orange;
+}

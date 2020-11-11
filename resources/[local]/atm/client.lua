@@ -16,8 +16,10 @@ config.ATMLocations = {
 	{ ['x'] = -717.614,  ['y'] = -915.880,  ['z'] = 19.268},
 	{ ['x'] = -1827.04,  ['y'] = 785.5159,  ['z'] = 138.020},
 	{ ['x'] = 1686.753,  ['y'] = 4815.809,  ['z'] = 42.008},
+	{ ['x'] = 1153.75,  ['y'] = -326.8,  ['z'] = 69.21},
 }
 config.ZDiff        = 2.0
+config.Range = 5
 
 -- Create blips
 Citizen.CreateThread(function()
@@ -72,7 +74,7 @@ Citizen.CreateThread(function()
 		isInATMMarker = false
 
 		for k,v in pairs(config.ATMLocations) do
-			if GetDistanceBetweenCoords(coords, v.x, v.y, v.z, true) < 1.0 then
+			if GetDistanceBetweenCoords(coords, v.x, v.y, v.z, true) < config.Range then
 				isInATMMarker, canSleep = true, false
 				break
 			end
@@ -102,13 +104,27 @@ end)
 
 -- Menu interactions
 Citizen.CreateThread(function()
+	local notification = false
 	while true do
 		Citizen.Wait(0)
 
-		if isInATMMarker and not menuIsShowed then
+		if not isInATMMarker then
+			notification = false
+		end
 
-		--	TriggerEvent("notify:SendNotification", GetPlayerPed(-1), 
-	--		{text= "Press e for atm", type = "info", timeout = 2000})
+		if isInATMMarker and (not menuIsShowed)  then
+			if (not notification) then
+				TriggerEvent("notify:SendNotification", {text = "<span style='font-weight: 900'>Appuyez sur e pour l'atm</span>",
+				layout = "centerLeft",
+				timeout = 2000,
+				progressBar = false,
+				type = "error",
+				animation = {
+					open = "gta_effects_fade_in",
+					close = "gta_effects_fade_out"
+				}})
+				notification = true
+			end
 
 			if IsControlJustReleased(0, 38) and IsPedOnFoot(PlayerPedId()) then
 				menuIsShowed = true
@@ -120,7 +136,6 @@ Citizen.CreateThread(function()
 				})
 				SetNuiFocus(true, true)
 			end
-
 		else
 			Citizen.Wait(500)
 		end

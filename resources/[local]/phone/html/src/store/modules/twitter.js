@@ -25,7 +25,7 @@ const actions = {
   twitterCreateNewAccount (_, {username, password, avatarUrl}) {
     PhoneAPI.twitter_createAccount(username, password, avatarUrl)
   },
-  twitterLogin ({ username, password }) {
+  twitterLogin ({ commit }, { username, password }) {
     PhoneAPI.twitter_login(username, password)
   },
   twitterChangePassword ({ state }, newPassword) {
@@ -44,7 +44,7 @@ const actions = {
   twitterSetAvatar ({ state }, { avatarUrl }) {
     PhoneAPI.twitter_setAvatar(state.twitterUsername, state.twitterPassword, avatarUrl)
   },
-  twitterPostTweet ({ state }, { message }) {
+  twitterPostTweet ({ state, commit }, { message }) {
     if (/^https?:\/\/.*\.(png|jpg|jpeg|gif)$/.test(message)) {
       PhoneAPI.twitter_postTweetImg(state.twitterUsername, state.twitterPassword, message)
     } else {

@@ -9,7 +9,7 @@ const getters = {
 }
 
 const actions = {
-  sendpara ({ id, amount }) {
+  sendpara ({ state }, { id, amount }) {
     PhoneAPI.callEvent('gcphone:bankTransfer', {id, amount})
   }
 }

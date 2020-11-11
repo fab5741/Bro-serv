@@ -1,11 +1,10 @@
-TriggerEvent("menu:progress:create", "hunger") 
-
+TriggerEvent("menu:progress:create", "hunger", "orange") 
 TriggerEvent("menu:progress:create", "thirsty") 
 
 local hunger = 100
 local thirsty = 100
 
-local thirstTickRate = 216 * 1000 
+local thirstTickRate = 256 * 1000 
 
 Citizen.CreateThread(function()
 	while true do

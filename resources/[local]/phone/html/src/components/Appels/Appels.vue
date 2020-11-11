@@ -1,96 +1,82 @@
 <template>
    <div class="phone_app">
-    <PhoneTitle :title="IntlString('APP_PHONE_TITLE')" v-on:back="onBackspace" />
-    <div class="content">
-      <component :is="subMenu[currentMenuIndex].Comp" />
-    </div>
-    <div class="subMenu">
-      <div
-        class="subMenu-elem"
-        :style="getColorItem(i)"
-        v-for="(Comp, i) of subMenu" 
-        :key="i"
-        @click="swapMenu(i)"
-      >
-        <i class="subMenu-icon fa" :class="['fa-' + Comp.icon]" @click.stop="swapMenu(i)"></i>
-        <span class="subMenu-name" @click.stop="swapMenu(i)">{{Comp.name}}</span>
-      </div>
-    </div>
+    Bonjour
    </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
-import PhoneTitle from './../PhoneTitle'
-import AppelsFavoris from './AppelsFavoris'
-import AppelsContacts from './AppelsContacts'
-import AppelsRecents from './AppelsRecents'
-
+/*
+import PhoneTitle from './../PhoneTitle';
+import AppelsFavoris from './AppelsFavoris';
+import AppelsContacts from './AppelsContacts';
+import AppelsRecents from './AppelsRecents';
+*/
 export default {
   components: {
-    PhoneTitle
+  // PhoneTitle
   },
-  data () {
+  data() {
     return {
-      currentMenuIndex: 1
-    }
+      currentMenuIndex: 1,
+    };
   },
   computed: {
-    ...mapGetters(['IntlString', 'useMouse', 'themeColor']),
-    subMenu () {
-      return [{
+    subMenu() {
+      return [
+        /*
+      {
         Comp: AppelsFavoris,
         name: this.IntlString('APP_PHONE_MENU_FAVORITES'),
-        icon: 'star'
+        icon: 'star',
       }, {
         Comp: AppelsRecents,
         name: this.IntlString('APP_PHONE_MENU_RECENTS'),
-        icon: 'clock'
+        icon: 'clock',
       }, {
         Comp: AppelsContacts,
         name: this.IntlString('APP_PHONE_MENU_CONTACTS'),
-        icon: 'user'
-      }]
-    }
+        icon: 'user',
+      }
+      */
+      ];
+    },
   },
   methods: {
-    getColorItem (index) {
+    getColorItem(index) {
       if (this.currentMenuIndex === index) {
         return {
-          color: this.themeColor
-        }
+          color: this.themeColor,
+        };
       }
-      return {}
+      return {};
     },
-    swapMenu (index) {
-      this.currentMenuIndex = index
+    swapMenu(index) {
+      this.currentMenuIndex = index;
     },
-    onLeft () {
-      this.currentMenuIndex = Math.max(this.currentMenuIndex - 1, 0)
+    onLeft() {
+      this.currentMenuIndex = Math.max(this.currentMenuIndex - 1, 0);
     },
-    onRight () {
-      this.currentMenuIndex = Math.min(this.currentMenuIndex + 1, this.subMenu.length - 1)
+    onRight() {
+      this.currentMenuIndex = Math.min(this.currentMenuIndex + 1, this.subMenu.length - 1);
     },
-    onBackspace: function () {
-      if (this.ignoreControls === true) return
-      this.$router.push({ name: 'home' })
-    }
+    onBackspace: function onBackspace() {
+      if (this.ignoreControls === true) return;
+      this.$router.push({ name: 'home' });
+    },
   },
-
-  created () {
+  created() {
     if (!this.useMouse) {
-      this.$bus.$on('keyUpBackspace', this.onBackspace)
-      this.$bus.$on('keyUpArrowLeft', this.onLeft)
-      this.$bus.$on('keyUpArrowRight', this.onRight)
+      this.$bus.$on('keyUpBackspace', this.onBackspace);
+      this.$bus.$on('keyUpArrowLeft', this.onLeft);
+      this.$bus.$on('keyUpArrowRight', this.onRight);
     }
   },
-  beforeDestroy () {
-    this.$bus.$off('keyUpBackspace', this.onBackspace)
-    this.$bus.$off('keyUpArrowLeft', this.onLeft)
-    this.$bus.$off('keyUpArrowRight', this.onRight)
-  }
-}
+  beforeDestroy() {
+    this.$bus.$off('keyUpBackspace', this.onBackspace);
+    this.$bus.$off('keyUpArrowLeft', this.onLeft);
+    this.$bus.$off('keyUpArrowRight', this.onRight);
+  },
+};
 </script>
 
 <style scoped>

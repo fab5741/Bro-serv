@@ -138,7 +138,7 @@ function SendNotification(options)
         container = options.container or false,
         buttons = options.button or false
     }
-
+print("NOTIF")
     SendNUIMessage({options = options})
 end
 

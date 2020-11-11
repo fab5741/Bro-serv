@@ -50,7 +50,7 @@ const actions = {
   notesRemoveChannel ({ commit }, { channel }) {
     commit('NOTES_REMOVES_CHANNELS', { channel })
   },
-  notesGetMessagesChannel ( { channel }) {
+  notesGetMessagesChannel ({ commit }, { channel }) {
     PhoneAPI.notesGetMessagesChannel(channel)
   },
   notesSendMessage (state, { channel, message }) {

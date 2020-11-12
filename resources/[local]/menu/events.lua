@@ -7,6 +7,7 @@ isOpen = {
 
 AddEventHandler("menu:create", function(name, title, type, subtitle, items, position, cb, cbServer)
     if(not isOpen[name]) then
+        isOpen[name] = true
         if type == "form" then
             SetNuiFocus(true, true)
         end
@@ -32,6 +33,7 @@ end)
 RegisterNetEvent("menu:delete")
 
 AddEventHandler("menu:delete", function(name)
+    isOpen[name] = nil
     SetNuiFocus(false, false)
     SendNUIMessage({
         name = name,

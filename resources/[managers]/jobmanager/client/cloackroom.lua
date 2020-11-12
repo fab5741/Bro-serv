@@ -1,31 +1,57 @@
 local buttons = {}
 
+local function printTable( t )
+
+    local printTable_cache = {}
+
+    local function sub_printTable( t, indent )
+
+        if ( printTable_cache[tostring(t)] ) then
+            print( indent .. "*" .. tostring(t) )
+        else
+            printTable_cache[tostring(t)] = true
+            if ( type( t ) == "table" ) then
+                for pos,val in pairs( t ) do
+                    if ( type(val) == "table" ) then
+                        print( indent .. "[" .. pos .. "] => " .. tostring( t ).. " {" )
+                        sub_printTable( val, indent .. string.rep( " ", string.len(pos)+8 ) )
+                        print( indent .. string.rep( " ", string.len(pos)+6 ) .. "}" )
+                    elseif ( type(val) == "string" ) then
+                        print( indent .. "[" .. pos .. '] => "' .. val .. '"' )
+                    else
+                        print( indent .. "[" .. pos .. "] => " .. tostring(val) )
+                    end
+                end
+            else
+                print( indent..tostring(t) )
+            end
+        end
+    end
+
+    if ( type(t) == "table" ) then
+        print( tostring(t) .. " {" )
+        sub_printTable( t, "  " )
+        print( "}" )
+    else
+        sub_printTable( t, "  " )
+    end
+end
+
+
 function load_cloackroom(job)
 	for k in ipairs (buttons) do
 		buttons [k] = nil
 	end
-
-    for k, data in pairs(config.skins) do
-		if(v.job == job) then
-			buttons[#buttons+1] = {name = tostring(v.name), func = "clockIn", params = tostring(v.model)}
-		end			
-    end
-
+	print(job)
+	buttons[#buttons+1] = {name = "Prendre le service", func = "clockIn", params = job}
 	buttons[#buttons+1] = {name = "Quitter le service", func = "clockOut", params = ""}
 end
 
-function clockIn(model)
-    if model then	    	
-		if IsModelValid(model) and IsModelInCdimage(model) then
-    		ServiceOn()
-    		SetCopModel(model)
+function clockIn(job)
+		ServiceOn()
+		SetSkin(job)
 
-    		drawNotification("now_in_service_notification")
-    		drawNotification("help_open_menu_notification")
-    	else
-    		drawNotification("This model is ~r~invalid~w~.")
-    	end
-    end
+		drawNotification("En service")
 end
 
 function clockOut()
@@ -34,88 +60,95 @@ function clockOut()
 	drawNotification("break_service_notification")
 end
 
-function SetCopModel(model)
-	SetMaxWantedLevel(0)
-	SetWantedLevelMultiplier(0.0)
-	SetRelationshipBetweenGroups(0, GetHashKey("police"), GetHashKey("PLAYER"))
-    SetRelationshipBetweenGroups(0, GetHashKey("PLAYER"), GetHashKey("police"))	
-
-	modelHash = GetHashKey(model)
-
-	RequestModel(modelHash)
-	while not HasModelLoaded(modelHash) do
-		Citizen.Wait(0)
-	end
-
-	if model == "s_m_y_cop_01" then
-		if (config.enableOutfits == true) then
-			if(GetEntityModel(PlayerPedId()) == GetHashKey("mp_m_freemode_01")) then
-			    SetPedPropIndex(PlayerPedId(), 1, 5, 0, 2)             --Sunglasses
-			    SetPedPropIndex(PlayerPedId(), 2, 0, 0, 2)             --Bluetoothn earphone
-			    SetPedComponentVariation(PlayerPedId(), 11, 55, 0, 2)  --Shirt
-			    SetPedComponentVariation(PlayerPedId(), 8, 58, 0, 2)   --Nightstick decoration
-			    SetPedComponentVariation(PlayerPedId(), 4, 35, 0, 2)   --Pants
-			    SetPedComponentVariation(PlayerPedId(), 6, 24, 0, 2)   --Shooes
-			    SetPedComponentVariation(PlayerPedId(), 10, 8, config.rank.outfit_badge[rank], 2) --rank
-			else
-			    SetPedPropIndex(PlayerPedId(), 1, 11, 3, 2)           --Sunglasses
-			    SetPedPropIndex(PlayerPedId(), 2, 0, 0, 2)            --Bluetoothn earphone
-			    SetPedComponentVariation(PlayerPedId(), 3, 14, 0, 2)  --Non buggy tshirt
-			    SetPedComponentVariation(PlayerPedId(), 11, 48, 0, 2) --Shirt
-			    SetPedComponentVariation(PlayerPedId(), 8, 35, 0, 2)  --Nightstick decoration
-			    SetPedComponentVariation(PlayerPedId(), 4, 34, 0, 2)  --Pants
-			    SetPedComponentVariation(PlayerPedId(), 6, 29, 0, 2)  --Shooes
-			    SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2) --rank
-			end
-		else
-			SetPlayerModel(PlayerId(), modelHash)
-		end
-	elseif model == "s_m_y_hwaycop_01" then
-			SetPlayerModel(PlayerId(), modelHash)
-			SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2)
-	elseif model == "s_m_y_sheriff_01" then
-		    SetPlayerModel(PlayerId(), modelHash)
-		    SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2)
-	elseif model == "s_m_y_ranger_01" then
-		SetPlayerModel(PlayerId(), modelHash)
-		SetPedComponentVariation(PlayerPedId(), 10, 7, config.rank.outfit_badge[rank], 2)
-	elseif model == "a_m_y_genstreet_01" then
-	
-	else
-		 SetPlayerModel(PlayerId(), modelHash)
-	end
-
+function SetSkin(job)
+	local skin ={
+		sex          = 0,
+		face         = 0,
+		skin         = 0,
+		beard_1      = 0,
+		beard_2      = 0,
+		beard_3      = 0,
+		beard_4      = 0,
+		hair_1       = 0,
+		hair_2       = 0,
+		hair_color_1 = 0,
+		hair_color_2 = 0,
+		tshirt_1     = 0,
+		tshirt_2     = 0,
+		torso_1      = 0,
+		torso_2      = 0,
+		decals_1     = 0,
+		decals_2     = 0,
+		arms         = 0,
+		pants_1      = 0,
+		pants_2      = 0,
+		shoes_1      = 0,
+		shoes_2      = 0,
+		mask_1       = 0,
+		mask_2       = 0,
+		bproof_1     = 0,
+		bproof_2     = 0,
+		chain_1      = 0,
+		chain_2      = 0,
+		helmet_1     = 0,
+		helmet_2     = 0,
+		glasses_1    = 0,
+		glasses_2    = 0,
+	}
+	TriggerEvent('skinchanger:loadClothes', skin, config.jobs[job].grades.stagiaire.skin_male)
 	giveBasicKit()
-	SetModelAsNoLongerNeeded(modelHash)
 end
 
 function removeUniforme()
-	if(config.enableOutfits == true) then
-		RemoveAllPedWeapons(PlayerPedId())
-		TriggerServerEvent("skin_customization:SpawnPlayer")
-	else
-		local model = GetHashKey("a_m_y_mexthug_01")
-		RequestModel(model)
-		while not HasModelLoaded(model) do
-			Citizen.Wait(0)
-		end
-		 
-		SetPlayerModel(PlayerId(), model)
-		SetModelAsNoLongerNeeded(model)
+	RemoveAllPedWeapons(PlayerPedId())
 
-		SetMaxWantedLevel(5)
-		SetWantedLevelMultiplier(1.0)
-		
-		SetRelationshipBetweenGroups(3, GetHashKey("police"), GetHashKey("PLAYER"))
-		SetRelationshipBetweenGroups(3, GetHashKey("PLAYER"), GetHashKey("police"))	
-	end
+	-- release the player model
+	SetModelAsNoLongerNeeded(model)  
+	skin ={
+		sex          = 0,
+		face         = 0,
+		skin         = 0,
+		beard_1      = 0,
+		beard_2      = 0,
+		beard_3      = 0,
+		beard_4      = 0,
+		hair_1       = 0,
+		hair_2       = 0,
+		hair_color_1 = 0,
+		hair_color_2 = 0,
+		tshirt_1     = 0,
+		tshirt_2     = 0,
+		torso_1      = 0,
+		torso_2      = 0,
+		decals_1     = 0,
+		decals_2     = 0,
+		arms         = 0,
+		pants_1      = 0,
+		pants_2      = 0,
+		shoes_1      = 0,
+		shoes_2      = 0,
+		mask_1       = 0,
+		mask_2       = 0,
+		bproof_1     = 0,
+		bproof_2     = 0,
+		chain_1      = 0,
+		chain_2      = 0,
+		helmet_1     = 0,
+		helmet_2     = 0,
+		glasses_1    = 0,
+		glasses_2    = 0,
+	}
+
+	local clothes = {
+	}
+	TriggerEvent('skinchanger:loadClothes', skin, clothes)
 end
 
-function OpenCloackroom()
+function OpenCloackroom(job)
 	if anyMenuOpen.menuName ~= "cloackroom" and not anyMenuOpen.isActive then
 		SendNUIMessage({
-			title = GetLabelText("collision_8vlv02g"),
-			subtitle = GetLabelText("INPUT_CHARACTER_WHEEL"),
+			title = "Vestiaire",
+			subtitle = job.label,
 			buttons = buttons,
 			action = "setAndOpen"
 		})

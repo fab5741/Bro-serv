@@ -30,6 +30,7 @@ AddEventHandler('shops:buy', function(type, amount, zone)
 		 ['type'] = typee,
 		 ['zone'] = zonee},
 		function(res)
+			print("HEREEEE")
 			local pricee = (amounte * res[1].price)
 			if res[1] and res[1].liquid >= pricee then
 				MySQL.Async.fetchAll('UPDATE shops SET shops.amount=shops.amount-@amount where shops.type = @zone and shops.item = @type',

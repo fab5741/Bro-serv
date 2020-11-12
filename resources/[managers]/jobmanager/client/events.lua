@@ -1,5 +1,7 @@
 RegisterNetEvent("job:set")
 
+
+
 -- source is global here, don't add to function
 AddEventHandler('job:set', function (grade)
     TriggerServerEvent("job:set", grade)
@@ -15,24 +17,26 @@ end)
 
 
 AddEventHandler('job:hasEnteredMarker', function(location, job)
-	if location.action == 'lockers' then
-        DisplayHelpText("Ouvrir le vestiaire : "..job.label,0,1,0.5,0.8,0.6,255,255,255,255)
+
+    label = config.jobs[job].label
+    if location.action == 'lockers' then
+        DisplayHelpText("Ouvrir le vestiaire : "..label,0,1,0.5,0.8,0.6,255,255,255,255)
         if IsControlJustPressed(1,config.bindings.interact_position) then
-            load_cloackroom(job.id)
-            OpenCloackroom()
+            load_cloackroom(job)
+            OpenCloackroom(job)
         end
     elseif location.action == 'collect' then
-        DisplayHelpText("Collecter : "..job.label,0,1,0.5,0.8,0.6,255,255,255,255)
+        DisplayHelpText("Collecter : "..label,0,1,0.5,0.8,0.6,255,255,255,255)
         if IsControlJustPressed(1,config.bindings.interact_position) then
             collect(location, job)
         end
     elseif location.action == 'process' then
-        DisplayHelpText("Transformation : "..job.label,0,1,0.5,0.8,0.6,255,255,255,255)
+        DisplayHelpText("Transformation : "..label,0,1,0.5,0.8,0.6,255,255,255,255)
         if IsControlJustPressed(1,config.bindings.interact_position) then
             process(location, job)
         end
     elseif location.action == 'sell' then
-        DisplayHelpText("Revente : "..job.label,0,1,0.5,0.8,0.6,255,255,255,255)
+        DisplayHelpText("Revente : "..label,0,1,0.5,0.8,0.6,255,255,255,255)
         if IsControlJustPressed(1,config.bindings.interact_position) then
             sell(location, job)
         end

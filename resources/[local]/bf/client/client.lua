@@ -125,17 +125,24 @@ function load_menu()
 	buttonsWallet[#buttonsWallet+1] = {name = "Donner", func = "", params = ""}
 end
 
+RegisterNetEvent('bf:job')
+
+AddEventHandler("bf:job", function(job)
+	CloseMenu()
+	SendNUIMessage({
+		title = "PlayerName",
+		subtitle = job[1].job.. " (" .. job[1].grade ..")",
+		buttons = buttonsCategories,
+		action = "setAndOpen"
+	})
+	
+	anyMenuOpen.menuName = "playermenu"
+	anyMenuOpen.isActive = true
+end)
+
 function TogglePlayerMenu()
 	if((anyMenuOpen.menuName ~= "playermenu" and anyMenuOpen.menuName ~= "playermenu-wallet" and anyMenuOpen.menuName ~= "playermenu-items") and not anyMenuOpen.isActive) then
-		SendNUIMessage({
-			title = "Joueur",
-			subtitle = GetLabelText("PM_MP_OPTIONS"),
-			buttons = buttonsCategories,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "playermenu"
-		anyMenuOpen.isActive = true
+		TriggerServerEvent("job:get", "bf:job")
 	else
 		if((anyMenuOpen.menuName ~= "playermenu" and anyMenuOpen.menuName ~= "playermenu-wallet" and anyMenuOpen.menuName ~= "playermenu-items" ) and  anyMenuOpen.isActive) then
 			CloseMenu()

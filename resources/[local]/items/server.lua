@@ -79,10 +79,14 @@ AddEventHandler("items:use", function (type, amount)
         TriggerClientEvent("needs:change", source, 0, 60)
     end
     if(type == "14") then
-        -- EAT water
-        print("water")
-        TriggerClientEvent("needs:change", source, 1, 60)
-    end
+      -- EAT water
+      print("water")
+      TriggerClientEvent("needs:change", source, 1, 60)
+  end
+  if(type == "19") then
+    TriggerClientEvent("needs:change", source, 0, 80)
+    TriggerClientEvent("needs:change", source, 1, 10)
+  end
     sub(source, type, amount)
 end)
 

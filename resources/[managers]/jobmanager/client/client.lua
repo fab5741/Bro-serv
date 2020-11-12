@@ -1,29 +1,20 @@
-local job = "Chomeur"
-local grade = "Chomeur"
+local job = {
+	job = "Chomeur",
+	grade = "Chomeur"
+}
+
 anyMenuOpen = {
 	menuName = "",
 	isActive = false
 }
+RegisterNetEvent('job:get')
 
-
-Citizen.CreateThread(function()
---	TriggerServerEvent("job:get")
-   -- TriggerEvent("job:draw")
-   -- Wait(0)
- --   while true do
-   --     Wait(30)
---
-  --      DrawTextOnSCreen(0.90,0.95, "Job : " .. job)
-    --    DrawTextOnSCreen(0.90, 0.975, "Grade : ".. grade)
-    -- end
-
-end)
-
--- Draw markers & Marker logic
-Citizen.CreateThread(function()
-    -- Draw blips
-	for k,v in pairs(config.jobs) do
-			drawBlip(v)
+AddEventHandler("job:get", function(job)
+	job = job[1]
+	-- Draw blips
+	v = config.jobs[job.job]
+	if v then
+		drawBlip(v)
 		for k, v in pairs(v.lockers) do
 			drawBlip(v)
 		end
@@ -36,29 +27,32 @@ Citizen.CreateThread(function()
 		for k, v in pairs(v.sell) do
 			drawBlip(v)
 		end
-    end
+	end
 	while true do
-        Citizen.Wait(0)
-        local playerCoords = GetEntityCoords(PlayerPedId())
-        local letSleep, isInMarker, hasExited = true, false, false
-        local currentstation, currentPart, currentPartNum
+		Citizen.Wait(0)
+		local playerCoords = GetEntityCoords(PlayerPedId())
+		local letSleep, isInMarker, hasExited = true, false, false
+		local currentstation, currentPart, currentPartNum
 
-		for k,job in pairs(config.jobs) do
-			for k, v in pairs(job.lockers) do
-				DrawMyMarker(playerCoords, v, job)
+		t = config.jobs[job.job]
+		if t then
+			for k, v in pairs(t.lockers) do
+				DrawMyMarker(playerCoords, v, job.job)
 			end
-			for k, v in pairs(job.collect) do
-				DrawMyMarker(playerCoords, v, job)
+			for k, v in pairs(t.collect) do
+				DrawMyMarker(playerCoords, v, job.job)
 			end
-			for k, v in pairs(job.process) do
-				DrawMyMarker(playerCoords, v, job)
+			for k, v in pairs(t.process) do
+				DrawMyMarker(playerCoords, v, job.job)
 			end
-			for k, v in pairs(job.sell) do
-				DrawMyMarker(playerCoords, v, job)
+			for k, v in pairs(t.sell) do
+				DrawMyMarker(playerCoords, v, job.job)
 			end
-        end
+		end
 	end
 end)
+
+TriggerServerEvent("job:get", "job:get")
 
 
 RegisterNUICallback('sendAction', function(data, cb)
@@ -69,14 +63,12 @@ end)
 --
 --Threads
 --
-
 local alreadyDead = false
 local playerStillDragged = false
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(5)	
-
+		Citizen.Wait(5)	
 		if(anyMenuOpen.isActive) then
 			DisableControlAction(1, 21)
 			DisableControlAction(1, 140)
@@ -136,4 +128,51 @@ Citizen.CreateThread(function()
 			end
 		end
     end
+end)
+
+--functions
+
+function isNearTakeService()
+	local distance = 10000
+	local pos = {}
+	t = config.jobs[job.job]
+	if t then
+		for k, v in pairs(t.lockers) do
+			local coords = GetEntityCoords(PlayerPedId(), 0)
+			local currentDistance = coords - v.coords
+			if(currentDistance < distance) then
+				distance = currentDistance
+				pos = v.coords
+			end
+		end
+	end
+	
+	if anyMenuOpen.menuName == "cloackroom" and anyMenuOpen.isActive and distance > 3 then
+		--CloseMenu()
+	end
+
+	if(distance < 30) then
+		if anyMenuOpen.menuName ~= "cloackroom" and not anyMenuOpen.isActive then
+			DrawMarker(1, pos.x, pos.y, pos.z-1, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 0, 155, 255, 200, 0, 0, 2, 0, 0, 0, 0)
+		end
+	end
+
+	if(distance < 2) then
+		return true
+	end
+end
+
+Citizen.CreateThread(function()
+    while true do
+		Citizen.Wait(5)	
+		if(isNearTakeService()) then
+			if not (anyMenuOpen.isActive) then
+				DisplayHelpText("Vestiaire".. GetLabelText("collision_8vlv02g"),0,1,0.5,0.8,0.6,255,255,255,255)
+				if IsControlJustPressed(1,config.bindings.interact_position) then
+					load_cloackroom(job)
+					OpenCloackroom(job)
+				end
+			end
+		end
+	end
 end)

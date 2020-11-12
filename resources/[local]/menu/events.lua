@@ -1,25 +1,32 @@
 RegisterNetEvent("menu:create")
 
-AddEventHandler("menu:create", function(name, title, type, subtitle, items, position, cb, cbServer)
-    if type == "form" then
-        SetNuiFocus(true, true)
-    end
-    currentMenu = name
+isOpen = {
 
-    SendNUIMessage({
-        name = name,
-        title = title,
-        type = type,
-        subtitle = subtitle,
-        items = json.encode(items),
-        position= position,
-        action = "setAndOpen",
-        cb = cb
-    })
-    
-    RegisterNUICallback(cb, function(data)
-        TriggerEvent(cbServer, data)
-    end)
+}
+
+
+AddEventHandler("menu:create", function(name, title, type, subtitle, items, position, cb, cbServer)
+    if(not isOpen[name]) then
+        if type == "form" then
+            SetNuiFocus(true, true)
+        end
+        currentMenu = name
+
+        SendNUIMessage({
+            name = name,
+            title = title,
+            type = type,
+            subtitle = subtitle,
+            items = json.encode(items),
+            position= position,
+            action = "setAndOpen",
+            cb = cb
+        })
+        
+        RegisterNUICallback(cb, function(data)
+            TriggerEvent(cbServer, data)
+        end)
+    end
 end)
 
 RegisterNetEvent("menu:delete")

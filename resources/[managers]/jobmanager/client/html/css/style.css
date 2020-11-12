@@ -22,8 +22,8 @@ body {
 }
 
 .menu {
-	float: right;
-	margin-right: 10px;
+	float: left;
+	margin-left: 10px;
 	width: 418px;
 	background: rgba(0, 0, 0, 0.8);
 	display: none;

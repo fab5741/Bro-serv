@@ -1191,13 +1191,7 @@ Citizen.CreateThread(function()
 				playerStillDragged = false
 			end
 		end
-
-		if config.enableNeverWanted then
-			if IsPlayerWantedLevelGreater(PlayerId(), 0) then
-				ClearPlayerWantedLevel(PlayerId())
-			end
-		end
-	
+		
         if(isCop) then
 			if(isNearTakeService()) then
 				if not (anyMenuOpen.isActive) then

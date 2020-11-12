@@ -1,8 +1,7 @@
 config = {
     jobs = {
-        food = {
-            label = "Fermiers",
-            id = 'food',
+        Fermiers = {
+            label= "Fermiers",
             lockers = {
                 {
                     coords = vector3(2307.13,4883.27,41),
@@ -76,9 +75,8 @@ config = {
                 }
             }
         },
-        wine = {
-            label = "Vignerons",
-            id = 'wine',
+        Vignerons = {
+            label= "Vignerons",
             lockers = {
                 {
                     coords = vector3(-1921.31, 2054.82,139.5),
@@ -101,6 +99,9 @@ config = {
                     string = "collect",
                     },
                     action = "collect",
+                    items = {
+                        {name="Raisin", label="Raisin", amount="1", type="18"},
+                     }
                 }
             },
             process = {
@@ -113,6 +114,9 @@ config = {
                 string = "process",
                 },
                 action = "process",
+                items = {
+                    {name="Raisin", label="Raisin", amount="1", type="18", to="19", amountTo="1"},
+                }
             }
             },
             sell = {
@@ -125,12 +129,40 @@ config = {
                     string = "sell",
                     },
                     action = "sell",
+                    items = {
+                        {name="Jus de raisin", label="Jus de raisin", amount="1", type="19", price="5"},
+                    }
                 }
+            },
+            grades = {
+                stagiaire = {
+                    label= "Stagiaire",
+                    skin_male = {
+                        tshirt_1 = 19,  tshirt_2 = 1,
+                        torso_1 = 55,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 5,   pants_2 = 0,
+                        shoes_1 = 25,   shoes_2 = 0,
+                        helmet_1 = 46,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    },
+                    skin_female = {
+                        tshirt_1 = 36,  tshirt_2 = 1,
+                        torso_1 = 48,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 44,
+                        pants_1 = 34,   pants_2 = 0,
+                        shoes_1 = 27,   shoes_2 = 0,
+                        helmet_1 = 45,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    }
+               }
             }
         },
-        mechanic = {
-            label = "Mécaniciens",
-            id = 'mechanic',
+        Mecanos = {
             coords = vector3(-362.1,-129.6,37.6),
             blip = {
             sprite = 446,

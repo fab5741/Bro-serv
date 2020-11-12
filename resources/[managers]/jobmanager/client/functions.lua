@@ -75,10 +75,10 @@ end
 local buttons = {}
 local isCollecting = false
 local lastLocation = false
+
+
 function collect(location, job)
-	for k in ipairs (buttons) do
-		buttons [k] = nil
-	end
+    buttons = {}
 
     for k, v in pairs(location.items) do
         buttons[#buttons+1] = {name = tostring(v.label), func = "collectItem", params = v.type}
@@ -111,7 +111,6 @@ function collectItem(item)
             item = v
         end
     end
-    print(lastLocation.items)
     isCollecting = true
     Wait(timeCollecting)
     TriggerServerEvent('items:add', item.type,  item.amount) 
@@ -172,9 +171,7 @@ end
 
 
 function sell(location, job)
-	for k in ipairs (buttons) do
-		buttons [k] = nil
-	end
+    buttons = {}
 
     for k, v in pairs(location.items) do
         buttons[#buttons+1] = {name = tostring(v.label), func = "sellItems", params = v.type}
@@ -200,6 +197,7 @@ function sell(location, job)
 end
 
 local timeprocessing = 0
+local isSelling = false
 
 function sellItems(item)
     for k, v in pairs(lastLocation.items) do
@@ -207,12 +205,12 @@ function sellItems(item)
             item = v
         end
     end
-    isprocessing = true
-    Wait(timeprocessing)
+    isSelling = true
+    --Wait(isSelling)
     
-    TriggerServerEvent('jobs:sell', item.type, item.amount, item.price, "TwentyFourSeven")
+    TriggerServerEvent('jobs:sell', item, "TwentyFourSeven")
     CloseMenu()
-    isprocessing = false
+    isSelling = false
 end
 
 

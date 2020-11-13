@@ -13,6 +13,7 @@ ui_page 'html/dist/index.html'
 
 
 client_script {
+    'client/client.lua'
 }
 
 server_scripts {

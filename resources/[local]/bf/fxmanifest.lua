@@ -30,7 +30,4 @@ files {
    'client/html/fonts/SignPainter-HouseScript.ttf'
 }
 
-
 ui_page('client/html/index.html')
-
-dependency  'menu'

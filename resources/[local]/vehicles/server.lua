@@ -1,9 +1,10 @@
 RegisterNetEvent("vehicle:buy")
 
-AddEventHandler("vehicle:buy", function(data)
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		
-			
+AddEventHandler("vehicle:buy", function(id, name)
+	local sourceValue = source
+
+	for k,v in pairs(GetPlayerIdentifiers(source))do
+				
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
 		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
@@ -18,20 +19,26 @@ AddEventHandler("vehicle:buy", function(data)
 			liveid = v
 		  end
 	end
-    MySQL.ready(function ()
+	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid from players where fivem = @fivem',
         {['fivem'] =  discord},
 		function(res)
-			if res[1] and res[1].liquid >= amounte then
-				MySQL.Async.fetchAll('UPDATE accounts, players set amount=amount+@amount, liquid=liquid-@amount where fivem = @fivem and accounts.player = players.id',
-				{['fivem'] =  discord,
-				['amount'] = amounte},
-				function(res)
-					TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot effectué", type = "info", timeout = 5000})
-				end)
-			else
-				TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot loupé (Pas assez de liquide)", type = "info", timeout = 5000})
-			end
+			MySQL.Async.fetchAll('SELECT price FROM `vehicles` where id = @id', {['id'] = id}, function(price)
+				if res[1] and price[1] and res[1].liquid >= price[1].price then
+					print(res[1].liquid)
+					print(price[1].price)
+					print("ON ACHETE")
+					MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
+					{['fivem'] =  discord,
+					['price'] = price[1].price},
+					function(res)
+						TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Vous avez acheté une ".. name, false)
+						TriggerClientEvent("vehicle:buyok", sourceValue, name)
+					end)
+				else
+					TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Vous n'avez pas assé d'argent", false)
+				end
+			end)
         end)
       end)
 end)

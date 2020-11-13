@@ -1,4 +1,9 @@
 local liquid = 0
+local dirty = 0
+local player = {
+	firstname = "Bro",
+	lastname = "Inconnu",
+}
 local anyMenuOpen = {
 	menuName = "",
 	isActive = false
@@ -14,6 +19,9 @@ function CloseMenu()
 end
 
 Citizen.CreateThread(function()
+	TriggerServerEvent("bf:player:get", "bf:player:get")
+	TriggerServerEvent("account:liquid", "bf:liquid")
+
   while true do
     Citizen.Wait(0)
 
@@ -25,7 +33,7 @@ Citizen.CreateThread(function()
     if (IsControlJustPressed(1, 288)) then
       load_menu()
       TogglePlayerMenu()
-    end
+	end
   end
 end)
 
@@ -92,11 +100,16 @@ Citizen.CreateThread(function()
   	end
 end)
 
+RegisterNetEvent('bf:player:get')
+
+AddEventHandler("bf:player:get", function(playere) 
+	player = playere
+end)
+
 RegisterNetEvent('bf:liquid')
 
 AddEventHandler("bf:liquid", function(liquide) 
   liquid = liquide
-  TriggerServerEvent("items:get", "bf:items")
 end)
 -------- MENUUUUUUUUUUU
 
@@ -119,10 +132,6 @@ function load_menu()
 	--Categories
 	buttonsCategories[#buttonsCategories+1] = {name = "Portefeuille", func = "OpenWalletMenu", params = ""}
 	buttonsCategories[#buttonsCategories+1] = {name = "Inventaire", func = "OpenItemsMenu", params = ""}
-
-	--Wallet
-	buttonsWallet[#buttonsWallet+1] = {name = "Liquide", func = "", params = ""}
-	buttonsWallet[#buttonsWallet+1] = {name = "Donner", func = "", params = ""}
 end
 
 RegisterNetEvent('bf:job')
@@ -130,7 +139,7 @@ RegisterNetEvent('bf:job')
 AddEventHandler("bf:job", function(job)
 	CloseMenu()
 	SendNUIMessage({
-		title = "PlayerName",
+		title = player.firstname.. " " .. player.lastname,
 		subtitle = job[1].job.. " (" .. job[1].grade ..")",
 		buttons = buttonsCategories,
 		action = "setAndOpen"
@@ -141,6 +150,7 @@ AddEventHandler("bf:job", function(job)
 end)
 
 function TogglePlayerMenu()
+	TriggerServerEvent("account:liquid", "bf:liquid")
 	if((anyMenuOpen.menuName ~= "playermenu" and anyMenuOpen.menuName ~= "playermenu-wallet" and anyMenuOpen.menuName ~= "playermenu-items") and not anyMenuOpen.isActive) then
 		TriggerServerEvent("job:get", "bf:job")
 	else
@@ -170,7 +180,8 @@ function OpenWalletMenu()
 
 	SendNUIMessage({
 		title = "Portefeuille",
-		subtitle = "Portefeuille",
+		--subtitle = "Liquid " .. liquid .. " / Sale " .. dirty,
+		subtitle = "Liquid " .. liquid.." $",
 		buttons = buttonsWallet,
 		action = "setAndOpen"
 	})

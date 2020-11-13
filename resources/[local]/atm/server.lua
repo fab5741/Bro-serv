@@ -63,7 +63,6 @@ AddEventHandler('atm:withdraw', function(amount)
 			liveid = v
 		  end
 	end
-
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select amount from accounts, players where fivem = @fivem and accounts.player = players.id',
         {['fivem'] =  discord},
@@ -73,10 +72,10 @@ AddEventHandler('atm:withdraw', function(amount)
 				{['fivem'] =  discord,
 				['amount'] = amounte},
 				function(res)
-					TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Retrait effectué", type = "info", timeout = 5000})
+					TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Retrait effectué ", false)
 				end)
 			else
-				TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Retrait loupé (Pas assez d'argent)", type = "info", timeout = 5000})
+				TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Retrait loupé (Pas assez d'argent) ", false)
 			end
         end)
       end)

@@ -68,7 +68,6 @@ end)
 
 RegisterServerEvent('police:takeService')
 AddEventHandler('police:takeService', function()
-
 	if(not inServiceCops[source]) then
 		inServiceCops[source] = getPlayerID(source)
 		
@@ -80,7 +79,6 @@ end)
 
 RegisterServerEvent('police:breakService')
 AddEventHandler('police:breakService', function()
-
 	if(inServiceCops[source]) then
 		inServiceCops[source] = nil
 		

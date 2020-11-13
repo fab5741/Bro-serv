@@ -124,10 +124,8 @@ function spawnPlayer(x, y, z, skin)
 
             if foundGround then
                 SetPedCoordsKeepVehicle(PlayerPedId(), x, y, height + 0.0)
-
                 break
             end
-
             Citizen.Wait(5)
         end
 

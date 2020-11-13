@@ -56,11 +56,10 @@ function SpawnerVeh(hash)
 	
 	policevehicle = CreateVehicle(car, playerCoords, 90.0, true, false)
 	SetVehicleEngineOn(policevehicle, true, true, true)	
-	SetVehicleMod(policevehicle, 11, 2)
-	SetVehicleMod(policevehicle, 12, 2)
-	SetVehicleMod(policevehicle, 13, 2)
+	--SetVehicleMod(policevehicle, 11, 2)
+	--SetVehicleMod(policevehicle, 12, 2)
+	--SetVehicleMod(policevehicle, 13, 2)
 
-	SetEntityHeading(policevehicle, (playerHeading+160)%360)
 	SetVehicleEnginePowerMultiplier(policevehicle, 25.0)
 	SetVehicleOnGroundProperly(policevehicle)
 	SetVehicleHasBeenOwnedByPlayer(policevehicle,true)
@@ -73,6 +72,7 @@ function SpawnerVeh(hash)
 
 	TaskWarpPedIntoVehicle(playerPed, policevehicle, -1)
 	SetEntityInvincible(policevehicle, false)	
+	CloseMenu()
 end
 
 function OpenGarage()

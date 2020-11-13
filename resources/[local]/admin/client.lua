@@ -65,6 +65,26 @@ RegisterCommand("tpm", function(source)
 end)
 
 
+RegisterCommand("tp", function(source, args)
+   -- local waypointCoords = vector3(args[1], args[2], args[3])
+   local waypointCoords = vector3(239.61, -2018.95, 18.31)
+    for height = 1, 1000 do
+        SetPedCoordsKeepVehicle(PlayerPedId(), waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+        local foundGround, zPos = GetGroundZFor_3dCoord(waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+        if foundGround then
+            SetPedCoordsKeepVehicle(PlayerPedId(), waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+            break
+        end
+
+        Citizen.Wait(5)
+    end
+end)
+
+
+
 RegisterCommand("kill", function(source)
     SetEntityHealth(PlayerPedId(),0)
 end)

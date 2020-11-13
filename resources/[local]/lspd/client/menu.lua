@@ -31,40 +31,30 @@ function load_menu()
 	end
 	
 	--Categories
-	buttonsCategories[#buttonsCategories+1] = {name = GetLabelText("CRW_ANIMATION"), func = "OpenAnimMenu", params = ""}
+	buttonsCategories[#buttonsCategories+1] = {name = "Animations", func = "OpenAnimMenu", params = ""}
 	buttonsCategories[#buttonsCategories+1] = {name = GetLabelText("collision_c29ovv"), func = "OpenCitizenMenu", params = ""}
 	buttonsCategories[#buttonsCategories+1] = {name = GetLabelText("PIM_TVEHI"), func = "OpenVehMenu", params = ""}
 	buttonsCategories[#buttonsCategories+1] = {name = GetLabelText("collision_9o6rwvf"), func = "OpenPropsMenu", params = ""}
 	
 	--Animations
-	buttonsAnimation[#buttonsAnimation+1] = {name = "menu_anim_do_traffic_title", func = 'DoTraffic', params = ""}
-	buttonsAnimation[#buttonsAnimation+1] = {name = "menu_anim_take_notes_title", func = 'Note', params = ""}
-	buttonsAnimation[#buttonsAnimation+1] = {name = "menu_anim_standby_title", func = 'StandBy', params = ""}
-	buttonsAnimation[#buttonsAnimation+1] = {name = "menu_anim_standby_2_title", func = 'StandBy2', params = ""}
-	buttonsAnimation[#buttonsAnimation+1] = {name = "menu_anim_Cancel_emote_title", func = 'CancelEmote', params = ""}
+	buttonsAnimation[#buttonsAnimation+1] = {name = "Traffic", func = 'DoTraffic', params = ""}
+	buttonsAnimation[#buttonsAnimation+1] = {name = "Notes", func = 'Note', params = ""}
+	buttonsAnimation[#buttonsAnimation+1] = {name = "Standby", func = 'StandBy', params = ""}
+	buttonsAnimation[#buttonsAnimation+1] = {name = "Standby2", func = 'StandBy2', params = ""}
+	buttonsAnimation[#buttonsAnimation+1] = {name = "Annuler animation", func = 'CancelEmote', params = ""}
 	
 	--Citizens
-	buttonsCitizen[#buttonsCitizen+1] = {name = "menu_weapons_title", func = 'RemoveWeapons', params = ""}
-	buttonsCitizen[#buttonsCitizen+1] = {name = "menu_toggle_cuff_title", func = 'ToggleCuff', params = ""}
-	buttonsCitizen[#buttonsCitizen+1] = {name = "menu_force_player_get_in_car_title", func = 'PutInVehicle', params = ""}
-	buttonsCitizen[#buttonsCitizen+1] = {name = "menu_force_player_get_out_car_title", func = 'UnseatVehicle', params = ""}
-	buttonsCitizen[#buttonsCitizen+1] = {name = "menu_drag_player_title", func = 'DragPlayer', params = ""}
-	buttonsCitizen[#buttonsCitizen+1] = {name =  "menu_fines_title", func = 'OpenMenuFine', params = ""}
+	buttonsCitizen[#buttonsCitizen+1] = {name = "Enlever armes", func = 'RemoveWeapons', params = ""}
+	buttonsCitizen[#buttonsCitizen+1] = {name = "Menotter", func = 'ToggleCuff', params = ""}
+	buttonsCitizen[#buttonsCitizen+1] = {name = "Porter", func = 'DragPlayer', params = ""}
+	buttonsCitizen[#buttonsCitizen+1] = {name =  "amendes", func = 'OpenMenuFine', params = ""}
 	
 	--Fines
-	buttonsFine[#buttonsFine+1] = {name = "$250", func = 'Fines', params = 250}
-	buttonsFine[#buttonsFine+1] = {name = "$500", func = 'Fines', params = 500}
-	buttonsFine[#buttonsFine+1] = {name = "$1000", func = 'Fines', params = 1000}
-	buttonsFine[#buttonsFine+1] = {name = "$1500", func = 'Fines', params = 1500}
-	buttonsFine[#buttonsFine+1] = {name = "$2000", func = 'Fines', params = 2000}
-	buttonsFine[#buttonsFine+1] = {name = "$4000", func = 'Fines', params = 4000}
-	buttonsFine[#buttonsFine+1] = {name = "$6000", func = 'Fines', params = 6000}
-	buttonsFine[#buttonsFine+1] = {name = "$8000", func = 'Fines', params = 8000}
-	buttonsFine[#buttonsFine+1] = {name = "$10000", func = 'Fines', params = 10000}
-	buttonsFine[#buttonsFine+1] = {name = "menu_custom_amount_fine_title", func = 'Fines', params = -1}
+	buttonsFine[#buttonsFine+1] = {name = "Infraction légére (250 $)", func = 'Fines', params = 250}
+	buttonsFine[#buttonsFine+1] = {name = "infraction moyenne (500 $)", func = 'Fines', params = 500}
+	buttonsFine[#buttonsFine+1] = {name = "infraction lourde (1000 $)", func = 'Fines', params = 1000}
 
 	-- vehicles
-	buttonsVehicle[#buttonsVehicle+1] = {name = "menu_crochet_veh_title", func = 'Crochet', params = ""}
 	buttonsVehicle[#buttonsVehicle+1] = {name = GetLabelText("FMMC_REMVEH"), func = 'DropVehicle', params = ""}		
 	buttonsVehicle[#buttonsVehicle+1] = {name = "Spike Stripes", func = 'SpawnSpikesStripe', params = ""}
 	
@@ -167,25 +157,6 @@ function ToggleCuff()
 	end
 end
 
-function PutInVehicle()
-	local t, distance = GetClosestPlayer()
-	if(distance ~= -1 and distance < 3) then
-		local v = GetVehiclePedIsIn(PlayerPedId(), true)
-		TriggerServerEvent("lspd:forceEnterAsk", GetPlayerServerId(t), v)
-	else
-		drawNotification("no_player_near_ped")
-	end
-end
-
-function UnseatVehicle()
-	local t, distance = GetClosestPlayer()
-	if(distance ~= -1 and distance < 3) then
-		TriggerServerEvent("lspd:confirmUnseat", GetPlayerServerId(t))
-	else
-		drawNotification("no_player_near_ped")
-	end
-end
-
 function DragPlayer()
 	local t, distance = GetClosestPlayer()
 	if(distance ~= -1 and distance < 3) then
@@ -222,31 +193,6 @@ function Fines(amount)
 	else
 		drawNotification(i18n.translate("no_player_near_ped"))
 	end
-end
-
-function Crochet()
-	Citizen.CreateThread(function()
-		local pos = GetEntityCoords(PlayerPedId())
-		local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
-
-		local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
-		local _, _, _, _, vehicleHandle = GetRaycastResult(rayHandle)
-		if DoesEntityExist(vehicleHandle) and IsEntityAVehicle(vehicleHandle) then
-			local prevObj = GetClosestObjectOfType(pos.x, pos.y, pos.z, 10.0, GetHashKey("prop_weld_torch"), false, true, true)
-			if(IsEntityAnObject(prevObj)) then
-				SetEntityAsMissionEntity(prevObj)
-				DeleteObject(prevObj)
-			end
-
-			TaskStartScenarioInPlace(PlayerPedId(), "WORLD_HUMAN_WELDING", 0, true)
-			Citizen.Wait(20000)
-			SetVehicleDoorsLocked(vehicleHandle, 1)
-			ClearPedTasksImmediately(PlayerPedId())
-			drawNotification("menu_veh_opened_notification")
-		else
-			drawNotification("no_veh_near_ped")
-		end
-	end)
 end
 
 function DropVehicle()

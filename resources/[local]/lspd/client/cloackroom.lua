@@ -27,7 +27,6 @@ function clockIn(model)
 		if IsModelValid(model) and IsModelInCdimage(model) then
     		ServiceOn()
     		SetCopModel(model)
-
     		drawNotification("En service")
     	else
     		drawNotification("Le model est invalide")
@@ -274,6 +273,7 @@ function removeUniforme()
 		
 	SetRelationshipBetweenGroups(3, GetHashKey("police"), GetHashKey("PLAYER"))
 	SetRelationshipBetweenGroups(3, GetHashKey("PLAYER"), GetHashKey("police"))	
+	TriggerServerEvent("lspd:breakService")
 end
 
 function OpenCloackroom()

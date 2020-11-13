@@ -50,18 +50,19 @@ end)
 
 
 -- time for each paycheck
-local moneyDutyTime = 1800 *1000
+local moneyDutyTime = 30 *1000 * 60
 
 -- Key Controls
 Citizen.CreateThread(function()
 	while true do
-		Citizen.Wait(moneyDutyTime)
+        Citizen.Wait(moneyDutyTime)
+        print("Time for paycheck")
 
         -- Check if people are working
         MySQL.ready(function ()
             MySQL.Async.execute('Update accounts, players, job_grades SET accounts.amount = accounts.amount + job_grades.salary/2 where players.onDuty = 1 and accounts.player = players.id and players.job_grade = job_grades.id',{},
             function(affectedRows)
-                TriggerClientEvent("notify:SendNotification", -1, {text= "Vous avez reçu votre paie", type = "error", timeout = 2000})
+                TriggerClientEvent("lspd:notify",  -1,  "CHAR_BANK_FLEECA", -1,"Vous avez reçu votre paie", false)
             end)
         end)
     end

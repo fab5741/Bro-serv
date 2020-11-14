@@ -262,7 +262,11 @@ AddEventHandler('lsms:revive', function(noAmbulancies)
     SetPlayerInvincible(ped, false)
     ClearPedBloodDamage(ped)
     StopScreenEffect('DeathFailOut')
-    DoScreenFadeIn(800)
+	DoScreenFadeIn(800)
+	
+	
+	TriggerServerEvent("player:spawned")
+	TriggerServerEvent("needs:spawned")
 end)
 
 -- ESX job part
@@ -445,6 +449,79 @@ Citizen.CreateThread(function()
 end)
 
 local skinChanged = false
+local skin ={
+	sex          = 0,
+	face         = 0,
+	skin         = 0,
+	beard_1      = 0,
+	beard_2      = 0,
+	beard_3      = 0,
+	beard_4      = 0,
+	hair_1       = 0,
+	hair_2       = 0,
+	hair_color_1 = 0,
+	hair_color_2 = 0,
+	tshirt_1     = 0,
+	tshirt_2     = 0,
+	torso_1      = 0,
+	torso_2      = 0,
+	decals_1     = 0,
+	decals_2     = 0,
+	arms         = 0,
+	pants_1      = 0,
+	pants_2      = 0,
+	shoes_1      = 0,
+	shoes_2      = 0,
+	mask_1       = 0,
+	mask_2       = 0,
+	bproof_1     = 0,
+	bproof_2     = 0,
+	chain_1      = 0,
+	chain_2      = 0,
+	helmet_1     = 0,
+	helmet_2     = 0,
+	glasses_1    = 0,
+	glasses_2    = 0,
+}
+
+local clothes = {
+recruit = {
+	male = {
+		tshirt_2=0,
+		hair_color_1=5,
+		glasses_2=3,
+		shoes=9,
+		torso_2=3,
+		hair_color_2=0,
+		pants_1=24,
+		glasses_1=4,
+		hair_1=2,
+		sex=0,
+		decals_2=0,
+		tshirt_1=15,
+		helmet_1=8,
+		helmet_2=0,
+		arms=92,
+		face=19,
+		decals_1=60,
+		torso_1=13,
+		hair_2=0,
+		skin=34,
+		pants_2=5
+	},
+	female = {
+		tshirt_1 = 36,  tshirt_2 = 1,
+		torso_1 = 48,   torso_2 = 0,
+		decals_1 = 0,   decals_2 = 0,
+		arms = 44,
+		pants_1 = 34,   pants_2 = 0,
+		shoes_1 = 27,   shoes_2 = 0,
+		helmet_1 = 45,  helmet_2 = 0,
+		chain_1 = 0,    chain_2 = 0,
+		ears_1 = 2,     ears_2 = 0
+	}
+},
+}
 
 AddEventHandler('lsms:hasEnteredMarker', function(hospital, part, partNum)
 	print(part)
@@ -538,18 +615,51 @@ AddEventHandler('lsms:hasEnteredMarker', function(hospital, part, partNum)
 	elseif part == 'lockers' then
 		TriggerEvent('skinchanger:getSkin', function(skin)
 			if skinChanged then
-				print("not on duty")
-				TriggerEvent('skinchanger:loadSkin', skin)
-				TriggerEvent('skinchanger:loadClothes', {})
+				skin ={
+					sex          = 0,
+					face         = 0,
+					skin         = 0,
+					beard_1      = 0,
+					beard_2      = 0,
+					beard_3      = 0,
+					beard_4      = 0,
+					hair_1       = 0,
+					hair_2       = 0,
+					hair_color_1 = 0,
+					hair_color_2 = 0,
+					tshirt_1     = 0,
+					tshirt_2     = 0,
+					torso_1      = 0,
+					torso_2      = 0,
+					decals_1     = 0,
+					decals_2     = 0,
+					arms         = 0,
+					pants_1      = 0,
+					pants_2      = 0,
+					shoes_1      = 0,
+					shoes_2      = 0,
+					mask_1       = 0,
+					mask_2       = 0,
+					bproof_1     = 0,
+					bproof_2     = 0,
+					chain_1      = 0,
+					chain_2      = 0,
+					helmet_1     = 0,
+					helmet_2     = 0,
+					glasses_1    = 0,
+					glasses_2    = 0,
+				}
+			
+				local clothes = {
+				}
+				TriggerEvent('skinchanger:loadClothes', skin, clothes)
 				skinChanged =false
 				onDuty = false
 			else
 				if skin.sex == 0 then
-					TriggerEvent('skinchanger:loadClothes', 
-					{tshirt_2=0,hair_color_1=5,glasses_2=3,shoes=9,torso_2=3,hair_color_2=0,pants_1=24,glasses_1=4,hair_1=2,sex=0,decals_2=0,tshirt_1=15,helmet_1=8,helmet_2=0,arms=92,face=19,decals_1=60,torso_1=13,hair_2=0,skin=34,pants_2=5})
+					TriggerEvent('skinchanger:loadClothes', skin, clothes.recruit.male)
 				else
-					TriggerEvent('skinchanger:loadClothes', 
-					{tshirt_2=3,decals_2=0,glasses=0,hair_1=2,torso_1=73,shoes=1,hair_color_2=0,glasses_1=19,skin=13,face=6,pants_2=5,tshirt_1=75,pants_1=37,helmet_1=57,torso_2=0,arms=14,sex=1,glasses_2=0,decals_1=0,hair_2=0,helmet_2=0,hair_color_1=0})
+					TriggerEvent('skinchanger:loadClothes', skin, clothes.recruit.female)
 				end
 				skinChanged = true
 				onDuty = true

@@ -4,7 +4,10 @@ ui_page 'html/index.html'
 
 ui_page_preload 'yes'
 
-client_script 'client.lua'
+client_script {
+  'events.lua',
+  'client.lua'
+}
 
 files {
   'html/index.html',

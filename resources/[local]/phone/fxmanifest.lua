@@ -5,30 +5,17 @@ description '- Bro - phone'
 
 version '0.0.1'
 
-client_script {
-    'client.lua'
+files {
+    'html/dist/index.html'
 }
 
-ui_page 'html/ui.html'
+ui_page 'html/dist/index.html'
 
-files {
-	'html/ui.html',
 
-	'html/css/app.css',
+client_script {
+    'client/client.lua'
+}
 
-	'html/scripts/mustache.min.js',
-	'html/scripts/app.js',
+server_scripts {
 
-	'html/img/phone.png',
-
-	'html/img/icons/signal.png',
-	'html/img/icons/rep.png',
-	'html/img/icons/msg.png',
-	'html/img/icons/add.png',
-	'html/img/icons/back.png',
-	'html/img/icons/new-msg.png',
-	'html/img/icons/reply.png',
-	'html/img/icons/write.png',
-	'html/img/icons/edit.png',
-	'html/img/icons/location.png'
 }

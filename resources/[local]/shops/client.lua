@@ -3,36 +3,56 @@ config.DrawDistance = 100
 config.Size         = {x = 1.5, y = 1.5, z = 1.5}
 config.Color        = {r = 0, g = 128, b = 255}
 config.Type         = 1
-config.Locale       = 'en'
 
 config.Zones = {
 
 	TwentyFourSeven = {
-		Items = {},
-		Pos = {
-			{x = 373.875,   y = 325.896,  z = 102.566},
-			{x = 2557.458,  y = 382.282,  z = 107.622},
-			{x = -3038.939, y = 585.954,  z = 6.908},
-			{x = -3241.927, y = 1001.462, z = 11.830},
-			{x = 547.431,   y = 2671.710, z = 41.156},
-			{x = 1961.464,  y = 3740.672, z = 31.343},
-			{x = 1729.216,  y = 6414.131, z = 34.037}
-		}
+		{
+			pos = {x = 373.875,   y = 325.896,  z = 102.566},
+			pnj = {model = "mp_m_shopkeep_01", x=372.77, y=327.64, z=103.57, a=242.89},
+		},
+		{
+			pos = {x = 2557.458,  y = 382.282,  z = 107.622},
+			pnj = {model = "mp_m_shopkeep_01", x=2557.03, y=380.69, z=108.62, a=5.3},
+		},
+		{
+			pos = {x = 547.431,   y = 2671.710, z = 41.156},
+			pnj = {model = "mp_m_shopkeep_01", x=549.43, y=2669.35, z=42.16, a=80.64},
+		},
+		{
+			pos = {x = 1961.464,  y = 3740.672, z = 31.343},
+			pnj = {model = "mp_m_shopkeep_01", x=1958.77, y=3741.79, z=32.34, a=276.71},
+		},
+		{
+			pos = {x = 1729.216,  y = 6414.131, z = 34.037},
+			pnj = {model = "mp_m_shopkeep_01", x=1728.84, y=6417.17, z=35.04, a=232.14},
+		},
 	},
 
 	LTDgasoline = {
-		Items = {},
-		Pos = {
-			{x = -48.519,   y = -1757.514, z = 28.421},
-			{x = 1163.373,  y = -323.801,  z = 68.205},
-			{x = -707.501,  y = -914.260,  z = 18.215},
-			{x = -1820.523, y = 792.518,   z = 137.118},
-			{x = 1698.388,  y = 4924.404,  z = 41.063}
-		}
-    }
-}
+		{
+			pos = {x = -48.519,   y = -1757.514, z = 28.421},
+			pnj = {model = "mp_m_shopkeep_01", x=-46.58, y=-1757.82, z=29.42, a=11.33},
+		},
+		{
+			pos = {x = 1163.373,  y = -323.801,  z = 68.205},
+			pnj = {model = "mp_m_shopkeep_01", x=1165.07, y=-324.48, z=69.21, a=92.26},
+		},
+		{
+			pos = {x = -707.501,  y = -914.260,  z = 18.215},
+			pnj = {model = "mp_m_shopkeep_01", x=-705.47, y=-913.5, z=19.22, a=91.14},
+		},
+		{
+			pos = {x = -1820.523, y = 792.518,   z = 137.118},
 
-config.Locale = 'fr'
+			pnj = {model = "mp_m_shopkeep_01", x=-1819.16, y=793.22, z=138.08, a=113.33},
+		},
+		{
+			pos = {x = 1698.388,  y = 4924.404,  z = 41.063},
+			pnj = {model = "mp_m_shopkeep_01", x=1698.79, y=4922.33, z=42.06, a=0.31},
+		},
+	}
+}
 
 config.Marker = {
 	r = 250, g = 0, b = 0, a = 100,  -- red color
@@ -52,7 +72,7 @@ config.stores = {
 		reward = math.random(5000, 35000),
 		nameOfStore = "24/7. (Paleto Bay)",
 		secondsRemaining = 350, -- seconds
-		lastRobbed = 0
+		lastRobbed = 0,
 	},
 	["sandyshores_twentyfoursever"] = {
 		position = { x = 1961.24, y = 3749.46, z = 32.34 },
@@ -115,8 +135,8 @@ config.stores = {
 -- Create blips
 Citizen.CreateThread(function()   
     for k,v in pairs(config.Zones) do
-		for i = 1, #v.Pos, 1 do
-			local blip = AddBlipForCoord(v.Pos[i].x, v.Pos[i].y, v.Pos[i].z)
+		for i = 1, #v, 1 do
+			local blip = AddBlipForCoord(v[i].pos.x, v[i].pos.y, v[i].pos.z)
 
 			SetBlipSprite (blip, 52)
 			SetBlipScale  (blip, 1.0)
@@ -126,6 +146,18 @@ Citizen.CreateThread(function()
 			BeginTextCommandSetBlipName('STRING')
 			AddTextComponentSubstringPlayerName('Supérette')
 			EndTextCommandSetBlipName(blip)
+
+			RequestModel(GetHashKey(v[i].pnj.model))
+			while not HasModelLoaded(GetHashKey(v[i].pnj.model)) do
+				Wait(1)
+			end
+
+		-- Spawn the bartender to the coordinates
+			bartender =  CreatePed(5, v[i].pnj.model, v[i].pnj.x, v[i].pnj.y, v[i].pnj.z, v[i].pnj.a, false, true)
+			SetBlockingOfNonTemporaryEvents(bartender, true)
+			SetPedCombatAttributes(bartender, 46, true)
+			SetPedFleeAttributes(bartender, 0, 0)
+			SetPedRelationshipGroupHash(bartender, GetHashKey("CIVFEMALE"))
 		end
 	end
 end)
@@ -133,6 +165,15 @@ end)
 AddEventHandler('shops:hasEnteredMarker', function(zone)
 	isInshopsMarker = true
 	currentZone = zone
+	TriggerEvent("notify:SendNotification", {text = "<span style='font-weight: 900'>Appuyez sur e pour le magasin</span>",
+	layout = "centerLeft",
+	timeout = 2000,
+	progressBar = false,
+	type = "error",
+	animation = {
+		open = "gta_effects_fade_in",
+		close = "gta_effects_fade_out"
+	}})
 end)
 
 AddEventHandler('shops:hasExitedMarker', function(zone)
@@ -149,11 +190,11 @@ Citizen.CreateThread(function()
 		local isInMarker, letSleep, currentZone = false, false
 
 		for k,v in pairs(config.Zones) do
-			for i = 1, #v.Pos, 1 do
-				local distance = GetDistanceBetweenCoords(playerCoords, v.Pos[i].x, v.Pos[i].y, v.Pos[i].z, true)
+			for i = 1, #v, 1 do
+				local distance = GetDistanceBetweenCoords(playerCoords, v[i].pos.x, v[i].pos.y, v[i].pos.z, true)
 
 				if distance < config.DrawDistance then
-					DrawMarker(config.Type, v.Pos[i].x, v.Pos[i].y, v.Pos[i].z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Size.x, config.Size.y, config.Size.z, config.Color.r, config.Color.g, config.Color.b, 100, false, true, 2, false, nil, nil, false)
+					DrawMarker(config.Type, v[i].pos.x, v[i].pos.y, v[i].pos.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Size.x, config.Size.y, config.Size.z, config.Color.r, config.Color.g, config.Color.b, 100, false, true, 2, false, nil, nil, false)
 					letSleep = false
 
 					if distance < config.Size.x then

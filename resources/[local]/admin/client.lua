@@ -65,12 +65,29 @@ RegisterCommand("tpm", function(source)
 end)
 
 
-RegisterCommand("kill", function(source)
-    SetEntityHealth(PlayerPedId(),0)
+RegisterCommand("tp", function(source, args)
+   -- local waypointCoords = vector3(args[1], args[2], args[3])
+   local waypointCoords = vector3(239.61, -2018.95, 18.31)
+    for height = 1, 1000 do
+        SetPedCoordsKeepVehicle(PlayerPedId(), waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+        local foundGround, zPos = GetGroundZFor_3dCoord(waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+        if foundGround then
+            SetPedCoordsKeepVehicle(PlayerPedId(), waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+            break
+        end
+
+        Citizen.Wait(5)
+    end
 end)
 
 
 
+RegisterCommand("kill", function(source)
+    SetEntityHealth(PlayerPedId(),0)
+end)
 
 RegisterCommand("revive", function(source)
     print("REVIVING")
@@ -80,3 +97,62 @@ end)
 RegisterCommand("money:add", function(source, args)
     TriggerServerEvent('account:money:add', GetPlayerPed(-1), args[1])
 end)
+
+
+RegisterCommand("change", function(source, args)
+
+    local skin ={
+        sex          = 0,
+        face         = 0,
+        skin         = 0,
+        beard_1      = 0,
+        beard_2      = 0,
+        beard_3      = 0,
+        beard_4      = 0,
+        hair_1       = 0,
+        hair_2       = 0,
+        hair_color_1 = 0,
+        hair_color_2 = 0,
+        tshirt_1     = 0,
+        tshirt_2     = 0,
+        torso_1      = 0,
+        torso_2      = 0,
+        decals_1     = 0,
+        decals_2     = 0,
+        arms         = 0,
+        pants_1      = 0,
+        pants_2      = 0,
+        shoes_1      = 0,
+        shoes_2      = 0,
+        mask_1       = 0,
+        mask_2       = 0,
+        bproof_1     = 0,
+        bproof_2     = 0,
+        chain_1      = 0,
+        chain_2      = 0,
+        helmet_1     = 0,
+        helmet_2     = 0,
+        glasses_1    = 0,
+        glasses_2    = 0,
+    }
+    
+    local row = args[1] or 'tshirt_1'
+    local value = args[2] or '1'
+
+    local clothes = {
+        tshirt_1 = 0,  tshirt_2 = 0,
+        torso_1 = 15,   torso_2 = 0,
+        decals_1 = 0,   decals_2 = 0,
+        arms = 0,
+        pants_1 = 0,   pants_2 = 0,
+        shoes_1 = 0,   shoes_2 = 0,
+        helmet_1 = 2,  helmet_2 = 0,
+        chain_1 = 0,    chain_2 = 0,
+        ears_1 = 0,     ears_2 = 0
+    }
+
+    clothes[row] = tonumber(value)
+    
+    TriggerEvent('skinchanger:loadClothes', skin, clothes)
+end)
+

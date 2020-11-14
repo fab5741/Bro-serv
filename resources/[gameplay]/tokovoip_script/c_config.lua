@@ -18,7 +18,7 @@ TokoVoipConfig = {
 	radioClickMaxChannel = 100, -- Set the max amount of radio channels that will have local radio clicks enabled
 	radioAnim = true, -- Enable or disable the radio animation
 	radioEnabled = true, -- Enable or disable using the radio
-	wsServer = "127.0.0.1:33250", -- Address of the websocket server
+	wsServer = "51.178.86.118:33250", -- Address of the websocket server
 
 	plugin_data = {
 		-- TeamSpeak channel name used by the voip
@@ -32,7 +32,7 @@ TokoVoipConfig = {
 		TSChannelWait = "[TokoVOIP] Waiting channel", -- You NEED tokovoip in the wait channel name!
 
 		-- Blocking screen informations
-		TSServer = "127.0.0.1", -- TeamSpeak server address to be displayed on blocking screen
+		TSServer = "51.178.86.118", -- TeamSpeak server address to be displayed on blocking screen
 		TSChannelSupport = "S1: Waiting For Support", -- TeamSpeak support channel name displayed on blocking screen
 		TSDownload = "https://voip.itokoyamato.net", -- Download link displayed on blocking screen
 		TSChannelWhitelist = { -- Black screen will not be displayed when users are in those TS channels

@@ -132,20 +132,12 @@ Citizen.CreateThread(function()
                     cruiseIsOn = false
                 end
 
-                -- Check what units should be used for speed
-                if ShouldUseMetricMeasurements() then
-                    -- Get vehicle speed in KPH and draw speedometer
-                    local speed = currSpeed*3.6
-                    local speedColor = (speed >= speedLimit) and speedColorOver or speedColorUnder
-                    drawTxt(("%.3d"):format(math.ceil(speed)), 2, speedColor, 0.8, screenPosX + 0.000, screenPosY + 0.000)
-                    drawTxt("KPH", 2, speedColorText, 0.4, screenPosX + 0.030, screenPosY + 0.018)
-                else
-                    -- Get vehicle speed in MPH and draw speedometer
-                    local speed = currSpeed*2.23694
-                    local speedColor = (speed >= speedLimit) and speedColorOver or speedColorUnder
-                    drawTxt(("%.3d"):format(math.ceil(speed)), 2, speedColor, 0.8, screenPosX + 0.000, screenPosY + 0.000)
-                    drawTxt("MPH", 2, speedColorText, 0.4, screenPosX + 0.030, screenPosY + 0.018)
-                end
+                -- Get vehicle speed in KPH and draw speedometer
+                local speed = currSpeed*3.6
+                local speedColor = (speed >= speedLimit) and speedColorOver or speedColorUnder
+                drawTxt(("%.3d"):format(math.ceil(speed)), 2, speedColor, 0.8, screenPosX + 0.000, screenPosY + 0.000)
+                drawTxt("KPH", 2, speedColorText, 0.4, screenPosX + 0.030, screenPosY + 0.018)
+
                 
                 -- Draw fuel gauge
                 local fuelColor = (currentFuel >= fuelWarnLimit) and fuelColorOver or fuelColorUnder

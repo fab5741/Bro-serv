@@ -32,12 +32,6 @@ local config = {
             Helicopters = {
 				coords = vector3(55.25, -562.98,28.74)
             },
-
-            FastTravels = {
-            },
-
-            FastTravelsPrompt = {
-            }
         }
 	}
 }
@@ -93,10 +87,46 @@ config.AuthorizedVehicles = {
 	}
 }
 
+
+anyMenuOpen = {
+	menuName = "",
+	isActive = false
+}
+
+
 local onDuty
+local myJob = {
+	"Chomeur",
+	"Chomeur"
+}
+
+RegisterNUICallback('sendAction', function(data, cb)
+	_G[data.action](data.params)
+    cb('ok')
+end)
+-- GET THE JOB
+RegisterNetEvent('lsms:job')
+
+AddEventHandler("lsms:job", function(job)
+	myJob = job[1]
+end)
+
+Citizen.CreateThread(function()
+	TriggerServerEvent("job:get", "lsms:job")
+end)
+
 
 RegisterNetEvent("lsms:revive")
 
+
+function CloseMenu()
+	SendNUIMessage({
+		action = "close"
+	})
+	
+	anyMenuOpen.menuName = ""
+	anyMenuOpen.isActive = false
+end
 
 -- Create blips
 Citizen.CreateThread(function()
@@ -112,17 +142,18 @@ Citizen.CreateThread(function()
 		AddTextComponentSubstringPlayerName('Hopital')
 		EndTextCommandSetBlipName(blip)
 
-		local blip = AddBlipForCoord(v.lockers.blip.coords)
-		SetBlipSprite(blip, v.lockers.blip.sprite)
-		SetBlipScale(blip, v.lockers.blip.scale)
-		SetBlipColour(blip, v.lockers.blip.color)
-		SetBlipAsShortRange(blip, true)
+		if myJob.job == "LSMS" then
+			local blip = AddBlipForCoord(v.lockers.blip.coords)
+			SetBlipSprite(blip, v.lockers.blip.sprite)
+			SetBlipScale(blip, v.lockers.blip.scale)
+			SetBlipColour(blip, v.lockers.blip.color)
+			SetBlipAsShortRange(blip, true)
 
-		BeginTextCommandSetBlipName('STRING')
-		AddTextComponentSubstringPlayerName('Hopital')
-		EndTextCommandSetBlipName(blip)
+			BeginTextCommandSetBlipName('STRING')
+			AddTextComponentSubstringPlayerName('Hopital')
+			EndTextCommandSetBlipName(blip)
+		end
 	end
-
 end)
 
 -- local values
@@ -177,7 +208,6 @@ function SendDistressSignal()
 	local coords = GetEntityCoords(playerPed)
 
     print("Appel envoyé")
-	--ESX.ShowNotification(_U('distress_sent'))
 	TriggerServerEvent('lsms:distress', playerPed)
 end
 
@@ -220,45 +250,38 @@ AddEventHandler('player:dead', function(data)
     end
 end)
 
-AddEventHandler('lsms:revive', function(noAmbulancies)
+AddEventHandler('lsms:revive', function()
     isDead=false
-    if(noAmbulancies) then 
-        Citizen.CreateThread(function()
-            local timer = 5000
-    
-            while timer > 0 do
-                Citizen.Wait(0)
-                timer = timer - 30
-    
-                SetTextFont(4)
-                SetTextScale(0.45, 0.45)
-                SetTextColour(185, 185, 185, 255)
-                SetTextDropshadow(0, 0, 0, 0, 255)
-                SetTextDropShadow()
-                SetTextOutline()
-                BeginTextCommandDisplayText('STRING')
-                AddTextComponentSubstringPlayerName('Respawn instantanée pas d\'ambulanciers')
-                EndTextCommandDisplayText(0.175, 0.805)
-    
-                if IsControlJustReleased(0, 47) then
-                    SendDistressSignal()
-                    break
-                end
-            end
-        end)
-    end
+	Citizen.CreateThread(function()
+		local timer = 5000
+
+		while timer > 0 do
+			Citizen.Wait(0)
+			timer = timer - 30
+
+			SetTextFont(4)
+			SetTextScale(0.45, 0.45)
+			SetTextColour(185, 185, 185, 255)
+			SetTextDropshadow(0, 0, 0, 0, 255)
+			SetTextDropShadow()
+			SetTextOutline()
+			BeginTextCommandDisplayText('STRING')
+			AddTextComponentSubstringPlayerName('Respawn instantanée pas d\'ambulanciers')
+			EndTextCommandDisplayText(0.175, 0.805)
+
+			if IsControlJustReleased(0, 47) then
+				SendDistressSignal()
+				break
+			end
+		end
+	end)
     isDead=false
     DoScreenFadeOut(800)
 	while not IsScreenFadedOut() do
 		Citizen.Wait(50)
 	end
     local ped = GetPlayerPed(-1)
-    if(noAmbulancies) then 
-        --TODO resurect at hospital
-        NetworkResurrectLocalPlayer(GetEntityCoords(ped), true, true, false)
-    else
-        NetworkResurrectLocalPlayer(GetEntityCoords(ped), true, true, false)
-    end
+	NetworkResurrectLocalPlayer(GetEntityCoords(ped), true, true, false)
     SetPlayerInvincible(ped, false)
     ClearPedBloodDamage(ped)
     StopScreenEffect('DeathFailOut')
@@ -274,42 +297,19 @@ function OpenlsmsActionsMenu()
 
 end
 
-function FastTravel(coords, heading)
-	local playerPed = PlayerPedId()
-
-	DoScreenFadeOut(800)
-
-	while not IsScreenFadedOut() do
-		Citizen.Wait(500)
-	end
-
-        for height = 1, 1000 do
-            SetPedCoordsKeepVehicle(playerPed, coords.x, coords.y, height + 0.0)
-
-            local foundGround, zPos = GetGroundZFor_3dCoord(coords.x, coords.y, height + 0.0)
-
-            if foundGround then
-                SetPedCoordsKeepVehicle(playerPed, coords.x, coords.y, height + 0.0)
-
-                break
-            end
-
-            Citizen.Wait(5)
-        end
-		DoScreenFadeIn(800)
-
-		if heading then
-			SetEntityHeading(playerPed, heading)
-		end
-end
-
 -- Draw markers & Marker logic
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
         -- TODO if job is lsms
-        if true then
+		if myJob.job == "LSMS" then
+
+			if (IsControlJustPressed(1,166)) then
+				load_menu()
+				ToggleLSMSMenu()
+			end
+
             DrawMarker(0, 117.14, -1950.29, 20,7513, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.75, 0.75, 0.75, 204, 204, 0, 100, false, true, 2, false, false, false, false)
 
 			local playerCoords = GetEntityCoords(PlayerPedId())
@@ -342,19 +342,6 @@ Citizen.CreateThread(function()
 					end
 				end
 
-				-- Pharmacies
-				for k,v in ipairs(hospital.Pharmacies) do
-					local distance = #(playerCoords - v.coords)
-
-					if true then
-						DrawMarker(config.Marker.type, v, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
-						letSleep = false
-
-						if distance < config.Marker.x then
-							isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'Pharmacy', k
-						end
-					end
-				end
 
 				-- Vehicle Spawners
 				local distance = #(playerCoords - hospital.Vehicles.coords)
@@ -376,22 +363,7 @@ Citizen.CreateThread(function()
 						isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'Helicopters', 1
 					end
 				end
-
-				-- Fast Travels (Prompt)
-				for k,v in ipairs(hospital.FastTravelsPrompt) do
-					local distance = #(playerCoords - v.From)
-
-					if distance < config.DrawDistance then
-						DrawMarker(v.Marker.type, v.From, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.Marker.x, v.Marker.y, v.Marker.z, v.Marker.r, v.Marker.g, v.Marker.b, v.Marker.a, false, false, 2, v.Marker.rotate, nil, nil, false)
-						letSleep = false
-
-						if distance < v.Marker.x then
-							isInMarker, currentHospital, currentPart, currentPartNum = true, hospitalNum, 'FastTravelsPrompt', k
-						end
-					end
-				end
 			end
-
 			-- Logic for exiting & entering markers
 			if isInMarker and not HasAlreadyEnteredMarker or (isInMarker and (LastHospital ~= currentHospital or LastPart ~= currentPart or LastPartNum ~= currentPartNum)) then
 				if
@@ -415,34 +387,6 @@ Citizen.CreateThread(function()
 				Citizen.Wait(500)
 			end
 		else
-			Citizen.Wait(500)
-		end
-	end
-end)
-
--- Fast travels
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(0)
-		local playerCoords, letSleep = GetEntityCoords(PlayerPedId()), true
-
-		for hospitalNum,hospital in pairs(config.hospitals) do
-			-- Fast Travels
-			for k,v in ipairs(hospital.FastTravels) do
-				local distance = #(playerCoords - v.From)
-
-				if distance < config.DrawDistance then
-					DrawMarker(v.Marker.type, v.From, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, v.Marker.x, v.Marker.y, v.Marker.z, v.Marker.r, v.Marker.g, v.Marker.b, v.Marker.a, false, false, 2, v.Marker.rotate, nil, nil, false)
-					letSleep = false
-
-					if distance < v.Marker.x then
-						FastTravel(v.To.coords, v.To.heading)
-					end
-				end
-			end
-		end
-
-		if letSleep then
 			Citizen.Wait(500)
 		end
 	end
@@ -606,12 +550,6 @@ AddEventHandler('lsms:hasEnteredMarker', function(hospital, part, partNum)
 
 		-- release the model
 		SetModelAsNoLongerNeeded(vehicleName)
-	elseif part == 'FastTravelsPrompt' then
-		local travelItem = config.hospitals[hospital][part][partNum]
-
-		CurrentAction = part
-		CurrentActionMsg = travelItem.Prompt
-		CurrentActionData = {to = travelItem.To.coords, heading = travelItem.To.heading}
 	elseif part == 'lockers' then
 		TriggerEvent('skinchanger:getSkin', function(skin)
 			if skinChanged then
@@ -655,6 +593,7 @@ AddEventHandler('lsms:hasEnteredMarker', function(hospital, part, partNum)
 				TriggerEvent('skinchanger:loadClothes', skin, clothes)
 				skinChanged =false
 				onDuty = false
+				TriggerServerEvent('lsms:onDuty', false)
 			else
 				if skin.sex == 0 then
 					TriggerEvent('skinchanger:loadClothes', skin, clothes.recruit.male)
@@ -663,6 +602,7 @@ AddEventHandler('lsms:hasEnteredMarker', function(hospital, part, partNum)
 				end
 				skinChanged = true
 				onDuty = true
+				TriggerServerEvent('lsms:onDuty', true)
 			end
 		end)
 	end	
@@ -679,60 +619,103 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
-		if CurrentAction then
-			--ESX.ShowHelpNotification(CurrentActionMsg)
+		if myJob.job == "LSMS" then
 
-			if IsControlJustReleased(0, 38) then
-				if CurrentAction == 'lsmsActions' then
-					OpenlsmsActionsMenu()
-				elseif CurrentAction == 'Pharmacy' then
-					OpenPharmacyMenu()
-                elseif CurrentAction == 'Vehicles' then
-                        -- account for the argument not being passed
-    local vehicleName = 'adder'
+			if(anyMenuOpen.isActive) then
+				DisableControlAction(1, 21)
+				DisableControlAction(1, 140)
+				DisableControlAction(1, 141)
+				DisableControlAction(1, 142)
 
-    -- check if the vehicle actually exists
-    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-        TriggerEvent('chat:addMessage', {
-            args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-        })
+				SetDisableAmbientMeleeMove(PlayerPedId(), true)
 
-        return
-    end
+				if (IsControlJustPressed(1,172)) then
+					SendNUIMessage({
+						action = "keyup"
+					})
+					PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+				elseif (IsControlJustPressed(1,173)) then
+					SendNUIMessage({
+						action = "keydown"
+					})
+					PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+				elseif (IsControlJustPressed(1,176)) then
+					print("enter")
+					SendNUIMessage({
+						action = "keyenter"
+					})
+					PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+				elseif (IsControlJustPressed(1,177)) then
+					if(anyMenuOpen.menuName == "lsmsmenu" or anyMenuOpen.menuName == "cloackroom" or anyMenuOpen.menuName == "garage") then
+						CloseMenu()
+					elseif(anyMenuOpen.menuName == "armory") then
+						CloseArmory()					
+					elseif(anyMenuOpen.menuName == "armory-weapon_list") then
+						BackArmory()
+					else
+						BackMenuLSMS()
+					end
+				end
+			else
+				EnableControlAction(1, 21)
+				EnableControlAction(1, 140)
+				EnableControlAction(1, 141)
+				EnableControlAction(1, 142)
+			end
 
-    -- load the model
-    RequestModel(vehicleName)
+						if CurrentAction then
+							--ESX.ShowHelpNotification(CurrentActionMsg)
 
-    -- wait for the model to load
-    while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-    end
+							if IsControlJustReleased(0, 38) then
+								if CurrentAction == 'lsmsActions' then
+									OpenlsmsActionsMenu()
+								elseif CurrentAction == 'Pharmacy' then
+									OpenPharmacyMenu()
+								elseif CurrentAction == 'Vehicles' then
+										-- account for the argument not being passed
+					local vehicleName = 'adder'
 
-    -- get the player's position
-    local playerPed = PlayerPedId() -- get the local player ped
-    local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
+					-- check if the vehicle actually exists
+					if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+						TriggerEvent('chat:addMessage', {
+							args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
+						})
 
-    -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+						return
+					end
 
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
+					-- load the model
+					RequestModel(vehicleName)
 
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-    SetEntityAsNoLongerNeeded(vehicle)
+					-- wait for the model to load
+					while not HasModelLoaded(vehicleName) do
+						Wait(500) -- often you'll also see Citizen.Wait
+					end
 
-    -- release the model
-	SetModelAsNoLongerNeeded(vehicleName)
-	
-		OpenVehicleSpawnerMenu('car', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
-	elseif CurrentAction == 'Helicopters' then
-		OpenVehicleSpawnerMenu('helicopter', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
-	elseif CurrentAction == 'FastTravelsPrompt' then
-		FastTravel(CurrentActionData.to, CurrentActionData.heading)
-	end
+					-- get the player's position
+					local playerPed = PlayerPedId() -- get the local player ped
+					local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
 
-	CurrentAction = nil
-end
+					-- create the vehicle
+					local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+
+					-- set the player ped into the vehicle's driver seat
+					SetPedIntoVehicle(playerPed, vehicle, -1)
+
+					-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+					SetEntityAsNoLongerNeeded(vehicle)
+
+					-- release the model
+					SetModelAsNoLongerNeeded(vehicleName)
+					
+						OpenVehicleSpawnerMenu('car', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
+					elseif CurrentAction == 'Helicopters' then
+						OpenVehicleSpawnerMenu('helicopter', CurrentActionData.hospital, CurrentAction, CurrentActionData.partNum)
+					end
+
+					CurrentAction = nil
+				end
+			end
 			Citizen.Wait(500)
 		end
 	end

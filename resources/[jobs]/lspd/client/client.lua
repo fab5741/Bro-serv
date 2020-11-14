@@ -8,7 +8,6 @@ local myJob = {
 
 }
 
-
 -- GET THE JOB
 RegisterNetEvent('lspd:job')
 
@@ -17,14 +16,15 @@ AddEventHandler("lspd:job", function(job)
 end)
 
 Citizen.CreateThread(function()
-	TriggerServerEvent("job:get", "lspd:job")
+	TriggerServerEvent("job:get", function(job)
+		myJob = job[1]
+	end)
 end)
 
 -- Draw markers & Marker logic
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
-        -- TODO if job is lspd
 		if myJob.job == "LSPD" then
             DrawMarker(0, 117.14, -1950.29, 20,7513, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.75, 0.75, 0.75, 204, 204, 0, 100, false, true, 2, false, false, false, false)
 			-- Logic for exiting & entering markers
@@ -56,7 +56,6 @@ Citizen.CreateThread(function()
 	end
 end)
 
--- https://github.com/FiveM-Scripts/Cops_FiveM/blob/master/police/client/client.lua
 local isInService = false
 local policeHeli = nil
 local handCuffed = false

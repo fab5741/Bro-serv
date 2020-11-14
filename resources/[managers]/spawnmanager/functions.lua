@@ -54,26 +54,12 @@ function spawnPlayer(x, y, z, skin)
 
         -- freeze the local player
         freezePlayer(PlayerId(), true)
-        local model = "mp_m_freemode_01"
-        RequestModel(model)
-
-        -- load the model for this spawn
-        while not HasModelLoaded(model) do
-            RequestModel(model)
-
-            Wait(0)
-        end
-
-        -- change the player model
-        SetPlayerModel(PlayerId(), model)
-
         -- release the player model
         SetModelAsNoLongerNeeded(model)  
-        skin = nil   
         if(skin == nil) then
             skin ={
-                sex          = 0,
-                face         = 0,
+                sex          = 1,
+                face         = 1,
                 skin         = 0,
                 beard_1      = 0,
                 beard_2      = 0,
@@ -100,7 +86,7 @@ function spawnPlayer(x, y, z, skin)
                 bproof_2     = 0,
                 chain_1      = 0,
                 chain_2      = 0,
-                helmet_1     = 0,
+                helmet_1     = 121,
                 helmet_2     = 0,
                 glasses_1    = 0,
                 glasses_2    = 0,

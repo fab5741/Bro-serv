@@ -52,21 +52,17 @@ end)
 RegisterNetEvent("job:process")
 AddEventHandler('job:process', function(isOk)
     if isOk then
-        TriggerEvent("notify:SendNotification", 
-        {text= "Vous avez transformé", type = "info", timeout = 5000})
+        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vous avez transformé", false, "now_cuffed")
     else
-        TriggerEvent("notify:SendNotification", 
-        {text= "Vos poches sont vides", type = "error", timeout = 5000})
+        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vos poches sont vides", false, "now_cuffed")
     end
 end)
 
 RegisterNetEvent("job:sell")
 AddEventHandler('job:sell', function(isOk)
     if isOk then
-        TriggerEvent("notify:SendNotification", 
-        {text= "Vous avez vendu", type = "info", timeout = 5000})
+        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vous avez vendu", false, "now_cuffed")
     else
-        TriggerEvent("notify:SendNotification", 
-        {text= "Vos poches sont vides", type = "error", timeout = 5000})
+        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vos poches sont vides", false, "now_cuffed")
     end
 end)

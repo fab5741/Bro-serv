@@ -61,8 +61,6 @@ end)
 
 
 RegisterNetEvent("spawnmanager:player:get")
-
-
 local items = {
     {name = "firstName", label =  'Nom :',    type = "text", placeholder = "John"},
 {name = "lastName",  label =  'Prénom : ',     type = "text", placeholder = "Smith"},

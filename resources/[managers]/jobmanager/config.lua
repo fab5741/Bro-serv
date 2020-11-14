@@ -70,9 +70,36 @@ config = {
                     },
                     action = "sell",
                     items = {
-                        {name="bread", label="Pain", amount="1", type="13", price="5"},
+                        {name="bread", label="Pain", amount="1", type="13", price="2"},
                     }
                 }
+            },
+            grades = {
+                stagiaire = {
+                    label= "Stagiaire",
+                    skin_male = {
+                        tshirt_1 = 19,  tshirt_2 = 1,
+                        torso_1 = 55,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 5,   pants_2 = 0,
+                        shoes_1 = 25,   shoes_2 = 0,
+                        helmet_1 = 46,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    },
+                    skin_female = {
+                        tshirt_1 = 36,  tshirt_2 = 1,
+                        torso_1 = 48,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 44,
+                        pants_1 = 34,   pants_2 = 0,
+                        shoes_1 = 27,   shoes_2 = 0,
+                        helmet_1 = 45,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    }
+               }
             }
         },
         Vignerons = {
@@ -130,7 +157,7 @@ config = {
                     },
                     action = "sell",
                     items = {
-                        {name="Jus de raisin", label="Jus de raisin", amount="1", type="19", price="5"},
+                        {name="Jus de raisin", label="Jus de raisin", amount="1", type="19", price="2"},
                     }
                 }
             },
@@ -199,13 +226,4 @@ config.Marker                     = {type = 1, x = 1.5, y = 1.5, z = 0.5, r = 10
 config.bindings = {
     interact_position = 51, -- E
     use_job_menu = 166, -- F5
-}
-
-config.skins = {
-        [0] = {
-            {name="Fermier", model="a_m_m_farmer_01", job="food"},
-            },
-        [1] = {
-            {name="Vigneron", model="a_m_m_eastsa_01", job="wine"},
-            },
 }

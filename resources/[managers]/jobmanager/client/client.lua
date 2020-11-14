@@ -13,6 +13,7 @@ AddEventHandler("job:get", function(job)
 	job = job[1]
 	-- Draw blips
 	v = config.jobs[job.job]
+	print(job.job)
 	if v then
 		drawBlip(v)
 		for k, v in pairs(v.lockers) do

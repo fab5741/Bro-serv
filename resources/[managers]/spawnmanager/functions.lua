@@ -58,16 +58,16 @@ function spawnPlayer(x, y, z, skin)
         SetModelAsNoLongerNeeded(model)  
         if(skin == nil) then
             skin ={
-                sex          = 1,
-                face         = 1,
-                skin         = 0,
+                sex          = 0,
+                face         = 5,
+                skin         = 25,
                 beard_1      = 0,
                 beard_2      = 0,
                 beard_3      = 0,
                 beard_4      = 0,
-                hair_1       = 0,
+                hair_1       = 3,
                 hair_2       = 0,
-                hair_color_1 = 0,
+                hair_color_1 = 2,
                 hair_color_2 = 0,
                 tshirt_1     = 0,
                 tshirt_2     = 0,

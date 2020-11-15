@@ -30,7 +30,7 @@ TokoVoipConfig = {
 		-- Optional: TeamSpeak waiting channel name, players wait in this channel and will be moved to the TSChannel automatically
 		-- If the TSChannel is public and people can join directly, you can leave this empty and not use the auto-move
 		TSChannelWait = "[TokoVOIP] Waiting channel", -- You NEED tokovoip in the wait channel name!
-
+ 
 		-- Blocking screen informations
 		TSServer = "51.178.86.118", -- TeamSpeak server address to be displayed on blocking screen
 		TSChannelSupport = "S1: Waiting For Support", -- TeamSpeak support channel name displayed on blocking screen

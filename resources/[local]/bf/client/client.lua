@@ -21,7 +21,6 @@ end
 Citizen.CreateThread(function()
 	TriggerServerEvent("bf:player:get", "bf:player:get")
 	TriggerServerEvent("account:liquid", "bf:liquid")
-
   while true do
     Citizen.Wait(0)
 
@@ -30,7 +29,8 @@ Citizen.CreateThread(function()
      -- TriggerServerEvent("account:liquid", "bf:liquid")
     --end
 
-    if (IsControlJustPressed(1, 288)) then
+	if (IsControlJustPressed(1, 288)) then
+	  TriggerServerEvent("account:liquid", "bf:liquid")
       load_menu()
       TogglePlayerMenu()
 	end
@@ -175,9 +175,6 @@ end
 
 function OpenWalletMenu()
 	CloseMenu()
-
-
-
 	SendNUIMessage({
 		title = "Portefeuille",
 		--subtitle = "Liquid " .. liquid .. " / Sale " .. dirty,

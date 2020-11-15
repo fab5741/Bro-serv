@@ -21,9 +21,25 @@ AddEventHandler('account:money:add', function(amount)
 	end
 
   MySQL.ready(function ()
-    MySQL.Async.execute('UPDATE accounts, players SET accounts.amount = accounts.amount + @amount WHERE fivem = @fivem and players.id = accounts.player', {
-        ['fivem'] = discord, ['amount'] = amount
-    })
+	MySQL.Async.fetchAll('select * from accounts where players = @fivem',
+        {['fivem'] =  discord},
+		function(res)
+			print(res)
+			if res[1]  then
+				MySQL.Async.execute('INSERT INTO `accounts` (`id`, `player`, `amount`) VALUES (NULL, @fivem, `0`)', {
+					['fivem'] = discord
+				}, function(res)
+					MySQL.Async.execute('UPDATE accounts, players SET accounts.amount = accounts.amount + @amount WHERE fivem = @fivem and players.id = accounts.player', {
+						['fivem'] = discord, ['amount'] = amount
+					})				
+				end)
+
+			else
+				MySQL.Async.execute('UPDATE accounts, players SET accounts.amount = accounts.amount + @amount WHERE fivem = @fivem and players.id = accounts.player', {
+					['fivem'] = discord, ['amount'] = amount
+				})
+			end
+        end)
   end)
 end)
 
@@ -31,8 +47,6 @@ RegisterNetEvent("account:liquid")
 
 AddEventHandler('account:liquid', function(cb)
   local sourceValue = source
-
-  
 	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v

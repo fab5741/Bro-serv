@@ -118,3 +118,43 @@ AddEventHandler('shops:withdraw', function(amount)
         end)
       end)
 end)
+
+
+RegisterNetEvent('shops:rob')
+AddEventHandler('shops:rob', function(id)
+	local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+	end
+	
+	MySQL.ready(function ()
+		MySQL.Async.fetchAll('select money from shops where id = @id', {['id'] = id},
+		function(res)
+			print(res[1])
+			if res[1] ~= nil  and res[1].money ~= nil then
+				MySQL.Async.fetchAll('UPDATE players set liquid=liquid+@amount where fivem = @fivem',
+				{['fivem'] =  discord,
+				['amount'] = res[1].money},
+				function(res2)
+					MySQL.Async.execute('UPDATE shops SET money=0 where id = @id', {['id'] = id}, function(res3)
+						TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"vous avez braqué pour " .. res[1].money.." $", false)
+					end)		
+				end)
+			else
+				TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Error", false)
+			end
+        end)
+	end)
+end)

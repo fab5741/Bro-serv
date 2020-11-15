@@ -17,7 +17,6 @@ end)
 
 
 AddEventHandler('job:hasEnteredMarker', function(location, job)
-
     label = config.jobs[job].label
     if location.action == 'lockers' then
         DisplayHelpText("Ouvrir le vestiaire : "..label,0,1,0.5,0.8,0.6,255,255,255,255)
@@ -35,12 +34,7 @@ AddEventHandler('job:hasEnteredMarker', function(location, job)
         if IsControlJustPressed(1,config.bindings.interact_position) then
             process(location, job)
         end
-    elseif location.action == 'sell' then
-        DisplayHelpText("Revente : "..label,0,1,0.5,0.8,0.6,255,255,255,255)
-        if IsControlJustPressed(1,config.bindings.interact_position) then
-            sell(location, job)
-        end
-	end	
+    end
 end)
 
 AddEventHandler('job:hasExitedMarker', function(station, part, partNum)

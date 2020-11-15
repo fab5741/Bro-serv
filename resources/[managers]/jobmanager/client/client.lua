@@ -177,3 +177,11 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
+
+RegisterNetEvent('job:openStorageMenu')
+
+AddEventHandler("job:openStorageMenu", function(location, job)   
+	print("okkk")
+	sell(location, job)
+end)

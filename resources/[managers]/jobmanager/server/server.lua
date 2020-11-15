@@ -70,7 +70,7 @@ end)
 
 RegisterNetEvent("jobs:sell")
 
-AddEventHandler('jobs:sell', function (item, shop)
+AddEventHandler('jobs:sell', function (item, price, shop)
     local source = source
         for k,v in pairs(GetPlayerIdentifiers(source))do
             
@@ -90,34 +90,37 @@ AddEventHandler('jobs:sell', function (item, shop)
             end
     end
 
-    MySQL.Async.fetchAll('select id, amount from players, player_item where fivem = @fivem and player_item.item = @type and player_item.player = players.id',
-    {['fivem'] =  discord,
-    ['amount'] = item.amount,
-    ['type'] = item.type},
-    function(res)
-        if res and res[1] and res[1].amount > 0 then
-            MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
-            {['id'] = res[1].id,
-            ['amount'] = item.amount,
-            ['type'] = item.type},
-            function(affectedRows)
-                    MySQL.Async.execute('UPDATE shops SET amount=amount+@amount WHERE type=@shop and item = @item',
-                    {['id'] = res[1].id,
-                    ['item'] = item.type,
-                    ['amount'] = item.amount,
-                    ['shop'] = shop},
-                    function(res)
-                        MySQL.Async.execute('UPDATE players SET liquid = liquid + @amount WHERE players.fivem = @fivem',
-                        {['fivem'] =  discord,
-                        ['amount'] = item.amount * item.price,
-                        },
-                        function(res)
-                            TriggerClientEvent("job:sell", source, true)
+    MySQL.ready(function ()
+        MySQL.Async.fetchAll('select money from shops where id = @id',{['id'] = shop},
+        function(res)
+            if res and res[1] and res[1].money > price then
+                MySQL.Async.execute('Update shops SET money=money-@price where id = @id',{['price'] = price, ['id'] = shop},
+                function(affectedRows)
+                    if(affectedRows == 1) then
+                        MySQL.Async.execute('Update players SET liquid=liquid+@price where fivem = @fivem',{['price'] = price, ['fivem'] = discord},
+                        function(affectedRows)
+                            if(affectedRows == 1) then
+                                TriggerEvent("items:sub", item, 1)
+                                MySQL.Async.execute('INSERT INTO shop_item (id, shop, item, amount) VALUES(1, @shop, @item, 1) ON DUPLICATE KEY UPDATE amount=amount+1',{
+                                    ['shop'] = shop,
+                                    ['item'] = item,
+                                },
+                                function(affectedRows)
+                                    if(affectedRows == 1) then
+                                        TriggerClientEvent("lspd:notify",  -1,  "CHAR_BANK_FLEECA", -1,"Transaction effectué", false)
+                                    end
+                                end)
+                            else
+                                TriggerClientEvent("lspd:notify",  -1,  "CHAR_BANK_FLEECA", -1,"Error 4", false)
+                            end
                         end)
-                    end)
-            end)
-        else
-            TriggerClientEvent("job:sell", source, false)
-        end
+                    else
+                        TriggerClientEvent("lspd:notify",  -1,  "CHAR_BANK_FLEECA", -1,"Error 3", false)
+                    end
+                end)
+            else
+                TriggerClientEvent("lspd:notify",  -1,  "CHAR_BANK_FLEECA", -1,"Le magasin ne peut pas vous payer !", false)
+            end
+        end)
     end)
 end)

@@ -171,23 +171,29 @@ end
 
 
 function sell(location, job)
+    print(location)
+    print(job)
     buttons = {}
 
-    for k, v in pairs(location.items) do
-        buttons[#buttons+1] = {name = tostring(v.label), func = "sellItems", params = v.type}
+ --   for k, v in pairs(location.items) do
+  --      buttons[#buttons+1] = {name = tostring(v.label), func = "sellItems", params = v.type}
+   -- end
+
+    if job == "Fermiers" then
+        buttons[#buttons+1] = {name = "Pain", func = "sellItem", params = json.encode({item = 13, price=2,5,shop = location})}
     end
 
     buttons[#buttons+1] = {name = "Stopper la vente", func = "CloseMenu", params = ""}
     
-    if anyMenuOpen.menuName ~= "process" and not anyMenuOpen.isActive then
+    if anyMenuOpen.menuName ~= "sell" and not anyMenuOpen.isActive then
 		SendNUIMessage({
 			title = "Revente",
-			subtitle = "Grossiste superette",
+			subtitle = job.." ("..location..")",
 			buttons = buttons,
 			action = "setAndOpen"
 		})
 		
-		anyMenuOpen.menuName = "process"
+		anyMenuOpen.menuName = "sell"
         anyMenuOpen.isActive = true
         lastLocation = location
 		if config.enableVersionNotifier then
@@ -199,16 +205,12 @@ end
 local timeprocessing = 0
 local isSelling = false
 
-function sellItems(item)
-    for k, v in pairs(lastLocation.items) do
-        if(item == v.type)then
-            item = v
-        end
-    end
+function sellItem(data)
+    data = json.decode(data)
     isSelling = true
     --Wait(isSelling)
     
-    TriggerServerEvent('jobs:sell', item, "TwentyFourSeven")
+    TriggerServerEvent('jobs:sell', data.item, data.price, data.shop)
     CloseMenu()
     isSelling = false
 end

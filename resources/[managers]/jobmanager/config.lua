@@ -60,19 +60,6 @@ config = {
                 }
              },
             sell = {
-                {
-                    coords = vector3(1212.65,-1261.7,34.43),
-                    blip = {
-                    sprite = 50,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "sell",
-                    },
-                    action = "sell",
-                    items = {
-                        {name="bread", label="Pain", amount="1", type="13", price="2"},
-                    }
-                }
             },
             grades = {
                 stagiaire = {

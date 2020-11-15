@@ -5,51 +5,109 @@ config.Color        = {r = 0, g = 128, b = 255}
 config.Type         = 1
 
 config.Zones = {
-
 	TwentyFourSeven = {
 		{
+			id =1,
 			pos = {x = 373.875,   y = 325.896,  z = 102.566},
 			pnj = {model = "mp_m_shopkeep_01", x=372.77, y=327.64, z=103.57, a=242.89},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =2,
 			pos = {x = 2557.458,  y = 382.282,  z = 107.622},
 			pnj = {model = "mp_m_shopkeep_01", x=2557.03, y=380.69, z=108.62, a=5.3},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =3,
 			pos = {x = 547.431,   y = 2671.710, z = 41.156},
 			pnj = {model = "mp_m_shopkeep_01", x=549.43, y=2669.35, z=42.16, a=80.64},
+			storage = {
+				x= 548.8, 
+				y= 2662.91,
+				z= 41.0
+			}
 		},
 		{
+			id =4,
 			pos = {x = 1961.464,  y = 3740.672, z = 31.343},
 			pnj = {model = "mp_m_shopkeep_01", x=1958.77, y=3741.79, z=32.34, a=276.71},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =5,
 			pos = {x = 1729.216,  y = 6414.131, z = 34.037},
 			pnj = {model = "mp_m_shopkeep_01", x=1728.84, y=6417.17, z=35.04, a=232.14},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 	},
 
 	LTDgasoline = {
-		{
+		{			
+			id =6,
 			pos = {x = -48.519,   y = -1757.514, z = 28.421},
 			pnj = {model = "mp_m_shopkeep_01", x=-46.58, y=-1757.82, z=29.42, a=11.33},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =7,
 			pos = {x = 1163.373,  y = -323.801,  z = 68.205},
 			pnj = {model = "mp_m_shopkeep_01", x=1165.07, y=-324.48, z=69.21, a=92.26},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =8,
 			pos = {x = -707.501,  y = -914.260,  z = 18.215},
 			pnj = {model = "mp_m_shopkeep_01", x=-705.47, y=-913.5, z=19.22, a=91.14},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =9,
 			pos = {x = -1820.523, y = 792.518,   z = 137.118},
-
 			pnj = {model = "mp_m_shopkeep_01", x=-1819.16, y=793.22, z=138.08, a=113.33},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 		{
+			id =10,
 			pos = {x = 1698.388,  y = 4924.404,  z = 41.063},
 			pnj = {model = "mp_m_shopkeep_01", x=1698.79, y=4922.33, z=42.06, a=0.31},
+			storage = {
+				x= 0.8, 
+				y= 0.91,
+				z= 0.16
+			}
 		},
 	}
 }
@@ -60,77 +118,8 @@ config.Marker = {
 	DrawDistance = 15.0, Type = 1    -- default circle type, low draw distance due to indoors area
 }
 
-config.PoliceNumberRequired = 2
-config.TimerBeforeNewRob    = 1800 -- The cooldown timer on a store after robbery was completed / canceled, in seconds
-
-config.MaxDistance    = 20   -- max distance from the robbary, going any longer away from it will to cancel the robbary
-config.GiveBlackMoney = true -- give black money? If disabled it will give cash instead
-
-config.stores = {
-	["paleto_twentyfourseven"] = {
-		position = { x = 1736.32, y = 6419.47, z = 35.03 },
-		reward = math.random(5000, 35000),
-		nameOfStore = "24/7. (Paleto Bay)",
-		secondsRemaining = 350, -- seconds
-		lastRobbed = 0,
-	},
-	["sandyshores_twentyfoursever"] = {
-		position = { x = 1961.24, y = 3749.46, z = 32.34 },
-		reward = math.random(3000, 20000),
-		nameOfStore = "24/7. (Sandy Shores)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	},
-	["littleseoul_twentyfourseven"] = {
-		position = { x = -709.17, y = -904.21, z = 19.21 },
-		reward = math.random(3000, 20000),
-		nameOfStore = "24/7. (Little Seoul)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	},
-	["bar_one"] = {
-		position = { x = 1990.57, y = 3044.95, z = 47.21 },
-		reward = math.random(5000, 35000),
-		nameOfStore = "Yellow Jack. (Sandy Shores)",
-		secondsRemaining = 300, -- seconds
-		lastRobbed = 0
-	},
-	["ocean_liquor"] = {
-		position = { x = -2959.33, y = 388.21, z = 14.00 },
-		reward = math.random(3000, 30000),
-		nameOfStore = "Robs Liquor. (Great Ocean Highway)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	},
-	["rancho_liquor"] = {
-		position = { x = 1126.80, y = -980.40, z = 45.41 },
-		reward = math.random(3000, 50000),
-		nameOfStore = "Robs Liquor. (El Rancho Blvd)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	},
-	["sanandreas_liquor"] = {
-		position = { x = -1219.85, y = -916.27, z = 11.32 },
-		reward = math.random(3000, 30000),
-		nameOfStore = "Robs Liquor. (San Andreas Avenue)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	},
-	["grove_ltd"] = {
-		position = { x = -43.40, y = -1749.20, z = 29.42 },
-		reward = math.random(3000, 15000),
-		nameOfStore = "LTD Gasoline. (Grove Street)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	},
-	["mirror_ltd"] = {
-		position = { x = 1160.67, y = -314.40, z = 69.20 },
-		reward = math.random(3000, 15000),
-		nameOfStore = "LTD Gasoline. (Mirror Park Boulevard)",
-		secondsRemaining = 200, -- seconds
-		lastRobbed = 0
-	}
-}
+config.robLength = 60
+config.robMaxDistance = 20
 
 -- Create blips
 Citizen.CreateThread(function()   
@@ -188,6 +177,7 @@ Citizen.CreateThread(function()
 		Citizen.Wait(0)
 		local playerCoords = GetEntityCoords(PlayerPedId())
 		local isInMarker, letSleep, currentZone = false, false
+		isInMarkerStorage, letSleep, currentZone = false, false
 
 		for k,v in pairs(config.Zones) do
 			for i = 1, #v, 1 do
@@ -203,6 +193,17 @@ Citizen.CreateThread(function()
 						lastZone    = k
 					end
 				end
+
+				distance = GetDistanceBetweenCoords(playerCoords, v[i].storage.x, v[i].storage.y, v[i].storage.z, true)
+
+				if distance < config.DrawDistance then
+					DrawMarker(config.Type, v[i].storage.x, v[i].storage.y, v[i].storage.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Size.x, config.Size.y, config.Size.z, config.Color.r, config.Color.g, config.Color.b, 100, false, true, 2, false, nil, nil, false)
+					letSleep = false
+
+					if distance < config.Size.x then
+						isInMarkerStorage  = v[i].id
+					end
+				end
 			end
 		end
 
@@ -215,6 +216,7 @@ Citizen.CreateThread(function()
 			hasAlreadyEnteredMarker = false
 			TriggerEvent('shops:hasExitedMarker', lastZone)
 		end
+		
 
 		if letSleep then
 			Citizen.Wait(500)
@@ -244,6 +246,17 @@ RegisterNUICallback('buy', function(data, cb)
 	cb('ok')
 end)
 
+-- Menu interactions
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(0)
+		if isInMarkerStorage then
+			if IsControlJustReleased(0, 46) and IsPedOnFoot(PlayerPedId()) then
+				TriggerEvent('job:openStorageMenu', isInMarkerStorage, "Fermiers")
+			end
+		end
+	end
+end)
 
 -- Menu interactions
 Citizen.CreateThread(function()
@@ -260,7 +273,6 @@ Citizen.CreateThread(function()
 				})
 				SetNuiFocus(true, true)
 			end
-
 		else
 			Citizen.Wait(500)
 		end
@@ -276,3 +288,71 @@ AddEventHandler('onResourceStop', function(resource)
 		end
 	end
 end)
+
+
+
+--- roberry
+
+function robNpc(targetPed)
+    robbedRecently = true
+
+    Citizen.CreateThread(function()
+        local dict = 'random@mugging3'
+        RequestAnimDict(dict)
+        while not HasAnimDictLoaded(dict) do
+            Citizen.Wait(10)
+        end
+
+        TaskStandStill(targetPed, config.robLength * 1000)
+        FreezeEntityPosition(targetPed, true)
+        TaskPlayAnim(targetPed, dict, 'handsup_standing_base', 8.0, -8, .01, 49, 0, 0, 0, 0)
+		TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Braquage en cours", false)
+
+        Citizen.Wait(config.robLength * 1000)
+
+		local playerCoords = GetEntityCoords(PlayerPedId())
+
+		if(GetDistanceBetweenCoords(GetEntityCoords(targetPed), GetEntityCoords(GetPlayerPed(-1))) < config.robMaxDistance) then
+			local j = 0
+			for k,v in pairs(config.Zones) do
+				for i = 1, #v, 1 do
+					j = j+1
+					local distance = GetDistanceBetweenCoords(playerCoords, v[i].pos.x, v[i].pos.y, v[i].pos.z, true)
+
+					if distance < config.DrawDistance then
+						TriggerServerEvent("shops:rob", v[i].id)
+					end
+				end
+			end
+		else
+			TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Vous vous êtes trop éloigné", false)
+		end
+        robbedRecently = false
+    end)
+end
+
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1)
+
+        if IsControlJustPressed(0, 58) then
+            local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId(-1))
+
+            if aiming then
+                local playerPed = GetPlayerPed(-1)
+
+                if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
+					if robbedRecently then
+						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Trop rapide !", false)
+					elseif IsPedDeadOrDying(targetPed, true) then
+						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "L'épicier est mort", false)
+                    else
+                        robNpc(targetPed)
+                    end
+                end
+            end
+        end
+    end
+end)
+

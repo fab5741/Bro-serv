@@ -92,8 +92,6 @@ end)
 
 RegisterNetEvent("items:sub")
 
-
-
 -- source is global here, don't add to function
 AddEventHandler("items:sub", function (type, amount)
     local source = source

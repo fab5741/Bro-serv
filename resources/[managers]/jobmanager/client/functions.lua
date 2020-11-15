@@ -171,8 +171,6 @@ end
 
 
 function sell(location, job)
-    print(location)
-    print(job)
     buttons = {}
 
  --   for k, v in pairs(location.items) do
@@ -215,4 +213,127 @@ function sellItem(data)
     isSelling = false
 end
 
+--safe
+
+function safe()
+    buttons = {}
+
+    buttons[#buttons+1] = {name = "Retirer", func = "safeWitdhraw"}
+    buttons[#buttons+1] = {name = "Déposer", func = "safeAdd"}
+    buttons[#buttons+1] = {name = "Quitter", func = "CloseMenu"}
+    
+    if anyMenuOpen.menuName ~= "sell" and not anyMenuOpen.isActive then
+		SendNUIMessage({
+			title = "Coffre",
+			subtitle = "Fermiers",
+			buttons = buttons,
+			action = "setAndOpen"
+		})
+		
+		anyMenuOpen.menuName = "sell"
+        anyMenuOpen.isActive = true
+        lastLocation = location
+		if config.enableVersionNotifier then
+			TriggerServerEvent('job:UpdateNotifier')
+		end
+	end
+end
+
+function safeWitdhraw()
+    CloseMenu()
+    anyMenuOpen.isActive = false
+    SendNUIMessage({
+        withdraw = true,
+        action = "openAmount"
+    })
+    SetNuiFocus(true, true)
+end
+
+function safeAdd()
+    CloseMenu()
+    anyMenuOpen.isActive = false
+    SendNUIMessage({
+        withdraw = false,
+        action = "openAmount"
+    })
+    SetNuiFocus(true, true)
+end
+
+function parking(job)
+    buttons = {}
+
+    if IsPedOnFoot(PlayerPedId())  then
+        buttons[#buttons+1] = {name = "Sortir", func = "getVehicles", params= job}
+    else
+        buttons[#buttons+1] = {name = "Rentrer", func = "storeVehicle"}
+    end
+    buttons[#buttons+1] = {name = "Quitter", func = "CloseMenu"}
+    
+    if anyMenuOpen.menuName ~= "parking" and not anyMenuOpen.isActive then
+		SendNUIMessage({
+			title = "Parking",
+			subtitle = "Fermiers",
+			buttons = buttons,
+			action = "setAndOpen"
+		})
+		
+		anyMenuOpen.menuName = "parking"
+        anyMenuOpen.isActive = true
+        lastLocation = location
+		if config.enableVersionNotifier then
+			TriggerServerEvent('job:UpdateNotifier')
+		end
+	end
+end
+
+function storeVehicle()
+    CloseMenu()
+    Citizen.CreateThread(function()
+        print(GetVehiclePedIsUsing(PlayerPedId()))
+        vehicle = GetVehiclePedIsUsing(PlayerPedId())
+        DeleteEntity(vehicle)
+	end)
+end
+
+
+function getVehicles(job)
+    CloseMenu()
+    TriggerServerEvent("job:parking:getAll", job)
+end
+
+function getVehicle(id)
+    CloseMenu()
+    TriggerServerEvent("job:parking:get", id)
+end
+
+RegisterNetEvent("job:parking:getAll")
+
+-- source is global here, don't add to function
+AddEventHandler('job:parking:getAll', function (job, vehicles)
+    if #vehicles > 0 then
+        buttons = {}    
+
+        for k, v in pairs(vehicles) do
+            buttons[#buttons+1] = {name = "Sortir : "..tostring(v.name), func = "getVehicle", params = v.id}
+        end
+    
+        if anyMenuOpen.menuName ~= "getVehicles" and not anyMenuOpen.isActive then
+            SendNUIMessage({
+                title = "Parking",
+                subtitle = "Fermiers",
+                buttons = buttons,
+                action = "setAndOpen"
+            })
+            
+            anyMenuOpen.menuName = "getVehicles"
+            anyMenuOpen.isActive = true
+            lastLocation = location
+            if config.enableVersionNotifier then
+                TriggerServerEvent('job:UpdateNotifier')
+            end
+        end
+    else
+        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Parking vide", false, "now_cuffed")
+    end
+end)
 

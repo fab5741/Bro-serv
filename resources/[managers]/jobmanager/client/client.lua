@@ -11,9 +11,14 @@ RegisterNetEvent('job:get')
 
 AddEventHandler("job:get", function(job)
 	job = job[1]
-	-- Draw blips
+	RegisterNUICallback('amount', function(data)
+		print(job.job)
+		TriggerServerEvent("job:safe:deposit", data.withdraw, data.amount, job.job)
+		amount = tonumber(data.amount)
+		SetNuiFocus(false, false)
+	end)
+	-- Draw blips 
 	v = config.jobs[job.job]
-	print(job.job)
 	if v then
 		drawBlip(v)
 		for k, v in pairs(v.lockers) do
@@ -25,7 +30,10 @@ AddEventHandler("job:get", function(job)
 		for k, v in pairs(v.process) do
 			drawBlip(v)
 		end
-		for k, v in pairs(v.sell) do
+		for k, v in pairs(v.safe) do
+			drawBlip(v)
+		end
+		for k, v in pairs(v.parking) do
 			drawBlip(v)
 		end
 	end
@@ -46,7 +54,10 @@ AddEventHandler("job:get", function(job)
 			for k, v in pairs(t.process) do
 				DrawMyMarker(playerCoords, v, job.job)
 			end
-			for k, v in pairs(t.sell) do
+			for k, v in pairs(t.safe) do
+				DrawMyMarker(playerCoords, v, job.job)
+			end
+			for k, v in pairs(t.parking) do
 				DrawMyMarker(playerCoords, v, job.job)
 			end
 		end
@@ -55,11 +66,11 @@ end)
 
 TriggerServerEvent("job:get", "job:get")
 
-
 RegisterNUICallback('sendAction', function(data, cb)
 	_G[data.action](data.params)
     cb('ok')
 end)
+
 
 --
 --Threads
@@ -182,6 +193,5 @@ end)
 RegisterNetEvent('job:openStorageMenu')
 
 AddEventHandler("job:openStorageMenu", function(location, job)   
-	print("okkk")
 	sell(location, job)
 end)

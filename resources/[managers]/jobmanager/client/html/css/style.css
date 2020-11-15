@@ -99,3 +99,8 @@ li {
 	height: 38px;
 	width: 100%;
 }
+
+.amount {
+	background-color: black;
+	color: white;
+}

@@ -25,9 +25,6 @@ AddEventHandler("vehicle:buy", function(id, name)
 		function(res)
 			MySQL.Async.fetchAll('SELECT price FROM `vehicles` where id = @id', {['id'] = id}, function(price)
 				if res[1] and price[1] and res[1].liquid >= price[1].price then
-					print(res[1].liquid)
-					print(price[1].price)
-					print("ON ACHETE")
 					MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
 					{['fivem'] =  discord,
 					['price'] = price[1].price},
@@ -100,7 +97,6 @@ RegisterNetEvent("vehicle:store")
 
 AddEventHandler("vehicle:store", function(vehicle, parking)
     local sourceValue = source
-    print(vehicle, parking)
     MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = @parking WHERE `player_vehicle`.`id` = @vehicle ', {
         ['vehicle'] =  vehicle,
         ['parking'] =  parking,
@@ -108,3 +104,30 @@ AddEventHandler("vehicle:store", function(vehicle, parking)
         print("updated", parking)
     end)
 end)
+
+RegisterNetEvent("vehicle:set:id")
+
+AddEventHandler("vehicle:set:id", function(vehicle, id)
+    local sourceValue = source
+    MySQL.Async.fetchAll('UPDATE `player_vehicle` SET gameId= @id WHERE `player_vehicle`.`id` = @vehicle ', {
+        ['vehicle'] =  vehicle,
+        ['id'] =  id,
+    }, function(result)
+    end)
+end)
+
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(5000)
+		MySQL.ready(function ()
+				MySQL.Async.fetchAll('select * from player_vehicle, vehicles where parking = "" and vehicles.id = player_vehicle.vehicle',{},
+				function(res)
+					for k,v in pairs(res) do    
+				--	print(v.gameId)
+					end       
+				end)
+		end)
+	end
+end)
+

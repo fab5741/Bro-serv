@@ -1,5 +1,6 @@
+
 $(document).ready(function(){	
-	
+send = false	
 	window.addEventListener('message', (event) => {
 		if(event.data.action == "setAndOpen"){
 			$(".header").append(event.data.title);
@@ -76,5 +77,24 @@ $(document).ready(function(){
 				 params: params
 			}));
 		}
+
+		if(event.data.action == "openAmount"){
+			$('#amount').show()
+			amount = true
+			withdraw = event.data.withdraw
+		}
+
+		$(document).on('keypress',function(e) {
+			if(e.which == 13 && !send && amount) {
+				send = true
+				amount = false
+				$.post('http://jobmanager/amount', JSON.stringify({
+					amount: $('#amount').val(),
+					withdraw: withdraw
+
+			   }));
+
+			}
+		});
 	});
 });

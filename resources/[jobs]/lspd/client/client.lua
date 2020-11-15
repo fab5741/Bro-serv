@@ -16,9 +16,7 @@ AddEventHandler("lspd:job", function(job)
 end)
 
 Citizen.CreateThread(function()
-	TriggerServerEvent("job:get", function(job)
-		myJob = job[1]
-	end)
+	TriggerServerEvent("job:get", "lspd:job")
 end)
 
 -- Draw markers & Marker logic

@@ -135,7 +135,7 @@ function CheckInventory()
 	if(distance ~= -1 and distance < 3) then
 		TriggerServerEvent("lspd:targetCheckInventory", GetPlayerServerId(t))
 	else
-		drawNotification("no_player_near_ped")
+		drawNotification("Pas de joueur à proximité")
 	end
 end
 
@@ -144,16 +144,17 @@ function RemoveWeapons()
     if(distance ~= -1 and distance < 3) then
         TriggerServerEvent("lspd:removeWeapons", GetPlayerServerId(t))
     else
-        drawNotification("no_player_near_ped")
+        drawNotification("Pas de joueur à proximité")
     end
 end
 
 function ToggleCuff()
 	local t, distance = GetClosestPlayer()
+
 	if(distance ~= -1 and distance < 3) then
 		TriggerServerEvent("lspd:cuffGranted", GetPlayerServerId(t))
 	else
-		drawNotification("no_player_near_ped")
+		drawNotification("Pas de joueur à proximité")
 	end
 end
 
@@ -161,14 +162,15 @@ function DragPlayer()
 	local t, distance = GetClosestPlayer()
 	if(distance ~= -1 and distance < 3) then
 		TriggerServerEvent("lspd:dragRequest", GetPlayerServerId(t))
-		TriggerEvent("lspd:notify", "CHAR_ANDREAS", 1, "title_notification", false, "drag_sender_notification_part_1" .. GetPlayerName(serverTargetPlayer) .. "drag_sender_notification_part_2")
+		TriggerEvent("lspd:notify", "CHAR_ANDREAS", 1, "Porter", false, "" .. GetPlayerName(serverTargetPlayer) .. "")
 	else
-		drawNotification("no_player_near_ped")
+		drawNotification("Pas de joueur à proximité")
 	end
 end
 
 function Fines(amount)
 	local t, distance = GetClosestPlayer()
+	
 	if(distance ~= -1 and distance < 3) then
 		Citizen.Trace("Price : "..tonumber(amount))
 		if(tonumber(amount) == -1) then
@@ -191,7 +193,7 @@ function Fines(amount)
 			TriggerServerEvent("lspd:finesGranted", GetPlayerServerId(t), tonumber(amount))
 		end
 	else
-		drawNotification(i18n.translate("no_player_near_ped"))
+		drawNotification("Pas de joueur à proximité")
 	end
 end
 
@@ -330,7 +332,7 @@ end
 function OpenAnimMenu()
 	CloseMenu()
 	SendNUIMessage({
-		title = "menu_global_title",
+		title = "Animations",
 		subtitle = GetLabelText("CRW_ANIMATION"),
 		buttons = buttonsAnimation,
 		action = "setAndOpen"
@@ -343,7 +345,7 @@ end
 function OpenCitizenMenu()
 	CloseMenu()
 	SendNUIMessage({
-		title = "menu_global_title",
+		title = "Citoyen",
 		subtitle = GetLabelText("collision_c29ovv"),
 		buttons = buttonsCitizen,
 		action = "setAndOpen"
@@ -356,7 +358,7 @@ end
 function OpenVehMenu()
 	CloseMenu()
 	SendNUIMessage({
-		title = "menu_global_title",
+		title = "Vehicules",
 		subtitle = GetLabelText("PIM_TVEHI"),
 		buttons = buttonsVehicle,
 		action = "setAndOpen"
@@ -369,7 +371,7 @@ end
 function OpenMenuFine()
 	CloseMenu()
 	SendNUIMessage({
-		title = "menu_global_title",
+		title = "Amendes",
 		subtitle = GetLabelText("PM_MP_OPTIONS"),
 		buttons = buttonsFine,
 		action = "setAndOpen"
@@ -382,7 +384,7 @@ end
 function OpenPropsMenu()
 	CloseMenu()
 	SendNUIMessage({
-		title = "menu_global_title",
+		title = "Props",
 		subtitle = GetLabelText("collision_9o6rwvf"),
 		buttons = buttonsProps,
 		action = "setAndOpen"

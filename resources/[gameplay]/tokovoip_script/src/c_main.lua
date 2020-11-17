@@ -38,15 +38,7 @@ local function setPlayerTalkingState(player, playerServerId)
 	animStates[playerServerId] = talking;
 end
 
-local function PlayRedMFacialAnimation(player, animDict, animName)
-	RequestAnimDict(animDict)
-	while not HasAnimDictLoaded(animDict) do
-		Wait(100)
-	end
-  SetFacialIdleAnimOverride(player, animName, animDict)
-end
-
-RegisterNUICallback("updatePluginData", function(data, cb)
+ RegisterNUICallback("updatePluginData", function(data, cb)
 	local payload = data.payload;
 	if (voip[payload.key] == payload.data) then return end
 	voip[payload.key] = payload.data;
@@ -64,15 +56,11 @@ RegisterNUICallback("setPlayerTalking", function(data, cb)
 		setPlayerData(voip.serverId, "voip:talking", 1, true);
 		if (GetConvar("gametype") == "gta5") then
 			PlayFacialAnim(GetPlayerPed(PlayerId()), "mic_chatter", "mp_facial");
-		elseif (GetConvar("gametype") == "rdr3") then
-			PlayRedMFacialAnimation(GetPlayerPed(PlayerId()), "face_human@gen_male@base", "mood_talking_normal");
 		end
 	else
 		setPlayerData(voip.serverId, "voip:talking", 0, true);
 		if (GetConvar("gametype") == "gta5") then
 			PlayFacialAnim(PlayerPedId(), "mood_normal_1", "facials@gen_male@base");
-		elseif (GetConvar("gametype") == "rdr3") then
-			PlayRedMFacialAnimation(PlayerPedId(), "face_human@gen_male@base", "mood_normal");
 		end
 	end
 	cb('ok');

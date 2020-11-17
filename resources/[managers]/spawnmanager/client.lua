@@ -83,5 +83,8 @@ RegisterNetEvent("player:spawnLastPos")
 
 -- source is global here, don't add to function
 AddEventHandler('player:spawnLastPos', function (x,y,z, skin)
+    local ped = PlayerPedId()
+	SetCanAttackFriendly(ped, true, true)
+	NetworkSetFriendlyFireOption(true)
     spawnPlayer(x, y, z, skin)
 end)

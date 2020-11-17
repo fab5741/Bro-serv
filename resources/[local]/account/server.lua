@@ -70,3 +70,31 @@ AddEventHandler('account:liquid', function(cb)
     TriggerClientEvent(cb, sourceValue, result)
   end)
 end)
+
+RegisterNetEvent("account:get")
+
+AddEventHandler('account:get', function(cb)
+  local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+  end
+  
+
+  MySQL.Async.fetchScalar('SELECT amount from players, accounts where fivem = @fivem and players.id = accounts.player', {
+    ['fivem'] = discord
+  }, function(result)
+    TriggerClientEvent(cb, sourceValue, result)
+  end)
+end)

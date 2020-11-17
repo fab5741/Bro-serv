@@ -1,7 +1,5 @@
 price = 10 -- you may edit this to your liking. if "enableprice = false" ignore this one
 
---DO-NOT-EDIT-BELLOW-THIS-LINE--
-
 RegisterServerEvent('carwash:checkmoney')
 AddEventHandler('carwash:checkmoney', function ()
 local sourceValue = source

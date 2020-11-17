@@ -81,9 +81,9 @@ RegisterNetEvent('lspd:getArrested')
 AddEventHandler('lspd:getArrested', function()
 	handCuffed = not handCuffed
 	if(handCuffed) then
-		TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"title_notification", false, "now_cuffed")
+		TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Menottes", false, "menotté")
 	else
-		TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "title_notification", false, "now_uncuffed")
+		TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Menottes", false, "démenotté")
 		cuffing = false
 		drag = false
 		ClearPedTasksImmediately(PlayerPedId())
@@ -99,20 +99,20 @@ AddEventHandler('lspd:payFines', function(amount, sender)
 		if(lockAskingFine ~= true) then
 			lockAskingFine = true
 			local notifReceivedAt = GetGameTimer()
-			Notification("info_fine_request_before_amount"..amount.."info_fine_request_after_amount")
+			Notification("Montant de l'amende : "..amount.. " $")
 			while(true) do
 				Wait(0)
 				
 				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
 					TriggerServerEvent('lspd:finesETA', sender, 2)
-					Notification("request_fine_expired")
+					Notification("Demande expiré")
 					lockAskingFine = false
 					break
 				end
 				
 				if IsControlPressed(1, config.bindings.accept_fine) then
 					TriggerServerEvent('lspd:withdraw', amount)
-					Notification("pay_fine_success_before_amount"..amount.."pay_fine_success_after_amount")
+					Notification("Amende de "..amount.." $ payé")
 					TriggerServerEvent('lspd:finesETA', sender, 0)
 					lockAskingFine = false
 					break

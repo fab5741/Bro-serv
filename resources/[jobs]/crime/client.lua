@@ -93,11 +93,11 @@ Citizen.CreateThread(function()
 		Wait(1000)
 		local coords = GetEntityCoords(PlayerPedId())
 		for k,v in pairs(config.drugs) do
-			if GetDistanceBetweenCoords(coords, v.collect.tp.start.x, v.collect.tp.start.y, v.collect.tp.start.z, true) < config.range then
+			if GetDistanceBetweenCoords(coords, v.collect.tp.start.x, v.collect.tp.start.y, v.collect.tp.start.z, true) < config.range and not IsPedInAnyVehicle(GetPlayerPed(-1), false) then
 				SetPedCoordsKeepVehicle(PlayerPedId(), v.collect.tp.endpoint.x, v.collect.tp.endpoint.y, v.collect.tp.endpoint.z)
 				Wait(5000)
 			end
-			if GetDistanceBetweenCoords(coords, v.collect.tp.endpoint.x, v.collect.tp.endpoint.y, v.collect.tp.endpoint.z, true) < config.range then
+			if GetDistanceBetweenCoords(coords, v.collect.tp.endpoint.x, v.collect.tp.endpoint.y, v.collect.tp.endpoint.z, true) < config.range and not IsPedInAnyVehicle(GetPlayerPed(-1), false) then
 				SetPedCoordsKeepVehicle(PlayerPedId(), v.collect.tp.start.x, v.collect.tp.start.y,  v.collect.tp.start.z)
 				Wait(5000)
 			end

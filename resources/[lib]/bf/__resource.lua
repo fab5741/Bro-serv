@@ -175,6 +175,9 @@ exports {
     "GetPlayerPedInDirection",
     "GetPlayerServerIdInDirection",
 
+
+    -- Custom
+    "bf_menu_exemple",
 }
 
 server_scripts {

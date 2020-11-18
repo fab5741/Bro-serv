@@ -1,8 +1,5 @@
-
 fx_version 'adamant'
 games { 'gta5' }
-
-
 
 ui_page('client/html/index.html')
 
@@ -15,6 +12,7 @@ files({
     'client/html/fonts/SignPainter-HouseScript.ttf'
 })
 
+dependency 'bf'
 
 client_script {
     'config.lua',

@@ -156,3 +156,60 @@ RegisterCommand("change", function(source, args)
     TriggerEvent('skinchanger:loadClothes', skin, clothes)
 end)
 
+
+
+-- TODO https://github.com/DevTestingPizza/vBasic/releases
+
+
+-- A second thread for running at a different delay.
+Citizen.CreateThread(function()
+
+    -- Wait until the settings have been loaded.
+    while settings.trafficDensity == nil or settings.pedDensity == nil do
+        Citizen.Wait(1)
+    end
+    
+    -- Do this every tick.
+    while true do
+        Citizen.Wait(0) -- these things NEED to run every tick.
+        
+        -- Traffic and ped density management
+        SetTrafficDensity(settings.trafficDensity)
+        SetPedDensity(settings.pedDensity)
+        
+        -- Wanted level management
+        if (settings.neverWanted and GetPlayerWantedLevel(PlayerId()) > 0) then
+            SetPlayerWantedLevel(PlayerId(), 0, false)
+            SetPlayerWantedLevelNow(PlayerId(), false)
+        end
+        
+        -- Dispatch services management
+        for i=0,20 do
+            EnableDispatchService(i, not settings.noEmergencyServices)
+        end
+        
+    end
+end)
+
+
+function SetTrafficDensity(density)
+    SetParkedVehicleDensityMultiplierThisFrame(density)
+    SetVehicleDensityMultiplierThisFrame(density)
+    SetRandomVehicleDensityMultiplierThisFrame(density)
+end
+
+function SetPedDensity(density)
+    SetPedDensityMultiplierThisFrame(density)
+    SetScenarioPedDensityMultiplierThisFrame(density, density)
+end
+
+
+
+Citizen.CreateThread(function()
+    while true do
+    Citizen.Wait(0)
+    local playerPed = GetPlayerPed(-1)
+    local playerLocalisation = GetEntityCoords(playerPed)
+    ClearAreaOfCops(playerLocalisation.x, playerLocalisation.y, playerLocalisation.z, 400.0)
+    end
+    end)

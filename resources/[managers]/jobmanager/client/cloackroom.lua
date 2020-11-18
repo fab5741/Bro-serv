@@ -37,27 +37,17 @@ local function printTable( t )
     end
 end
 
-
-function load_cloackroom(job)
-	for k in ipairs (buttons) do
-		buttons [k] = nil
-	end
-	print(job)
-	buttons[#buttons+1] = {name = "Prendre le service", func = "clockIn", params = job}
-	buttons[#buttons+1] = {name = "Quitter le service", func = "clockOut", params = ""}
-end
-
 function clockIn(job)
 		ServiceOn()
 		SetSkin(job)
+		exports.bf:Notification("En service")
 
-		drawNotification("En service")
 end
 
 function clockOut()
 	ServiceOff()
 	removeUniforme()
-	drawNotification("break_service_notification")
+	exports.bf:Notification("Fin de service")
 end
 
 function SetSkin(job)
@@ -96,7 +86,6 @@ function SetSkin(job)
 		glasses_2    = 0,
 	}
 	TriggerEvent('skinchanger:loadClothes', skin, config.jobs[job].grades.stagiaire.skin_male)
-	giveBasicKit()
 end
 
 function removeUniforme()
@@ -142,21 +131,4 @@ function removeUniforme()
 	local clothes = {
 	}
 	TriggerEvent('skinchanger:loadClothes', skin, clothes)
-end
-
-function OpenCloackroom(job)
-	if anyMenuOpen.menuName ~= "cloackroom" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Vestiaire",
-			subtitle = job.label,
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "cloackroom"
-		anyMenuOpen.isActive = true
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
 end

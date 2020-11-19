@@ -165,7 +165,7 @@ end)
 Citizen.CreateThread(function()
 
     -- Wait until the settings have been loaded.
-    while settings.trafficDensity == nil or settings.pedDensity == nil do
+    while 0.2 == nil or 0.2 == nil do
         Citizen.Wait(1)
     end
     
@@ -174,18 +174,16 @@ Citizen.CreateThread(function()
         Citizen.Wait(0) -- these things NEED to run every tick.
         
         -- Traffic and ped density management
-        SetTrafficDensity(settings.trafficDensity)
-        SetPedDensity(settings.pedDensity)
+        SetTrafficDensity(0.2)
+        SetPedDensity(0.2)
         
         -- Wanted level management
-        if (settings.neverWanted and GetPlayerWantedLevel(PlayerId()) > 0) then
-            SetPlayerWantedLevel(PlayerId(), 0, false)
-            SetPlayerWantedLevelNow(PlayerId(), false)
-        end
-        
+        SetPlayerWantedLevel(PlayerId(), 0, false)
+        SetPlayerWantedLevelNow(PlayerId(), false)
+    
         -- Dispatch services management
         for i=0,20 do
-            EnableDispatchService(i, not settings.noEmergencyServices)
+            EnableDispatchService(i, false)
         end
         
     end

@@ -56,9 +56,7 @@ RegisterNetEvent("player:spawnPlayerFromLastPos")
 AddEventHandler('player:spawnPlayerFromLastPos', function()
 	local sourceValue = source
 
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		
-			
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
 		  elseif string.sub(v, 1, string.len("license:")) == "license:" then

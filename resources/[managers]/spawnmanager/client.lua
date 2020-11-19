@@ -5,7 +5,10 @@ Citizen.CreateThread(function()
     while not spawned do
         Citizen.Wait(0)
         if NetworkIsPlayerActive(PlayerId()) then
-            TriggerServerEvent("player:spawnPlayerFromLastPos")
+            local ped = PlayerPedId()
+            SetCanAttackFriendly(ped, true, true)
+            NetworkSetFriendlyFireOption(true)
+            TriggerServerEvent('skin:getPlayerSkin', "spawn:spawn")
             spawned = true
         end 
     end
@@ -34,57 +37,19 @@ Citizen.CreateThread(function()
     end
 end)
 
--- try to get player
-TriggerServerEvent("player:get", "spawnmanager:player:get")
-
-
-RegisterNetEvent("player:identityCreate")
-
-local playerCreating = false
-
-AddEventHandler('player:identityCreate', function (data)
-    -- create player identity
-    if not playerCreating then
-        playerCreating = true
-        local myData = {}
-        for k,v in ipairs(data) do
-            print(k,v, v.name, v.value)
-            myData[v.name] = v.value
-        end
-        
-        TriggerServerEvent("player:set", myData)
-        TriggerEvent(
-            "menu:delete", "identity"
-        )
-    end
-end)
-
-
-RegisterNetEvent("spawnmanager:player:get")
-local items = {
-    {name = "firstName", label =  'Nom :',    type = "text", placeholder = "John"},
-{name = "lastName",  label =  'Prénom : ',     type = "text", placeholder = "Smith"},
-{name = "birth",       label =  'Date de naissance :',    type = "text", placeholder = "01/02/1234"},
-{name = "sex",    label =  'Male :',   type = "checkbox", placeholder = "male"},
-}
-
-AddEventHandler('spawnmanager:player:get', function (data)
-    if data == nil then
-        TriggerEvent(
-            "menu:create", "identity", "Création identité", "form",
-            "", items, "center|midlle", "identityCreate", "player:identityCreate"
-        ) 
-    end
-end)
-
-
-
-RegisterNetEvent("player:spawnLastPos")
+RegisterNetEvent("spawn:spawn")
 
 -- source is global here, don't add to function
-AddEventHandler('player:spawnLastPos', function (x,y,z, skin)
-    local ped = PlayerPedId()
-	SetCanAttackFriendly(ped, true, true)
-	NetworkSetFriendlyFireOption(true)
-    spawnPlayer(x, y, z, skin)
+AddEventHandler('spawn:spawn', function (skin, jobSkin, x, y, z)
+    if skin == nil or skin == "" or skin == "{}" then
+        print("start nicoo")
+        TriggerEvent('nicoo_charcreator:CharCreator')
+        Citizen.Wait(100)
+        skinLoaded = true
+    else
+        TriggerEvent('skinchanger:loadSkin', skin)
+        Citizen.Wait(100)
+        skinLoaded = true
+    end
+    spawnPlayer(x, y, z)
 end)

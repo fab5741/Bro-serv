@@ -19,46 +19,125 @@ AddEventHandler("job:get", function(job)
 		SetNuiFocus(false, false)
 	end)
 	-- Draw blips 
-	v = config.jobs[job.job]
-	if v then
-		for k, v in pairs(v.lockers) do
-			exports.bf:AddArea("lockers"..k, {
-				marker = {
-					weight = 1,
-					height = 2,
-				},
-				trigger = {
-					weight = 2,
-					enter = {
-						callback = function()
-							exports.bf:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
-							zone = k
-							zoneType = "lockers"
-						end
+	if job ~= nil and job.job ~= nil then
+		v = config.jobs[job.job]
+		if v then
+			for k, v in pairs(v.lockers) do
+				exports.bf:AddArea("lockers"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
 					},
-					exit = {
-						callback = function()
-							zone = nil
-							zoneType = nil
-						end
+					trigger = {
+						weight = 2,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "lockers"
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
 					},
-				},
-				blip = {
-					text = job.job.. " Vestiaire "..k,
-					imageId	= 496,
-					colorId = 26,
-				},
-				locations = {
-					{
-						x = v.coords.x,
-						y = v.coords.y,
-						z = v.coords.z,
+					blip = {
+						text = job.job.. " Vestiaire "..k,
+						imageId	= 496,
+						colorId = 26,
 					},
-				},
-			})
-			exports.bf:AddMenu("lockers"..k, {
-				title = "Vestiaire "..k,
-				position = 1,
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				exports.bf:AddMenu("lockers"..k, {
+					title = "Vestiaire "..k,
+					position = 1,
+					buttons = {
+						{
+							text = "Prendre le service",
+							exec = {
+								callback = function()
+									clockIn(job.job)
+								end
+							},
+						},
+						{
+							text = "Quitter le service",
+							exec = {
+								callback = function()
+									clockOut(job.job)
+								end
+							},
+						},
+						{
+							text = "Close menu",
+							close = true,
+						},
+					},
+				})
+			end
+			for k, v in pairs(v.collect) do
+				exports.bf:AddArea("collect"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 2,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Récolte Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "collect"
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.job.. " Récolte "..k,
+						imageId	= 496,
+						colorId = 26,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				label = config.jobs[job.job].label
+
+				buttons = {}
+				for kk, vv in pairs(v.items) do
+
+					buttons[#buttons+1] = {
+						text = "Collecter"..vv.label,
+						exec = {
+							callback = function()
+								
+							end
+						},
+					}
+				end
+				buttons[#buttons+1] = {
+					text = "Arreter le farming",
+					close = true,
+				}
+
 				buttons = {
 					{
 						text = "Prendre le service",
@@ -80,165 +159,91 @@ AddEventHandler("job:get", function(job)
 						text = "Close menu",
 						close = true,
 					},
-				},
-			})
-		end
-		for k, v in pairs(v.collect) do
-			exports.bf:AddArea("collect"..k, {
-				marker = {
-					weight = 1,
-					height = 2,
-				},
-				trigger = {
-					weight = 2,
-					enter = {
-						callback = function()
-							exports.bf:HelpPromt("Récolte Key : ~INPUT_PICKUP~")
-							zone = k
-							zoneType = "collect"
-						end
-					},
-					exit = {
-						callback = function()
-							zone = nil
-							zoneType = nil
-						end
-					},
-				},
-				blip = {
-					text = job.job.. " Récolte "..k,
-					imageId	= 496,
-					colorId = 26,
-				},
-				locations = {
-					{
-						x = v.coords.x,
-						y = v.coords.y,
-						z = v.coords.z,
-					},
-				},
-			})
-			label = config.jobs[job.job].label
-
-			buttons = {}
-			for kk, vv in pairs(v.items) do
-
-				buttons[#buttons+1] = {
-					text = "Collecter"..vv.label,
-					exec = {
-						callback = function()
-							
-						end
-					},
 				}
+				TriggerEvent("bf:PrintTable", buttons)
+
+				exports.bf:AddMenu("collect "..k, {
+					title = "Récolte "..k,
+					position = 1,
+					buttons 
+				})
 			end
-			buttons[#buttons+1] = {
-				text = "Arreter le farming",
-				close = true,
-			}
-
-			buttons = {
-				{
-					text = "Prendre le service",
-					exec = {
-						callback = function()
-							clockIn(job.job)
-						end
-					},
-				},
-				{
-					text = "Quitter le service",
-					exec = {
-						callback = function()
-							clockOut(job.job)
-						end
-					},
-				},
-				{
-					text = "Close menu",
-					close = true,
-				},
-			}
-			TriggerEvent("bf:PrintTable", buttons)
-
-			exports.bf:AddMenu("collect "..k, {
-				title = "Récolte "..k,
-				position = 1,
-				buttons 
-			})
-		end
-		for k, v in pairs(v.process) do
-			exports.bf:AddBlip("process"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				text = job.job.. " Traitement "..k,
-				imageId	= 467,
-				colorId = 26,
-			})
-		end
-		for k, v in pairs(v.safe) do
-			exports.bf:AddBlip("safe"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				text = job.job.." Coffre ",
-				imageId	= 475,
-				colorId = 26,
-			})
-		end
-		for k, v in pairs(v.parking) do
-			exports.bf:AddBlip("parking"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				text = job.job.." Parking" ,
-				imageId	= 477,
-				colorId = 26,
-			})
+			for k, v in pairs(v.process) do
+				exports.bf:AddBlip("process"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					text = job.job.. " Traitement "..k,
+					imageId	= 467,
+					colorId = 26,
+				})
+			end
+			for k, v in pairs(v.safe) do
+				exports.bf:AddBlip("safe"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					text = job.job.." Coffre ",
+					imageId	= 475,
+					colorId = 26,
+				})
+			end
+			for k, v in pairs(v.parking) do
+				exports.bf:AddBlip("parking"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					text = job.job.." Parking" ,
+					imageId	= 477,
+					colorId = 26,
+				})
+			end
 		end
 	end
 	local playerCoords = GetEntityCoords(PlayerPedId())
 	local letSleep, isInMarker, hasExited = true, false, false
 	local currentstation, currentPart, currentPartNum
 
-	t = config.jobs[job.job]
-	if t then
-		for k, v in pairs(t.collect) do
-			exports.bf:AddMarker("collect"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				weight = 1,
-				height = 2,
-			})
-		end
-		for k, v in pairs(t.process) do
-			exports.bf:AddMarker("process"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				weight = 1,
-				height = 2,
-			})
-		end
-		for k, v in pairs(t.safe) do
-			exports.bf:AddMarker("safe"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				weight = 1,
-				height = 2,
-			})
-		end
-		for k, v in pairs(t.parking) do
-			exports.bf:AddMarker("parking"..k, {
-				x = v.coords.x,
-				y = v.coords.y,
-				z = v.coords.z,
-				weight = 1,
-				height = 2,
-			})
+
+	if job ~= nil and job.job ~= nil then
+		t = config.jobs[job.job]
+		if t then
+			for k, v in pairs(t.collect) do
+				exports.bf:AddMarker("collect"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					weight = 1,
+					height = 2,
+				})
+			end
+			for k, v in pairs(t.process) do
+				exports.bf:AddMarker("process"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					weight = 1,
+					height = 2,
+				})
+			end
+			for k, v in pairs(t.safe) do
+				exports.bf:AddMarker("safe"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					weight = 1,
+					height = 2,
+				})
+			end
+			for k, v in pairs(t.parking) do
+				exports.bf:AddMarker("parking"..k, {
+					x = v.coords.x,
+					y = v.coords.y,
+					z = v.coords.z,
+					weight = 1,
+					height = 2,
+				})
+			end
 		end
 	end
 end)

@@ -40,9 +40,6 @@ AddEventHandler('lspd:remove:uniform', function(skin)
 	RemoveAllPedWeapons(PlayerPedId())
 
 	TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), clothes)
-		
-	SetRelationshipBetweenGroups(3, GetHashKey("police"), GetHashKey("PLAYER"))
-	SetRelationshipBetweenGroups(3, GetHashKey("PLAYER"), GetHashKey("police"))	
 	TriggerServerEvent("lspd:breakService")
 end)
 
@@ -50,10 +47,6 @@ RegisterNetEvent("lspd:add:uniform")
 
 -- source is global here, don't add to function
 AddEventHandler('lspd:add:uniform', function(skin)
-	print("add uniform")
-	SetRelationshipBetweenGroups(0, GetHashKey("police"), GetHashKey("PLAYER"))
-    SetRelationshipBetweenGroups(0, GetHashKey("PLAYER"), GetHashKey("police"))	
-
 	local clothes = {
 		recruit = {
 			male = {

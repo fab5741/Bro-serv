@@ -23,7 +23,7 @@ end)
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
-		if myJob.job == "LSPD" then
+		if myjob ~= nil and myJob.job == "LSPD" then
             DrawMarker(0, 117.14, -1950.29, 20,7513, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.75, 0.75, 0.75, 204, 204, 0, 100, false, true, 2, false, false, false, false)
 			-- Logic for exiting & entering markers
 			if isInMarker and not HasAlreadyEnteredMarker or (isInMarker and (Laststation ~= currentstation or LastPart ~= currentPart or LastPartNum ~= currentPartNum)) then
@@ -532,7 +532,7 @@ Citizen.CreateThread(function()
 			end
 		end
 		
-        if(myJob.job == "LSPD") then
+        if( myJob ~= nil and myJob.job == "LSPD") then
 			if(isNearTakeService()) then
 				if not (anyMenuOpen.isActive) then
 				    DisplayHelpText("Vestiaire".. GetLabelText("collision_8vlv02g"),0,1,0.5,0.8,0.6,255,255,255,255)

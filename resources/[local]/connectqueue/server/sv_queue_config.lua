@@ -4,10 +4,11 @@ Config = {}
 -- a lot of the steamid converting websites are broken rn and give you the wrong steamid. I use https://steamid.xyz/ with no problems.
 -- you can also give priority through the API, read the examples/readme.
 Config.Priority = {
-    ["STEAM_0:1:0000####"] = 1,
-    ["steam:110000######"] = 25,
-    ["ip:127.0.0.0"] = 85
+    ["discord:150331120255238144"] = 1,
+    ["discord:149499775727697920"] = 1,
+    ["discord:158325306980171776"] = 1,
 }
+
 
 -- require people to run steam
 Config.RequireSteam = false
@@ -45,13 +46,13 @@ Config.ShowTemp = false
 
 -- simple localization
 Config.Language = {
-    joining = "\xF0\x9F\x8E\x89Joining...",
-    connecting = "\xE2\x8F\xB3Connecting...",
+    joining = "\xF0\x9F\x8E\x89Connection..",
+    connecting = "\xE2\x8F\xB3Connection en cours..",
     idrr = "\xE2\x9D\x97[Queue] Error: Couldn't retrieve any of your id's, try restarting.",
     err = "\xE2\x9D\x97[Queue] There was an error",
-    pos = "\xF0\x9F\x90\x8CYou are %d/%d in queue \xF0\x9F\x95\x9C%s",
+    pos = "\xF0\x9F\x90\x8CVous êtes %d/%d dans la queue \xF0\x9F\x95\x9C%s",
     connectingerr = "\xE2\x9D\x97[Queue] Error: Error adding you to connecting list",
     timedout = "\xE2\x9D\x97[Queue] Error: Timed out?",
-    wlonly = "\xE2\x9D\x97[Queue] You must be whitelisted to join this server",
-    steam = "\xE2\x9D\x97 [Queue] Error: Steam must be running"
+    wlonly = "\xE2\x9D\x97[Queue] Vous devez être whitelisté pour entrer sur le serveur",
+    steam = "\xE2\x9D\x97 [Queue] Erreur ; Steam doit être ouvert"
 }

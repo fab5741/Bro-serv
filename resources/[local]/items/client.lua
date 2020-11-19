@@ -1,6 +1,5 @@
 
 RegisterNUICallback('use', function(data)
-    print("name", data.label)
     if data.label == "Pain" then
         print("change needs ")
         TriggerServerEvent("needs:change", 1, 60)

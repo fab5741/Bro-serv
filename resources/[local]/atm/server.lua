@@ -4,27 +4,24 @@ AddEventHandler('atm:deposit', function(amount)
 	local sourceValue = source
 	local amounte = tonumber(amount)
 
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		
-			
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do			
+		if string.sub(v, 1, string.len("steam:")) == "steam:" then
+		steamid = v
+		elseif string.sub(v, 1, string.len("license:")) == "license:" then
+		license = v
+		elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+		xbl  = v
+		elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+		ip = v
+		elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+		discord = v
+		elseif string.sub(v, 1, string.len("live:")) == "live:" then
+		liveid = v
+		end
 	end
-
 	MySQL.ready(function ()
 
-		MySQL.Async.fetchAll('select * from accounts where player = @fivem',
+		MySQL.Async.fetchAll('select  * from accounts where player = @fivem',
         {['fivem'] =  discord},
 		function(res)
 			if res ~= nil  then
@@ -42,11 +39,11 @@ AddEventHandler('atm:deposit', function(amount)
 								{['fivem'] =  discord,
 								['amount'] = amounte},
 								function(res)
-									TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot effectué", type = "info", timeout = 5000})
+									exports.bf:Notification("Depot effecuté", sourceValue)
+									TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot effectué", false)
 								end)
 							else
-								print(discord)
-								TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot loupé (Pas assez de liquide)", type = "info", timeout = 5000})
+								TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot loupé (Pas assez de liquide)", false)
 							end
 						end)			
 					end)
@@ -60,11 +57,10 @@ AddEventHandler('atm:deposit', function(amount)
 						{['fivem'] =  discord,
 						['amount'] = amounte},
 						function(res)
-							TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot effectué", type = "info", timeout = 5000})
+							TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot effectué", false)
 						end)
 					else
-						print(discord)
-						TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot loupé (Pas assez de liquide)", type = "info", timeout = 5000})
+						TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot loupé (Pas assez de liquide)", false)
 					end
 				end)
 			end

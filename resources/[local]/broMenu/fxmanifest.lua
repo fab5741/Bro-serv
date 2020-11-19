@@ -5,8 +5,9 @@ description '- Bro -'
 
 version '0.0.1'
 
-client_script 'client/client.lua'
+dependency "bf"
 
+client_script 'client/client.lua'
 
 server_script { 
     '@mysql-async/lib/MySQL.lua',

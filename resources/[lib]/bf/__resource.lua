@@ -50,6 +50,8 @@ client_scripts {
 
 }
 
+
+
 exports {
 
     -- Utils
@@ -66,6 +68,7 @@ exports {
     "PrintTable",
     "Copy",
     "Clone",
+    "getPlayerIdentifiers",
 
     -- Ui
     "HelpPromt",
@@ -174,10 +177,6 @@ exports {
     "GetPlayersPedOrderById",
     "GetPlayerPedInDirection",
     "GetPlayerServerIdInDirection",
-
-
-    -- Custom
-    "bf_menu_exemple",
 }
 
 server_scripts {
@@ -185,7 +184,8 @@ server_scripts {
     -- Utils
     "src/utils/utils.common.lua",
     "src/utils/utils.server.lua",
-
+    -- Dependencies
+    "src/server.lua",
 }
 
 server_exports {
@@ -203,5 +203,4 @@ server_exports {
     "GetRandomString",
     "Copy",
     "Clone",
-
 }

@@ -1,10 +1,10 @@
-local liquid = 0
-local account = 0
-local dirty = 0
-local player = {
-	firstname = "Bro",
-	lastname = "Inconnu",
-}
+firstname = "John"
+lastname = "Smith"
+birth = "00/00/0000"
+
+CharacterDad = 0
+CharacterMom = 0
+
 local anyMenuOpen = {
 	menuName = "",
 	isActive = false
@@ -20,99 +20,123 @@ function CloseMenu()
 end
 
 Citizen.CreateThread(function()
-	TriggerServerEvent("bf:player:get", "bf:player:get")
-	TriggerServerEvent("account:liquid", "bf:liquid")
-	TriggerServerEvent("account:get", "bf:account:get")
+	exports.bf:AddMenu("bro", {
+		title = "Bro Menu",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "Portefeuille",
+				exec = {
+					callback = function()
+						TriggerServerEvent("account:liquid", "bf:liquid")
+					end
+				},
+			},
+			{
+				text = "Inventaire",
+				exec = {
+					callback = function()
+						TriggerServerEvent("items:get", "bf:items")
+					end
+				},
+			},
+		},
+	})
+	exports.bf:AddMenu("bro-wallet", {
+		title = "Portefeuille",
+		position = 1,
+	})
+	exports.bf:AddMenu("bro-items", {
+		title = "Inventaire",
+		position = 1,
+	})
+	exports.bf:AddMenu("bro-items-item", {
+		title = "Item",
+		position = 1,
+	})
+	exports.bf:AddMenu("bro-wallet-character", {
+		title = "Personnage",
+		menuTitle = "Léon Paquin (17/05/1992)",
+		position = 1,
+		buttons = {
+			{
+				text = "Nom",
+				exec = {
+					callback = function()
+						lastname = exports.bf:OpenTextInput({ title="Nom", maxInputLength=25, customTitle=true})
+						TriggerServerEvent("bro:set", "lastname", lastname, "bro:set")
+					end
+				}
+			},
+			{
+				text = "Prénom",
+				exec = {
+					callback = function()
+						firstname = exports.bf:OpenTextInput({ title="Prénom", maxInputLength=25, customTitle=true})
+						TriggerServerEvent("bro:set", "firstname", firstname, "bro:set")
+					end
+				}
+			},
+			{
+				text = "Date de naissance",
+				exec = {
+					callback = function()
+						birth = exports.bf:OpenTextInput({ title="Date de naissance (01/01/1999)", maxInputLength=10, customTitle=true})
+						TriggerServerEvent("bro:set", "birth", birth, "bro:set")
+					end
+				}
+			},
+		},
+	})
   while true do
     Citizen.Wait(0)
-
-    --TriggerEvent("bf:items")
-    --if (IsControlJustPressed(1, 288)) then
-     -- TriggerServerEvent("account:liquid", "bf:liquid")
-    --end
-
 	if (IsControlJustPressed(1, 288)) then
-	  TriggerServerEvent("account:liquid", "bf:liquid")
-	  TriggerServerEvent("account:get", "bf:account:get")
-      load_menu()
-      TogglePlayerMenu()
+		exports.bf:OpenMenu("bro")
 	end
   end
 end)
 
-
-RegisterNUICallback('sendAction', function(data, cb)
-	_G[data.action](data.params)
-    cb('ok')
-end)
-
-
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(5)	
-		if(anyMenuOpen.isActive) then
-			DisableControlAction(1, 21)
-			DisableControlAction(1, 140)
-			DisableControlAction(1, 141)
-			DisableControlAction(1, 142)
-
-			SetDisableAmbientMeleeMove(PlayerPedId(), true)
-
-			if (IsControlJustPressed(1,172)) then
-				SendNUIMessage({
-					action = "keyup"
-				})
-				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-			elseif (IsControlJustPressed(1,173)) then
-				SendNUIMessage({
-					action = "keydown"
-				})
-				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-			elseif (anyMenuOpen.menuName == "cloackroom") then
-				if IsControlJustPressed(1, 176) then
-					SendNUIMessage({
-						action = "keyenter"
-					})
-
-					PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-					Citizen.Wait(500)
-					CloseMenu()
-				end
-			elseif (IsControlJustPressed(1,176)) then
-				SendNUIMessage({
-					action = "keyenter"
-				})
-				PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-			elseif (IsControlJustPressed(1,177)) then
-				if(anyMenuOpen.menuName == "playermenu" or anyMenuOpen.menuName == "cloackroom" or anyMenuOpen.menuName == "garage") then
-					CloseMenu()
-				elseif(anyMenuOpen.menuName == "armory") then
-					CloseArmory()					
-				elseif(anyMenuOpen.menuName == "armory-weapon_list") then
-					BackArmory()
-				else
-					BackMenuPolice()
-				end
-			end
-		else
-			EnableControlAction(1, 21)
-			EnableControlAction(1, 140)
-			EnableControlAction(1, 141)
-			EnableControlAction(1, 142)
-		end
-  	end
-end)
-
-RegisterNetEvent('bf:player:get')
-
-AddEventHandler("bf:player:get", function(playere) 
-	player = playere
-end)
-
 RegisterNetEvent('bf:liquid')
 
-AddEventHandler("bf:liquid", function(liquide) 
-  liquid = liquide
+AddEventHandler("bf:liquid", function(liquid) 
+  local buttons = {}
+	buttons[1] =     {
+		text = "Liquide : " .. liquid.. " $",
+	}
+	buttons[2] =     {
+		text = "Identité",
+		exec = {
+			callback = function()
+				TriggerServerEvent("bro:get", "bro:get")
+			end
+		}
+	}
+	exports.bf:SetMenuButtons("bro-wallet", buttons)
+	exports.bf:NextMenu("bro-wallet")
+end)
+
+RegisterNetEvent('bro:get')
+
+AddEventHandler("bro:get", function(data) 
+	firstname = data.firstname
+	lastname = data.lastname
+	birth = data.birth
+	exports.bf:SetMenuValue("bro-wallet-character",
+	{
+		menuTitle = firstname.." ".. lastname.. " ("..birth.. ")",
+	})
+	exports.bf:NextMenu("bro-wallet-character")
+end)
+
+
+RegisterNetEvent('bro:set')
+
+AddEventHandler("bro:set", function() 
+	exports.bf:SetMenuValue("bro-wallet-character",
+	{
+		menuTitle = firstname.." ".. lastname.. " ("..birth.. ")",
+	})
 end)
 
 RegisterNetEvent('bf:account:get')
@@ -185,8 +209,6 @@ end
 
 function OpenWalletMenu()
 	CloseMenu()
-
-	print(account)
 	SendNUIMessage({
 		title = "Portefeuille",
 		--subtitle = "Liquid " .. liquid .. " / Sale " .. dirty,
@@ -200,55 +222,95 @@ function OpenWalletMenu()
 end
 
 
+
+function GetPlayers()
+    local players = {}
+
+    for i = 0, 31 do
+        if NetworkIsPlayerActive(i) then
+            table.insert(players, i)
+        end
+    end
+
+    return players
+end
+
+function GetClosestPlayer()
+	local players = GetPlayers()
+	local closestDistance = -1
+	local closestPlayer = -1
+	local ply = PlayerPedId()
+	local plyCoords = GetEntityCoords(ply, 0)
+	
+	for index,value in ipairs(players) do
+		local target = GetPlayerPed(value)
+		if(target ~= ply) then
+			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
+			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
+			if(closestDistance == -1 or closestDistance > distance) then
+				closestPlayer = value
+				closestDistance = distance
+			end
+		end
+	end
+	
+	return closestPlayer, closestDistance
+end
+
+
 RegisterNetEvent('bf:items')
 
 AddEventHandler("bf:items", function(inventory)
-	CloseMenu()
-	buttonsItems = {}
+	local buttons = {}
 	for k, v in ipairs (inventory) do
-		buttonsItems[k] = {name = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )', func = "OpenUseItem", params = v['id']}
+		buttons[k] =     {
+			text = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			exec = {
+				callback = function() 
+					local buttons = {}
+					buttons[1] =     {
+						text = "Utiliser",
+						exec = {
+							callback = function() 
+								TriggerServerEvent("items:use", v.id, 1)
+							end
+						},
+					}
+					buttons[2] =     {
+						text = "Donner",
+						exec = {
+							callback = function() 
+								local distMin = 18515151515151515151515
+								local current = nil
+
+								
+								local player = GetClosestPlayer()
+								local me = GetPlayerServerId(i)
+								local coords = GetEntityCoords(GetPlayerPed(i))
+								local mycoords = GetEntityCoords(GetPlayerPed(player))
+								local dist = Vdist(mycoords, coords)
+								print(player)
+								print(me)
+								print(coords)
+								print(mycoords)
+								if dist < 10  then
+									TriggerServerEvent("items:give", v.id, 1, player)
+								end
+							end
+						},
+					}
+					exports.bf:SetMenuButtons("bro-items-item", buttons)
+					exports.bf:NextMenu("bro-items-item")
+				end
+			},
+		}
 	end
-	SendNUIMessage({
-		title = "Inventaire",
-		subtitle = "Inventaire",
-		buttons = buttonsItems,
-		action = "setAndOpen"
-	})
-	
-	anyMenuOpen.menuName = "playermenu-items"
-	anyMenuOpen.isActive = true
+	exports.bf:SetMenuButtons("bro-items", buttons)
+	exports.bf:NextMenu("bro-items")
 end)
 
-function OpenItemsMenu()
-	CloseMenu()
-	
-	TriggerServerEvent("items:get", "bf:items")
-end
 
-function OpenUseItem(Id)
-	CloseMenu()
-	buttonsUseItem = {}
-	buttonsUseItem[#buttonsUseItem+1] = {name = "Use", func = "useItem", params = Id}
-	--TODO
-	--buttonsUseItem[#buttonsUseItem+1] = {name = "Give", func = "", params = ""}
-	--buttonsUseItem[#buttonsUseItem+1] = {name = "Drop", func = "", params = ""}
-
-	SendNUIMessage({
-		title = "Item",
-		subtitle = "Item",
-		buttons = buttonsUseItem,
-		action = "setAndOpen"
-	})
-	
-	anyMenuOpen.menuName = "playermenu-wallet"
-	anyMenuOpen.isActive = true
-end
-
-function useItem(Id)
-	--TODO : Really use item
-	TriggerServerEvent("items:use", Id, 1)
-end
-
+-- surrender anim
 Citizen.CreateThread(function()
     local dict = "missminuteman_1ig_2"
     
@@ -270,4 +332,3 @@ Citizen.CreateThread(function()
         end
     end
 end)
-	

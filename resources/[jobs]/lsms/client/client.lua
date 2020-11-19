@@ -303,7 +303,7 @@ Citizen.CreateThread(function()
 		Citizen.Wait(0)
 
         -- TODO if job is lsms
-		if myJob.job == "LSMS" then
+		if myJob ~= nil and myJob.job == "LSMS" then
 
 			if (IsControlJustPressed(1,166)) then
 				load_menu()
@@ -619,7 +619,7 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
-		if myJob.job == "LSMS" then
+		if myJob ~= nil and myJob.job == "LSMS" then
 
 			if(anyMenuOpen.isActive) then
 				DisableControlAction(1, 21)

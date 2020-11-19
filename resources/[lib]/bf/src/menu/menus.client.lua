@@ -672,32 +672,3 @@ function MenuFrame()
     end)
 
 end
-
-function AddMenu("bf_menu", {
-    title = "Title exemple",
-    menuTitle = "Sub title exemple",
-    buttons = {
-        {
-            text = "Hello world callback",
-            exec = {
-                callback = message,
-            },
-        },
-        {
-            text = "Hello world Client event",
-            exec = {
-                eventClient = "ft_emples:MenuClientEvent",
-            },
-        },
-        {
-            text = "Hello world Server event",
-            exec = {
-                eventServer = "ft_emples:MenuServerEvent",
-            },
-        },
-        {
-            text = "Close menu",
-            close = true,
-        },
-    },
-})

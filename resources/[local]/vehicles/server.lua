@@ -108,6 +108,32 @@ AddEventHandler("vehicle:parking:get:all", function(id, cb)
     end)
 end)
 
+RegisterNetEvent("vehicles:get:all")
+
+AddEventHandler("vehicles:get:all", function(cb)
+	local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+	end
+    MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label, player_vehicle.parking from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id', {
+        ['fivem'] =  discord,
+    }, function(result)
+            TriggerClientEvent(cb, sourceValue, result)
+    end)
+end)
+
 RegisterNetEvent("vehicle:parking:get")
 
 AddEventHandler("vehicle:parking:get", function(id, cb)

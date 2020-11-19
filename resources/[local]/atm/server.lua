@@ -39,11 +39,22 @@ AddEventHandler('atm:deposit', function(amount)
 								{['fivem'] =  discord,
 								['amount'] = amounte},
 								function(res)
-									exports.bf:Notification("Depot effecuté", sourceValue)
-									TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot effectué", false)
+									TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+										icon = "CHAR_BANK_MAZE",
+										type = 2,
+										text = "Depot effectué ~g~" .. amounte .. " $",
+										title = "MAZE BANK",
+										subTitle = "ATM" 
+									})
 								end)
 							else
-								TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot loupé (Pas assez de liquide)", false)
+								TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+									icon = "CHAR_BANK_MAZE",
+									type = 2,
+									text = "Depot loupé ~g~" .. amounte .. " $",
+									title = "MAZE BANK",
+									subTitle = "ATM" 
+								})
 							end
 						end)			
 					end)
@@ -57,10 +68,22 @@ AddEventHandler('atm:deposit', function(amount)
 						{['fivem'] =  discord,
 						['amount'] = amounte},
 						function(res)
-							TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot effectué", false)
+							TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+								icon = "CHAR_BANK_MAZE",
+								type = 2,
+								text = "Retrait effectué ~g~" .. amounte .. " $",
+								title = "MAZE BANK",
+								subTitle = "ATM" 
+							})
 						end)
 					else
-						TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Depot loupé (Pas assez de liquide)", false)
+						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+							icon = "CHAR_BANK_MAZE",
+							type = 2,
+							text = "Depot effectué ~g~" .. amounte .. " $",
+							title = "MAZE BANK",
+							subTitle = "ATM" 
+						})
 					end
 				end)
 			end
@@ -99,10 +122,22 @@ AddEventHandler('atm:withdraw', function(amount)
 				{['fivem'] =  discord,
 				['amount'] = amounte},
 				function(res)
-					TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Retrait effectué ", false)
+					TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+						icon = "CHAR_BANK_MAZE",
+						type = 2,
+						text = "Retrait effectué ~g~" .. amounte .. " $",
+						title = "MAZE BANK",
+						subTitle = "ATM" 
+					})
 				end)
 			else
-				TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Retrait loupé (Pas assez d'argent) ", false)
+				TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+					icon = "CHAR_BANK_MAZE",
+					type = 2,
+					text = "Retrait loupé ~g~" .. amounte .. " $",
+					title = "MAZE BANK",
+					subTitle = "ATM" 
+				})
 			end
         end)
       end)

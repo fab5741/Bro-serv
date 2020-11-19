@@ -1,5 +1,8 @@
 config = {}
 
+liquid = 0
+account = 0
+
 Citizen.CreateThread(function()
 	exports.bf:AddMenu("atm", {
 		title = "ATM ",
@@ -10,6 +13,7 @@ Citizen.CreateThread(function()
 				exec = {
 					callback = function()
 						TriggerServerEvent('atm:withdraw',  exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+						TriggerServerEvent("account:liquid", "atm:liquid")
 					end
 				},
 			},
@@ -18,6 +22,7 @@ Citizen.CreateThread(function()
 				exec = {
 					callback = function()
 						TriggerServerEvent('atm:deposit',  exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+						TriggerServerEvent("account:liquid", "atm:liquid")
 					end
 				},
 			},
@@ -68,7 +73,27 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 		if zoneType == "atm" and IsControlJustPressed(1, 51) then
-			exports.bf:OpenMenu("atm")
+			TriggerServerEvent("account:liquid", "atm:liquid")
 		end
 	end
 end)
+
+RegisterNetEvent("atm:liquid")
+
+AddEventHandler('atm:liquid', function(data)
+	liquid = data
+	TriggerServerEvent("account:get", "atm:get")
+end)
+
+RegisterNetEvent("atm:get")
+
+AddEventHandler('atm:get', function(data)
+	Wait(0)
+	account = data
+	exports.bf:SetMenuValue("atm", {
+		menuTitle = "LQD ~g~" .. liquid .. " $~s~ / CMP ~g~" .. account.." $",
+	})
+	exports.bf:CloseMenu("atm")
+	exports.bf:OpenMenu("atm")
+end)
+

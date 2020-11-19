@@ -45,6 +45,7 @@ end)
 RegisterNetEvent("account:liquid")
 
 AddEventHandler('account:liquid', function(cb)
+	print("salut")
   local sourceValue = source
 	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
@@ -66,6 +67,8 @@ AddEventHandler('account:liquid', function(cb)
   MySQL.Async.fetchScalar('SELECT liquid from players where fivem = @fivem', {
     ['fivem'] = discord
   }, function(result)
+	print(result)
+
     TriggerClientEvent(cb, sourceValue, result)
   end)
 end)

@@ -8,5 +8,6 @@ AddEventHandler('onResourceStart', function(resourceName)
       StartResource("atm")
       StartResource("admin")
       StartResource("jobmanager")
+      StartResource("vehicles")
     end
-  end)
+end)

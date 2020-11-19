@@ -50,15 +50,11 @@ AddEventHandler("vehicle:menu:buy", function()
     end)
 end)
 
+RegisterNetEvent("vehicle:depots:get:all")
 
-RegisterNetEvent("vehicle:menu:parking:get")
-
-AddEventHandler("vehicle:menu:parking:get", function(id)
+AddEventHandler("vehicle:depots:get:all", function(cb)
 	local sourceValue = source
-
 	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		
-			
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
 		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
@@ -73,22 +69,58 @@ AddEventHandler("vehicle:menu:parking:get", function(id)
 			liveid = v
 		  end
 	end
-    local ide = id
+    MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.player = players.id and players.fivem = @fivem and player_vehicle.parking = "depot"', {
+        ['fivem'] =  discord,
+	}, function(result)
+            TriggerClientEvent(cb, sourceValue, result)
+    end)
+end)
+
+
+
+RegisterNetEvent("vehicle:parking:get:all")
+
+AddEventHandler("vehicle:parking:get:all", function(id, cb)
+	local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+	end
+	local ide = id
+	print(id)
+	print(discord)
     MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.player = players.id and players.fivem = @fivem and player_vehicle.parking = @id', {
         ['fivem'] =  discord,
         ['id'] =  id,
     }, function(result)
-            TriggerClientEvent("vehicle:menu:parking:get", sourceValue, result, ide)
+            TriggerClientEvent(cb, sourceValue, result)
     end)
 end)
 
 RegisterNetEvent("vehicle:parking:get")
 
-AddEventHandler("vehicle:parking:get", function(id)
-    MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = NULL WHERE `player_vehicle`.`id` = @id ', {
+AddEventHandler("vehicle:parking:get", function(id, cb)
+	local sourceValue = source
+    MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = "" WHERE `player_vehicle`.`id` = @id ', {
         ['id'] =  id,
-    }, function(result)
-        print("get")
+	}, function(result)
+		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.id = @id', {
+			['fivem'] =  discord,
+			['id'] =  id,
+		}, function(result)
+			TriggerClientEvent(cb, sourceValue, result[1])
+		end)
     end)
 end)
 

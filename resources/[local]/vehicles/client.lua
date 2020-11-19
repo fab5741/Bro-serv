@@ -13,7 +13,11 @@ config = {
 	parkings = {
 		main = {
 			id = 1,
-			coords = vector3(234.68,-782.73,29.9),
+			coords = {
+				x =234.68,
+				y=-782.73,
+				z=29.9
+			},
 			Blip = {
 				coords = vector3(234.68,-782.73,30.24),
 				sprite = 357,
@@ -90,8 +94,12 @@ config = {
 config.Marker  = {type = 1, x = 1.5, y = 1.5, z = 0.5, r = 102, g = 0, b = 102, a = 100, rotate = false}
 config.DrawDistance = 20
 
+zoneType =0
+zone = "global"
+
 
 currentVehicle = 0
+
 -- Create blips
 Citizen.CreateThread(function()
 	for k,v in pairs(config.shops) do
@@ -106,18 +114,86 @@ Citizen.CreateThread(function()
 		AddTextComponentSubstringPlayerName('Concessionnaire')
 		EndTextCommandSetBlipName(blip)
 	end
-	for k,v in pairs(config.parkings) do
-		local blip = AddBlipForCoord(v.Blip.coords)
 
-		SetBlipSprite(blip, v.Blip.sprite)
-		SetBlipScale(blip, v.Blip.scale)
-		SetBlipColour(blip, v.Blip.color)
-		SetBlipAsShortRange(blip, true)
+	-- parkings
+	exports.bf:AddMenu("parking-veh", {
+		title = "Parking",
+		position = 1,
+	})
+	exports.bf:AddMenu("parking-foot", {
+		title = "Parking",
+		menuTitle = "Retirer",
+		position = 1,
+	})
+	exports.bf:AddArea("parkings", {
+		marker = {
+			type = 1,
+			weight = 1,
+			height = 1,
+			red = 255,
+			green = 255,
+			blue = 153,
+		},
+		trigger = {
+			weight = 2,
+			enter = {
+				callback = function()
+					exports.bf:HelpPromt("Parking : ~INPUT_PICKUP~")
+					zoneType = "parking"
+					zone = "global"
+				end
+			},
+		},
+		blip = {
+			text = "Parking",
+			colorId = 2,
+			imageId = 357,
+		},
+		locations = {
+			{
+				x =234.68,
+				y=-782.73,
+				z=29.9
+			}
+		},
+	})
 
-		BeginTextCommandSetBlipName('STRING')
-		AddTextComponentSubstringPlayerName('Parking')
-		EndTextCommandSetBlipName(blip)
-	end
+	--depots
+	exports.bf:AddMenu("depots", {
+		title = "Fourrière",
+		position = 1,
+	})
+	exports.bf:AddArea("depots", {
+		marker = {
+			type = 1,
+			weight = 1,
+			height = 1,
+			red = 255,
+			green = 255,
+			blue = 153,
+		},
+		trigger = {
+			weight = 2,
+			enter = {
+				callback = function()
+					exports.bf:HelpPromt("Fourrière : ~INPUT_PICKUP~")
+					zoneType = "depots"
+				end
+			},
+		},
+		blip = {
+			text = "Parking",
+			colorId = 2,
+			imageId = 326,
+		},
+		locations = {
+			{
+				x =383.04083251953,
+				y=-1622.9884033203,
+				z=29.291938781738
+			}
+		},
+	})
 end)
 
 local menuOpened = 0
@@ -137,47 +213,6 @@ local function isPedDrivingAVehicle()
 	end
 	return false
 end
-
--- Draw markers
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(0)
-		local playerCoords = GetEntityCoords(PlayerPedId())
-		for k,v in pairs(config.shops) do
-			local distance = #(playerCoords - v.coords)
-
-			if distance < config.DrawDistance then
-				DrawMarker(config.Marker.type, v.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
-			end
-
-			if distance < config.Marker.x then	
-				if(menuOpened == 0) then
-					menuOpened = 1
-					TriggerServerEvent("vehicle:menu:buy")
-				end
-			end
-		end
-		for k,v in pairs(config.parkings) do
-			local distance = #(playerCoords - v.coords)
-
-			if distance < config.DrawDistance then
-				DrawMarker(config.Marker.type, v.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
-			end
-
-			if distance < config.Marker.x then
-				if(menuOpened == 0) then
-					menuOpened = 1
-					if isPedDrivingAVehicle() then
-						TriggerEvent("vehicle:menu:parking:store", v.id)
-					else
-						TriggerServerEvent("vehicle:menu:parking:get", v.id)
-					end
-				end
-			end
-		end
-	end
-end)
-
 
 RegisterNetEvent("vehicle:menu:buy")
 
@@ -328,20 +363,6 @@ AddEventHandler("vehicle:parking:get", function(data, id)
 end)
 
 
-
-RegisterNetEvent("vehicle:parking:store")
-
-AddEventHandler("vehicle:parking:store", function(data)
-
-	TriggerServerEvent("vehicle:store", currentVehicle, data.parking)
-	print("store : ", data)
-	currentVehicle = 0
-	TriggerEvent("menu:delete", "vehiclesShop") 
-	menuOpened = 0
-
-	DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-
-end)
 
 RegisterNetEvent("vehicle:menu:closed")
 
@@ -695,3 +716,161 @@ Citizen.CreateThread(function()
 end)
 
 
+-- detect parking enter
+Citizen.CreateThread(function()
+	local notification = false
+	while true do
+		Citizen.Wait(0)
+		if zoneType == "parking" and IsControlJustPressed(1, 51) then
+			if isPedDrivingAVehicle() then
+				exports.bf:SetMenuValue("parking-veh", {
+					buttons = {
+						{
+							text = "Stocker : " .. zone,
+							exec = {
+								callback = function()
+									TriggerServerEvent("vehicle:store", currentVehicle, zone)
+									currentVehicle = 0
+								
+									DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
+									exports.bf:CloseMenu("parking-veh")
+								end
+							},
+						}
+					}
+				})
+
+				exports.bf:OpenMenu("parking-veh")
+			else
+				TriggerServerEvent("vehicle:parking:get:all", zone, "vehicle:foot")
+			end
+		elseif zoneType == "depots" and IsControlJustPressed(1, 51) then
+			if isPedDrivingAVehicle() then
+				exports.bf:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
+			else
+				TriggerServerEvent("vehicle:depots:get:all", "vehicle:depots")
+			end
+		end
+	end
+end)
+
+RegisterNetEvent("vehicle:depots")
+
+AddEventHandler("vehicle:depots", function(vehicles)
+	local buttons = {}
+	
+	for k, v in ipairs (vehicles) do
+		buttons[k] =     {
+			text = v.label,
+			exec = {
+				callback = function() 
+					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
+				end
+		}
+	}
+	end
+	exports.bf:SetMenuButtons("depots", buttons)
+	exports.bf:OpenMenu("depots")
+end)
+
+RegisterNetEvent("vehicle:foot")
+
+AddEventHandler("vehicle:foot", function(vehicles)
+	local buttons = {}
+
+	for k, v in ipairs (vehicles) do
+		buttons[k] =     {
+			text = v.label,
+			exec = {
+				callback = function() 
+					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
+				end
+		}
+	}
+	end
+	exports.bf:SetMenuButtons("parking-foot", buttons)
+	exports.bf:OpenMenu("parking-foot")
+end)
+
+RegisterNetEvent("vehicle:get")
+
+AddEventHandler("vehicle:get", function(data)
+	print("go")
+	local vehicleName = data.name
+	currentVehicle = data.id
+	menuOpened = 0
+    -- check if the vehicle actually exists
+    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+        TriggerEvent('chat:addMessage', {
+            args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
+        })
+        return
+    end
+
+    -- load the model
+    RequestModel(vehicleName)
+    local playerPed = PlayerPedId() -- get the local player ped
+
+    -- wait for the model to load
+    while not HasModelLoaded(vehicleName) do
+        Wait(500) -- often you'll also see Citizen.Wait
+    end
+
+	ClearAreaOfVehicles(232.19, -788.63, 30.63, 5.0, false, false, false, false, false)
+    -- create the vehicle
+    local vehicle = CreateVehicle(vehicleName, 232.19, -788.63, 29.83, 150.5, true, false)
+
+    -- set the player ped into the vehicle's driver seat
+    SetPedIntoVehicle(playerPed, vehicle, -1)
+
+    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+    SetEntityAsNoLongerNeeded(vehicle)
+
+    -- release the model
+	SetModelAsNoLongerNeeded(vehicleName)
+	
+	TriggerServerEvent("vehicle:parking:get", data.id)
+	
+	exports.bf:CloseMenu("parking-foot")
+end)
+
+RegisterNetEvent("vehicle:depots:get")
+
+AddEventHandler("vehicle:depots:get", function(data)
+	local vehicleName = data.name
+	currentVehicle = data.id
+	menuOpened = 0
+    -- check if the vehicle actually exists
+    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+        TriggerEvent('chat:addMessage', {
+            args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
+        })
+        return
+    end
+
+    -- load the model
+    RequestModel(vehicleName)
+    local playerPed = PlayerPedId() -- get the local player ped
+
+    -- wait for the model to load
+    while not HasModelLoaded(vehicleName) do
+        Wait(500) -- often you'll also see Citizen.Wait
+    end
+	
+	ClearAreaOfVehicles(384.67245483398,-1622.2377929688, 29.291933059692, 5.0, false, false, false, false, false)
+    -- create the vehicle
+    local vehicle = CreateVehicle(vehicleName, 384.67245483398,-1622.2377929688, 29.291933059692, -30.0, true, false)
+
+    -- set the player ped into the vehicle's driver seat
+    SetPedIntoVehicle(playerPed, vehicle, -1)
+
+    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+    SetEntityAsNoLongerNeeded(vehicle)
+
+    -- release the model
+	SetModelAsNoLongerNeeded(vehicleName)
+	
+	TriggerServerEvent("vehicle:parking:get", data.id)
+	
+	exports.bf:CloseMenu("parking-foot")
+end)

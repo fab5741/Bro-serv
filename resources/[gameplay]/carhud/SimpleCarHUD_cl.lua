@@ -45,6 +45,7 @@ local pedInVeh = false
 local timeText = ""
 local locationText = ""
 local currentFuel = 0.0
+seatbeltIsOn = false
 
 -- Main thread
 Citizen.CreateThread(function()
@@ -53,7 +54,6 @@ Citizen.CreateThread(function()
     local cruiseSpeed = 999.0
     local prevVelocity = {x = 0.0, y = 0.0, z = 0.0}
     local cruiseIsOn = false
-    local seatbeltIsOn = false
 
     while true do
         -- Loop forever and update HUD every frame
@@ -216,3 +216,10 @@ function drawTxt(content, font, colour, scale, x, y)
     AddTextComponentString(content)
     DrawText(x, y)
 end
+
+
+RegisterNetEvent('vehicle:belt')
+
+AddEventHandler('vehicle:belt', function (cb)
+    TriggerEvent(cb, seatbeltIsOn)
+end)

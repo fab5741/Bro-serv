@@ -29,6 +29,7 @@ AddEventHandler('account:liquid', function(cb)
   end)
 end)
 
+
 RegisterNetEvent("account:get")
 
 AddEventHandler('account:get', function(cb)

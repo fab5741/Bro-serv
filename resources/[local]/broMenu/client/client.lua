@@ -367,43 +367,48 @@ AddEventHandler("bf:vehicles", function(vehicles)
 			exec = {
 				callback = function() 
 					if v.parking == "" then
-						local vehicleName = v.name
-						currentVehicle = v.id
-						-- check if the vehicle actually exists
-						if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-							TriggerEvent('chat:addMessage', {
-								args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-							})
-							return
-						end
-
-						-- load the model
-						RequestModel(vehicleName)
 						local playerPed = PlayerPedId() -- get the local player ped
 
-						-- wait for the model to load
-						while not HasModelLoaded(vehicleName) do
-							Wait(500) -- often you'll also see Citizen.Wait
+						if not IsPedInAnyVehicle(playerPed) then
+							local vehicleName = v.name
+							currentVehicle = v.id
+							-- check if the vehicle actually exists
+							if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+								TriggerEvent('chat:addMessage', {
+									args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
+								})
+								return
+							end
+
+							-- load the model
+							RequestModel(vehicleName)
+
+							-- wait for the model to load
+							while not HasModelLoaded(vehicleName) do
+								Wait(500) -- often you'll also see Citizen.Wait
+							end
+							local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
+
+							ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
+							-- create the vehicle
+							local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+
+							-- set the player ped into the vehicle's driver seat
+							SetPedIntoVehicle(playerPed, vehicle, -1)
+
+							-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+							SetEntityAsNoLongerNeeded(vehicle)
+
+							-- release the model
+							SetModelAsNoLongerNeeded(vehicleName)
+
+							TriggerServerEvent("account:money:sub", 100)
+													
+							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 100 $ ~s~ de franchise.")
+							exports.bf:CloseMenu("bro-vehicles")
+						else
+							exports.bf:Notification("Vous êtes déjà dans un véhicle")
 						end
-						local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
-
-						ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
-						-- create the vehicle
-						local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
-
-						-- set the player ped into the vehicle's driver seat
-						SetPedIntoVehicle(playerPed, vehicle, -1)
-
-						-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-						SetEntityAsNoLongerNeeded(vehicle)
-
-						-- release the model
-						SetModelAsNoLongerNeeded(vehicleName)
-
-						TriggerServerEvent("account:money:sub", 100)
-												
-						exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 100 $ ~s~ de franchise.")
-						exports.bf:CloseMenu("bro-vehicles")
 					end
 				end
 			},

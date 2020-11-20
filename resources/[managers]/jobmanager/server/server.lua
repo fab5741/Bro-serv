@@ -1,10 +1,18 @@
+
+inService = {
+    LSPD = {
+
+    },
+    LSMS = {
+
+    }
+}
+
 RegisterNetEvent("job:get")
 
 AddEventHandler('job:get', function (cb)
     local sourceValue = source
     for k,v in pairs(GetPlayerIdentifiers(source))do
-		
-			
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
 		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
@@ -21,7 +29,8 @@ AddEventHandler('job:get', function (cb)
 	end
     MySQL.ready(function ()
         MySQL.Async.fetchAll('SELECT jobs.name as job, job_grades.label as grade from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and fivem = @fivem',
-        {['fivem'] =  discord}, function(res)
+        {['fivem'] =  discord},
+         function(res)
                 if(res[1]) then
                     TriggerClientEvent(cb, sourceValue, res)
                 else
@@ -62,7 +71,7 @@ Citizen.CreateThread(function()
         MySQL.ready(function ()
             MySQL.Async.execute('Update accounts, players, job_grades SET accounts.amount = accounts.amount + job_grades.salary/2 where players.onDuty = 1 and accounts.player = players.id and players.job_grade = job_grades.id',{},
             function(affectedRows)
-                TriggerClientEvent("lspd:notify",  -1,  "CHAR_BANK_FLEECA", -1,"Vous avez reçu votre paie", false)
+                TriggerClientEvent('bf:Notification', -1, "Vous avez reçu votre paie")
             end)
         end)
     end
@@ -197,7 +206,7 @@ end)
 --- Parkings
 RegisterNetEvent("job:parking:get")
 
-AddEventHandler('job:parking:get', function (id)
+AddEventHandler('job:parking:get', function (cb, id, job)
     local source = source
         for k,v in pairs(GetPlayerIdentifiers(source))do               
             if string.sub(v, 1, string.len("steam:")) == "steam:" then
@@ -214,49 +223,115 @@ AddEventHandler('job:parking:get', function (id)
             liveid = v
             end
     end
-    print(id)
     MySQL.ready(function ()
-        MySQL.Async.execute('Update player_vehicle SET parking="" where id = @id',{['id'] = id},
+        MySQL.Async.execute('Update job_vehicle SET parking="" where id = @id',{['id'] = id},
         function(affectedRows)
             if affectedRows == 1 then
-                print("get the car")
-                MySQL.Async.fetchAll('select player_vehicle.id, name from player_vehicle, vehicles where player_vehicle.id= @id and vehicles.id = player_vehicle.vehicle',{['id'] = id},
+                MySQL.Async.fetchAll('select job_vehicle.id, name from job_vehicle, vehicles where job_vehicle.id= @id and vehicles.id = job_vehicle.vehicle',{['id'] = id},
                 function(res)
-                    TriggerClientEvent("job:getCar",  source, res[1].name, res[1].id)
+                    TriggerClientEvent(cb,  source, res[1].name, res[1].id, job)
                 end)
             end
         end)
     end)
 end)
 
+-- lsms
+RegisterNetEvent("job:lsms:revive")
 
-
-RegisterNetEvent("job:parking:getAll")
-
-AddEventHandler('job:parking:getAll', function (job)
+AddEventHandler('job:lsms:revive', function (player)
     local source = source
-        for k,v in pairs(GetPlayerIdentifiers(source))do               
-            if string.sub(v, 1, string.len("steam:")) == "steam:" then
-            steamid = v
-            elseif string.sub(v, 1, string.len("license:")) == "license:" then
-            license = v
-            elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-            xbl  = v
-            elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-            ip = v
-            elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-            discord = v
-            elseif string.sub(v, 1, string.len("live:")) == "live:" then
-            liveid = v
-            end
-    end
-    MySQL.ready(function ()
-            MySQL.Async.fetchAll('select player_vehicle.id, name from player_vehicle, vehicles where parking = @job and vehicles.id = player_vehicle.vehicle',{['job'] = job},
-            function(res)
-                TriggerClientEvent("job:parking:getAll",  source, job, res)
-            end)
-    end)
+    TriggerClientEvent("job:revive", player)
 end)
 
 
+RegisterNetEvent("job:lsms:distress")
+
+AddEventHandler('job:lsms:distress', function(player)
+    --check le nombre d'ambulanciers présent
+    print("appel recu de " .. player)
+
+    --TODO disable or true, when phone woirking
+    if #inService["LSMS"] == 0 or true then
+        TriggerClientEvent('job:lsms:revive', source)
+    else
+        TriggerClientEvent('bf:Notification', sourceValue, "Appel en cours")
+        for k,v in pairs(inService["LSMS"])do
+            TriggerClientEvent('bf:Notification', v, "Appel en cours")
+        end
+    end
+end)
+
+
+
+-- homes
+RegisterNetEvent("job:avert:all")
+
+AddEventHandler("job:avert:all", function (job)
+    local sourceValue = source
+    
+    if #inService[job] == 0 then
+        TriggerClientEvent('bf:Notification', sourceValue, "Personne n'est en service, démerdez vous. Job : ~b~(".. job.. ")")
+    else
+        for k,v  in pairs (inService[job]) do
+            TriggerClientEvent('bf:Notification', v, "On vous demande à l'acceuil ~b~(".. job.. ")")
+        end
+        TriggerClientEvent('bf:Notification', sourceValue, "Votre appel à été émis pour le ~b~(".. job.. ")")
+    end
+
+end)
+
+
+-- clock in
+RegisterNetEvent("job:clock:set")
+
+AddEventHandler("job:clock:set", function (isIn, job)
+    local sourceValue = source
+    print(job)
+    if isIn then
+        inService[job][#inService[job]+1] = sourceValue
+    else
+        for i = 1, #inService[job] do
+            if inService[job][i] == sourceValue then
+                inService[job][i] = nil
+            end
+        end
+    end
+end)
+RegisterNetEvent("job:clock")
+
+AddEventHandler("job:clock", function (isIn, job)
+    local sourceValue = source
+    for k,v in pairs(GetPlayerIdentifiers(source))do
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+    end
+    local isIn = isIn
+    local job = job
+    MySQL.ready(function ()
+        MySQL.Async.execute('Update players SET onDuty = @isIn where fivem= @fivem',{['@fivem'] = discord, ['@isIn'] = isIn},
+        function(affectedRows)
+            if affectedRows > 0 then
+                if isIn then
+                    TriggerEvent("job:clock:set", true, job)
+                    TriggerClientEvent('bf:Notification', sourceValue, "Vous entrez en service")
+                else
+                    TriggerEvent("job:clock:set", false, job)
+                    TriggerClientEvent('bf:Notification', sourceValue, "Vous quittez le service")
+                end
+            end
+        end)
+    end)
+end)
 

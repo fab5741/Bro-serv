@@ -174,8 +174,8 @@ Citizen.CreateThread(function()
         Citizen.Wait(0) -- these things NEED to run every tick.
         
         -- Traffic and ped density management
-        SetTrafficDensity(0.2)
-        SetPedDensity(0.2)
+        SetTrafficDensity(1)
+        SetPedDensity(1)
         
         -- Wanted level management
         SetPlayerWantedLevel(PlayerId(), 0, false)

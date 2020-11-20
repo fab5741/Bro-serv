@@ -4,25 +4,15 @@ config = {
             label= "Fermiers",
             lockers = {
                 {
-                    coords = vector3(2029.99, 4980.23, 41.1),
-                    blip = {
+                    coords = vector3(2030.2646484375,4979.7456054688,42.098190307617),
                     sprite = 496,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "locker",
-                    },
                     action = "lockers",
                 }
             },
             collect = {
                 {
                     coords = vector3(2572.38, 4523.48, 35.2),
-                    blip = {
                     sprite = 496,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "collect",
-                    },
                     action = "collect",
                     items = {
                        {name="wheat", label="Blé", amount="1", type="16"},
@@ -33,12 +23,7 @@ config = {
             process = {
                 {
                     coords = vector3(463.28,3566.37,32.2),
-                    blip = {
                     sprite = 202,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "process",
-                    },
                     action = "process",
                     items = {
                         {name="wheat", label="Blé", amount="1", type="16", to="15", amountTo="1"},
@@ -47,12 +32,7 @@ config = {
                 },
                 {
                     coords = vector3(470.25,3565.63,32.45),
-                    blip = {
                     sprite = 202,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "process",
-                    },
                     action = "process",
                     items = {
                         {name="flour", label="Farine", amount="1", type="15", to="13", amountTo="1"},
@@ -61,27 +41,19 @@ config = {
              },
             sell = {
             },
-            safe = {
+            safes = {
                 {
-                    coords = vector3(2016.24, 4987.08, 41.1),
-                    blip = {
+                    coords = vector3(2016.3625488281,4986.939453125,42.098285675049),
                     sprite = 496,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "safe",
-                    },
                     action = "safe",
                 }
             },
             parking = {
                 {
-                    coords = vector3(2034.92, 4989.24, 39.0),
-                    blip = {
-                        sprite = 357,
-                        scale  = 1.2,
-                        color  = 5,
-                        string = "Parking",
-                    },
+                    coords = vector3(2035.1791992188,4989.015625,39.695823669434),
+                    spawn = vector3(2036.4399414062,4986.6323242188,40.001270294189),
+                    heading = -100.0,
+                    sprite = 357,
                     action = "parking",
                 }
             },
@@ -246,6 +218,127 @@ config = {
                 },
                 action = "Parking",
             },
+        },
+        LSMS = {
+            lockers = {
+                {
+                    coords = vector3(336.27508544922, -580.03137207031, 28.791479110718),
+                    blip = {
+                    sprite = 51,
+                    scale  = 0.4,
+                    color  = 5,
+                    string = "locker",
+                    },
+                    action = "lockers",
+                }
+            },
+            parking = {
+                {
+                    coords = vector3(339.56744384766,-562.45819091797,28.743431091309),
+                    spawn = vector3(344.1618347168, -556.84796142578, 28.743431091309),
+                    heading = -15.0,
+                    blip = {
+                        sprite = 357,
+                        scale  = 1.2,
+                        color  = 5,
+                        string = "Parking",
+                    },
+                    action = "parking",
+                }
+            },
+            homes = {
+                {
+                    coords = vector3(341.41842651367,-582.73522949219,28.791477203369),
+                    sprite = 500,
+                    action = "homes",
+                },
+            },
+            grades = {
+                stagiaire = {
+                    label= "Stagiaire",
+                    skin_male = {
+                        tshirt_1 = 59,  tshirt_2 = 1,
+                        torso_1 = 55,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 25,   pants_2 = 0,
+                        shoes_1 = 25,   shoes_2 = 0,
+                        helmet_1 = 46,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    },
+                    skin_female = {
+                        tshirt_1 = 36,  tshirt_2 = 1,
+                        torso_1 = 48,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 44,
+                        pants_1 = 34,   pants_2 = 0,
+                        shoes_1 = 27,   shoes_2 = 0,
+                        helmet_1 = 45,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    }
+               }
+            }
+        },
+        LSPD = {
+            lockers = {
+                {
+                    coords = vector3(457.06948852539,-992.75042724609,30.689332962036),
+                    sprite = 51,
+                    action = "lockers",
+                }
+            },
+            parking = {
+                {
+                    coords = vector3(455.12176513672,-1020.779296875,28.307716369629),
+                    spawn = vector3(452.06982421875,-1020.469909668,28.381450653076),
+                    heading = 90.0,
+                    sprite = 357,
+                    action = "parking",
+                }
+            },
+            armories = {
+                {
+                    coords = vector3(451.75173950195,-980.27758789062,30.689315795898),
+                    sprite = 549,
+                    action = "armories",
+                },
+            },
+            homes = {
+                {
+                    coords = vector3(441.18566894531,-981.09637451172,30.689331054688),
+                    sprite = 500,
+                    action = "homes",
+                },
+            },
+            grades = {
+                stagiaire = {
+                    label= "Stagiaire",
+                    skin_male = {
+                        tshirt_1 = 59,  tshirt_2 = 1,
+                        torso_1 = 55,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 25,   pants_2 = 0,
+                        shoes_1 = 25,   shoes_2 = 0,
+                        helmet_1 = 46,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    },
+                    skin_female = {
+                        tshirt_1 = 36,  tshirt_2 = 1,
+                        torso_1 = 48,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 44,
+                        pants_1 = 34,   pants_2 = 0,
+                        shoes_1 = 27,   shoes_2 = 0,
+                        helmet_1 = 45,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    }
+               }
+            }
         }
     }
 }

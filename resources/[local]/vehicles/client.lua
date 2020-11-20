@@ -425,7 +425,7 @@ end)
 RegisterNetEvent("vehicle:permis:get:ds")
 
 AddEventHandler("vehicle:permis:get:ds", function(permis)
-	if not permis then
+	if permis == 0 then
 		exports.bf:HelpPromt("Auto-école : ~INPUT_PICKUP~")
 		zoneType = "ds"
 	end

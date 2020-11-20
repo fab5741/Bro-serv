@@ -66,10 +66,10 @@ AddEventHandler("vehicle:ds", function(cb, price)
 		  end
 	end
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select liquid, id from players where fivem = @fivem',
+		MySQL.Async.fetchAll('select liquid, id, permis from players where fivem = @fivem',
         {['fivem'] =  discord},
 		function(res)
-			if res[1] and res[1].liquid >= price then
+			if res[1] and res[1].liquid >= price and res[1].permis == 0 then
 				MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
 				{['fivem'] =  discord,
 				['price'] = price},
@@ -139,8 +139,6 @@ AddEventHandler("vehicle:parking:get:all", function(id, cb)
 		  end
 	end
 	local ide = id
-	print(id)
-	print(discord)
     MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.player = players.id and players.fivem = @fivem and player_vehicle.parking = @id', {
         ['fivem'] =  discord,
         ['id'] =  id,
@@ -198,6 +196,20 @@ AddEventHandler("vehicle:store", function(vehicle, parking)
 	print("STORE")
     local sourceValue = source
     MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = @parking WHERE `player_vehicle`.`id` = @vehicle ', {
+        ['vehicle'] =  vehicle,
+        ['parking'] =  parking,
+    }, function(result)
+        print("updated", parking)
+    end)
+end)
+
+
+RegisterNetEvent("vehicle:job:store")
+
+AddEventHandler("vehicle:job:store", function(vehicle, parking)
+	print("STORE")
+    local sourceValue = source
+    MySQL.Async.fetchAll('UPDATE `job_vehicle` SET parking = @parking WHERE `job_vehicle`.`id` = @vehicle ', {
         ['vehicle'] =  vehicle,
         ['parking'] =  parking,
     }, function(result)
@@ -284,5 +296,18 @@ Citizen.CreateThread(function()
 		end)
 	end
 end)
+
+
+--jobs
+RegisterNetEvent("vehicle:job:parking")
+
+AddEventHandler("vehicle:job:parking", function(cb, job)
+    local sourceValue = source
+    MySQL.Async.fetchAll('SELECT vehicles.label, job_vehicle.id from job_vehicle, vehicles, jobs where job_vehicle.parking = "global" and vehicles.id = job_vehicle.vehicle and job_vehicle.job = jobs.id and jobs.name = @job', {['@job'] = job
+    }, function(result)
+        TriggerClientEvent(cb, sourceValue, result)
+    end)
+end)
+
 
 

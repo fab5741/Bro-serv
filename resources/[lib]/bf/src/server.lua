@@ -9,5 +9,6 @@ AddEventHandler('onResourceStart', function(resourceName)
       StartResource("admin")
       StartResource("jobmanager")
       StartResource("vehicles")
+      StartResource("lsms")
     end
 end)

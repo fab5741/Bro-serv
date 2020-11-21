@@ -570,3 +570,63 @@ function CloseArmory()
 	Citizen.Wait(500)
 	DoScreenFadeIn(500)
 end
+
+--redirect callbacks
+local function isPedDrivingAVehicle()
+	local ped = GetPlayerPed(-1)
+	vehicle = GetVehiclePedIsIn(ped, false)
+	if IsPedInAnyVehicle(ped, false) then
+		-- Check if ped is in driver seat
+		if GetPedInVehicleSeat(vehicle, -1) == ped then
+			local class = GetVehicleClass(vehicle)
+			-- We don't want planes, helicopters, bicycles and trains
+			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+
+function addBeginArea() 
+	exports.bf:RemoveArea("begin-current")
+	points_coords = points[math.random(1,#points)]
+	exports.bf:AddArea("begin-current", {
+		marker = {
+			type = 1,
+			weight = 1,
+			height = 1,
+			red = 255,
+			green = 255,
+			blue = 153,
+		},
+		trigger = {
+			weight = 1,
+			enter = {
+				callback = function()
+					if 	GetVehiclePedIsIn(PlayerPedId(), false) == vehicleLivraison then
+						TriggerServerEvent("account:liquid:add", 1)
+						exports.bf:Notification("Vous avez gagné ~g~1$")
+					else
+						exports.bf:Notification("Ou est passé votre vehicule de livraison ? non payé")
+					end
+					addBeginArea()
+				end
+			},
+		},
+		blip = {
+			text = "Livraison",
+			colorId = 18,
+			imageId = 51,
+			route = true,
+		},
+		locations = {
+			{
+				x = points_coords.x,
+				y = points_coords.y,
+				z = points_coords.z,
+			}
+		},
+	})
+end

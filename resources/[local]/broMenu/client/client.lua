@@ -102,13 +102,25 @@ Citizen.CreateThread(function()
 		title = "Vehicules",
 		position = 1,
 	})
+
+	-- main loop
   while true do
     Citizen.Wait(0)
 	if (IsControlJustPressed(1, 288)) then
-		exports.bf:OpenMenu("bro")
+		TriggerServerEvent("job:get", "bf:open")
 	end
   end
 end)
+RegisterNetEvent('bf:open')
+
+AddEventHandler("bf:open", function(job) 
+	job = job[1]
+	exports.bf:SetMenuValue("bro", {
+		menuTitle = job.job
+	})
+	exports.bf:OpenMenu("bro")
+end)
+
 
 RegisterNetEvent('bf:liquid')
 

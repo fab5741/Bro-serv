@@ -44,15 +44,31 @@ end)
 
 RegisterNetEvent("job:set")
 
-AddEventHandler('job:set', function (grade)
+AddEventHandler('job:set', function (grade, notif)
     local sourceValue = source
+    local source = source
+    for k,v in pairs(GetPlayerIdentifiers(source))do                
+        if string.sub(v, 1, string.len("steam:")) == "steam:" then
+        steamid = v
+        elseif string.sub(v, 1, string.len("license:")) == "license:" then
+        license = v
+        elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+        xbl  = v
+        elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+        ip = v
+        elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+        discord = v
+        elseif string.sub(v, 1, string.len("live:")) == "live:" then
+        liveid = v
+        end
+end
     local gradee = grade
     MySQL.ready(function ()
         MySQL.Async.fetchAll('UPDATE players set job_grade= @grade where fivem = @fivem',
-        {['fivem'] =  GetPlayerIdentifiers(sourceValue)[5],
+        {['fivem'] =  discord,
          ['grade'] = gradee},
         function(res)
-            TriggerClientEvent("job:draw", sourceValue)
+            TriggerClientEvent("bf:Notification", sourceValue, "Vous êtes maintenant ~g~"..notif)
         end)
       end)
 end)
@@ -81,9 +97,7 @@ RegisterNetEvent("jobs:sell")
 
 AddEventHandler('jobs:sell', function (item, price, shop)
     local source = source
-        for k,v in pairs(GetPlayerIdentifiers(source))do
-            
-                
+        for k,v in pairs(GetPlayerIdentifiers(source))do                
             if string.sub(v, 1, string.len("steam:")) == "steam:" then
             steamid = v
             elseif string.sub(v, 1, string.len("license:")) == "license:" then

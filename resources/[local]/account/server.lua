@@ -23,9 +23,37 @@ AddEventHandler('account:liquid', function(cb)
   MySQL.Async.fetchScalar('SELECT liquid from players where fivem = @fivem', {
     ['fivem'] = discord
   }, function(result)
-	print(result)
-
     TriggerClientEvent(cb, sourceValue, result)
+  end)
+end)
+
+
+RegisterNetEvent("account:liquid:add")
+
+AddEventHandler('account:liquid:add', function(amount)
+  local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+  end
+  print(amount)
+  local amount=amount
+  print(amount)
+  MySQL.Async.fetchScalar('update players set liquid=liquid+@amount where fivem = @fivem', {
+	['@fivem'] = discord,
+	['@amount'] = amount,
+  }, function(result)
   end)
 end)
 

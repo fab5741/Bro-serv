@@ -27,7 +27,14 @@ function Blip:Show()
     if self.rotation ~= nil then
         SetBlipRotation(self.blip, self.rotation)
     end
-
+    SetBlipRouteColour(
+        self.blip, 
+        2
+    )
+    SetBlipRoute(
+        self.blip, 
+        true
+    )
 end
 
 --
@@ -55,6 +62,7 @@ function blip.new(data)
     self.imageId = data.imageId or 1
     self.colorId = data.colorId or 0
     self.scale = data.scale or 1.0
+    self.route = data.route or false
 
     if data.shortRange == nil or type(data.shortRange) ~= "boolean" then
         self.shortRange = true

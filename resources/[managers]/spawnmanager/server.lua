@@ -151,7 +151,7 @@ AddEventHandler('player:set', function(data)
         dataa.sex = 1
     end
     MySQL.ready(function ()
-        MySQL.Async.execute("INSERT INTO `players` (`id`, `fivem`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `birth`) VALUES (NULL, @fivem, '-1038.703', '-2683.085', '12', '1', '0', '', '100', @firstname, @lastname, @birth);", {
+        MySQL.Async.execute("INSERT INTO `players` (`id`, `fivem`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `birth`, `permis`) VALUES (NULL, @fivem, '-1038.703', '-2683.085', '12', '1', '0', '', '100', @firstname, @lastname, @birth, 0);", {
             ['@fivem'] =  discord,
             ['@firstname'] =  dataa.firstName,
             ['@lastname'] =  dataa.lastName,

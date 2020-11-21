@@ -47,7 +47,7 @@ config.Zones = {
 	},
 }
 
-config.robLength = 60
+config.robLength = 2
 config.robMaxDistance = 20
 
 zoneType = ""
@@ -179,8 +179,11 @@ function robNpc(targetPed)
 
         TaskStandStill(targetPed, config.robLength * 1000)
         FreezeEntityPosition(targetPed, true)
-        TaskPlayAnim(targetPed, dict, 'handsup_standing_base', 8.0, -8, .01, 49, 0, 0, 0, 0)
-		TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Braquage en cours", false)
+		TaskPlayAnim(targetPed, dict, 'handsup_standing_base', 8.0, -8, .01, 49, 0, 0, 0, 0)
+		exports.bf:Notification('Braquage en cours')
+
+		-- If no luck, cops get averted
+		TriggerServerEvent("job:avert:all", "LSPD", "Un braquage est en cours")
 
         Citizen.Wait(config.robLength * 1000)
 
@@ -189,17 +192,16 @@ function robNpc(targetPed)
 		if(GetDistanceBetweenCoords(GetEntityCoords(targetPed), GetEntityCoords(GetPlayerPed(-1))) < config.robMaxDistance) then
 			local j = 0
 			for k,v in pairs(config.Zones) do
-				for i = 1, #v, 1 do
-					j = j+1
-					local distance = GetDistanceBetweenCoords(playerCoords, v[i].pos.x, v[i].pos.y, v[i].pos.z, true)
+				j = j+1
+				local distance = GetDistanceBetweenCoords(playerCoords, v.pos.x, v.pos.y, v.pos.z, true)
 
-					if distance < config.DrawDistance then
-						TriggerServerEvent("shops:rob", v[i].id)
-					end
+				if distance < config.robMaxDistance then
+					--lets rob
+					TriggerServerEvent("shops:rob", v.id)
 				end
 			end
 		else
-			TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Vous vous êtes trop éloigné", false)
+			exports.bf:Notification('Vous vous êtes trop éloigné')
 		end
         robbedRecently = false
     end)
@@ -218,9 +220,9 @@ Citizen.CreateThread(function()
 
                 if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
 					if robbedRecently then
-						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Trop rapide !", false)
+						exports.bf:Notification('Trop rapide !')
 					elseif IsPedDeadOrDying(targetPed, true) then
-						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "L'épicier est mort", false)
+						exports.bf:Notification("L'épicier est mort")
                     else
                         robNpc(targetPed)
                     end

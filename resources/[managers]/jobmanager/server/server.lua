@@ -84,17 +84,61 @@ local moneyDutyTime = 30 *1000 * 60
 
 -- Key Controls
 Citizen.CreateThread(function()
-	while true do
+    while true do
         Citizen.Wait(moneyDutyTime)
         print("Time for paycheck")
 
         -- Check if people are working
-        MySQL.ready(function ()
-            MySQL.Async.execute('Update accounts, players, job_grades SET accounts.amount = accounts.amount + job_grades.salary/2 where players.onDuty = 1 and accounts.player = players.id and players.job_grade = job_grades.id',{},
-            function(affectedRows)
-                TriggerClientEvent('bf:Notification', -1, "Vous avez reçu votre paie")
+        MySQL.ready(function()
+            MySQL.Async.fetchAll('select players.gameId, jobs.id as job, job_grades.salary, players.id as player from players, jobs, job_grades where jobs.id = job_grades.job and onDuty = 1 and players.job_grade= job_grades.id',{},
+                function(res)
+                    for k,v in pairs(res) do
+                        MySQL.Async.fetchScalar('select money from jobs where id=@job',
+                            {['@job'] = v.job},
+                        function(money)
+                            v.salary = v.salary/2
+                            if money > v.salary then
+                               MySQL.Async.execute('update jobs set money = money - @salary where id = @job',{
+                                   ['@salary'] = v.salary,
+                                   ['@job'] = v.job
+                               },
+                               function(affectedRows)
+                                    MySQL.Async.execute('update accounts set amount = amount + @salary where accounts.player = @player',{
+                                        ['@salary'] = v.salary,
+                                        ['@player'] = v.player
+                                    },
+                                    function(affectedRows)
+                                        TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~g~"..v.salary.." $")
+                                    end)
+                               end)
+                            else
+                                TriggerClientEvent('bf:Notification', v.gameId, "~r~Vous n'avez pas reçu votre paie, la société, n'a pas assez de fond pour vous payer !")
+                            end
+                        end)
+                    end
+                end)
             end)
-        end)
+       -- MySQL.ready(function ()
+         --   MySQL.Async.execute('Update accounts, players, job_grades SET accounts.amount = accounts.amount + job_grades.salary/2 where players.onDuty = 1 and accounts.player = players.id and players.job_grade = job_grades.id',{},
+           -- function(affectedRows)
+             --   MySQL.Async.fetchAll('select id from jobs',{},
+              --  function(res)
+                  --  for k,v in pairs(res) do
+                     --   MySQL.Async.fetchScalar('select SUM(salary/2) from job_grades, players where players.job_grade = job_grades.id and job = @job and onDuty=1',
+                     --   {['@job'] = job},
+                      --  function(sum)
+                      --      if sum ~= nil then
+                    --            MySQL.Async.execute('Update jobs set money = money-@money',
+                  --              {['@money'] = sum},
+                --                function(numRows)
+              --                      TriggerClientEvent('bf:Notification', -1, "Vous avez reçu votre paie")
+            --                    end)
+                --            end
+              --          end)
+           ---         end
+          --      end)
+        --    end)
+      --  end)
     end
 end)
 
@@ -286,18 +330,18 @@ end)
 -- homes
 RegisterNetEvent("job:avert:all")
 
-AddEventHandler("job:avert:all", function (job)
+AddEventHandler("job:avert:all", function (job, message)
     local sourceValue = source
+    local message = message
     
     if #inService[job] == 0 then
         TriggerClientEvent('bf:Notification', sourceValue, "Personne n'est en service, démerdez vous. Job : ~b~(".. job.. ")")
     else
         for k,v  in pairs (inService[job]) do
-            TriggerClientEvent('bf:Notification', v, "On vous demande à l'acceuil ~b~(".. job.. ")")
+            TriggerClientEvent('bf:Notification', v, message)
         end
         TriggerClientEvent('bf:Notification', sourceValue, "Votre appel à été émis pour le ~b~(".. job.. ")")
     end
-
 end)
 
 

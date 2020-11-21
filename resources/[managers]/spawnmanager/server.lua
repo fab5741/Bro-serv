@@ -31,19 +31,8 @@ AddEventHandler('player:saveCoordsServer', function(name, pos)
 	end
     local nameValue = name
     MySQL.ready(function ()
-     --   MySQL.Async.fetchAll('select x,y,z from players WHERE fivem = @fivem', {['fivem'] =  discord}, function(res)
-       --     if(not res[1]) then
-         --       MySQL.Async.execute('INSERT INTO players (`id`, `fivem`, `name`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `sex`, `birth`) VALUES (NULL, @fivem, @name, x= @x, y =@y, z = @z, 1, 0, "",0, "","", 0, "1990-08-04")', {
-           --         ['fivem'] = discord, ['name'] = nameValue, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z
-             --   })
-            --else
-              --  MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z WHERE fivem = @fivem', {
-                --    ['fivem'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z
-                --})
-            --end
-        --end)
-        MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z WHERE fivem = @fivem', {
-            ['fivem'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z
+        MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z, gameId = @gameId WHERE fivem = @fivem', {
+            ['fivem'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z, ['@gameId'] = sourceValue
         })
       end)
 end)

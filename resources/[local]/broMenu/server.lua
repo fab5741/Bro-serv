@@ -82,3 +82,35 @@ AddEventHandler('bro:set', function(field, value, cb)
 	end
 
 end)
+
+
+
+
+RegisterNetEvent('bro:skin:get')
+AddEventHandler('bro:skin:get', function(cb)
+	local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+	end
+
+	print("skin get")
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('select skin from players where fivem = @fivem',
+		{['@fivem'] =  discord},
+		function(res)
+				TriggerClientEvent(cb, sourceValue, res)
+		end)
+	end)
+end)

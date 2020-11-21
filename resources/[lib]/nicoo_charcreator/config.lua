@@ -44,84 +44,30 @@ Config.Outfit = {
 		}
 	},
 	{
-		label = 'Vagos',
+		label = 'Confortable',
 		id = {
 			male = {
-				tshirt = {15, 0},
-				torso = {14, 1},
+				tshirt = {2, 0},
+				torso = {3, 0},
 				decals = {0, 0},
-				arms = {1, 0},
-				pants = {42, 5},
-				shoes = {8, 6},
+				arms = {4, 0},
+				pants = {5, 4},
+				shoes = {3, 0},
 				chain = {0, 0},
 				helmet = {-1, 0},
 				glasses = {0, 0}
 			},
 			female = {
-				tshirt = {60, 0},
-				torso = {35, 0},
+				tshirt = {15, 0},
+				torso = {5, 0},
 				decals = {0, 0},
-				arms = {5, 0},
-				pants = {3, 8},
-				shoes = {50, 0},
-				chain = {90, 0},
+				arms = {15, 0},
+				pants = {57, 0},
+				shoes = {35, 0},
+				chain = {0, 0},
 				helmet = {-1, 0},
-				glasses = {0, 0}	
+				glasses = {0, 0}
 			}
 		}
 	},
-	{
-		label = 'Vagos',
-		id = {
-			male = {
-				tshirt = {15, 0},
-				torso = {14, 1},
-				decals = {0, 0},
-				arms = {1, 0},
-				pants = {42, 5},
-				shoes = {8, 6},
-				chain = {0, 0},
-				helmet = {-1, 0},
-				glasses = {0, 0}
-			},
-			female = {
-				tshirt = {60, 0},
-				torso = {35, 0},
-				decals = {0, 0},
-				arms = {5, 0},
-				pants = {3, 8},
-				shoes = {50, 0},
-				chain = {90, 0},
-				helmet = {-1, 0},
-				glasses = {0, 0}	
-			}
-		}
-	},
-	{
-		label = 'Families',
-		id = {
-			male = {
-				tshirt = {15, 0},
-				torso = {128, 0},
-				decals = {0, 0},
-				arms = {0, 0},
-				pants = {42, 6},
-				shoes = {6, 0},
-				chain = {0, 0},
-				helmet = {-1, 0},
-				glasses = {0, 0}
-			},
-			female = {
-				tshirt = {60, 0},
-				torso = {31, 1},
-				decals = {0, 0},
-				arms = {5, 0},
-				pants = {45, 0},
-				shoes = {1, 8},
-				chain = {36, 0},
-				helmet = {-1, 0},
-				glasses = {0, 0}	
-			}
-		}
-	}
 }

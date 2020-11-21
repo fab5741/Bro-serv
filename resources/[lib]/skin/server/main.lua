@@ -38,6 +38,9 @@ function getSkin(cb, source)
 		if user.skin then
 			skin = json.decode(user.skin)
 		end
+		if user.clothes then
+			clothes = json.decode(user.clothes)
+		end
 		if user.x then
 			x = json.decode(user.x)
 		end
@@ -48,7 +51,7 @@ function getSkin(cb, source)
 			z = json.decode(user.z)
 		end
 
-		TriggerClientEvent(cb, source, skin, jobSkin, x, y, z)
+		TriggerClientEvent(cb, source, skin, clothes, jobSkin, x, y, z)
 	end)
 end
 
@@ -73,12 +76,12 @@ AddEventHandler('skin:getPlayerSkin', function(cb)
 		end
 	end
 
-	MySQL.Async.fetchAll('SELECT skin, x, y, z FROM players WHERE fivem = @fivem', {
+	MySQL.Async.fetchAll('SELECT skin, clothes,  x, y, z FROM players WHERE fivem = @fivem', {
 		['@fivem'] = discord
 	}, function(res)
 		if res== nil or res[1] == nil then
 			print("pas de joueur, pas de chocolat")
-			MySQL.Async.execute("INSERT INTO `players` (`id`, `fivem`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `birth`, `permis`) VALUES (NULL, @fivem, '-1038.703', '-2683.085', '12', '1', '0', '', '100', '', '', '', 0)", {
+			MySQL.Async.execute("INSERT INTO `players` (`id`, `fivem`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`,`clothes`, `liquid`, `firstname`, `lastname`, `birth`, `permis`) VALUES (NULL, @fivem, '-1038.703', '-2683.085', '12', '1', '0', '{}', '{}', '100', '', '', '', 0)", {
 				['@fivem'] = discord
 			}, function(affectedrows)
 				if affectedrows > 0 then

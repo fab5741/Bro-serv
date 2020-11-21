@@ -5,19 +5,44 @@ birth = "00/00/0000"
 CharacterDad = 0
 CharacterMom = 0
 
-local anyMenuOpen = {
-	menuName = "",
-	isActive = false
-}
+RegisterNetEvent('bromenu:koszulka')
+AddEventHandler('bromenu:koszulka', function()
+	TriggerEvent('skinchanger:getSkin', function(skin)
+		print(skin)
+		local clothesSkin = {
+		['tshirt_1'] = 15, ['tshirt_2'] = 0,
+		['torso_1'] = 15, ['torso_2'] = 0,
+		['arms'] = 15, ['arms_2'] = 0
+		}
+		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+	end)
+end)
+RegisterNetEvent('bromenu:spodnie')
+AddEventHandler('bromenu:spodnie', function()
+	TriggerEvent('skinchanger:getSkin', function(skin)
+		local clothesSkin = {
+		['pants_1'] = 21, ['pants_2'] = 0
+		}
+		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+	end)
+end)
 
-function CloseMenu()
-	SendNUIMessage({
-		action = "close"
-	})
-	
-	anyMenuOpen.menuName = ""
-	anyMenuOpen.isActive = false
-end
+RegisterNetEvent('bromenu:buty')
+AddEventHandler('bromenu:buty', function()
+	TriggerEvent('skinchanger:getSkin', function(skin)
+		local clothesSkin = {
+		['shoes_1'] = 34, ['shoes_2'] = 0
+		}
+		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+	end)
+end)
+
+RegisterNetEvent('bromenu:skin:reset')
+AddEventHandler('bromenu:skin:reset', function(skin)
+		TriggerEvent('skinchanger:loadSkin', json.decode(skin))
+end)
+
+
 
 Citizen.CreateThread(function()
 	exports.bf:AddMenu("bro", {
@@ -45,10 +70,13 @@ Citizen.CreateThread(function()
 				text = "Vehicules",
 				exec = {
 					callback = function()
-						print("trigger")
 						TriggerServerEvent("vehicles:get:all", "bf:vehicles")
 					end
 				},
+			},
+			{
+				text = "Vetements",
+				openMenu = "bro-clothes"
 			},
 		},
 	})
@@ -101,6 +129,45 @@ Citizen.CreateThread(function()
 	exports.bf:AddMenu("bro-vehicles", {
 		title = "Vehicules",
 		position = 1,
+	})
+	exports.bf:AddMenu("bro-clothes", {
+		title = "Vetements",
+		position = 1,
+		buttons = {
+			{
+				text = "Remettre",
+				exec = {
+					callback = function()
+						TriggerServerEvent("bro:skin:get", "bromenu:skin:reset")
+					end
+				},
+			},
+			{
+				text = "T-Shirt",
+				exec = {
+					callback = function()
+						print("bromenu")
+						TriggerEvent('bromenu:koszulka')
+					end
+				},
+			},
+			{
+				text = "Pantalon",
+				exec = {
+					callback = function()
+						TriggerEvent('bromenu:spodnie')
+					end
+				},
+			},
+			{
+				text = "Chaussures",
+				exec = {
+					callback = function()
+						TriggerEvent('bromenu:buty')
+					end
+				},
+			},
+		}
 	})
 
 	-- main loop

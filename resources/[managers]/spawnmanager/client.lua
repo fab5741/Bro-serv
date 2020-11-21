@@ -40,7 +40,7 @@ end)
 RegisterNetEvent("spawn:spawn")
 
 -- source is global here, don't add to function
-AddEventHandler('spawn:spawn', function (skin, jobSkin, x, y, z)
+AddEventHandler('spawn:spawn', function (skin, clothes, jobSkin, x, y, z)
     if skin == nil or skin == "" or skin == "{}" then
         print("start nicoo")
         TriggerEvent('nicoo_charcreator:CharCreator')

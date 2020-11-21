@@ -167,64 +167,51 @@ AddEventHandler("job:get", function(job)
 							},
 						},
 					})
-					label = config.jobs[job.job].label
-	
-					buttons = {}
-					for kk, vv in pairs(v.items) do
-	
-						buttons[#buttons+1] = {
-							text = "Collecter"..vv.label,
-							exec = {
-								callback = function()
-									
-								end
-							},
-						}
-					end
-					buttons[#buttons+1] = {
-						text = "Arreter le farming",
-						close = true,
-					}
-	
-					buttons = {
-						{
-							text = "Prendre le service",
-							exec = {
-								callback = function()
-									clockIn(job.job)
-								end
-							},
-						},
-						{
-							text = "Quitter le service",
-							exec = {
-								callback = function()
-									clockOut(job.job)
-								end
-							},
-						},
-						{
-							text = "Close menu",
-							close = true,
-						},
-					}
-	
-					exports.bf:AddMenu("collect "..k, {
+					exports.bf:AddMenu("collect"..k, {
 						title = "Récolte "..k,
 						position = 1,
-						buttons 
 					})
 				end
 			end
 			if v.process then
 				for k, v in pairs(v.process) do
-					exports.bf:AddBlip("process"..k, {
-						x = v.coords.x,
-						y = v.coords.y,
-						z = v.coords.z,
-						text = job.job.. " Traitement "..k,
-						imageId	= 467,
-						colorId = 26,
+					exports.bf:AddArea("process"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Traitement Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "process"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.job.. " Traitement "..k,
+							imageId	= 496,
+							colorId = 26,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("process"..k, {
+						title = "Traitement "..k,
+						position = 1,
 					})
 				end
 			end
@@ -739,6 +726,10 @@ Citizen.CreateThread(function()
 				TriggerServerEvent("job:avert:all", avert)
 			elseif zoneType == "safes" then
 				TriggerServerEvent("job:get", "job:safe:open")		
+			elseif zoneType == "collect" then
+				TriggerServerEvent("job:get", "job:collect:open")	
+			elseif zoneType == "process" then
+				TriggerServerEvent("job:get", "job:process:open")		
 			elseif zoneType == "armories" then
 				DoScreenFadeOut(500)
 				Wait(600)
@@ -776,6 +767,53 @@ Citizen.CreateThread(function()
 			TriggerServerEvent("job:get", "job:open:menu")
 		end
 	end
+end)
+
+
+
+RegisterNetEvent('job:process:open')
+
+AddEventHandler("job:process:open", function(job)  
+	job = job[1]	
+	buttons = {}
+	for k, v in pairs(config.jobs[job.job].process[zone].items) do
+
+		buttons[#buttons+1] = {
+			text = "Traitement "..v.label,
+			exec = {
+				callback = function()
+					TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo) 
+					exports.bf:Notification('Vous avez transformé : '..v.label.. " X "..v.amount)
+					exports.bf:CloseMenu(zoneType..zone)
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons(zoneType..zone, buttons)
+	exports.bf:OpenMenu(zoneType..zone)
+end)
+
+
+RegisterNetEvent('job:collect:open')
+
+AddEventHandler("job:collect:open", function(job)  
+	job = job[1]	
+	buttons = {}
+	for k, v in pairs(config.jobs[job.job].collect[zone].items) do
+
+		buttons[#buttons+1] = {
+			text = "Collecter "..v.label,
+			exec = {
+				callback = function()
+					TriggerServerEvent('items:add', v.type,  v.amount) 
+					exports.bf:Notification('Vous avez collecté : '..v.label.. " X "..v.amount)
+					exports.bf:CloseMenu(zoneType..zone)
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons(zoneType..zone, buttons)
+	exports.bf:OpenMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:parking:open')

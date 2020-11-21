@@ -16,7 +16,6 @@ config = {
                     action = "collect",
                     items = {
                        {name="wheat", label="Blé", amount="1", type="16"},
-                       {name="orge", label="Orge", amount="1", type="17"},
                     }
                 }
             },
@@ -27,7 +26,6 @@ config = {
                     action = "process",
                     items = {
                         {name="wheat", label="Blé", amount="1", type="16", to="15", amountTo="1"},
-                        {name="orge", label="Orge", amount="1", type="17", to="15", amountTo="1"},
                     }
                 },
                 {
@@ -39,8 +37,6 @@ config = {
                     }
                 }
              },
-            sell = {
-            },
             safes = {
                 {
                     coords = vector3(2016.3625488281,4986.939453125,42.098285675049),

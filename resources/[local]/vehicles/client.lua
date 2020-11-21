@@ -127,6 +127,12 @@ Citizen.CreateThread(function()
 					zone = "global"
 				end
 			},
+			exit = {
+				callback = function()
+					zoneType = nil
+					zone = nil
+				end
+			}
 		},
 		blip = {
 			text = "Concessionnaire",
@@ -170,6 +176,12 @@ Citizen.CreateThread(function()
 					zone = "global"
 				end
 			},
+			exit = {
+				callback = function()
+					zoneType = nil
+					zone = nil
+				end
+			}
 		},
 		blip = {
 			text = "Parking",
@@ -200,12 +212,18 @@ Citizen.CreateThread(function()
 			blue = 153,
 		},
 		trigger = {
-			weight = 2,
+			weight = 1,
 			enter = {
 				callback = function()
 					TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:depot")
 				end
 			},
+			exit = {
+				callback = function()
+					zoneType = nil
+					zone = nil
+				end
+			}
 		},
 		blip = {
 			text = "Fourrière",
@@ -231,12 +249,18 @@ Citizen.CreateThread(function()
 			blue = 153,
 		},
 		trigger = {
-			weight = 2,
+			weight = 1,
 			enter = {
 				callback = function()
 					TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:ds")
 				end
 			},
+			exit = {
+				callback = function()
+					zoneType = nil
+					zone = nil
+				end
+			}
 		},
 		blip = {
 			text = "Auto-école",

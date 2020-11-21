@@ -1,11 +1,12 @@
 config = {
     jobs = {
         Fermiers = {
+            color= 24,
             label= "Fermiers",
             lockers = {
                 {
                     coords = vector3(2030.2646484375,4979.7456054688,42.098190307617),
-                    sprite = 496,
+                    sprite = 366,
                     action = "lockers",
                 }
             },
@@ -22,7 +23,7 @@ config = {
             process = {
                 {
                     coords = vector3(463.28,3566.37,32.2),
-                    sprite = 202,
+                    sprite = 502,
                     action = "process",
                     items = {
                         {name="wheat", label="Blé", amount="1", type="16", to="15", amountTo="1"},
@@ -30,7 +31,7 @@ config = {
                 },
                 {
                     coords = vector3(470.25,3565.63,32.45),
-                    sprite = 202,
+                    sprite = 503,
                     action = "process",
                     items = {
                         {name="flour", label="Farine", amount="1", type="15", to="13", amountTo="1"},
@@ -40,7 +41,7 @@ config = {
             safes = {
                 {
                     coords = vector3(2016.3625488281,4986.939453125,42.098285675049),
-                    sprite = 496,
+                    sprite = 568,
                     action = "safe",
                 }
             },
@@ -49,7 +50,7 @@ config = {
                     coords = vector3(2035.1791992188,4989.015625,39.695823669434),
                     spawn = vector3(2036.4399414062,4986.6323242188,40.001270294189),
                     heading = -100.0,
-                    sprite = 357,
+                    sprite = 524,
                     action = "parking",
                 }
             },
@@ -82,29 +83,19 @@ config = {
             }
         },
         Vignerons = {
+            color = 50,
             label= "Vignerons",
             lockers = {
                 {
-                    coords = vector3(-1921.31, 2054.82,139.5),
-                    blip = {
-                        sprite = 496,
-                        scale  = 1.2,
-                        color  = 5,
-                        string = "locker",
-                    },
+                    coords = vector3(-1921.0443115234,2054.7062988281,140.73498535156),
+                    sprite = 496,
                     action = "lockers",
                 }
             },
             collect = {
                 {
                     coords = vector3(-1819.93,2134.48,123.8),
-                    blip = {
-                    sprite = 496,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "collect",
-                    },
-                    action = "collect",
+                    sprite = 502,
                     items = {
                         {name="Raisin", label="Raisin", amount="1", type="18"},
                      }
@@ -113,12 +104,7 @@ config = {
             process = {
                 {
                 coords = vector3(1731.98,3031.5,61.5),
-                blip = {
-				sprite = 202,
-				scale  = 1.2,
-                color  = 5,
-                string = "process",
-                },
+				sprite = 503,
                 action = "process",
                 items = {
                     {name="Raisin", label="Raisin", amount="1", type="18", to="19", amountTo="1"},
@@ -128,12 +114,7 @@ config = {
             sell = {
                 {
                     coords = vector3(1211.98,-1256.05,34.1),
-                    blip = {
-                    sprite = 50,
-                    scale  = 1.2,
-                    color  = 5,
-                    string = "sell",
-                    },
+                    sprite = 504,
                     action = "sell",
                     items = {
                         {name="Jus de raisin", label="Jus de raisin", amount="1", type="19", price="2"},
@@ -141,14 +122,12 @@ config = {
                 }
             },
             parking = {
-                coords = vector3(2034.92, 4989.24, 39.38),
-                blip = {
-                sprite = 357,
-                scale  = 1.2,
-                color  = 5,
-                string = "Parking",
-                },
-                action = "Parking",
+                {
+                    coords = vector3(-1924.4694824219,2041.6114501953,140.73466491699),
+                    spawn = vector3(-1921.9117431641,2040.6607666016,140.73532104492),
+                    heading = -100.0,
+                    sprite = 524,
+                }
             },
             grades = {
                 stagiaire = {
@@ -179,9 +158,10 @@ config = {
             },
         },
         Mecanos = {
+            color = 73,
             coords = vector3(-362.1,-129.6,37.6),
             blip = {
-            sprite = 446,
+            sprite = 402,
             scale  = 1.8,
             color  = 5,
             string = "Mécanicien",
@@ -216,6 +196,7 @@ config = {
             },
         },
         LSMS = {
+            color = 1, 
             lockers = {
                 {
                     coords = vector3(336.27508544922, -580.03137207031, 28.791479110718),
@@ -245,8 +226,7 @@ config = {
             homes = {
                 {
                     coords = vector3(341.41842651367,-582.73522949219,28.791477203369),
-                    sprite = 500,
-                    action = "homes",
+                    sprite = 61,
                 },
             },
             grades = {
@@ -278,6 +258,7 @@ config = {
             }
         },
         LSPD = {
+            color = 77,
             lockers = {
                 {
                     coords = vector3(457.06948852539,-992.75042724609,30.689332962036),
@@ -297,14 +278,14 @@ config = {
             armories = {
                 {
                     coords = vector3(451.75173950195,-980.27758789062,30.689315795898),
-                    sprite = 549,
+                    sprite = 110,
                     action = "armories",
                 },
             },
             homes = {
                 {
                     coords = vector3(441.18566894531,-981.09637451172,30.689331054688),
-                    sprite = 500,
+                    sprite = 60,
                     action = "homes",
                 },
             },
@@ -337,10 +318,11 @@ config = {
             }
         },
         NEWSPAPERS = {
+            color = 38,
             begin = {
                 {
                     coords = vector3(-259.20123291016,-843.56219482422,31.425704956055),
-                    sprite = 51,
+                    sprite = 77,
                     vehicle = "faggio2",   
                     points = {
                         vector3(-9.6269121170044,-933.23095703125,28.610500335693),
@@ -388,8 +370,9 @@ config = {
         }
     },
     center = {
+        color = 37,
         pos = vector3(-234.76637268066,-920.52563476562,32.312194824219),
-        sprite = 25,
+        sprite = 475,
         jobs = {
             {
                 name = "NEWSPAPERS",

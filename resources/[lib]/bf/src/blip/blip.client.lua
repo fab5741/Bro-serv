@@ -27,6 +27,14 @@ function Blip:Show()
     if self.rotation ~= nil then
         SetBlipRotation(self.blip, self.rotation)
     end
+    SetBlipRoute(
+        self.blip,
+        self.route
+    )
+    SetBlipRouteColour(
+        self.blip, 
+        self.colorId 
+    )
 end
 
 --

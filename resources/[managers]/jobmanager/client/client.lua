@@ -16,11 +16,13 @@ RegisterNetEvent('job:get')
 AddEventHandler("job:get", function(job)
 	job = job[1]
 	RegisterNUICallback('amount', function(data)
-	print(job.job)
-	TriggerServerEvent("job:safe:deposit", data.withdraw, data.amount, job.job)
-	amount = tonumber(data.amount)
-	SetNuiFocus(false, false)
-end)
+		print(job.job)
+		TriggerServerEvent("job:safe:deposit", data.withdraw, data.amount, job.job)
+		amount = tonumber(data.amount)
+		SetNuiFocus(false, false)
+	end)
+
+	ClearAllBlipRoutes()
 
 	exports.bf:AddArea("center", {
 		marker = {
@@ -45,7 +47,7 @@ end)
 		blip = {
 			text = "Job Center",
 			imageId	= config.center.sprite,
-			colorId = 26,
+			colorId = config.center.color,
 		},
 		locations = {
 			{
@@ -83,9 +85,9 @@ end)
 						},
 					},
 					blip = {
-						text = kk.. " Accueil "..k,
+						text = kk,
 						imageId	= v.sprite,
-						colorId = 26,
+						colorId = vv.color,
 					},
 					locations = {
 						{
@@ -98,15 +100,12 @@ end)
 			end
 		end
 	end
-
-
-	print(job.job)
 	-- Draw areas 
 	if job ~= nil and job.job ~= nil then
-		v = config.jobs[job.job]
-		if v then
-			if v.lockers then
-				for k, v in pairs(v.lockers) do
+		myjob = config.jobs[job.job]
+		if myjob then
+			if myjob.lockers then
+				for k, v in pairs(myjob.lockers) do
 					exports.bf:AddArea("lockers"..k, {
 						marker = {
 							weight = 1,
@@ -131,7 +130,7 @@ end)
 						blip = {
 							text = job.job.. " Vestiaire "..k,
 							imageId	= v.sprite,
-							colorId = 26,
+							colorId = myjob.color,
 						},
 						locations = {
 							{
@@ -165,8 +164,8 @@ end)
 					})
 				end
 			end
-			if v.collect then
-				for k, v in pairs(v.collect) do
+			if myjob.collect then
+				for k, v in pairs(myjob.collect) do
 					exports.bf:AddArea("collect"..k, {
 						marker = {
 							weight = 1,
@@ -190,8 +189,8 @@ end)
 						},
 						blip = {
 							text = job.job.. " Récolte "..k,
-							imageId	= 496,
-							colorId = 26,
+							imageId	= v.sprite,
+							colorId = myjob.color,
 						},
 						locations = {
 							{
@@ -207,8 +206,8 @@ end)
 					})
 				end
 			end
-			if v.process then
-				for k, v in pairs(v.process) do
+			if myjob.process then
+				for k, v in pairs(myjob.process) do
 					exports.bf:AddArea("process"..k, {
 						marker = {
 							weight = 1,
@@ -232,8 +231,8 @@ end)
 						},
 						blip = {
 							text = job.job.. " Traitement "..k,
-							imageId	= 496,
-							colorId = 26,
+							imageId	= v.sprite,
+							colorId = myjob.color,
 						},
 						locations = {
 							{
@@ -249,8 +248,8 @@ end)
 					})
 				end
 			end
-			if v.safes then
-				for k, v in pairs(v.safes) do
+			if myjob.safes then
+				for k, v in pairs(myjob.safes) do
 					exports.bf:AddArea("safes"..k, {
 						marker = {
 							weight = 1,
@@ -275,7 +274,7 @@ end)
 						blip = {
 							text = job.job.. " Coffre "..k,
 							imageId	= v.sprite,
-							colorId = 26,
+							colorId = myjob.color,
 						},
 						locations = {
 							{
@@ -312,8 +311,8 @@ end)
 					})
 				end
 			end
-			if v.armories then
-				for k, v in pairs(v.armories) do
+			if myjob.armories then
+				for k, v in pairs(myjob.armories) do
 					exports.bf:AddArea("armories"..k, {
 						marker = {
 							weight = 1,
@@ -338,7 +337,7 @@ end)
 						blip = {
 							text = job.job.. " Armurerie "..k,
 							imageId	= v.sprite,
-							colorId = 26,
+							colorId = myjob.color,
 						},
 						locations = {
 							{
@@ -391,8 +390,8 @@ end)
 					})
 				end
 			end
-			if v.parking then
-				for k, v in pairs(v.parking) do
+			if myjob.parking then
+				for k, v in pairs(myjob.parking) do
 				exports.bf:AddArea("parking"..k, {
 					marker = {
 						weight = 1,
@@ -419,7 +418,7 @@ end)
 					blip = {
 						text = job.job.. " Parking "..k,
 						imageId	= v.sprite,
-						colorId = 26,
+						colorId = myjob.color,
 					},
 					locations = {
 						{
@@ -439,8 +438,9 @@ end)
 				})
 				end
 			end
-			if v.begin then
-				for k, v in pairs(v.begin) do
+			if myjob.begin then
+				print("yopotet")
+				for k, v in pairs(myjob.begin) do
 				exports.bf:AddArea("begin"..k, {
 					marker = {
 						weight = 1,
@@ -468,7 +468,7 @@ end)
 					blip = {
 						text = job.job.. " Livraisons "..k,
 						imageId	= v.sprite,
-						colorId = 26,
+						colorId = myjob.color,
 					},
 					locations = {
 						{

@@ -13,4 +13,4 @@ server_script {
     'server.lua'
 }
 
-dependency  'menu'
+dependency  'bf'

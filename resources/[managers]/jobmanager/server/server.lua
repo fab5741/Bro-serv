@@ -4,8 +4,13 @@ inService = {
 
     },
     LSMS = {
+    },
+    Fermiers = {
 
-    }
+    },
+    Vignerons = {
+
+    },
 }
 
 RegisterNetEvent("job:get")

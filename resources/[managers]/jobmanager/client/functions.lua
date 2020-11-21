@@ -572,7 +572,7 @@ function CloseArmory()
 end
 
 --redirect callbacks
-local function isPedDrivingAVehicle()
+function isPedDrivingAVehicle()
 	local ped = GetPlayerPed(-1)
 	vehicle = GetVehiclePedIsIn(ped, false)
 	if IsPedInAnyVehicle(ped, false) then
@@ -617,8 +617,8 @@ function addBeginArea()
 		},
 		blip = {
 			text = "Livraison",
-			colorId = 18,
-			imageId = 51,
+			colorId = 38,
+			imageId = 77,
 			route = true,
 		},
 		locations = {

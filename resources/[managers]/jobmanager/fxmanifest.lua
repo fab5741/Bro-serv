@@ -9,6 +9,7 @@ client_script {
     'client/functions.lua',
     'client/events.lua',
     'client/menu.lua',
+    'client/jobs.lua',
     'client/client.lua',
 }
 

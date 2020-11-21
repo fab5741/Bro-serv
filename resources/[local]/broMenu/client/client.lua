@@ -302,7 +302,7 @@ AddEventHandler("bf:items", function(inventory)
 						text = "Utiliser",
 						exec = {
 							callback = function() 
-								TriggerServerEvent("items:use", v.id, 1)
+								TriggerServerEvent("items:use", v.item, 1)
 							end
 						},
 					}

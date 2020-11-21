@@ -5,9 +5,7 @@ RegisterNetEvent("items:add")
 AddEventHandler("items:add", function (type, amount)
     local source = source
 
-    for k,v in pairs(GetPlayerIdentifiers(source))do
-		
-			
+    for k,v in pairs(GetPlayerIdentifiers(source))do	
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
 		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
@@ -73,17 +71,19 @@ RegisterNetEvent("items:use")
 -- source is global here, don't add to function
 AddEventHandler("items:use", function (type, amount)
     local source = source
-    if(type == "13") then
-        print("bread")
+    if(type == 13) then
         -- EAT bread
+        TriggerClientEvent("items:eat", source)
         TriggerClientEvent("needs:change", source, 0, 60)
     end
-    if(type == "14") then
+    if(type == 14) then
       -- EAT water
       print("water")
+      TriggerClientEvent("items:drink", source)
       TriggerClientEvent("needs:change", source, 1, 60)
   end
-  if(type == "19") then
+  if(type == 19) then
+    TriggerClientEvent("items:drink", source)
     TriggerClientEvent("needs:change", source, 0, 80)
     TriggerClientEvent("needs:change", source, 1, 10)
   end

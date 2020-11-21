@@ -49,6 +49,7 @@ Citizen.CreateThread(function()
 			SetEntityHeading(PlayerPed, (BedHeading+180))
 
 			TaskPlayAnim(PlayerPed, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
+			exports.bf:Notification("~g~F1~w~ pour vous relever")
 
 			OnBed = true
 		elseif IsControlJustReleased(0, 288) and IsEntityPlayingAnim(PlayerPedId(), 'missfbi1', 'cpr_pumpchest_idle', 3) then

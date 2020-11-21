@@ -107,7 +107,12 @@ Citizen.CreateThread(function()
   while true do
     Citizen.Wait(0)
 	if (IsControlJustPressed(1, 288)) then
-		TriggerServerEvent("job:get", "bf:open")
+		if exports.bf:MenuIsOpen("bro") then
+			exports.bf:CloseMenu("bro") 
+		else
+			print("ok")
+			TriggerServerEvent("job:get", "bf:open")
+		end
 	end
   end
 end)

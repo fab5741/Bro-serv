@@ -78,11 +78,20 @@ AddEventHandler('skin:getPlayerSkin', function(cb)
 	}, function(res)
 		if res== nil or res[1] == nil then
 			print("pas de joueur, pas de chocolat")
-			MySQL.Async.execute("INSERT INTO `players` (`id`, `fivem`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `birth`) VALUES (NULL, @fivem, '-1038.703', '-2683.085', '12', '1', '0', '', '100', '', '', '')", {
+			MySQL.Async.execute("INSERT INTO `players` (`id`, `fivem`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `birth`, `permis`) VALUES (NULL, @fivem, '-1038.703', '-2683.085', '12', '1', '0', '', '100', '', '', '', 0)", {
 				['@fivem'] = discord
 			}, function(affectedrows)
 				if affectedrows > 0 then
-					getSkin(cb, sourceValue)
+					MySQL.Async.fetchScalar("select id from players where fivem= @fivem", {
+						['@fivem'] =  discord,
+					}, function(id)
+						print(id)
+							MySQL.Async.execute("INSERT INTO `accounts` (`id`, `player`, `amount`) VALUES (NULL, @id, 1000)", {
+								['@id'] =  id,
+							}, function(res)
+								getSkin(cb, sourceValue)
+							end)
+						end)
 				else
 					print("c'est la merde")
 				end

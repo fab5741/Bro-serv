@@ -28,7 +28,7 @@ local seatbeltColorOn = {160, 255, 160}     -- Color used when seatbelt is on
 local seatbeltColorOff = {255, 96, 96}      -- Color used when seatbelt is off
 
 -- CRUISE CONTROL PARAMETERS
-local cruiseInput = 182                     -- Toggle cruise on/off with CAPSLOCK or A button (controller)
+local cruiseInput = 27		                     -- Toggle cruise on/off with CAPSLOCK or A button (controller)
 local cruiseColorOn = {160, 255, 160}       -- Color used when seatbelt is on
 local cruiseColorOff = {255, 255, 255}      -- Color used when seatbelt is off
 

@@ -39,17 +39,13 @@ end)
 
 RegisterNetEvent("spawn:spawn")
 
--- source is global here, don't add to function
-AddEventHandler('spawn:spawn', function (skin, clothes, jobSkin, x, y, z)
-    if skin == nil or skin == "" or skin == "{}" then
-        print("start nicoo")
+AddEventHandler('spawn:spawn', function (player)
+    if player.skin == nil or player.skin == "" then
         TriggerEvent('nicoo_charcreator:CharCreator')
         Citizen.Wait(100)
-        skinLoaded = true
     else
-        TriggerEvent('skinchanger:loadSkin', skin)
+        TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), nil)
         Citizen.Wait(100)
-        skinLoaded = true
     end
-    spawnPlayer(x, y, z)
+    spawnPlayer(player.x,player.y, player.z)
 end)

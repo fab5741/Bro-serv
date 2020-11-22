@@ -78,6 +78,19 @@ Citizen.CreateThread(function()
 				text = "Vetements",
 				openMenu = "bro-clothes"
 			},
+			{
+				text = "Quitter son travail",
+				exec = {
+					callback = function()
+						if  exports.bf:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
+							-- on quitte le job
+							TriggerServerEvent("job:set", 1, "Chomeur")
+							Wait(1000)
+							TriggerServerEvent("job:get", "jobs:refresh")
+						end
+					end
+				},
+			},
 		},
 	})
 	exports.bf:AddMenu("bro-wallet", {
@@ -434,7 +447,6 @@ end)
 RegisterNetEvent('bf:vehicles')
 
 AddEventHandler("bf:vehicles", function(vehicles)
-	print("YO")
 	local buttons = {}
 	for k, v in ipairs (vehicles) do
 		local parking = v.parking
@@ -456,14 +468,6 @@ AddEventHandler("bf:vehicles", function(vehicles)
 						if not IsPedInAnyVehicle(playerPed) then
 							local vehicleName = v.name
 							currentVehicle = v.id
-							-- check if the vehicle actually exists
-							if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-								TriggerEvent('chat:addMessage', {
-									args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-								})
-								return
-							end
-
 							-- load the model
 							RequestModel(vehicleName)
 
@@ -486,9 +490,9 @@ AddEventHandler("bf:vehicles", function(vehicles)
 							-- release the model
 							SetModelAsNoLongerNeeded(vehicleName)
 
-							TriggerServerEvent("account:money:sub", 100)
+							TriggerServerEvent("account:money:sub", 10)
 													
-							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 100 $ ~s~ de franchise.")
+							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
 							exports.bf:CloseMenu("bro-vehicles")
 						else
 							exports.bf:Notification("Vous êtes déjà dans un véhicle")
@@ -501,3 +505,18 @@ AddEventHandler("bf:vehicles", function(vehicles)
 	exports.bf:SetMenuButtons("bro-vehicles", buttons)
 	exports.bf:NextMenu("bro-vehicles")
 end)
+
+
+AddEventHandler('onResourceStop', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	print('The resource ' .. resourceName .. ' was stopped.')
+	exports.bf:RemoveMenu("bro")
+	exports.bf:RemoveMenu("bro-wallet")
+	exports.bf:RemoveMenu("bro-items")
+	exports.bf:RemoveMenu("bro-items-item")
+	exports.bf:RemoveMenu("bro-wallet-character")
+	exports.bf:RemoveMenu("bro-vehicles")
+	exports.bf:RemoveMenu("bro-clothes")
+  end)

@@ -251,3 +251,67 @@ AddEventHandler("job:lsms:revive", function()
 	DoScreenFadeIn(800)
 	TriggerEvent("player:alive")
 end)
+
+
+
+RegisterNetEvent('jobs:assurance:vehicles')
+
+AddEventHandler("jobs:assurance:vehicles", function(vehicles)
+	local buttons = {}
+	for k, v in ipairs (vehicles) do
+		local parking = v.parking
+
+		if v.parking == "" then
+			parking = "Volé"
+		elseif v.parking == "depot" then
+			parking = "Fourrière"
+		elseif v.parking == "global" then
+			parking = "Parking global"
+		end
+		buttons[k] =     {
+			text =  v.label.. " ("..parking..")",
+			exec = {
+				callback = function() 
+					if v.parking == "" then
+						local playerPed = PlayerPedId() -- get the local player ped
+
+						if not IsPedInAnyVehicle(playerPed) then
+							local vehicleName = v.name
+							currentVehicle = v.id
+							-- load the model
+							RequestModel(vehicleName)
+
+							-- wait for the model to load
+							while not HasModelLoaded(vehicleName) do
+								Wait(500) -- often you'll also see Citizen.Wait
+							end
+							local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
+
+							ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
+							-- create the vehicle
+							local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+
+							-- set the player ped into the vehicle's driver seat
+							SetPedIntoVehicle(playerPed, vehicle, -1)
+
+							-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+							SetEntityAsNoLongerNeeded(vehicle)
+
+							-- release the model
+							SetModelAsNoLongerNeeded(vehicleName)
+
+							TriggerServerEvent("account:money:sub", 10)
+													
+							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
+							exports.bf:CloseMenu("bro-vehicles")
+						else
+							exports.bf:Notification("Vous êtes déjà dans un véhicle")
+						end
+					end
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons("jobs-vehicles", buttons)
+	exports.bf:NextMenu("jobs-vehicles")
+end)

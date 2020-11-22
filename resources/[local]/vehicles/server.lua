@@ -18,26 +18,82 @@ AddEventHandler("vehicle:buy", function(cb, id)
 		  end
 	end
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select liquid, id from players where fivem = @fivem',
+		MySQL.Async.fetchAll('select liquid, id, permis from players where fivem = @fivem',
         {['fivem'] =  discord},
 		function(res)
-			MySQL.Async.fetchAll('SELECT price, id, label FROM `vehicles` where id = @id', {['id'] = id}, function(res2)
+			MySQL.Async.fetchAll('SELECT price, id, label, name FROM `vehicles` where id = @id', {['id'] = id}, function(res2)
 				if res[1] and res2[1] and res[1].liquid >= res2[1].price then
-					MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
-					{['fivem'] =  discord,
-					['price'] = res2[1].price},
-					function(res3)
-						MySQL.Async.fetchAll("INSERT INTO `player_vehicle` (`id`, `player`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @player , @vehicle, '', 0)",
-						{
-							['player'] = res[1].id,
-							['vehicle'] = res2[1].id
-						},
-						function(res4)
-							print("OK")
-							TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
-							TriggerClientEvent(cb, sourceValue, res2[1].label)
-						end)
-					end)
+					if res[1].permis then
+						MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
+							{['fivem'] =  discord,
+							['price'] = res2[1].price},
+							function(res3)
+								MySQL.Async.insert("INSERT INTO `player_vehicle` (`id`, `player`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @player , @vehicle, '', 0)",
+								{
+									['player'] = res[1].id,
+									['vehicle'] = res2[1].id
+								},
+								function(insertId)
+									TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
+									TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
+								end)
+							end)
+					else
+						TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas le permis !")
+
+					end					
+				else
+					TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assez d'argent")
+				end
+			end)
+        end)
+      end)
+end)
+
+RegisterNetEvent("vehicle:job:buy")
+
+AddEventHandler("vehicle:job:buy", function(cb, id, job)
+	local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(source))do
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+	end
+	MySQL.ready(function ()
+		MySQL.Async.fetchAll('select liquid, players.id, permis, job_grades.job as job from players, job_grades where fivem = @fivem and job_grades.id = players.job_grade',
+        {['fivem'] =  discord},
+		function(res)
+			MySQL.Async.fetchAll('SELECT price, id, label, name FROM `vehicles` where id = @id', {['id'] = id}, function(res2)
+				if res[1] and res2[1] and res[1].liquid >= res2[1].price then
+					if res[1].permis then
+						MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
+							{['fivem'] =  discord,
+							['price'] = res2[1].price},
+							function(res3)
+								MySQL.Async.insert("INSERT INTO `job_vehicle` (`id`, `job`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @job , @vehicle, '', 0)",
+								{
+									['job'] = res[1].job,
+									['vehicle'] = res2[1].id
+								},
+								function(insertId)
+									TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
+									TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
+								end)
+							end)
+					else
+						TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas le permis !")
+
+					end					
 				else
 					TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assez d'argent")
 				end
@@ -69,7 +125,7 @@ AddEventHandler("vehicle:ds", function(cb, price)
 		MySQL.Async.fetchAll('select liquid, id, permis from players where fivem = @fivem',
         {['fivem'] =  discord},
 		function(res)
-			if res[1] and res[1].liquid >= price and res[1].permis == 0 then
+			if res[1] and res[1].liquid >= price and res[1].permis == false then
 				MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where fivem = @fivem',
 				{['fivem'] =  discord,
 				['price'] = price},
@@ -87,7 +143,17 @@ RegisterNetEvent("vehicle:shop:get:all")
 
 AddEventHandler("vehicle:shop:get:all", function(cb)
     local sourceValue = source
-    MySQL.Async.fetchAll('SELECT * from vehicles', {
+    MySQL.Async.fetchAll('SELECT * from vehicles WHERE job IS  NULL ORDER BY price', {
+    }, function(result)
+        TriggerClientEvent(cb, sourceValue, result)
+    end)
+end)
+
+RegisterNetEvent("vehicle:shop:job:get:all")
+
+AddEventHandler("vehicle:shop:job:get:all", function(cb)
+    local sourceValue = source
+    MySQL.Async.fetchAll('SELECT * from vehicles WHERE job IS NOT NULL ORDER BY price', {
     }, function(result)
         TriggerClientEvent(cb, sourceValue, result)
     end)
@@ -173,6 +239,34 @@ AddEventHandler("vehicles:get:all", function(cb)
     end)
 end)
 
+
+RegisterNetEvent("vehicles:jobs:get:all")
+
+AddEventHandler("vehicles:jobs:get:all", function(cb, job)
+	local sourceValue = source
+	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
+		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamid = v
+		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xbl  = v
+		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			ip = v
+		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		  end
+	end
+	print(job)
+    MySQL.Async.fetchAll('select job_vehicle.id, vehicles.name, vehicles.label, job_vehicle.parking from job_vehicle, vehicles where job_vehicle.vehicle = vehicles.id and job_vehicle.job = @job', {
+        ['@job'] =  job,
+    }, function(result)
+            TriggerClientEvent(cb, sourceValue, result)
+    end)
+end)
+
 RegisterNetEvent("vehicle:parking:get")
 
 AddEventHandler("vehicle:parking:get", function(id, cb)
@@ -193,7 +287,7 @@ end)
 RegisterNetEvent("vehicle:store")
 
 AddEventHandler("vehicle:store", function(vehicle, parking)
-	print("STORE")
+	print(vehicle)
     local sourceValue = source
     MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = @parking WHERE `player_vehicle`.`id` = @vehicle ', {
         ['vehicle'] =  vehicle,

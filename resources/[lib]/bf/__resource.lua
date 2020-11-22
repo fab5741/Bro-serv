@@ -1,11 +1,14 @@
---
--- @Project: FiveM Tools
--- @Author: Samuelds
--- @License: GNU General Public License v3.0
--- @Source: https://github.com/FivemTools/ft_libs
---
-
 resource_manifest_version '44febabe-d386-4d18-afbe-5e627f4af937'
+
+ui_page 'html/index.html'
+
+ui_page_preload 'yes'
+
+files {
+  'html/index.html',
+  'html/index.css',
+  'html/app.js',
+}
 
 client_scripts {
 
@@ -48,9 +51,9 @@ client_scripts {
     "src/entity/player.client.lua",
     "src/entity/vehicle.client.lua",
 
+    -- Progress
+    "src/progress/progress.lua"
 }
-
-
 
 exports {
 
@@ -204,3 +207,4 @@ server_exports {
     "Copy",
     "Clone",
 }
+

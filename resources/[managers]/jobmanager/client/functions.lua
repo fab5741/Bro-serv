@@ -246,7 +246,7 @@ function RespawnPed(ped, coords, heading)
 	SetPlayerInvincible(ped, false)
     ClearPedBloodDamage(ped)
     
-	TriggerEvent('spawn:spawn')
+	--TriggerEvent('spawn:spawn')
 end
 
 
@@ -590,6 +590,7 @@ end
 
 
 function addBeginArea() 
+	beginInProgress = true
 	exports.bf:RemoveArea("begin-current")
 	points_coords = points[math.random(1,#points)]
 	exports.bf:AddArea("begin-current", {
@@ -606,7 +607,7 @@ function addBeginArea()
 			enter = {
 				callback = function()
 					if 	GetVehiclePedIsIn(PlayerPedId(), false) == vehicleLivraison then
-						TriggerServerEvent("account:liquid:add", 1)
+						TriggerServerEvent("account:liquid:add", 0.30)
 						exports.bf:Notification("Vous avez gagné ~g~1$")
 					else
 						exports.bf:Notification("Ou est passé votre vehicule de livraison ? non payé")
@@ -629,4 +630,523 @@ function addBeginArea()
 			}
 		},
 	})
+end
+
+function refresh(job)
+	deleteMenuAndArea()
+	createMenuAndArea(job)
+end
+
+
+function deleteMenuAndArea()
+	exports.bf:RemoveArea("center")
+	for kk, vv in pairs(config.jobs) do
+		if vv.homes then
+			for k, v in pairs(vv.homes) do
+				exports.bf:RemoveArea("homes"..kk..k)
+			end
+		end
+		if vv.lockers then
+			for k, v in pairs(vv.lockers) do
+				exports.bf:RemoveArea("lockers"..k)
+				exports.bf:RemoveMenu("lockers"..k)
+			end
+		end
+		if vv.collect then
+			for k, v in pairs(vv.collect) do
+				exports.bf:RemoveArea("collect"..k)
+				exports.bf:RemoveMenu("collect"..k)
+			end
+		end
+		if vv.process then
+			for k, v in pairs(vv.process) do
+				exports.bf:RemoveArea("process"..k)
+				exports.bf:RemoveMenu("process"..k)
+			end
+		end
+		if vv.safes then
+			for k, v in pairs(vv.safes) do
+				exports.bf:RemoveArea("safes"..k)
+				exports.bf:RemoveMenu("safes"..k)
+			end
+		end
+		if vv.armories then
+			for k, v in pairs(vv.armories) do
+				exports.bf:RemoveArea("armories"..k)
+				exports.bf:RemoveMenu("armories"..k)
+			end
+		end
+		if vv.parking then
+			for k, v in pairs(vv.parking) do
+			exports.bf:RemoveArea("parking"..k)
+			end
+		end
+		if vv.begin then
+			for k, v in pairs(vv.begin) do
+			exports.bf:RemoveArea("begin"..k)
+			end
+		end
+	end
+end
+
+function createMenuAndArea(job)
+	ClearAllBlipRoutes()
+
+	exports.bf:AddArea("center", {
+		marker = {
+			weight = 1,
+			height = 1,
+		},
+		trigger = {
+			weight = 1,
+			enter = {
+				callback = function()
+					exports.bf:HelpPromt("Job Center Key : ~INPUT_PICKUP~")
+					zoneType = "center"
+					zone = "global"
+				end
+			},
+			exit = {
+				callback = function()
+					zoneType = nil
+				end
+			},
+		},
+		blip = {
+			text = "Job Center",
+			imageId	= config.center.sprite,
+			colorId = config.center.color,
+		},
+		locations = {
+			{
+				x = config.center.pos.x,
+				y = config.center.pos.y,
+				z = config.center.pos.z,
+			},
+		},
+	})
+
+	-- global to everyone
+	for kk, vv in pairs(config.jobs) do
+		if vv.homes then
+			for k, v in pairs(vv.homes) do
+				exports.bf:AddArea("homes"..kk..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Accueil Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "homes"
+								avert = kk
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = kk,
+						imageId	= v.sprite,
+						colorId = vv.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+			end
+		end
+	end
+	-- Draw areas 
+	if job ~= nil and job.job ~= nil then
+		myjob = config.jobs[job.job]
+		if myjob then
+			if myjob.lockers then
+				for k, v in pairs(myjob.lockers) do
+					exports.bf:AddArea("lockers"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "lockers"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.job.. " Vestiaire "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("lockers"..k, {
+						title = "Vestiaire "..k,
+						position = 1,
+						buttons = {
+							{
+								text = "Prendre le service",
+								exec = {
+									callback = function()
+										clockIn(job.job)
+									end
+								},
+							},
+							{
+								text = "Quitter le service",
+								exec = {
+									callback = function()
+										clockOut(job.job)
+									end
+								},
+							},
+						},
+					})
+				end
+			end
+			if myjob.collect then
+				for k, v in pairs(myjob.collect) do
+					exports.bf:AddArea("collect"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Récolte Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "collect"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.job.. " Récolte "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("collect"..k, {
+						title = "Récolte "..k,
+						position = 1,
+					})
+				end
+			end
+			if myjob.process then
+				for k, v in pairs(myjob.process) do
+					exports.bf:AddArea("process"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Traitement Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "process"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.job.. " Traitement "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("process"..k, {
+						title = "Traitement "..k,
+						position = 1,
+					})
+				end
+			end
+			if myjob.safes then
+				for k, v in pairs(myjob.safes) do
+					exports.bf:AddArea("safes"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Coffre Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "safes"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.job.. " Coffre "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("safes"..k, {
+						title = job.job.." Coffre "..k,
+						position = 1,
+						
+					buttons = {
+						{
+							text = "Retirer",
+							exec = {
+								callback = function()
+									TriggerServerEvent('account:job:withdraw', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent("job:get", "job:safe:open")		
+								end
+							},
+						},
+						{
+							text = "Déposer",
+							exec = {
+								callback = function()
+									TriggerServerEvent('account:job:deposit', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent("job:get", "job:safe:open")		
+								end
+							},
+						},
+					}
+					})
+				end
+			end
+			if myjob.armories then
+				for k, v in pairs(myjob.armories) do
+					exports.bf:AddArea("armories"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Armurerie Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "armories"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.job.. " Armurerie "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("armories"..k, {
+						title = job.job.." Armurerie "..k,
+						position = 1,
+						closable = false,
+						buttons= {
+							{
+								text = "Kit de base",
+								exec = {
+									callback = function()
+										giveBasicKit()
+									end
+								},
+							},
+							{
+								text = "Mettre Gillet",
+								exec = {
+									callback = function()
+										addBulletproofVest()
+									end
+								},
+							},
+							{
+								text = "Enlever Gillet",
+								exec = {
+									callback = function()
+										removeBulletproofVest()
+									end
+								},
+							},
+							{
+								text = "Quitter",
+								exec = {
+									callback = function()
+										print("close")
+										CloseArmory()
+										exports.bf:CloseMenu("armories"..k)
+									end
+								},
+							}
+						}
+					})
+				end
+			end
+			if myjob.parking then
+				for k, v in pairs(myjob.parking) do
+				exports.bf:AddArea("parking"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Parking Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "parking"
+								spawn = v.spawn
+								heading = v.heading
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.job.. " Parking "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				exports.bf:AddMenu("parking"..k, {
+					title = job.job.." Parking "..k,
+					position = 1,
+				})
+				exports.bf:AddMenu("parking-veh", {
+					title = "Parking",
+					position = 1,
+				})
+				end
+			end
+			if myjob.begin then
+				for k, v in pairs(myjob.begin) do
+				exports.bf:AddArea("begin"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Commencer la tournée Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "begin"
+								vehicle = v.vehicle
+								coords = v.coords
+								points = v.points
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.job.. " Livraisons "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
+		end
+	end
 end

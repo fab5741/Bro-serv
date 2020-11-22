@@ -90,11 +90,6 @@ function DeleteGivenVehicle( veh, timeoutMax )
             -- Increase the timeout counter and make the system wait
             timeout = timeout + 1 
             Citizen.Wait( 500 )
-
-            -- We've timed out and the vehicle still hasn't been deleted. 
-            if ( DoesEntityExist( veh ) and ( timeout == timeoutMax - 1 ) ) then
-                Notify( "~r~Failed to delete vehicle after " .. timeoutMax .. " retries." )
-            end 
         end 
     else 
         Notify( "~g~Vehicle deleted." )
@@ -148,6 +143,51 @@ Citizen.CreateThread(function()
 		},
 	})
 
+	--- shop for job
+
+	exports.bf:AddMenu("shops-job", {
+		title = "Concessionnaire",
+		position = 1,
+	})
+
+	exports.bf:AddArea("shops-job", {
+		marker = {
+			type = 1,
+			weight = 1,
+			height = 1,
+			red = 255,
+			green = 255,
+			blue = 153,
+		},
+		trigger = {
+			weight = 2,
+			enter = {
+				callback = function()
+					exports.bf:HelpPromt("Concessionnaire entreprise : ~INPUT_PICKUP~")
+					zoneType = "shops-job"
+					zone = "global"
+				end
+			},
+			exit = {
+				callback = function()
+					zoneType = nil
+					zone = nil
+				end
+			}
+		},
+		blip = {
+			text = "Concessionnaire entreprise",
+			colorId = 1,
+			imageId = 326,
+		},
+		locations = {
+			{
+				x =375.50732421875,
+				y=-1612.0445556641,
+				z=29.291933059692
+			}
+		},
+	})
 	-- parkings
 	exports.bf:AddMenu("parking-veh", {
 		title = "Parking",
@@ -193,6 +233,11 @@ Citizen.CreateThread(function()
 				x =234.68,
 				y=-782.73,
 				z=29.9
+			},
+			{
+				x =316.07934570312,
+				y=-540.31567382812,
+				z=28.743453979492
 			}
 		},
 	})
@@ -396,7 +441,7 @@ Citizen.CreateThread(function()
 	exports.bf:DisableArea("checkpoints-1")
 	exports.bf:DisableArea("checkpoints-2")
 	exports.bf:DisableArea("checkpoints-3")
-	local price = 1000
+	local price = 100
 	exports.bf:AddMenu("ds", {
 		title = "Auto-école",
 		position = 1,
@@ -449,7 +494,7 @@ end)
 RegisterNetEvent("vehicle:permis:get:ds")
 
 AddEventHandler("vehicle:permis:get:ds", function(permis)
-	if permis == 0 then
+	if permis == false then
 		exports.bf:HelpPromt("Auto-école : ~INPUT_PICKUP~")
 		zoneType = "ds"
 	end
@@ -466,18 +511,10 @@ AddEventHandler("vehicle:permis:get:depot", function(permis)
 	exports.bf:Notification("Vous n'avez pas le permis")
 end)
 
+RegisterNetEvent("vehicle:ds")
 
 AddEventHandler("vehicle:ds", function()
 	local vehicleName = "dilettante"
-
-	-- check if the vehicle actually exists
-	if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-		TriggerEvent('chat:addMessage', {
-			args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-		})
-		return
-	end
-
 	-- load the model
 	RequestModel(vehicleName)
     local playerPed = PlayerPedId() -- get the local player ped
@@ -510,48 +547,42 @@ AddEventHandler("vehicle:ds", function()
 	exports.bf:CloseMenu("ds")
 end)
 
-RegisterNetEvent("vehicle:menu:buy")
 
-AddEventHandler("vehicle:menu:buy", function(data)
-	for k,v in pairs(data) do
-		v.action = "vehicleBuy"
-	end
-	TriggerEvent("menu:create", "vehiclesShop", "Concessionnaire", "list",
-		"", data, "align-top-right", "", "") 
+RegisterNetEvent("vehicle:job:buy:ok")
+
+AddEventHandler("vehicle:job:buy:ok", function(name, id)
+	print(name)
+	local vehicleName = name
+	currentVehicle = id
+    -- load the model
+    RequestModel(vehicleName)
+    local playerPed = PlayerPedId() -- get the local player ped
+
+    -- wait for the model to load
+   while not HasModelLoaded(vehicleName) do
+        Wait(500) -- often you'll also see Citizen.Wait
+    end
+	ClearAreaOfVehicles(374.59939575195, -1619.4310302734, 29.29193687439, 5.0, false, false, false, false, false)
+    local vehicle = CreateVehicle(vehicleName, 374.59939575195, -1619.4310302734, 29.29193687439, 338.41, true, false)
+
+    -- set the player ped into the vehicle's driver seat
+    SetPedIntoVehicle(playerPed, vehicle, -1)
+
+    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+	SetEntityAsNoLongerNeeded(vehicle)
+
+    -- release the model
+	SetModelAsNoLongerNeeded(vehicleName)
+
+	exports.bf:CloseMenu("shops-job")
 end)
-
-RegisterNetEvent("vehicle:menu:parking:get")
-
-AddEventHandler("vehicle:menu:parking:get", function(data)
-	for k,v in pairs(data) do
-		print(v)
-		v.action = "parkingGet"
-	end	
-	TriggerEvent("menu:create", "vehiclesShop", "Parking get", "list",
-		"", data, "align-top-right", "", "") 
-end)
-
-RegisterNetEvent("vehicle:menu:parking:store")
-
-AddEventHandler("vehicle:menu:parking:store", function(parking)
-
-	items = {
-		{
-			name = "store",
-			label = "Stocker",
-			action = "parkingStore",
-			parking = parking
-		},
-		}
-	TriggerEvent("menu:create", "vehiclesShop", "Parking store", "list",
-		"", items, "align-top-right", "", "") 
-end)
-
 
 RegisterNetEvent("vehicle:buy:ok")
 
-AddEventHandler("vehicle:buy:ok", function(name)
+AddEventHandler("vehicle:buy:ok", function(name, id)
+	print(name)
 	local vehicleName = name
+	currentVehicle = id
     -- load the model
     RequestModel(vehicleName)
     local playerPed = PlayerPedId() -- get the local player ped
@@ -568,7 +599,7 @@ AddEventHandler("vehicle:buy:ok", function(name)
     SetPedIntoVehicle(playerPed, vehicle, -1)
 
     -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-    SetEntityAsNoLongerNeeded(vehicle)
+	SetEntityAsNoLongerNeeded(vehicle)
 
     -- release the model
 	SetModelAsNoLongerNeeded(vehicleName)
@@ -583,13 +614,6 @@ AddEventHandler("vehicle:parking:get", function(data, id)
 	currentVehicle = data.id
 	menuOpened = 0
 	TriggerEvent("menu:delete", "vehiclesShop") 
-    -- check if the vehicle actually exists
-    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-        TriggerEvent('chat:addMessage', {
-            args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-        })
-        return
-    end
 
     -- load the model
     RequestModel(vehicleName)
@@ -598,11 +622,14 @@ AddEventHandler("vehicle:parking:get", function(data, id)
     -- wait for the model to load
     while not HasModelLoaded(vehicleName) do
         Wait(500) -- often you'll also see Citizen.Wait
-    end
+	end
+	
 
-	ClearAreaOfVehicles(232.19, -788.63, 30.63, 5.0, false, false, false, false, false)
+	coords = exports.bf:GetPlayerCoords()
+
+	ClearAreaOfVehicles(coords.x, coords.y, coords.z, 5.0, false, false, false, false, false)
     -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, 232.19, -788.63, 29.83, 150.5, true, false)
+    local vehicle = CreateVehicle(vehicleName, coords.x, coords.y, coords.z, 150.5, true, false)
 
     -- set the player ped into the vehicle's driver seat
     SetPedIntoVehicle(playerPed, vehicle, -1)
@@ -615,8 +642,6 @@ AddEventHandler("vehicle:parking:get", function(data, id)
 	
 	TriggerServerEvent("vehicle:parking:get", data.id)
 end)
-
-
 
 RegisterNetEvent("vehicle:menu:closed")
 
@@ -978,7 +1003,9 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 		if zoneType == "shops" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("vehicle:shop:get:all", "vehicle:shop")		
+			TriggerServerEvent("vehicle:shop:get:all", "vehicle:shop")	
+		elseif zoneType == "shops-job" and IsControlJustPressed(1, 51) then
+				TriggerServerEvent("vehicle:shop:job:get:all", "vehicle:job:shop")		
 		elseif zoneType == "parking" and IsControlJustPressed(1, 51) then
 			if isPedDrivingAVehicle() then
 				exports.bf:SetMenuValue("parking-veh", {
@@ -1030,6 +1057,26 @@ Citizen.CreateThread(function()
 	end
 end)
 
+RegisterNetEvent("vehicle:job:shop")
+
+AddEventHandler("vehicle:job:shop", function(vehicles)
+	local buttons = {}
+	
+	for k, v in ipairs (vehicles) do
+		buttons[k] =     {
+			text = v.label.. " (~g~".. v.price.." $~s~)",
+			exec = {
+				callback = function() 
+					-- buy the car
+					TriggerServerEvent("vehicle:job:buy", "vehicle:job:buy:ok", v.id)
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons("shops", buttons)
+	exports.bf:OpenMenu("shops")
+end)
+
 RegisterNetEvent("vehicle:shop")
 
 AddEventHandler("vehicle:shop", function(vehicles)
@@ -1047,15 +1094,6 @@ AddEventHandler("vehicle:shop", function(vehicles)
 			hover = {
 				callback = function()
 					local vehicleName = v.name
-
-					-- check if the vehicle actually exists
-					if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-						TriggerEvent('chat:addMessage', {
-							args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-						})
-						return
-					end
-				
 					-- load the model
 					RequestModel(vehicleName)
 				
@@ -1069,8 +1107,7 @@ AddEventHandler("vehicle:shop", function(vehicles)
 					local vehicle = CreateVehicle(vehicleName, -44.44, -1098.43, 26.42, 10.04, true, false)
 				
 					-- set the player ped into the vehicle's driver seat
-				  --  SetPedIntoVehicle(playerPed, vehicle, -1)
-				
+				  --  SetPedIntoVehicle(playerPed, vehicle, -1)				
 				  
 					-- release the model
 					SetModelAsNoLongerNeeded(vehicleName)

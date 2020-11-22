@@ -14,6 +14,14 @@ function menus()
 				},
 			},
 		},
+		{
+			text = "Vehicules",
+			exec = {
+				callback = function()
+					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
+				end
+			},
+		},
 	})
 	exports.bf:AddMenu("LSPD", {
 		title = "Menu LSPD",
@@ -36,9 +44,22 @@ function menus()
 				text = "Objets",
 				openMenu = "lspd-props"
 			},
-		},
+			{
+				text = "Vehicules",
+				exec = {
+					callback = function()
+						TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 2)
+					end
+				},
+			},
+		},	
 	})
-
+	exports.bf:AddMenu("jobs-vehicles", {
+		title = "Menu  assurance",
+		menuTitle = "Job",
+		position = 1,
+	})
+	
 	exports.bf:AddMenu("NEWSPAPERS", {
 		title = "Menu Livreurs de journaux",
 		menuTitle = "Job",
@@ -48,6 +69,7 @@ function menus()
 				text = "Stopper les livraisons",
 				exec = {
 					callback = function()
+						beginInProgress = false
 						-- on nettoie la merde
 						exports.bf:RemoveArea("begin-current")
 						vehicleLivraison = 0

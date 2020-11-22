@@ -199,7 +199,7 @@ Citizen.CreateThread(function()
 			LoadAnimSet('missfbi1')
 
 			SetEntityCoords(PlayerPed, BedCoords)
-			SetEntityHeading(Play erPed, (BedHeading+180))
+			SetEntityHeading(PlayerPed, (BedHeading+180))
 
 			TaskPlayAnim(PlayerPed, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
 			exports.bf:Notification("~g~F1~w~ pour vous relever")

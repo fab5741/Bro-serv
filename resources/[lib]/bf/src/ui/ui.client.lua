@@ -95,7 +95,6 @@ function Text(settings)
 	SetTextEntry("STRING")
 	AddTextComponentString(text)
 	DrawText(x, y)
-
 end
 
 --

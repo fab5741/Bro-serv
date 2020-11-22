@@ -213,8 +213,8 @@ Citizen.CreateThread(function()
         },
         blip = {
             text = "Vêtements",
-            colorId = 18,
-            imageId = 51,
+            colorId = 82,
+            imageId = 366,
         },
         locations = {
             {

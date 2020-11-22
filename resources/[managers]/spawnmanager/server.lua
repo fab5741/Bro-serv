@@ -44,7 +44,6 @@ RegisterNetEvent("player:spawnPlayerFromLastPos")
 -- source is global here, don't add to function
 AddEventHandler('player:spawnPlayerFromLastPos', function()
 	local sourceValue = source
-
 	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
 		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
 			steamid = v
@@ -61,12 +60,12 @@ AddEventHandler('player:spawnPlayerFromLastPos', function()
 		  end
 	end
     MySQL.ready(function ()
-        MySQL.Async.fetchAll('select x,y,z, skin from players WHERE fivem = @fivem',
+        MySQL.Async.fetchAll('select x,y,z, skin, clothes from players WHERE fivem = @fivem',
         {['fivem'] =  discord}, function(res)
 			if(res[1]) then
-                TriggerClientEvent("player:spawnLastPos", sourceValue, res[1].x, res[1].y, res[1].z, res[1].skin)
+             --   TriggerClientEvent("spawn:spawn", sourceValue, res[1].x, res[1].y, res[1].z, res[1].skin, res[1].clothes)
             else
-                TriggerClientEvent("player:spawnLastPos", sourceValue, -1038.709, -2683.085, 8)
+               -- TriggerClientEvent("spawn:spawn", sourceValue, -1038.709, -2683.085, 8, "{}", "{}")
             end
             end)
       end)

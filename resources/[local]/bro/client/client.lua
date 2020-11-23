@@ -1,5 +1,4 @@
 -- rag doll on leg dammage
-
 local BONES = {
 	--[[Pelvis]][11816] = true,
 	--[[SKEL_L_Thigh]][58271] = true,
@@ -852,3 +851,45 @@ Citizen.CreateThread(function()
 		end
     end
 end)
+
+--traffic density
+
+-- A second thread for running at a different delay.
+Citizen.CreateThread(function()
+
+    -- Wait until the settings have been loaded.
+    while 0.2 == nil or 0.2 == nil do
+        Citizen.Wait(1)
+    end
+    
+    -- Do this every tick.
+    while true do
+        Citizen.Wait(0) -- these things NEED to run every tick.
+        
+        -- Traffic and ped density management
+        SetTrafficDensity(1.0)
+        SetPedDensity(1.0)
+        
+        -- Wanted level management
+        SetPlayerWantedLevel(PlayerId(), 0, false)
+        SetPlayerWantedLevelNow(PlayerId(), false)
+    
+        -- Dispatch services management
+        for i=0,20 do
+            EnableDispatchService(i, false)
+        end
+        
+    end
+end)
+
+
+function SetTrafficDensity(density)
+    SetParkedVehicleDensityMultiplierThisFrame(density)
+    SetVehicleDensityMultiplierThisFrame(density)
+    SetRandomVehicleDensityMultiplierThisFrame(density)
+end
+
+function SetPedDensity(density)
+    SetPedDensityMultiplierThisFrame(density)
+    SetScenarioPedDensityMultiplierThisFrame(density, density)
+end

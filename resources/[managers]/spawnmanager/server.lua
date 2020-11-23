@@ -31,8 +31,8 @@ AddEventHandler('player:saveCoordsServer', function(name, pos)
 	end
     local nameValue = name
     MySQL.ready(function ()
-        MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z, gameId = @gameId WHERE fivem = @fivem', {
-            ['fivem'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z, ['@gameId'] = sourceValue
+        MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z, gameId = @gameId WHERE discord = @discord', {
+            ['@discord'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z, ['@gameId'] = sourceValue
         })
       end)
 end)
@@ -60,8 +60,8 @@ AddEventHandler('player:spawnPlayerFromLastPos', function()
 		  end
 	end
     MySQL.ready(function ()
-        MySQL.Async.fetchAll('select x,y,z, skin, clothes from players WHERE fivem = @fivem',
-        {['fivem'] =  discord}, function(res)
+        MySQL.Async.fetchAll('select x,y,z, skin, clothes from players WHERE discord = @discord',
+        {['@discord'] =  discord}, function(res)
 			if(res[1]) then
              --   TriggerClientEvent("spawn:spawn", sourceValue, res[1].x, res[1].y, res[1].z, res[1].skin, res[1].clothes)
             else
@@ -96,8 +96,8 @@ AddEventHandler('player:get', function(cb)
 	end
     local cbe = cb
     MySQL.ready(function ()
-        MySQL.Async.fetchAll('SELECT * FROM players WHERE fivem = @fivem', {
-            ['@fivem'] =  discord
+        MySQL.Async.fetchAll('SELECT * FROM players WHERE discord = @discord', {
+            ['@discord'] =  discord
         }, function(res)
             if res and res[1] then
                TriggerClientEvent(cbe, sourceValue, res[1])

@@ -4,6 +4,8 @@ game 'gta5'
 
 description 'ESX Skin'
 
+dependency "bf"
+
 version '1.1.0'
 
 server_scripts {

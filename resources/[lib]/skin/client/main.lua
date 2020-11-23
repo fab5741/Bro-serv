@@ -1,3 +1,4 @@
+
 function CreateSkinCam()
     if not DoesCamExist(cam) then
         cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)

@@ -33,43 +33,6 @@ config = {
 	}
 }
 
-local function printTable( t )
-
-    local printTable_cache = {}
-
-    local function sub_printTable( t, indent )
-
-        if ( printTable_cache[tostring(t)] ) then
-            print( indent .. "*" .. tostring(t) )
-        else
-            printTable_cache[tostring(t)] = true
-            if ( type( t ) == "table" ) then
-                for pos,val in pairs( t ) do
-                    if ( type(val) == "table" ) then
-                        print( indent .. "[" .. pos .. "] => " .. tostring( t ).. " {" )
-                        sub_printTable( val, indent .. string.rep( " ", string.len(pos)+8 ) )
-                        print( indent .. string.rep( " ", string.len(pos)+6 ) .. "}" )
-                    elseif ( type(val) == "string" ) then
-                        print( indent .. "[" .. pos .. '] => "' .. val .. '"' )
-                    else
-                        print( indent .. "[" .. pos .. "] => " .. tostring(val) )
-                    end
-                end
-            else
-                print( indent..tostring(t) )
-            end
-        end
-    end
-
-    if ( type(t) == "table" ) then
-        print( tostring(t) .. " {" )
-        sub_printTable( t, "  " )
-        print( "}" )
-    else
-        sub_printTable( t, "  " )
-    end
-end
-
 local isInRangeCollect = nil
 local isInRangeProcess = nil
 local isInRangeSell = nil
@@ -104,7 +67,7 @@ Citizen.CreateThread(function()
 			for kk,vv in pairs(v.collect) do
 				if GetDistanceBetweenCoords(coords, vv.x, vv.y, vv.z, true) < config.range then
 					if  isInRangeCollect == nil  then
-						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Hey, tu veux de la beuh, mon bro ? (E)", false, "")
+						exports.bf:Notification("Hey, tu veux de la beuh, mon bro ? (E)")
 						isInRangeCollect = vv
 					end
 				else
@@ -116,7 +79,7 @@ Citizen.CreateThread(function()
 			for kk,vv in pairs(v.process) do
 				if GetDistanceBetweenCoords(coords, vv.x, vv.y, vv.z, true) < config.range then
 					if  isInRangeProcess == nil  then
-						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Tu sais comment faire des pochons ?", false, "")
+						exports.bf:Notification("Tu sais comment faire des pochons ?")
 						isInRangeProcess = vv
 					end
 				else
@@ -128,7 +91,7 @@ Citizen.CreateThread(function()
 			for kk,vv in pairs(v.sell) do
 				if GetDistanceBetweenCoords(coords, vv.x, vv.y, vv.z, true) < config.range then
 					if  isInRangeSell == nil  then
-						TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Je te prend un pochon", false, "")
+						exports.bf:Notification("Je te prend un pochon")
 						isInRangeSell = vv
 					end
 				else
@@ -150,8 +113,7 @@ Citizen.CreateThread(function()
 					isCollecting = true
 					Wait(5000)
 					TriggerServerEvent("items:add",  20, 1)
-
-					TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Vous récoltez un peu de weed (non traité)", false, "")
+					exports.bf:Notification("Vous récoltez un peu de weed (non traité)")
 					isCollecting = false
 				end
 			end
@@ -162,7 +124,7 @@ Citizen.CreateThread(function()
 					isProcessing = true
 					Wait(5000)
 					TriggerServerEvent("items:process",  20, 1, 21, 1)
-					TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Vous avez traité un pochon de weed", false, "")
+					exports.bf:Notification("Vous avez traité un pochon de weed")
 					isProcessing = false
 				end
 			end
@@ -175,7 +137,7 @@ Citizen.CreateThread(function()
 					-- TODO test, if items in inventory
 					TriggerServerEvent("items:sub",  21, 1)
 					TriggerServerEvent("account:money:add",  8)
-					TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1, "Vous avez vendu un pochon de weed", false, "")
+					exports.bf:Notification("Vous avez vendu un pochon de weed")
 					isSelling = false
 				end
 			end

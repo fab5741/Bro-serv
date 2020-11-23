@@ -146,17 +146,3 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-
-RegisterNetEvent("jobs:refresh")
-
-AddEventHandler("jobs:refresh", function(job)
-	refresh(job)
-end)
-
-AddEventHandler('onResourceStop', function(resourceName)
-	if (GetCurrentResourceName() ~= resourceName) then
-	  return
-	end
-	print('The resource ' .. resourceName .. ' was stopped.')
-	deleteMenuAndArea()
-  end)

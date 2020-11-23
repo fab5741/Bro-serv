@@ -4,9 +4,9 @@ callData = {}
 mumbleConfig = {
 	debug = false, -- enable debug msgs
 	voiceModes = {
-		{2.5, "Whisper"}, -- Whisper speech distance in gta distance units
+		{2.5, "Chuchoter"}, -- Whisper speech distance in gta distance units
 		{8.0, "Normal"}, -- Normal speech distance in gta distance units
-		{20.0, "Shouting"}, -- Shout speech distance in gta distance units
+		{20.0, "Crier"}, -- Shout speech distance in gta distance units
 	},
 	speakerRange = 1.5, -- Speaker distance in gta distance units (how close you need to be to another player to hear other players on the radio or phone)
 	callSpeakerEnabled = true, -- Allow players to hear all talking participants of a phone call if standing next to someone that is on the phone
@@ -30,18 +30,12 @@ mumbleConfig = {
 		} -- Toggle speaker mode (phone calls)
 	},
 	radioChannelNames = { -- Add named radio channels (Defaults to [channel number] MHz)
-		[1] = "LEO Tac 1",
-		[2] = "LEO Tac 2",
-		[3] = "EMS Tac 1",
-		[4] = "EMS Tac 2",
-		[500] = "Hurr Durr 500 Hurr Durr",
 	},
 	callChannelNames = { -- Add named call channels (Defaults to [channel number])
-
 	},
 	use3dAudio = true, -- Enable 3D Audio
 	useSendingRangeOnly = true, -- Use sending range only for proximity voice (don't recommend setting this to false)
-	useNativeAudio = false, -- Use native audio (audio occlusion in interiors)
+	useNativeAudio = true, -- Use native audio (audio occlusion in interiors)
 	useExternalServer = false, -- Use an external voice server (bigger servers need this), tutorial: https://forum.cfx.re/t/how-to-host-fivems-voice-chat-mumble-in-another-server/1487449?u=frazzle
 	externalAddress = "127.0.0.1",
 	externalPort = 30120,

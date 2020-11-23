@@ -53,3 +53,46 @@ function GetVehiclesInAround(settings)
     return GetEntitiesInAround(settings)
 
 end
+
+
+--
+-- Spawn A car
+--
+function spawnCar(vehicleName, keep, pos)
+    print("spawn car")
+    -- check if the vehicle actually exists
+    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
+        return false
+    end
+
+    -- load the model
+    RequestModel(vehicleName)
+
+    -- wait for the model to load
+    while not HasModelLoaded(vehicleName) do
+        Wait(500) -- often you'll also see Citizen.Wait
+    end
+
+    local playerPed = PlayerPedId() -- get the local player ped
+
+    if pos == nil then
+        pos = GetEntityCoords(playerPed) -- get the position of the local player ped
+    end
+
+    print(pos)
+    print(vehicleName)
+    -- create the vehicle
+    local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+
+    -- set the player ped into the vehicle's driver seat
+    SetPedIntoVehicle(playerPed, vehicle, -1)
+
+    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
+    if not keep then
+        SetEntityAsNoLongerNeeded(vehicle)
+    end
+
+    -- release the model
+    SetModelAsNoLongerNeeded(vehicleName)
+    return true
+end

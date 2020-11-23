@@ -20,6 +20,23 @@ function GetSteamIDFormSource(source)
 
 end
 
+
+--
+-- Get Discord Id
+--
+function GetDiscordFromSource(source)
+
+    assert(type(source) == "number", "source must be number")
+
+	for k,v in pairs(GetPlayerIdentifiers(source))do			
+		if string.sub(v, 1, string.len("discord:")) == "discord:" then
+            return v
+		end
+	end
+	return false
+
+end
+
 --
 -- Get IP
 --

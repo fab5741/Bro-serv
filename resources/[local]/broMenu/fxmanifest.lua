@@ -5,9 +5,16 @@ description '- Bro -'
 
 version '0.0.1'
 
-dependency "bf"
+dependencies {
+    'bf',
+    'jobManager'
+}
 
-client_script 'client/client.lua'
+client_script  {
+    'client/menu.lua',
+    'client/events.lua',
+    'client/client.lua'
+} 
 
 server_script { 
     '@mysql-async/lib/MySQL.lua',

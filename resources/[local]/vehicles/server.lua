@@ -34,8 +34,15 @@ AddEventHandler("vehicle:buy", function(cb, id)
 									['vehicle'] = res2[1].id
 								},
 								function(insertId)
-									TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
-									TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
+										MySQL.Async.execute('UPDATE jobs set money = money + @money where id = @gouv',
+										{
+											['@gouv'] = 7,
+											['@money'] = res2[1].price *(tva),
+										},
+										function(res)
+											TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
+											TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
+										end)
 								end)
 							end)
 					else

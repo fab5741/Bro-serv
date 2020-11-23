@@ -315,3 +315,34 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 	exports.bf:SetMenuButtons("jobs-vehicles", buttons)
 	exports.bf:NextMenu("jobs-vehicles")
 end)
+
+
+-- On nettoie le caca
+AddEventHandler('onResourceStop', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	exports.bf:RemoveMenu("jobs")
+	exports.bf:RemoveMenu("bro-wallet")
+	exports.bf:RemoveMenu("bro-items")
+	exports.bf:RemoveMenu("bro-items-item")
+	exports.bf:RemoveMenu("bro-wallet-character")
+	exports.bf:RemoveMenu("bro-vehicles")
+	exports.bf:RemoveMenu("bro-clothes")
+end)
+
+
+--lifecycle
+RegisterNetEvent("jobs:refresh")
+
+AddEventHandler("jobs:refresh", function(job)
+	refresh(job)
+end)
+
+AddEventHandler('onResourceStop', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	print('The resource ' .. resourceName .. ' was stopped.')
+	deleteMenuAndArea()
+  end)

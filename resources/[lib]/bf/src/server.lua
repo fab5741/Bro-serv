@@ -2,13 +2,15 @@ AddEventHandler('onResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
       return
     end
-    print('The resource ' .. resourceName .. ' has been started.')
     if false then
-      StartResource("bromenu")
-      StartResource("atm")
+      StartResource("account")
+      print("loaded")
       StartResource("admin")
-      StartResource("jobmanager")
-      StartResource("vehicles")
-      StartResource("lsms")
+      print("loaded")
+      StartResource("atm")
+      print("loaded")
+      StartResource("jobManager")
+      print("loaded")
+      StartResource("bromenu")
     end
 end)

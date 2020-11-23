@@ -5,9 +5,13 @@ description '- Bro - ATM commands'
 
 version '0.0.1'
 
-dependency "bf"
+dependencies {
+    "bf", 
+    "account"
+} 
 
 client_script {
+    'events.lua',
     'client.lua'
 }
 server_script {

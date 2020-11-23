@@ -167,9 +167,10 @@ Citizen.CreateThread(function()
 				text = "Valider la tenue",
                 exec = {
                     callback = function()
-                        --save to bdd
-                        TriggerServerEvent("clothes:save", myclothesSkin)
-                        TriggerServerEvent("skin:save", mySkin)
+                        --save to 
+                        -- TODO
+                     --   TriggerServerEvent("clothes:save", myclothesSkin)
+                      --  TriggerServerEvent("skin:save", mySkin)
                     end
                 },
 			},

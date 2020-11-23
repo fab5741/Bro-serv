@@ -1,277 +1,127 @@
-RegisterNetEvent("account:liquid")
-
-AddEventHandler('account:liquid', function(cb)
-	print("salut")
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  
-
-  MySQL.Async.fetchScalar('SELECT liquid from players where fivem = @fivem', {
-    ['fivem'] = discord
-  }, function(result)
-    TriggerClientEvent(cb, sourceValue, result)
-  end)
-end)
-
-
-RegisterNetEvent("account:liquid:add")
-
-AddEventHandler('account:liquid:add', function(amount)
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  print(amount)
-  local amount=amount
-  print(amount)
-  MySQL.Async.fetchScalar('update players set liquid=liquid+@amount where fivem = @fivem', {
-	['@fivem'] = discord,
-	['@amount'] = amount,
-  }, function(result)
-  end)
-end)
-
-
-RegisterNetEvent("account:get")
-
-AddEventHandler('account:get', function(cb)
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  
-
-  MySQL.Async.fetchScalar('SELECT amount from players, accounts where fivem = @fivem and players.id = accounts.player', {
-    ['fivem'] = discord
-  }, function(result)
-    TriggerClientEvent(cb, sourceValue, result)
-  end)
-end)
-
-RegisterNetEvent("account:money:sub")
-
-AddEventHandler('account:money:sub', function(amount)
-	local sourceValue = source
-
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
-
-  MySQL.ready(function ()
-	MySQL.Async.fetchAll('select * from accounts,players where players.fivem = @fivem and players.id=accounts.player',
-        {['fivem'] =  discord},
-		function(res)
-			if res == nil or res[1] == nil  then
-				MySQL.Async.fetchAll('select * from players where players.fivem = @fivem',
-				{['fivem'] =  discord},
-				function(res2)
-					MySQL.Async.execute('INSERT INTO `accounts` (`id`, `player`, `amount`) VALUES (NULL, @id, 0)', {
-						['@id'] =  res2[1].id,
-					}, function(rows)
-						MySQL.Async.execute('UPDATE accounts SET accounts.amount = accounts.amount - @amount WHERE player = @id ', {
-							['id'] = res2[1].id, ['amount'] = amount
-						})				
-					end)
-				end)
-			else
-				MySQL.Async.execute('UPDATE accounts SET accounts.amount = accounts.amount - @amount WHERE player = @id ', {
-					['id'] = res[1].id, ['amount'] = amount
-				})
-			end
-        end)
-  end)
-end)
-
-
+-- Register net Events
+-- Player #1
+RegisterNetEvent("account:player:get")
+RegisterNetEvent("account:player:add")
+-- Player liquid #2
+RegisterNetEvent("account:player:liquid:get")
+RegisterNetEvent("account:player:liquid:add")
+-- Jobs #3
 RegisterNetEvent("account:job:get")
-
-AddEventHandler('account:job:get', function(cb,job)
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  
-  local job = job
-  MySQL.Async.fetchScalar('SELECT money from jobs WHERE name = @job', {
-    ['job'] = job
-  }, function(result)
-    TriggerClientEvent(cb, sourceValue, result)
-  end)
-end)
-
+RegisterNetEvent("account:job:add")
 RegisterNetEvent("account:job:withdraw")
 
-AddEventHandler('account:job:withdraw', function(cb,job)
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  
-  local job = job
-  MySQL.Async.fetchScalar('SELECT money from jobs WHERE name = @job', {
-    ['job'] = job
-  }, function(result)
-    TriggerClientEvent(cb, sourceValue, result)
-  end)
-end)
-
-RegisterNetEvent("account:job:withdraw")
-
-AddEventHandler('account:job:withdraw', function(job, amount)
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  local job = job
-
-	MySQL.Async.fetchScalar('select money from jobs WHERE name = @job', {
-		['@job'] = job,
-	}, function(money)
-		if money > amount then
-			MySQL.Async.execute('UPDATE jobs SET money = money - @amount WHERE name = @job', {
-				['@job'] = job,
-				['@amount'] = amount
-			}, function(result)
-				MySQL.Async.execute('UPDATE players SET liquid = liquid + @amount WHERE fivem = @fivem', {
-					['@fivem'] = discord,
-					['@amount'] = amount
-				}, function(result)
-					TriggerClientEvent(cb, sourceValue, result)
-					TriggerClientEvent('bf:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
-				end)
-			end)
-		else
-			TriggerClientEvent('bf:Notification', sourceValue,  "L'entreprise n'a pas assé d'argent")
-		end
+-- Event Handlers
+-- Player #1
+AddEventHandler('account:player:get', function(cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, player_account, players where players.discord = @discord and players.id = player_account.player and accounts.id = player_account.account', {
+			['@discord'] = discord
+		}, function(amount)
+			TriggerClientEvent(cb, sourceValue, amount)
+		end)
 	end)
 end)
 
-RegisterNetEvent("account:job:deposit")
-
-AddEventHandler('account:job:deposit', function(job, amount)
-  local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-  end
-  
-  local job = job
-
-	MySQL.Async.fetchScalar('select liquid from players WHERE fivem = @fivem', {
-		['@fivem'] = discord,
-	}, function(liquid)
-		if liquid > amount+1 then
-			MySQL.Async.execute('UPDATE jobs SET money = money + @amount WHERE name = @job', {
-				['@job'] = job,
+AddEventHandler('account:player:add', function(cb, amount)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.execute('UPDATE accounts, player_account SET accounts.amount = accounts.amount + @amount WHERE players.discord = @discord and player_account.account= accounts.id ', 
+			{
+				['@discord'] = discord, 
 				['@amount'] = amount
-			}, function(result)
-				MySQL.Async.execute('UPDATE players SET liquid = liquid - @amount WHERE fivem = @fivem', {
-					['@fivem'] = discord,
+			}, function(numRows)
+				TriggerClientEvent(cb, sourceValue, numRows == 1)
+		end)
+	end)
+end)
+
+-- Player liquid #2
+AddEventHandler('account:player:liquid:get', function(cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+			{
+				['@discord'] = discord
+			}, function(liquid)
+			TriggerClientEvent(cb, sourceValue, liquid)
+		end)
+	end)
+end)
+
+AddEventHandler('account:player:liquid:add', function(cb, amount)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local amount=amount
+	MySQL.ready(function ()
+		MySQL.Async.execute(
+			'update players set liquid=liquid+@amount where discord = @discord',
+			{
+				['@discord'] = discord,
+				['@amount'] = amount,
+			}, function(numRows)
+				TriggerClientEvent(cb, sourceValue, numRows == 1)
+		end)
+	end)
+end)
+
+-- Jobs #3
+AddEventHandler('account:job:get', function(cb, job)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where jobs.name = @job and players.id = job_account.player and accounts.id = job_account.account', {
+			['@job'] = job
+		}, function(amount)
+			TriggerClientEvent(cb, sourceValue, amount)
+		end)
+	end)
+end)
+
+AddEventHandler('account:job:add', function(cb, amount, job)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE jobs.name = @job and job_account.account= accounts.id ', 
+			{
+				['@job'] = job, 
+				['@amount'] = amount
+			}, function(numRows)
+				TriggerClientEvent(cb, sourceValue, numRows == 1)
+		end)
+	end)
+end)
+
+AddEventHandler('account:job:withdraw', function(cb, job, amount)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local job = job
+
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where jobs.name = @job and players.id = job_account.player and accounts.id = job_account.account', {
+			['@job'] = job
+		}, function(money)
+			if money > amount then
+				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount - @amount WHERE jobs.name = @job and job_account.account= accounts.id ', 
+				{
+					['@job'] = job,
 					['@amount'] = amount
 				}, function(result)
-					TriggerClientEvent(cb, sourceValue, result)
-					TriggerClientEvent('bf:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
+					MySQL.Async.execute('UPDATE players SET liquid = liquid + @amount WHERE discord = @discord', {
+						['@discord'] = discord,
+						['@amount'] = amount
+					}, function(result)
+						TriggerClientEvent(cb, sourceValue, result)
+						TriggerClientEvent('bf:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
+					end)
 				end)
-			end)
-		else
-			TriggerClientEvent('bf:Notification', sourceValue,  "Vous n'avez pas assé d'argent")
-		end
+			else
+				TriggerClientEvent('bf:Notification', sourceValue,  "L'entreprise n'a pas assez d'argent")
+			end
+		end)
 	end)
 end)

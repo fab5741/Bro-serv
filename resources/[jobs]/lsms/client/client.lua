@@ -1,31 +1,11 @@
 local config = {
     hospitals = {	
 		CentralLosSantos = {
-
             Blip = {
                 coords = vector3(340.73, -584.6, 28.79),
                 sprite = 61,
                 scale  = 1.2,
                 color  = 8
-            },
-
-            lsmsActions = {
-            },
-
-            Pharmacies = {
-			},
-			
-			lockers = {
-				coords = vector3(336.25, -579.45, 27.6),
-				sprite = 51,
-			},
-
-            Vehicles = {
-				coords = vector3(341.25, -562.98,28.24)
-            },
-
-            Helicopters = {
-				coords = vector3(55.25, -562.98,28.74)
             },
         }
 	}
@@ -148,9 +128,7 @@ AddEventHandler('player:alive', function()
 end)
 
 
-
 --beds 
-
 local Beds, CurrentBed, OnBed = {'v_med_bed2', 'v_med_bed1', 'v_med_emptybed'}, nil, false
 
 Citizen.CreateThread(function()
@@ -182,7 +160,7 @@ Citizen.CreateThread(function()
 		if CurrentBed ~= nil then
 			if not OnBed then
 				local BedCoords = GetEntityCoords(CurrentBed)
-				Draw3DText({x = BedCoords.x, y = BedCoords.y, z = (BedCoords.z+1)}, 'Press ~g~[E] ~w~to lie down', 0.35)
+				exports.bf:Show3DText({ text = "~g~[E] ~w~ pour se coucher", x = BedCoords.x, y = BedCoords.y, z = (BedCoords.z+1), scale = 0.35 })
 			end
 		end
 	end

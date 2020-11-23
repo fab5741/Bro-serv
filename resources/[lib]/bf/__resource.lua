@@ -171,6 +171,7 @@ exports {
     "GetPickups",
     "GetPickupsInArea",
     "GetPickupsInAround",
+    "spawnCar",
 
     -- Player
     "GetPlayerPed",
@@ -180,6 +181,7 @@ exports {
     "GetPlayersPedOrderById",
     "GetPlayerPedInDirection",
     "GetPlayerServerIdInDirection",
+    "tpPlayer",
 }
 
 server_scripts {
@@ -198,6 +200,7 @@ server_exports {
     "PrintTable",
     "Round",
     "GetSteamIDFormSource",
+    "GetDiscordFromSource",
     "GetIpFormSource",
     "TableContainsValue",
     "GetLastContentValue",

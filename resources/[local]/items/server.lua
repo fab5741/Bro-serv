@@ -3,26 +3,12 @@ RegisterNetEvent("items:add")
 
 -- source is global here, don't add to function
 AddEventHandler("items:add", function (type, amount)
-    local source = source
-
-    for k,v in pairs(GetPlayerIdentifiers(source))do	
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-    end
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
     
-    MySQL.Async.fetchAll('select id from players where fivem = @fivem',
-    {['fivem'] =  discord},
+  MySQL.ready(function ()
+    MySQL.Async.fetchAll('select id from players where discord = @discord',
+    {['discord'] =  discord},
     function(res)
         if res[1] then
             MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
@@ -32,28 +18,16 @@ AddEventHandler("items:add", function (type, amount)
             function(res)
             end)
         end
+      end)
     end)
-end)
+  end)
 
-function sub(source, type, amount) 
-    for k,v in pairs(GetPlayerIdentifiers(source))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-    end
-    
-    MySQL.Async.fetchAll('select id from players where fivem = @fivem',
-    {['fivem'] =  discord},
+function sub(source, type, amount)   
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  MySQL.ready(function ()
+    MySQL.Async.fetchAll('select id from players where discord = @discord',
+    {['discord'] =  discord},
     function(res)
         if res[1] then
             MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
@@ -63,6 +37,7 @@ function sub(source, type, amount)
             function(res)
             end)
         end
+      end)
     end)
 end
 
@@ -103,26 +78,12 @@ RegisterNetEvent("items:process")
 
 -- source is global here, don't add to function
 AddEventHandler("items:process", function (type, amount, typeTo, amountTo)
-    local source = source
-    for k,v in pairs(GetPlayerIdentifiers(source))do
-		
-			
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
-    MySQL.Async.fetchAll('select id, amount from players, player_item where fivem = @fivem and player_item.item = @type and player_item.player = players.id',
-    {['fivem'] =  discord,
+    local sourceValue = source
+    local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+    MySQL.ready(function ()
+
+    MySQL.Async.fetchAll('select id, amount from players, player_item where discord = @discord and player_item.item = @type and player_item.player = players.id',
+    {['discord'] =  discord,
     ['amount'] = amount,
     ['type'] = type},
     function(res)
@@ -143,6 +104,7 @@ AddEventHandler("items:process", function (type, amount, typeTo, amountTo)
         else
             TriggerClientEvent("job:process", source, false)
         end
+      end)
     end)
 end)
 
@@ -152,75 +114,29 @@ RegisterNetEvent("items:get")
 
 -- source is global here, don't add to function
 AddEventHandler("items:get", function (cb)
-    local sourceValue = source
-    for k,v in pairs(GetPlayerIdentifiers(source))do
-		
-			
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
-    MySQL.Async.fetchAll('SELECT items.id, item, amount, label, weight FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and fivem = @fivem and player_item.amount > 0',
-    {['fivem'] =  discord},
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  MySQL.ready(function ()
+    MySQL.Async.fetchAll('SELECT items.id, item, amount, label, weight FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and discord = @discord and player_item.amount > 0',
+    {['discord'] =  discord},
     function(res)
         TriggerClientEvent(cb, sourceValue, res)
     end)
+  end)
 end)
 
 RegisterNetEvent("items:give")
 
 -- source is global here, don't add to function
 AddEventHandler("items:give", function (type, amount, to)
-  print(type)
-  print(amount)
-  print(to)
-  print(source)
   local source = source
   local to = to
-  for k,v in pairs(GetPlayerIdentifiers(source))do		
-        if string.sub(v, 1, string.len("steam:")) == "steam:" then
-        steamid = v
-        elseif string.sub(v, 1, string.len("license:")) == "license:" then
-        license = v
-        elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-        xbl  = v
-        elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-        ip = v
-        elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-        discord = v
-        elseif string.sub(v, 1, string.len("live:")) == "live:" then
-        liveid = v
-        end
-    end
-    for k,v in pairs(GetPlayerIdentifiers(to))do		
-        if string.sub(v, 1, string.len("steam:")) == "steam:" then
-        steamidTo = v
-        elseif string.sub(v, 1, string.len("license:")) == "license:" then
-        licenseTo = v
-        elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-        xblTo  = v
-        elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-        ipTo = v
-        elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-        discordTo = v
-        elseif string.sub(v, 1, string.len("live:")) == "live:" then
-        liveidTo = v
-        end
-    end
-    print(discordTo)
-    print(to)
-    MySQL.Async.fetchAll('select id from players where fivem = @fivem',
-    {['fivem'] =  discord},
+  local discord = exports.bf:GetDiscordFromSource(source) 
+  local discordTo = exports.bf:GetDiscordFromSource(to) 
+  MySQL.ready(function ()
+
+    MySQL.Async.fetchAll('select id from players where discord = @discord',
+    {['discord'] =  discord},
     function(res)
         if res and res[1] then
             MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
@@ -228,8 +144,8 @@ AddEventHandler("items:give", function (type, amount, to)
             ['amount'] = amount,
             ['type'] = type},
             function(affectedRows)
-              MySQL.Async.fetchAll('select id from players where fivem = @fivem ',
-              {['fivem'] =  discordTo,
+              MySQL.Async.fetchAll('select id from players where discord = @discord ',
+              {['discord'] =  discordTo,
               ['type'] = type},
               function(res)
                 MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
@@ -244,5 +160,6 @@ AddEventHandler("items:give", function (type, amount, to)
         else
           
         end
+      end)
     end)
 end)

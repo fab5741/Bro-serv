@@ -874,6 +874,9 @@ Citizen.CreateThread(function()
         SetPlayerWantedLevel(PlayerId(), 0, false)
         SetPlayerWantedLevelNow(PlayerId(), false)
     
+        DisablePlayerVehicleRewards(PlayerId())
+
+
         -- Dispatch services management
         for i=0,20 do
             EnableDispatchService(i, false)

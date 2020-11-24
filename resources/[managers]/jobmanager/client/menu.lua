@@ -1,5 +1,5 @@
 function menus() 
-	exports.bf:AddMenu("LSMS", {
+	exports.bf:AddMenu("lsms", {
 		title = "Menu LSMS",
 		menuTitle = "Job",
 		position = 1,
@@ -23,7 +23,7 @@ function menus()
 			},
 		},
 	})
-	exports.bf:AddMenu("LSPD", {
+	exports.bf:AddMenu("lspd", {
 		title = "Menu LSPD",
 		menuTitle = "Job",
 		position = 1,
@@ -52,6 +52,14 @@ function menus()
 					end
 				},
 			},
+			{
+				text = "Gestion service",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			},
 		},	
 	})
 	exports.bf:AddMenu("jobs-vehicles", {
@@ -60,7 +68,7 @@ function menus()
 		position = 1,
 	})
 	
-	exports.bf:AddMenu("NEWSPAPERS", {
+	exports.bf:AddMenu("newspapers", {
 		title = "Menu Livreurs de journaux",
 		menuTitle = "Job",
 		position = 1,
@@ -298,6 +306,32 @@ function menus()
 			},
 		},
 	})
+
+	exports.bf:AddMenu("lspd-service", {
+		title = "Menu LSMS",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "SOIN",
+				exec = {
+					callback = function()
+						closest = GetClosestPlayer()
+						revivePlayer(closest)
+					end
+				},
+			},
+		},
+		{
+			text = "Vehicules",
+			exec = {
+				callback = function()
+					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
+				end
+			},
+		},
+	})
+
     -- job center
     buttons = {}
     for k, v in pairs(config.center.jobs) do

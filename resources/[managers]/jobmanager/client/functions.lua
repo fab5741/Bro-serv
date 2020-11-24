@@ -640,6 +640,7 @@ end
 
 function deleteMenuAndArea()
 	exports.bf:RemoveArea("center")
+	exports.bf:RemoveMenu("lspd-service")
 	for kk, vv in pairs(config.jobs) do
 		if vv.homes then
 			for k, v in pairs(vv.homes) do
@@ -769,8 +770,9 @@ function createMenuAndArea(job)
 		end
 	end
 	-- Draw areas 
-	if job ~= nil and job.job ~= nil then
-		myjob = config.jobs[job.job]
+	print(job.name)
+	if job ~= nil and job.name ~= nil then
+		myjob = config.jobs[job.name]
 		if myjob then
 			if myjob.lockers then
 				for k, v in pairs(myjob.lockers) do

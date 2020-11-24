@@ -7,7 +7,7 @@ exports.bf:AddMenu("bro", {
             text = "Portefeuille",
             exec = {
                 callback = function()
-                    TriggerServerEvent("account:liquid", "bf:liquid")
+                    TriggerServerEvent("account:player:liquid:get", "bf:liquid")
                 end
             },
         },

@@ -195,7 +195,7 @@ config = {
                 action = "Parking",
             },
         },
-        LSMS = {
+        lsms = {
             color = 1, 
             lockers = {
                 {
@@ -257,7 +257,7 @@ config = {
                }
             }
         },
-        LSPD = {
+        lspd = {
             color = 77,
             lockers = {
                 {
@@ -317,7 +317,7 @@ config = {
                }
             }
         },
-        NEWSPAPERS = {
+        newspapers = {
             color = 38,
             begin = {
                 {

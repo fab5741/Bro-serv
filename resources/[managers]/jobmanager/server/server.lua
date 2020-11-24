@@ -1,9 +1,9 @@
 
 inService = {
-    LSPD = {
+    lspd = {
 
     },
-    LSMS = {
+    lsms = {
     },
     Fermiers = {
 
@@ -19,7 +19,7 @@ AddEventHandler('job:get', function (cb)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
-        MySQL.Async.fetchAll('SELECT jobs.id as job, jobs.label as label, job_grades.label as grade from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and discord = @discord',
+        MySQL.Async.fetchAll('SELECT jobs.id as job, jobs.name, jobs.label as label, job_grades.label as grade from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and discord = @discord',
         {['discord'] =  discord},
          function(res)
                 if(res[1]) then
@@ -31,7 +31,19 @@ AddEventHandler('job:get', function (cb)
       end)
 end)
 
+RegisterNetEvent("job:isChef")
 
+AddEventHandler('job:isChef', function (cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.fetchScalar('SELECT grade FROM job_grades, players, jobs where jobs.id = job_grades.job and players.job_grade = job_grades.id and discord = @discord',
+        {['discord'] =  discord},
+        function(isChef)
+                TriggerClientEvent(cb, sourceValue, isChef)
+            end)
+      end)
+end)
 
 RegisterNetEvent("job:set")
 

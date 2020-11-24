@@ -3,7 +3,7 @@ RegisterNetEvent('bf:open')
 AddEventHandler("bf:open", function(job) 
 	job = job[1]
 	exports.bf:SetMenuValue("bro", {
-		menuTitle = job.job
+		menuTitle = job.label
 	})
 	exports.bf:OpenMenu("bro")
 end)
@@ -12,6 +12,7 @@ end)
 RegisterNetEvent('bf:liquid')
 
 AddEventHandler("bf:liquid", function(liquid) 
+	print(liquid)
   local buttons = {}
 	buttons[1] =     {
 		text = "Liquide : " .. liquid.. " $",
@@ -24,8 +25,42 @@ AddEventHandler("bf:liquid", function(liquid)
 			end
 		}
 	}
+	buttons[3] =     {
+		text = "Montrer carte d'identité",
+		exec = {
+			callback = function()
+				TriggerServerEvent("bro:get", "bro:show")
+			end
+		}
+	}
+	buttons[4] =     {
+		text = "Montrer permis",
+		exec = {
+			callback = function()
+				TriggerServerEvent("vehicle:permis:get", "bro:permis")
+			end
+		}
+	}
 	exports.bf:SetMenuButtons("bro-wallet", buttons)
 	exports.bf:NextMenu("bro-wallet")
+end)
+
+RegisterNetEvent('bro:permis')
+
+AddEventHandler("bro:permis", function(permis) 
+	peds = exports.bf:GetPlayerServerIdInDirection(5.0)
+	if peds ~= false then
+		TriggerServerEvent("bro:permis:show", permis, peds)
+	end
+end)
+
+RegisterNetEvent('bro:show')
+
+AddEventHandler("bro:show", function(player) 
+	peds = exports.bf:GetPlayerServerIdInDirection(5.0)
+	if peds ~= false then
+		TriggerServerEvent("bro:permis:show", permis, peds)
+	end
 end)
 
 RegisterNetEvent('bro:get')
@@ -40,6 +75,8 @@ AddEventHandler("bro:get", function(data)
 	})
 	exports.bf:NextMenu("bro-wallet-character")
 end)
+
+
 
 
 RegisterNetEvent('bro:set')

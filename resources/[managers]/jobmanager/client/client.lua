@@ -17,11 +17,11 @@ RegisterNetEvent('job:get')
 AddEventHandler("job:get", function(job)
 	job = job[1]
 	RegisterNUICallback('amount', function(data)
-		print(job.job)
 		TriggerServerEvent("job:safe:deposit", data.withdraw, data.amount, job.job)
 		amount = tonumber(data.amount)
 		SetNuiFocus(false, false)
 	end)
+
 	refresh(job)
 end)
 

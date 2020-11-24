@@ -59,10 +59,6 @@ AddEventHandler('job:getCar', function(car, carId)
     TriggerServerEvent("vehicle:set:id", carId, vehicle)
 end)
 
-
-
-
-
 RegisterNetEvent('job:process:open')
 
 AddEventHandler("job:process:open", function(job)  
@@ -136,9 +132,9 @@ RegisterNetEvent('job:open:menu')
 
 AddEventHandler("job:open:menu", function(job)  
 	job = job[1] 
-	print(job.job)
-	if job.job == "LSMS" or job.job == "LSPD" or job.job == "NEWSPAPERS" then
-		exports.bf:OpenMenu(job.job)
+	print(job.name)
+	if job.name == "lsms" or job.name == "lspd" or job.name == "newspapers" then
+		exports.bf:OpenMenu(job.name)
 	end
 end)
 
@@ -146,6 +142,8 @@ end)
 RegisterNetEvent('job:parking')
 
 AddEventHandler("job:parking", function(vehicles)  
+	print("open")
+
 	local buttons = {
 
 	}
@@ -166,40 +164,11 @@ end)
 RegisterNetEvent('job:parking:get')
 
 AddEventHandler("job:parking:get", function(name, id)  
+
 	local playerPed = PlayerPedId() -- get the local player ped
 
 	if not IsPedInAnyVehicle(playerPed) then
-		local vehicleName = name
-		currentVehicle = id
-		-- check if the vehicle actually exists
-		if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-			TriggerEvent('chat:addMessage', {
-				args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-			})
-			return
-		end
-
-		-- load the model
-		RequestModel(vehicleName)
-
-		-- wait for the model to load
-		while not HasModelLoaded(vehicleName) do
-			Wait(500) -- often you'll also see Citizen.Wait
-		end
-		
-		ClearAreaOfVehicles(spawn.x, spawn.y, spawn.z, 5.0, false, false, false, false, false)
-		-- create the vehicle
-		local vehicle = CreateVehicle(vehicleName, spawn.x, spawn.y, spawn.z, heading, true, false)
-
-		-- set the player ped into the vehicle's driver seat
-		SetPedIntoVehicle(playerPed, vehicle, -1)
-
-		-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-		SetEntityAsNoLongerNeeded(vehicle)
-
-		-- release the model
-		SetModelAsNoLongerNeeded(vehicleName)
-								
+		exports.bf:spawnCar(name, true, nil, true)
 		exports.bf:CloseMenu(zoneType..zone)
 	end
 end)
@@ -316,21 +285,17 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 	exports.bf:NextMenu("jobs-vehicles")
 end)
 
+RegisterNetEvent('jobs:service:manage')
 
--- On nettoie le caca
-AddEventHandler('onResourceStop', function(resourceName)
-	if (GetCurrentResourceName() ~= resourceName) then
-	  return
+AddEventHandler("jobs:service:manage", function(grade)
+	exports.bf:OpenMenu("lspd-service")
+
+	if grade == 5 then
+		exports.bf:OpenMenu("service")
+	else
+		exports.bf:Notification("~r~Vous n'êtes pas chef de service !")
 	end
-	exports.bf:RemoveMenu("jobs")
-	exports.bf:RemoveMenu("bro-wallet")
-	exports.bf:RemoveMenu("bro-items")
-	exports.bf:RemoveMenu("bro-items-item")
-	exports.bf:RemoveMenu("bro-wallet-character")
-	exports.bf:RemoveMenu("bro-vehicles")
-	exports.bf:RemoveMenu("bro-clothes")
 end)
-
 
 --lifecycle
 RegisterNetEvent("jobs:refresh")
@@ -338,11 +303,3 @@ RegisterNetEvent("jobs:refresh")
 AddEventHandler("jobs:refresh", function(job)
 	refresh(job)
 end)
-
-AddEventHandler('onResourceStop', function(resourceName)
-	if (GetCurrentResourceName() ~= resourceName) then
-	  return
-	end
-	print('The resource ' .. resourceName .. ' was stopped.')
-	deleteMenuAndArea()
-  end)

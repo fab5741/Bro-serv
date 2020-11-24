@@ -1,6 +1,6 @@
 -- vehicles
 RegisterCommand('car', function(source, args)
-    exports.bf:spawnCar(args[1] or 'adder', args[2] or true)
+    exports.bf:spawnCar(args[1] or 'adder', args[2] or true, nil, args[3] or true)
 end, false)
 
 

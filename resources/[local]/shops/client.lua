@@ -233,3 +233,12 @@ Citizen.CreateThread(function()
 end)
 
 
+AddEventHandler('onResourceStop', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	exports.bf:RemoveMenu("CurrentShop")
+	for k,v in pairs(config.Zones) do
+		exports.bf:RemoveArea("shops"..v.id)
+	end
+end)

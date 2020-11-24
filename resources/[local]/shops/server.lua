@@ -5,22 +5,7 @@ AddEventHandler('shops:buy', function(type, amount, shop_item)
 	local amounte = tonumber(amount)
 	local typee = tonumber(type)
 	local shop_item = shop_item
-
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do	
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 
 	local tva = 0.2
 	local price = 0
@@ -170,21 +155,8 @@ end)
 RegisterNetEvent('shops:rob')
 AddEventHandler('shops:rob', function(id)
 	local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do		
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select money from shops where id = @id', {['id'] = id},
 		function(res)
@@ -210,21 +182,8 @@ end)
 RegisterNetEvent('shops:items:get')
 AddEventHandler('shops:items:get', function(cb, shop)
 	local sourceValue = source
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
 	local shop = shop
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select shop_item.id, items.label, items.id as item from shop_item, items where shop = @shop and shop_item.item = items.id',

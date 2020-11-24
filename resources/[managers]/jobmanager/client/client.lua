@@ -21,15 +21,8 @@ AddEventHandler("job:get", function(job)
 		amount = tonumber(data.amount)
 		SetNuiFocus(false, false)
 	end)
-
 	refresh(job)
 end)
-
-RegisterNUICallback('sendAction', function(data, cb)
-	_G[data.action](data.params)
-    cb('ok')
-end)
-
 -- open menu loop
 Citizen.CreateThread(function()
 	TriggerServerEvent("job:get", "job:get")
@@ -69,35 +62,7 @@ Citizen.CreateThread(function()
 				exports.bf:OpenMenu("center")
 			elseif zoneType == "begin" then
 				if not beginInProgress then
-				    -- account for the argument not being passed
-					local vehicleName = vehicle
-
-					-- load the model
-					RequestModel(vehicleName)
-				
-					-- wait for the model to load
-					while not HasModelLoaded(vehicleName) do
-						Wait(500) -- often you'll also see Citizen.Wait
-					end
-				
-					-- get the player's position
-					local playerPed = PlayerPedId() -- get the local player ped
-					local pos = coords -- get the position of the local player ped
-				
-					-- create the vehicle
-					local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
-				
-					-- set the player ped into the vehicle's driver seat
-					SetPedIntoVehicle(playerPed, vehicle, -1)
-				
-					-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-					SetEntityAsNoLongerNeeded(vehicle)
-				
-					vehicleLivraison = vehicle
-					-- release the model
-					SetModelAsNoLongerNeeded(vehicleName)
-					--on lui file des points
-
+					vehicleLivraison = exports.bf:spawnCar(vehicle, true, nil, true)
 					addBeginArea() 
 				else
 					exports.bf:Notification("Vous avez déjà une course en cours !")
@@ -109,33 +74,7 @@ Citizen.CreateThread(function()
 			elseif zoneType == "process" then
 				TriggerServerEvent("job:get", "job:process:open")		
 			elseif zoneType == "armories" then
-				DoScreenFadeOut(500)
-				Wait(600)
-
-				Wait(800)
-				armoryPed = createArmoryPed()
-
-				if not DoesCamExist(ArmoryRoomCam) then
-					ArmoryRoomCam = CreateCam("DEFAULT_SCRIPTED_FLY_CAMERA", true)
-					AttachCamToEntity(ArmoryRoomCam, PlayerPedId(), 0.0, 0.0, 1.0, true)
-					PointCamAtEntity(ArmoryRoomCam, armoryPed, 0.0, -30.0, 1.0, true)
-
-					SetCamRot(ArmoryRoomCam, 0.0,0.0, GetEntityHeading(PlayerPedId()))
-					SetCamFov(ArmoryRoomCam, 70.0)							
-				end
-
-				Wait(100)
-				DoScreenFadeIn(500)
-
-				if DoesEntityExist(armoryPed) then
-					TaskTurnPedToFaceEntity(PlayerPedId(), armoryPed, -1)
-				end							
-
-				Wait(300)
-				exports.bf:OpenMenu(zoneType..zone)
-				if not IsAmbientSpeechPlaying(armoryPed) then
-					PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_GREETSHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
-				end
+				openArmory()
 			else
 				exports.bf:OpenMenu(zoneType..zone)
 			end

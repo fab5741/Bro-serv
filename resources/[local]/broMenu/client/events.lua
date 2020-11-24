@@ -148,6 +148,9 @@ RegisterNetEvent('bf:items')
 
 AddEventHandler("bf:items", function(inventory)
 	local buttons = {}
+	local weight = 0
+	local maxWeight = 100
+
 	for k, v in ipairs (inventory) do
 		buttons[k] =     {
 			text = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
@@ -175,10 +178,6 @@ AddEventHandler("bf:items", function(inventory)
 								local coords = GetEntityCoords(GetPlayerPed(i))
 								local mycoords = GetEntityCoords(GetPlayerPed(player))
 								local dist = Vdist(mycoords, coords)
-								print(player)
-								print(me)
-								print(coords)
-								print(mycoords)
 								if dist < 10  then
 									TriggerServerEvent("items:give", v.id, 1, player)
 								end
@@ -190,8 +189,18 @@ AddEventHandler("bf:items", function(inventory)
 				end
 			},
 		}
+		weight = weight + (v.amount*v.weight)
 	end
 	exports.bf:SetMenuButtons("bro-items", buttons)
+	if weight > (3/4*maxWeight) then
+		exports.bf:SetMenuValue("bro-items", {
+			menuTitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg",
+		})
+	else
+		exports.bf:SetMenuValue("bro-items", {
+			menuTitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg",
+		})
+	end
 	exports.bf:NextMenu("bro-items")
 end)
 

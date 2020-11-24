@@ -182,6 +182,7 @@ exports {
     "GetPlayerPedInDirection",
     "GetPlayerServerIdInDirection",
     "tpPlayer",
+    "isPedDrivingAVehicle",
 }
 
 server_scripts {

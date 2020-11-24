@@ -5,57 +5,9 @@ AddEventHandler('job:set', function (grade)
     TriggerServerEvent("job:set", grade)
 end)
 
-RegisterNetEvent("job:process")
-AddEventHandler('job:process', function(isOk)
-    if isOk then
-        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vous avez transformé", false, "now_cuffed")
-    else
-        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vos poches sont vides", false, "now_cuffed")
-    end
-end)
-
-RegisterNetEvent("job:sell")
-AddEventHandler('job:sell', function(isOk)
-    if isOk then
-        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vous avez vendu", false, "now_cuffed")
-    else
-        TriggerEvent("lspd:notify",  "CHAR_AGENT14", 1,"Vos poches sont vides", false, "now_cuffed")
-    end
-end)
-
 RegisterNetEvent("job:getCar")
 AddEventHandler('job:getCar', function(car, carId)
-    -- account for the argument not being passed
-    local vehicleName = car
-
-    -- check if the vehicle actually exists
-    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-        return
-    end
-
-    -- load the model
-    RequestModel(vehicleName)
-
-    -- wait for the model to load
-    while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-    end
-
-    -- get the player's position
-    local playerPed = PlayerPedId() -- get the local player ped
-    local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
-
-    -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
-
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
-
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-   -- SetEntityAsNoLongerNeeded(vehicle)
-
-    -- release the model
-    SetModelAsNoLongerNeeded(vehicleName)
+	exports.bf:spawnCar(car, true, nil, true)
     TriggerServerEvent("vehicle:set:id", carId, vehicle)
 end)
 
@@ -64,14 +16,13 @@ RegisterNetEvent('job:process:open')
 AddEventHandler("job:process:open", function(job)  
 	job = job[1]	
 	buttons = {}
-	for k, v in pairs(config.jobs[job.job].process[zone].items) do
+	for k, v in pairs(config.jobs[job.name].process[zone].items) do
 
 		buttons[#buttons+1] = {
 			text = "Traitement "..v.label,
 			exec = {
 				callback = function()
-					TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo) 
-					exports.bf:Notification('Vous avez transformé : '..v.label.. " X "..v.amount)
+					TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo, 'Vous avez transformé : '..v.label.. " X "..v.amount) 
 					exports.bf:CloseMenu(zoneType..zone)
 				end
 			},
@@ -87,14 +38,13 @@ RegisterNetEvent('job:collect:open')
 AddEventHandler("job:collect:open", function(job)  
 	job = job[1]	
 	buttons = {}
-	for k, v in pairs(config.jobs[job.job].collect[zone].items) do
+	for k, v in pairs(config.jobs[job.name].collect[zone].items) do
 
 		buttons[#buttons+1] = {
 			text = "Collecter "..v.label,
 			exec = {
 				callback = function()
-					TriggerServerEvent('items:add', v.type,  v.amount) 
-					exports.bf:Notification('Vous avez collecté : '..v.label.. " X "..v.amount)
+					TriggerServerEvent('items:add', v.type,  v.amount, 'Vous avez collecté : '..v.label.. " X "..v.amount) 
 					exports.bf:CloseMenu(zoneType..zone)
 				end
 			},
@@ -113,9 +63,9 @@ end)
 
 RegisterNetEvent('job:safe:open2')
 
-AddEventHandler("job:safe:open2", function(money) 
+AddEventHandler("job:safe:open2", function(amount) 
 	exports.bf:SetMenuValue(zoneType..zone, {
-		menuTitle = "Compte ~r~"..money.. " $"
+		menuTitle = "Compte ~r~"..amount.. " $"
 	})
 	exports.bf:OpenMenu(zoneType..zone)
 end)
@@ -172,13 +122,6 @@ AddEventHandler("job:parking:get", function(name, id)
 		exports.bf:CloseMenu(zoneType..zone)
 	end
 end)
-
-RegisterNetEvent('job:openStorageMenu')
-
-AddEventHandler("job:openStorageMenu", function(location, job)   
-	sell(location, job)
-end)
-
 
 function RespawnPed(ped, coords, heading)
 	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
@@ -245,32 +188,9 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 						local playerPed = PlayerPedId() -- get the local player ped
 
 						if not IsPedInAnyVehicle(playerPed) then
-							local vehicleName = v.name
 							currentVehicle = v.id
-							-- load the model
-							RequestModel(vehicleName)
-
-							-- wait for the model to load
-							while not HasModelLoaded(vehicleName) do
-								Wait(500) -- often you'll also see Citizen.Wait
-							end
-							local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
-
-							ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
-							-- create the vehicle
-							local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
-
-							-- set the player ped into the vehicle's driver seat
-							SetPedIntoVehicle(playerPed, vehicle, -1)
-
-							-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-							SetEntityAsNoLongerNeeded(vehicle)
-
-							-- release the model
-							SetModelAsNoLongerNeeded(vehicleName)
-
+							exports.bf:spawnCar(v.name, true, nil, true)
 							TriggerServerEvent("account:money:sub", 10)
-													
 							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
 							exports.bf:CloseMenu("bro-vehicles")
 						else

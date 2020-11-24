@@ -8,8 +8,7 @@ function menus()
 				text = "SOIN",
 				exec = {
 					callback = function()
-						closest = GetClosestPlayer()
-						revivePlayer(closest)
+						reviveClosestPlayer(closest)
 					end
 				},
 			},

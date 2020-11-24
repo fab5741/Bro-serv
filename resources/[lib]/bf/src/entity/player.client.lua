@@ -141,6 +141,25 @@ function GetPlayersPedOrderById()
 
 end
 
+--
+-- Is Ped driving a veh ?
+--
+function isPedDrivingAVehicle()
+	local ped = GetPlayerPed(-1)
+	vehicle = GetVehiclePedIsIn(ped, false)
+	if IsPedInAnyVehicle(ped, false) then
+		-- Check if ped is in driver seat
+		if GetPedInVehicleSeat(vehicle, -1) == ped then
+			local class = GetVehicleClass(vehicle)
+			-- We don't want planes, helicopters, bicycles and trains
+			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 
 --
 -- TP player

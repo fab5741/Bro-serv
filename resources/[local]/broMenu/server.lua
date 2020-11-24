@@ -88,9 +88,8 @@ end)
 RegisterNetEvent('bro:card:show')
 AddEventHandler('bro:card:show', function(permis, peds)
 	 for k,v  in pairs(peds) do
-			TriggerClientEvent("bf:Notification", v, "Carte d'identité")
-			TriggerClientEvent("bf:Notification", v, player.firstname.." "..player.lastname)
-			TriggerClientEvent("bf:Notification", v, player.birth)
-		end
-	 end
+		TriggerClientEvent("bf:Notification", v, "Carte d'identité")
+		TriggerClientEvent("bf:Notification", v, player.firstname.." "..player.lastname)
+		TriggerClientEvent("bf:Notification", v, player.birth)
+	end
 end)

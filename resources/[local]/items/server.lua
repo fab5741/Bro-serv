@@ -1,26 +1,44 @@
+maxWeight = 100
 
 RegisterNetEvent("items:add")
 
 -- source is global here, don't add to function
-AddEventHandler("items:add", function (type, amount)
+AddEventHandler("items:add", function (type, amount, message)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-    
   MySQL.ready(function ()
-    MySQL.Async.fetchAll('select id from players where discord = @discord',
-    {['discord'] =  discord},
-    function(res)
-        if res[1] then
-            MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
-            {['id'] = res[1].id,
-            ['amount'] = amount,
-            ['type'] = type},
-            function(res)
-            end)
-        end
-      end)
+    MySQL.Async.fetchScalar('select id from players where discord = @discord',
+    {['@discord'] =  discord},
+    function(player)
+      if player then
+        MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, player_item  WHERE player_item.item= items.id and player_item.player = @player",
+          {
+            ['@player'] = player,
+          }, function(weight)
+          MySQL.Async.fetchScalar("SELECT weight FROM `items` WHERE id = @type",
+          {
+            ['@type'] = type,
+          }, function(newWeight)
+            weight = (newWeight*amount)+weight
+            if weight <= maxWeight then
+              MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+              {['id'] = player,
+              ['amount'] = amount,
+              ['type'] = type},
+              function(res)
+                print(message)
+                TriggerClientEvent("bf:Notification", sourceValue, message)
+              end)
+            else
+              TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+            end
+          end)
+        end)
+      end
     end)
   end)
+end)
+
 
 function sub(source, type, amount)   
   local sourceValue = source
@@ -52,8 +70,6 @@ AddEventHandler("items:use", function (type, amount)
         TriggerClientEvent("needs:change", source, 0, 60)
     end
     if(type == 14) then
-      -- EAT water
-      print("water")
       TriggerClientEvent("items:drink", source)
       TriggerClientEvent("needs:change", source, 1, 60)
   end
@@ -77,35 +93,38 @@ end)
 RegisterNetEvent("items:process")
 
 -- source is global here, don't add to function
-AddEventHandler("items:process", function (type, amount, typeTo, amountTo)
+AddEventHandler("items:process", function (type, amount, typeTo, amountTo, message)
     local sourceValue = source
     local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+    print(type)
+    print(amount)
+    print(typeTo)
+    print(amountTo)
     MySQL.ready(function ()
-
-    MySQL.Async.fetchAll('select id, amount from players, player_item where discord = @discord and player_item.item = @type and player_item.player = players.id',
-    {['discord'] =  discord,
-    ['amount'] = amount,
-    ['type'] = type},
-    function(res)
-        if res and res[1] and res[1].amount > 0 then
-            MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
-            {['id'] = res[1].id,
-            ['amount'] = amount,
-            ['type'] = type},
-            function(affectedRows)
-                    MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
-                    {['id'] = res[1].id,
-                    ['amount'] = amountTo,
-                    ['type'] = typeTo},
-                    function(res)
-                        TriggerClientEvent("job:process", source, true)
-                    end)
-            end)
-        else
-            TriggerClientEvent("job:process", source, false)
-        end
+      MySQL.Async.fetchAll('select id, amount from players, player_item where discord = @discord and player_item.item = @type and player_item.player = players.id',
+      {['discord'] =  discord,
+      ['amount'] = amount,
+      ['type'] = type},
+      function(res)
+          if res and res[1] and res[1].amount > 0 then
+              MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
+              {['id'] = res[1].id,
+              ['amount'] = amount,
+              ['type'] = type},
+              function(affectedRows)
+                      MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+                      {['id'] = res[1].id,
+                      ['amount'] = amountTo,
+                      ['type'] = typeTo},
+                      function(res)
+                        TriggerClientEvent("bf:Notification", sourceValue, message)
+                      end)
+              end)
+          else
+            TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez rien à transformer")
+          end
+        end)
       end)
-    end)
 end)
 
 
@@ -133,33 +152,45 @@ AddEventHandler("items:give", function (type, amount, to)
   local to = to
   local discord = exports.bf:GetDiscordFromSource(source) 
   local discordTo = exports.bf:GetDiscordFromSource(to) 
+  
   MySQL.ready(function ()
-
-    MySQL.Async.fetchAll('select id from players where discord = @discord',
+    MySQL.Async.fetchScalar('select id from players where discord = @discord',
     {['discord'] =  discord},
-    function(res)
-        if res and res[1] then
-            MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
-            {['id'] = res[1].id,
-            ['amount'] = amount,
-            ['type'] = type},
-            function(affectedRows)
-              MySQL.Async.fetchAll('select id from players where discord = @discord ',
-              {['discord'] =  discordTo,
+    function(id)
+      MySQL.Async.fetchScalar('select id from players where discord = @discord',
+      {['discord'] =  discordTo},
+      function(to)
+        MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, player_item  WHERE player_item.item= items.id and player_item.player = @player",
+          {
+            ['@player'] = to,
+          }, function(weight)
+          MySQL.Async.fetchScalar("SELECT weight FROM `items` WHERE id = @type",
+          {
+            ['@type'] = type,
+          }, function(newWeight)
+            weight = (newWeight*amount)+weight
+            if weight < maxWeight then
+              MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
+              {['id'] = id,
+              ['amount'] = amount,
               ['type'] = type},
-              function(res)
-                MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
-                {['id'] = res[1].id,
-                ['amount'] = amount,
-                ['type'] = type},
-                function(res)
-                  print("don reéussi2")
+              function(affectedRows)
+                  MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+                  {['id'] = to,
+                  ['amount'] = amount,
+                  ['type'] = type},
+                  function(res)
+                    TriggerClientEvent("bf:Notification", sourceValue, "Vous avez donné ~g~" .. type.. " X " .. amount)
+                    TriggerClientEvent("bf:Notification", to, "Vous avez reçu un item")
+                  end)
                 end)
-              end)
-            end)
-        else
-          
-        end
+            else
+              TriggerClientEvent("bf:Notification", sourceValue, "La personne a trop de ~r~poids")
+              TriggerClientEvent("bf:Notification", to, "Vous portez trop de poids !")
+            end
+          end)
+        end)
       end)
     end)
+  end)
 end)

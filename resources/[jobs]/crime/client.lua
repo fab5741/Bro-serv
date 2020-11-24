@@ -112,8 +112,7 @@ Citizen.CreateThread(function()
 				if not isCollecting then
 					isCollecting = true
 					Wait(5000)
-					TriggerServerEvent("items:add",  20, 1)
-					exports.bf:Notification("Vous récoltez un peu de weed (non traité)")
+					TriggerServerEvent("items:add",  20, 1, "Vous récoltez un peu de ~g~weed (non traité)")
 					isCollecting = false
 				end
 			end

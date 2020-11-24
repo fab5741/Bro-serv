@@ -5,10 +5,10 @@ inService = {
     },
     lsms = {
     },
-    Fermiers = {
+    farm = {
 
     },
-    Vignerons = {
+    wine = {
 
     },
 }
@@ -313,7 +313,7 @@ AddEventHandler('job:lsms:distress', function(player)
     print("appel recu de " .. player)
 
     --TODO disable or true, when phone woirking
-    if #inService["LSMS"] == 0 or true then
+    if #inService["lsms"] == 0 or true then
         TriggerClientEvent('job:lsms:revive', source)
     else
         TriggerClientEvent('bf:Notification', sourceValue, "Appel en cours")

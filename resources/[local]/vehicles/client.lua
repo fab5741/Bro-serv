@@ -460,23 +460,6 @@ end)
 
 local menuOpened = 0
 
-local function isPedDrivingAVehicle()
-	local ped = GetPlayerPed(-1)
-	vehicle = GetVehiclePedIsIn(ped, false)
-	if IsPedInAnyVehicle(ped, false) then
-		-- Check if ped is in driver seat
-		if GetPedInVehicleSeat(vehicle, -1) == ped then
-			local class = GetVehicleClass(vehicle)
-			-- We don't want planes, helicopters, bicycles and trains
-			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
-				return true
-			end
-		end
-	end
-	return false
-end
-
-
 RegisterNetEvent("ds:belt")
 
 AddEventHandler("ds:belt", function(belt)
@@ -845,7 +828,7 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(50)
 		local ped = GetPlayerPed(-1)
-		if isPedDrivingAVehicle() then
+		if exports.bf:isPedDrivingAVehicle() then
 			vehicle = GetVehiclePedIsIn(ped, false)
 			vehicleClass = GetVehicleClass(vehicle)
 			healthEngineCurrent = GetVehicleEngineHealth(vehicle)
@@ -1007,7 +990,7 @@ Citizen.CreateThread(function()
 		elseif zoneType == "shops-job" and IsControlJustPressed(1, 51) then
 				TriggerServerEvent("vehicle:shop:job:get:all", "vehicle:job:shop")		
 		elseif zoneType == "parking" and IsControlJustPressed(1, 51) then
-			if isPedDrivingAVehicle() then
+			if exports.bf:isPedDrivingAVehicle() then
 				exports.bf:SetMenuValue("parking-veh", {
 					buttons = {
 						{
@@ -1030,13 +1013,13 @@ Citizen.CreateThread(function()
 				TriggerServerEvent("vehicle:parking:get:all", zone, "vehicle:foot")
 			end
 		elseif zoneType == "depots" and IsControlJustPressed(1, 51) then
-			if isPedDrivingAVehicle() then
+			if exports.bf:isPedDrivingAVehicle() then
 				exports.bf:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
 			else
 				TriggerServerEvent("vehicle:depots:get:all", "vehicle:depots")
 			end
 		elseif zoneType == "ds" and IsControlJustPressed(1, 51) then
-			if isPedDrivingAVehicle() then
+			if exports.bf:isPedDrivingAVehicle() then
 				exports.bf:Notification('~r~Tu ne peux pas passer le permis de voiture en conduisant.')
 			else
 				exports.bf:OpenMenu("ds")

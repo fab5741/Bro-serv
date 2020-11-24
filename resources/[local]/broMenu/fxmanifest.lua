@@ -8,6 +8,7 @@ version '0.0.1'
 dependencies {
     'bf',
     'account',
+    'items',
     'vehicles',
     'jobManager'
 }

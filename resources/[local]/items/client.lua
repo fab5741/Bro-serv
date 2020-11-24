@@ -18,8 +18,7 @@ end)
 
 RegisterNetEvent("items:eat")
 AddEventHandler("items:eat", function()
-    print("EATT")
-    prop_name = prop_name or 'prop_cs_burger_01'
+    local prop_name = 'prop_cs_burger_01'
 
     Citizen.CreateThread(function()
         local playerPed = PlayerPedId()
@@ -39,7 +38,7 @@ end)
 
 RegisterNetEvent("items:drink")
 AddEventHandler("items:drink", function()
-    prop_name = prop_name or 'prop_ld_flow_bottle'
+    local prop_name = 'prop_ld_flow_bottle'
 
     Citizen.CreateThread(function()
         local playerPed = PlayerPedId()

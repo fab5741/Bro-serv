@@ -59,6 +59,10 @@ Citizen.CreateThread(function()
 		title = "Magasin",
 		position = 1,
 	})
+	exports.bf:AddMenu("storage", {
+		title = "Entreprôt",
+		position = 1,
+	})
 	for k,v in pairs(config.Zones) do
 		exports.bf:AddArea("shops"..v.id, {
 			marker = {
@@ -94,6 +98,40 @@ Citizen.CreateThread(function()
 				},
 			}
 		})
+		exports.bf:AddArea("storage"..v.id, {
+			marker = {
+				weight = 0.5,
+				height = 0.3,
+			},
+			trigger = {
+				weight = 1,
+				enter = {
+					callback = function()
+						exports.bf:HelpPromt("Vendre : ~INPUT_PICKUP~")
+						zoneType = "storage"
+						zone = v.id
+					end
+				},
+				exit = {
+					callback = function()
+						zoneType = nil
+						zone = 0
+					end
+				},
+			},
+			blip = {
+				text = "Entrepôt",
+				colorId = 2,
+				imageId = 52,
+			},
+			locations = {
+				{
+					x= v.storage.x,
+					y= v.storage.y,
+					z= v.storage.z
+				},
+			}
+		})
 
 		-- spawn apu
 		RequestModel(GetHashKey(v.pnj.model))
@@ -118,7 +156,8 @@ Citizen.CreateThread(function()
 		if zone ~= nil and zoneType ~= nil and IsControlJustPressed(1,config.bindings.interact_position) then
 			if zoneType == "shops" then
 				TriggerServerEvent("shops:items:get", "shops:open", zone)
-				exports.bf:OpenMenu(zoneType..zone)
+			elseif zoneType == "storage" then
+				TriggerEvent("storage:open")
 			end
 		end
 	end
@@ -232,13 +271,51 @@ Citizen.CreateThread(function()
     end
 end)
 
+RegisterNetEvent("storage:open")
+-- close the menu when script is stopping to avoid being stuck in NUI focus
+AddEventHandler('storage:open', function()
+	buttons = {}
+	buttons[#buttons+1] = {
+		text = "Vendre pain ~g~3$",
+		exec = {
+			callback = function()
+				TriggerServerEvent("shops:sell", zone, 13, 1)
+			end
+		},
+	}
+	buttons[#buttons+1] = {
+		text = "Consulter le stock (Pain)",
+		exec = {
+			callback = function()
+				TriggerServerEvent("shops:stock", zone, 13)
+			end
+		},
+	}
+	buttons[#buttons+1] = {
+		text = "Quitter",
+		exec = {
+			callback = function()
+				exports.bf:CloseMenu("storage")
+				exports.bf:RemoveMenu("storage")
+			end
+		},
+	}
+	exports.bf:SetMenuValue("storage", {
+		buttons = buttons
+	})
+	exports.bf:OpenMenu("storage")
+end)
+
+
 
 AddEventHandler('onResourceStop', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
 	  return
 	end
 	exports.bf:RemoveMenu("CurrentShop")
+	exports.bf:RemoveMenu("storage")
 	for k,v in pairs(config.Zones) do
 		exports.bf:RemoveArea("shops"..v.id)
+		exports.bf:RemoveArea("storage"..v.id)
 	end
 end)

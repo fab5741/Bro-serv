@@ -1,7 +1,12 @@
 fx_version 'adamant'
 games { 'gta5' }
 
-dependency 'bf'
+dependencies {
+    'bf',
+    'vehicles',
+    'lsms', 
+    'account'   
+}
 
 client_script {
     'config.lua',

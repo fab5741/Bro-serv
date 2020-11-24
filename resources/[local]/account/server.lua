@@ -74,7 +74,7 @@ AddEventHandler('account:job:get', function(cb, job)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where jobs.name = @job and players.id = job_account.player and accounts.id = job_account.account', {
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account  where job_account.job = @job and accounts.id = job_account.account', {
 			['@job'] = job
 		}, function(amount)
 			TriggerClientEvent(cb, sourceValue, amount)
@@ -86,7 +86,7 @@ AddEventHandler('account:job:add', function(cb, amount, job)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE jobs.name = @job and job_account.account= accounts.id ', 
+		MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
 			{
 				['@job'] = job, 
 				['@amount'] = amount
@@ -100,13 +100,12 @@ AddEventHandler('account:job:withdraw', function(cb, job, amount)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local job = job
-
 	MySQL.ready(function ()
-		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where jobs.name = @job and players.id = job_account.player and accounts.id = job_account.account', {
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where job_account.job = @job and accounts.id = job_account.account', {
 			['@job'] = job
 		}, function(money)
 			if money > amount then
-				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount - @amount WHERE jobs.name = @job and job_account.account= accounts.id ', 
+				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount - @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
 				{
 					['@job'] = job,
 					['@amount'] = amount

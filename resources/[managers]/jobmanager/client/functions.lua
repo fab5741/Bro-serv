@@ -1,192 +1,8 @@
-local buttons = {}
-local isCollecting = false
-local lastLocation = false
-
---items
-function collect(location, job)
-    buttons = {}
-
-    for k, v in pairs(location.items) do
-        buttons[#buttons+1] = {name = tostring(v.label), func = "collectItem", params = v.type}
-    end
-
-    buttons[#buttons+1] = {name = "Arreter le farming", func = "CloseMenu", params = ""}
-    
-    if anyMenuOpen.menuName ~= "collect" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Collecte",
-			subtitle = "Céréales",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "collect"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
-end
-
-local timeCollecting = 0
-
-function collectItem(item)
-    for k, v in pairs(lastLocation.items) do
-        if(item == v.type)then
-            item = v
-        end
-    end
-    isCollecting = true
-    Wait(timeCollecting)
-    TriggerServerEvent('items:add', item.type,  item.amount) 
-    TriggerEvent("notify:SendNotification", 
-    {text= "Vous avez collecté", type = "info", timeout = 5000})
-    CloseMenu()
-    isCollecting = false
-end
-
-
-local buttons = {}
-local isprocessing = false
-local lastLocation = false
-function process(location, job)
-	for k in ipairs (buttons) do
-		buttons [k] = nil
-	end
-
-    for k, v in pairs(location.items) do
-        buttons[#buttons+1] = {name = tostring(v.label), func = "processItem", params = v.type}
-    end
-
-    buttons[#buttons+1] = {name = "Arreter la transformation", func = "CloseMenu", params = ""}
-    
-    if anyMenuOpen.menuName ~= "process" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Transformation",
-			subtitle = "Moulin",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "process"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
-end
-
-local timeprocessing = 0
-
-function processItem(item)
-    for k, v in pairs(lastLocation.items) do
-        if(item == v.type)then
-            item = v
-        end
-    end
-    isprocessing = true
-    Wait(timeprocessing)
-    
-    TriggerServerEvent('items:process', item.type,  item.amount, item.to,  item.amountTo) 
-    CloseMenu()
-    isprocessing = false
-end
-
-
-local timeprocessing = 0
-local isSelling = false
-
-function sellItem(data)
-    data = json.decode(data)
-    isSelling = true
-    --Wait(isSelling)
-    
-    TriggerServerEvent('jobs:sell', data.item, data.price, data.shop)
-    CloseMenu()
-    isSelling = false
-end
-
---safe
-function safe()
-    buttons = {}
-
-    buttons[#buttons+1] = {name = "Retirer", func = "safeWitdhraw"}
-    buttons[#buttons+1] = {name = "Déposer", func = "safeAdd"}
-    buttons[#buttons+1] = {name = "Quitter", func = "CloseMenu"}
-    
-    if anyMenuOpen.menuName ~= "sell" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Coffre",
-			subtitle = "Fermiers",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "sell"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
-end
-
-function safeWitdhraw()
-    CloseMenu()
-    anyMenuOpen.isActive = false
-    SendNUIMessage({
-        withdraw = true,
-        action = "openAmount"
-    })
-    SetNuiFocus(true, true)
-end
-
-function safeAdd()
-    CloseMenu()
-    anyMenuOpen.isActive = false
-    SendNUIMessage({
-        withdraw = false,
-        action = "openAmount"
-    })
-    SetNuiFocus(true, true)
-end
-
-
--- parkings
-function parking(job)
-    buttons = {}
-
-    if IsPedOnFoot(PlayerPedId())  then
-        buttons[#buttons+1] = {name = "Sortir", func = "getVehicles", params= job}
-    else
-        buttons[#buttons+1] = {name = "Rentrer", func = "storeVehicle"}
-    end
-    buttons[#buttons+1] = {name = "Quitter", func = "CloseMenu"}
-    
-    if anyMenuOpen.menuName ~= "parking" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Parking",
-			subtitle = "Fermiers",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "parking"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
-end
-
 -- LSMS Revive people
-function revivePlayer(closestPlayer)
-    local closestPlayerPed = GetPlayerPed(closestPlayer)
+function reviveClosestPlayer(closestPlayer)
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
 
-    if IsPedDeadOrDying(closestPlayerPed, 1) then
+    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) then
         local playerPed = PlayerPedId()
         local lib, anim = 'mini@cpr@char_a@cpr_str', 'cpr_pumpchest'
         exports.bf:Notification("Réanimation en cours")
@@ -196,9 +12,8 @@ function revivePlayer(closestPlayer)
             if i % 15 == 0 then
                 exports.bf:Notification("Réanimation en cours "..i.."/15")
             end
-            --ESX.Streaming.RequestAnimDict(lib, function()
-             --   TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
-            --end)
+			RequestAnimDict(lib)
+			TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
         end
         TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayer))
     else
@@ -206,46 +21,11 @@ function revivePlayer(closestPlayer)
     end
 end
 
-
-function GetPlayers()
-    local players = {}
-    for i = 0, 31 do
-        if NetworkIsPlayerActive(i) then
-            table.insert(players, i)
-        end
-    end
-    return players
-end
-
-
-function GetClosestPlayer()
-	local players = GetPlayers()
-	local closestDistance = -1
-	local closestPlayer = -1
-	local ply = PlayerPedId()
-	local plyCoords = GetEntityCoords(ply, 0)
-	
-	for index,value in ipairs(players) do
-		local target = GetPlayerPed(value)
-		if(target ~= ply) then
-			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
-			if(closestDistance == -1 or closestDistance > distance) then
-				closestPlayer = value
-				closestDistance = distance
-			end
-		end
-	end
-	
-	return closestPlayer, closestDistance
-end
-
 function RespawnPed(ped, coords, heading)
 	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
 	NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
 	SetPlayerInvincible(ped, false)
     ClearPedBloodDamage(ped)
-    
 	--TriggerEvent('spawn:spawn')
 end
 
@@ -693,6 +473,9 @@ end
 function createMenuAndArea(job)
 	ClearAllBlipRoutes()
 
+	-- create menus
+	menus()
+	
 	exports.bf:AddArea("center", {
 		marker = {
 			weight = 1,
@@ -770,7 +553,6 @@ function createMenuAndArea(job)
 		end
 	end
 	-- Draw areas 
-	print(job.name)
 	if job ~= nil and job.name ~= nil then
 		myjob = config.jobs[job.name]
 		if myjob then
@@ -798,7 +580,7 @@ function createMenuAndArea(job)
 							},
 						},
 						blip = {
-							text = job.job.. " Vestiaire "..k,
+							text = job.label.. " Vestiaire "..k,
 							imageId	= v.sprite,
 							colorId = myjob.color,
 						},
@@ -818,7 +600,7 @@ function createMenuAndArea(job)
 								text = "Prendre le service",
 								exec = {
 									callback = function()
-										clockIn(job.job)
+										clockIn(job.name)
 									end
 								},
 							},
@@ -826,7 +608,7 @@ function createMenuAndArea(job)
 								text = "Quitter le service",
 								exec = {
 									callback = function()
-										clockOut(job.job)
+										clockOut(job.name)
 									end
 								},
 							},
@@ -858,7 +640,7 @@ function createMenuAndArea(job)
 							},
 						},
 						blip = {
-							text = job.job.. " Récolte "..k,
+							text = job.label.. " Récolte "..k,
 							imageId	= v.sprite,
 							colorId = myjob.color,
 						},
@@ -900,7 +682,7 @@ function createMenuAndArea(job)
 							},
 						},
 						blip = {
-							text = job.job.. " Traitement "..k,
+							text = job.label.. " Traitement "..k,
 							imageId	= v.sprite,
 							colorId = myjob.color,
 						},
@@ -942,7 +724,7 @@ function createMenuAndArea(job)
 							},
 						},
 						blip = {
-							text = job.job.. " Coffre "..k,
+							text = job.label.. " Coffre "..k,
 							imageId	= v.sprite,
 							colorId = myjob.color,
 						},
@@ -955,7 +737,7 @@ function createMenuAndArea(job)
 						},
 					})
 					exports.bf:AddMenu("safes"..k, {
-						title = job.job.." Coffre "..k,
+						title = job.label.." Coffre "..k,
 						position = 1,
 						
 					buttons = {
@@ -963,6 +745,7 @@ function createMenuAndArea(job)
 							text = "Retirer",
 							exec = {
 								callback = function()
+									print(job.job)
 									TriggerServerEvent('account:job:withdraw', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
 									TriggerServerEvent("job:get", "job:safe:open")		
 								end
@@ -972,7 +755,7 @@ function createMenuAndArea(job)
 							text = "Déposer",
 							exec = {
 								callback = function()
-									TriggerServerEvent('account:job:deposit', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent('account:job:add', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
 									TriggerServerEvent("job:get", "job:safe:open")		
 								end
 							},
@@ -1005,7 +788,7 @@ function createMenuAndArea(job)
 							},
 						},
 						blip = {
-							text = job.job.. " Armurerie "..k,
+							text = job.label.. " Armurerie "..k,
 							imageId	= v.sprite,
 							colorId = myjob.color,
 						},
@@ -1018,7 +801,7 @@ function createMenuAndArea(job)
 						},
 					})
 					exports.bf:AddMenu("armories"..k, {
-						title = job.job.." Armurerie "..k,
+						title = job.label.." Armurerie "..k,
 						position = 1,
 						closable = false,
 						buttons= {
@@ -1086,7 +869,7 @@ function createMenuAndArea(job)
 						},
 					},
 					blip = {
-						text = job.job.. " Parking "..k,
+						text = job.label.. " Parking "..k,
 						imageId	= v.sprite,
 						colorId = myjob.color,
 					},
@@ -1099,7 +882,7 @@ function createMenuAndArea(job)
 					},
 				})
 				exports.bf:AddMenu("parking"..k, {
-					title = job.job.." Parking "..k,
+					title = job.label.." Parking "..k,
 					position = 1,
 				})
 				exports.bf:AddMenu("parking-veh", {
@@ -1135,7 +918,7 @@ function createMenuAndArea(job)
 						},
 					},
 					blip = {
-						text = job.job.. " Livraisons "..k,
+						text = job.label.. " Livraisons "..k,
 						imageId	= v.sprite,
 						colorId = myjob.color,
 					},
@@ -1150,5 +933,36 @@ function createMenuAndArea(job)
 				end
 			end
 		end
+	end
+end
+
+
+function openArmory()
+	DoScreenFadeOut(500)
+	Wait(600)
+
+	Wait(800)
+	armoryPed = createArmoryPed()
+
+	if not DoesCamExist(ArmoryRoomCam) then
+		ArmoryRoomCam = CreateCam("DEFAULT_SCRIPTED_FLY_CAMERA", true)
+		AttachCamToEntity(ArmoryRoomCam, PlayerPedId(), 0.0, 0.0, 1.0, true)
+		PointCamAtEntity(ArmoryRoomCam, armoryPed, 0.0, -30.0, 1.0, true)
+
+		SetCamRot(ArmoryRoomCam, 0.0,0.0, GetEntityHeading(PlayerPedId()))
+		SetCamFov(ArmoryRoomCam, 70.0)							
+	end
+
+	Wait(100)
+	DoScreenFadeIn(500)
+
+	if DoesEntityExist(armoryPed) then
+		TaskTurnPedToFaceEntity(PlayerPedId(), armoryPed, -1)
+	end							
+
+	Wait(300)
+	exports.bf:OpenMenu(zoneType..zone)
+	if not IsAmbientSpeechPlaying(armoryPed) then
+		PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_GREETSHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
 	end
 end

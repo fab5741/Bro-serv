@@ -60,6 +60,8 @@ end
 --
 function spawnCar(vehicleName, keep, pos, direct)
     print("spawn car")
+    print(vehicleName)
+    print(pos)
     -- check if the vehicle actually exists
     if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
         return false
@@ -105,5 +107,5 @@ function spawnCar(vehicleName, keep, pos, direct)
 
     -- release the model
     SetModelAsNoLongerNeeded(vehicleName)
-    return true
+    return vehicle
 end

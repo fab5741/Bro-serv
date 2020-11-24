@@ -1,6 +1,6 @@
 config = {
     jobs = {
-        Fermiers = {
+        farm = {
             color= 24,
             label= "Fermiers",
             lockers = {
@@ -82,7 +82,7 @@ config = {
                }
             }
         },
-        Vignerons = {
+        wine = {
             color = 50,
             label= "Vignerons",
             lockers = {

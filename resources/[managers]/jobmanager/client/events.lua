@@ -221,5 +221,5 @@ end)
 RegisterNetEvent("jobs:refresh")
 
 AddEventHandler("jobs:refresh", function(job)
-	refresh(job)
+	refresh(job[1])
 end)

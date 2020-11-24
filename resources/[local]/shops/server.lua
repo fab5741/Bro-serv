@@ -13,6 +13,8 @@ AddEventHandler('shops:buy', function(type, amount, shop_item)
 		price = 5
 	elseif type == 14 then 
 		price =5
+	elseif type == 19 then 
+		price =5
 	end
 
 	MySQL.ready(function ()
@@ -152,6 +154,8 @@ AddEventHandler('shops:sell', function(shop, type, amount)
 	if type == 13 then
 		price = 3
 	elseif type == 14 then 
+		price =3
+	elseif type == 19 then 
 		price =3
 	end
 

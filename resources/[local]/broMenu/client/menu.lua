@@ -37,7 +37,7 @@ exports.bf:AddMenu("bro", {
                 callback = function()
                     if  exports.bf:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
                         -- on quitte le job
-                        TriggerServerEvent("job:set", 1, "Chomeur")
+                        TriggerServerEvent("job:set", 19, "Chomeur")
                         Wait(1000)
                         TriggerServerEvent("job:get", "jobs:refresh")
                     end

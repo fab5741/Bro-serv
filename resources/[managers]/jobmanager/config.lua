@@ -157,45 +157,46 @@ config = {
                }
             },
         },
-        Mecanos = {
-            color = 73,
-            coords = vector3(-362.1,-129.6,37.6),
-            blip = {
-            sprite = 402,
-            scale  = 1.8,
-            color  = 5,
-            string = "Mécanicien",
-            },
+        bennys = {
+            label= "Benny's",
+            color = 6,
             lockers = {
                 {
-                    coords = vector3(-342.291, -133.370, 38.009),
-                    blip = {
-                    sprite = 496,
-                    scale  = 0.4,
-                    color  = 5,
-                    string = "locker",
-                    },
-                    action = "lockers",
+                    coords = vector3(-207.11326599121,-1338.4561767578,34.894428253174),
+                    sprite = 366,
                 }
             },
-            collect = {
-            },
-            process = {
-            },
-            sell = {
+            homes = {
+                {
+                    coords = vector3(-202.81202697754,-1308.4766845703,31.292528152466),
+                    sprite = 446,
+                },
             },
             parking = {
-                coords = vector3(2034.92, 4989.24, 39.38),
-                blip = {
-                sprite = 357,
-                scale  = 1.2,
-                color  = 5,
-                string = "Parking",
-                },
-                action = "Parking",
+                {
+                    coords = vector3(-191.55186462402,-1289.8022460938,31.295974731445),
+                    spawn = vector3(-189.26739501953,-1289.5209960938,31.295974731445),
+                    heading = -15.0,
+                    blip = {
+                        sprite = 357,
+                        scale  = 1.2,
+                        color  = 5,
+                        string = "Parking",
+                    },
+                    action = "parking",
+                }
             },
+            safes = {
+                {
+                    coords = vector3(-204.34022521973,-1327.9340820312,34.894428253174),
+                    sprite = 568,
+                    action = "safe",
+                }
+            },
+            
         },
         lsms = {
+            label = "Hopital",
             color = 1, 
             lockers = {
                 {
@@ -258,12 +259,12 @@ config = {
             }
         },
         lspd = {
+            label= "LSPD",
             color = 77,
             lockers = {
                 {
                     coords = vector3(457.06948852539,-992.75042724609,30.689332962036),
                     sprite = 51,
-                    action = "lockers",
                 }
             },
             parking = {
@@ -367,6 +368,40 @@ config = {
                     }               
                 }
             }
+        },
+        taxi = {
+            label = "Taxis",
+            color = 46,
+            lockers = {
+                {
+                    coords = vector3(895.21557617188,-179.61032104492,74.700332641602),
+                    sprite = 51,
+                    action = "lockers",
+                }
+            },
+            safes = {
+                {
+                    coords = vector3(902.99401855469,-154.02682495117,83.497840881348),
+                    sprite = 568,
+                    action = "safe",
+                }
+            },
+            parking = {
+                {
+                    coords = vector3(899.93090820312,-173.07524108887,74.034690856934),
+                    spawn = vector3(906.25860595703,-185.95358276367,74.002990722656),
+                    heading = 90.0,
+                    sprite = 357,
+                    action = "parking",
+                }
+            },
+            homes = {
+                {
+                    coords = vector3(903.41430664062,-178.53988647461,74.006706237793),
+                    sprite = 198,
+                    action = "homes",
+                },
+            },
         }
     },
     center = {

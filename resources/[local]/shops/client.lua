@@ -172,6 +172,8 @@ AddEventHandler('shops:open', function(items)
 			v.price = 5
 		elseif v.item == 14 then
 			v.price = 5
+		elseif v.item == 19 then
+			v.price = 5
 		end
         buttons[#buttons+1] = {
             text = v.label.. " ~g~"..v.price.." $",
@@ -284,10 +286,26 @@ AddEventHandler('storage:open', function()
 		},
 	}
 	buttons[#buttons+1] = {
+		text = "Vendre Jus de raisin ~g~3$",
+		exec = {
+			callback = function()
+				TriggerServerEvent("shops:sell", zone, 19, 1)
+			end
+		},
+	}
+	buttons[#buttons+1] = {
 		text = "Consulter le stock (Pain)",
 		exec = {
 			callback = function()
 				TriggerServerEvent("shops:stock", zone, 13)
+			end
+		},
+	}
+	buttons[#buttons+1] = {
+		text = "Consulter le stock (Jus de raisin)",
+		exec = {
+			callback = function()
+				TriggerServerEvent("shops:stock", zone, 19)
 			end
 		},
 	}

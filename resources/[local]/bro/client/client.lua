@@ -786,17 +786,7 @@ Citizen.CreateThread(function ()
     return
 end)
 
-function carwash_DrawSubtitleTimed(m_text, showtime)
-	SetTextEntry_2('STRING')
-	AddTextComponentString(m_text)
-	DrawSubtitleTimed(showtime, 1)
-end
-
-function carwash_DrawNotification(m_text)
-	SetNotificationTextEntry('STRING')
-	AddTextComponentString(m_text)
-	DrawNotification(true, false)
-end
+shown = false
 
 Citizen.CreateThread(function ()
 	while true do
@@ -805,31 +795,37 @@ Citizen.CreateThread(function ()
 			for i = 1, #vehicleWashStation do
 				garageCoords2 = vehicleWashStation[i]
 				if GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)),  garageCoords2[1], garageCoords2[2], garageCoords2[3], true ) < 20 then
-					DrawMarker(1, garageCoords2[1], garageCoords2[2], garageCoords2[3], 0, 0, 0, 0, 0, 0, 5.0, 5.0, 2.0, 0, 157, 0, 155, 0, 0, 2, 0, 0, 0, 0)
+                    DrawMarker(1, garageCoords2[1], garageCoords2[2], garageCoords2[3], 0, 0, 0, 0, 0, 0, 5.0, 5.0, 2.0, 0, 157, 0, 155, 0, 0, 2, 0, 0, 0, 0)
+                else
+                    shown = false
 				end
-				if GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)),  garageCoords2[1], garageCoords2[2], garageCoords2[3], true ) < 5 then
-					carwash_DrawSubtitleTimed("Press [~g~ENTER~s~] to wash your vehicle!")
-					if IsControlJustPressed(1, Key) then
+                if GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)),  garageCoords2[1], garageCoords2[2], garageCoords2[3], true ) < 5 then
+               --     if not shown then
+                 --      exports.bf:Notification("[~g~ENTER~s~] pour nettoyé votre véhicle")
+                   --     show = true
+                   -- end
+                    if IsControlJustPressed(1, Key) then
 						TriggerServerEvent('carwash:checkmoney')
 					end
 				end
-			end
+            end
+        else 
+            shown = false
+
 		end
 	end
 end)
 
 RegisterNetEvent('carwash:success')
 AddEventHandler('carwash:success', function (price)
-	print("success")
 	WashDecalsFromVehicle(GetVehiclePedIsUsing(GetPlayerPed(-1)), 1.0)
-	SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(-1)))
-	carwash_DrawNotification("Your vehicle was ~y~cleaned~s~! ~g~-$" .. price .. "~s~!")
+    SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(-1)))
+    exports.bf:Notification("Votre véhicule à été nettoyer. pour ~g~ "..price .. " $")
 end)
 
 RegisterNetEvent('carwash:notenoughmoney')
 AddEventHandler('carwash:notenoughmoney', function ()
-	print("fail")
-	carwash_DrawNotification("~h~~r~You don't have enough money!")
+    exports.bf:Notification("Vous n'avez pas assez d'argent")
 end)
 
 --minimap changer street names

@@ -420,11 +420,19 @@ end
 
 function deleteMenuAndArea()
 	exports.bf:RemoveArea("center")
+	exports.bf:RemoveMenu("lsms")
+	exports.bf:RemoveMenu("lspd")
 	exports.bf:RemoveMenu("lspd-service")
+	exports.bf:RemoveMenu("bennys")
 	for kk, vv in pairs(config.jobs) do
 		if vv.homes then
 			for k, v in pairs(vv.homes) do
 				exports.bf:RemoveArea("homes"..kk..k)
+			end
+		end
+		if vv.repair then
+			for k, v in pairs(vv.repair) do
+				exports.bf:RemoveArea("repair"..kk..k)
 			end
 		end
 		if vv.lockers then
@@ -551,7 +559,46 @@ function createMenuAndArea(job)
 				})
 			end
 		end
+		if vv.repair then
+			for k, v in pairs(vv.repair) do
+				exports.bf:AddArea("repair"..kk..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Réparation Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "repair"
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = vv.label,
+						imageId	= v.sprite,
+						colorId = vv.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+			end
+		end
 	end
+	
 	-- Draw areas 
 	if job ~= nil and job.name ~= nil then
 		myjob = config.jobs[job.name]
@@ -919,6 +966,44 @@ function createMenuAndArea(job)
 					},
 					blip = {
 						text = job.label.. " Livraisons "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
+			if myjob.custom then
+				for k, v in pairs(myjob.custom) do
+				exports.bf:AddArea("custom"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Customisation Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "custom"
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Customisation "..k,
 						imageId	= v.sprite,
 						colorId = myjob.color,
 					},

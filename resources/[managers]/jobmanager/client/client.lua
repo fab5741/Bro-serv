@@ -58,6 +58,18 @@ Citizen.CreateThread(function()
 				end
 			elseif zoneType == "homes" then
 				TriggerServerEvent("job:avert:all", avert, "On vous demande à l'acceuil ~b~(".. avert.. ")")
+			elseif zoneType == "repair" then
+				if isPedDrivingAVehicle() then
+					exports.bf:OpenMenu("repair")
+				else
+					exports.bf:Notification("Montez dans un véhicule")
+				end
+			elseif zoneType == "custom" then
+				if isPedDrivingAVehicle() then
+					exports.bf:OpenMenu("custom")
+				else
+					exports.bf:Notification("Montez dans un véhicule")
+				end
 			elseif zoneType == "center" then
 				exports.bf:OpenMenu("center")
 			elseif zoneType == "begin" then

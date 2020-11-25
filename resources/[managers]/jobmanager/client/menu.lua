@@ -331,6 +331,28 @@ function menus()
 		},
 	})
 
+	exports.bf:AddMenu("bennys", {
+		title = "Menu Benny's",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "Réparer voiture",
+				exec = {
+					callback = function()
+						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+						SetVehicleFixed(vehicle)
+						SetVehicleDeformationFixed(vehicle)
+						SetVehicleUndriveable(vehicle, false)
+						ClearPedTasksImmediately(playerPed)
+						exports.bf:Notification("Véhicle réparé")
+						exports.bf:CloseMenu("repair")
+					end
+				},
+			},
+		},
+	})
+
     -- job center
     buttons = {}
     for k, v in pairs(config.center.jobs) do
@@ -352,5 +374,338 @@ function menus()
         menuTitle = "Prendre un emploi",
         position = 1,
         buttons = buttons
-    })
+	})
+
+
+	exports.bf:AddMenu("repair", {
+        title = "Réparation",
+		position = 1,
+		buttons = {
+			{
+				text = "Réparer carrosserie (10$)",
+				exec = {
+					callback = function()
+						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+
+						SetVehicleFixed(vehicle)
+						SetVehicleDeformationFixed(vehicle)
+						SetVehicleUndriveable(vehicle, false)
+						ClearPedTasksImmediately(playerPed)
+						TriggerServerEvent("account:player:liquid:add", "", -10.0)
+						exports.bf:Notification("Véhicle réparé")
+						exports.bf:CloseMenu("repair")
+					end
+				},
+			},
+		}
+	})
+	exports.bf:AddMenu("custom", {
+        title = "Customisation",
+		position = 1,
+		buttons = {
+			{
+				text = "Peinture",
+				openMenu = "custom-paint"
+			},
+			{
+				text = "Spoilers",
+				openMenu = "custom-mod-0"
+			},
+			{
+				text = "Bumpers (devant)",
+				openMenu = "custom-mod-1"
+			},
+			{
+				text = "Bumpers (arriére)",
+				openMenu = "custom-mod-2"
+			},
+			{
+				text = "Side Skirt",
+				openMenu = "custom-mod-3"
+			},
+			{
+				text = "Exhaust",
+				openMenu = "custom-mod-4"
+			},
+			{
+				text = "Frame",
+				openMenu = "custom-mod-5"
+			},
+			{
+				text = "Grille",
+				openMenu = "custom-mod-6"
+			},
+			{
+				text = "Hood",
+				openMenu = "custom-mod-7"
+			},
+			{
+				text = "Fender",
+				openMenu = "custom-mod-8"
+			},
+			{
+				text = "Right Fender",
+				openMenu = "custom-mod-9"
+			},
+			{
+				text = "Toit",
+				openMenu = "custom-mod-10"
+			},
+			{
+				text = "Moteur",
+				openMenu = "custom-mod-11"
+			},
+			{
+				text = "Freins",
+				openMenu = "custom-mod-12"
+			},
+			{
+				text = "Transmission",
+				openMenu = "custom-mod-13"
+			},
+			{
+				text = "Klaxon",
+				openMenu = "custom-mod-14"
+			},
+			{
+				text = "Suspension",
+				openMenu = "custom-mod-15"
+			},
+			{
+				text = "Blindage",
+				openMenu = "custom-mod-16"
+			},
+			{
+				text = "Bumpers (devant)",
+				openMenu = "custom-mod-18"
+			},
+			{
+				text = "Roues",
+				openMenu = "custom-mod-19"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-20"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-21"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-22"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-23"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-24"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-25"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-26"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-27"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-28"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-29"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-30"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-31"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-32"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-33"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-34"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-35"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-36"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-37"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-38"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-39"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-40"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-41"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-42"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-43"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-44"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-45"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-46"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-47"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-48"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-49"
+			},
+			{
+				text = "",
+				openMenu = "custom-mod-50"
+			},
+		}
+	})
+	
+	exports.bf:AddMenu("custom-paint", {
+        title = "Customisation",
+		position = 1,
+		buttons = {
+			{
+				text = "Normal",
+				openMenu = "custom-paint-0"
+			},
+			{
+				text = "Metallic",
+				openMenu = "custom-paint-1"
+			},
+			{
+				text = "Pearl",
+				openMenu = "custom-paint-2"
+			},
+			{
+				text = "Mat",
+				openMenu = "custom-paint-3"
+			},
+			{
+				text = "Metal",
+				openMenu = "custom-paint-4"
+			},
+			{
+				text = "Chrome",
+				openMenu = "custom-paint-5"
+			},
+		}
+	})
+
+	function addMenuPaint(max, type) 
+		buttons = {}
+		for i = 0,max do
+			buttons[#buttons+1] = {
+				text = i,
+				hover = {
+					callback = function()
+						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+						SetVehicleModKit(
+							vehicle, 
+							0
+						)
+						SetVehicleModColor_1(
+							vehicle, 
+							type, 
+							i, 
+							0 -- always 0
+						)
+					end
+				},
+			}
+		end
+		exports.bf:AddMenu("custom-paint-"..type, {
+			title = "Peinture type"..type,
+			position = 1,
+			buttons = buttons
+		})	
+	end
+
+	addMenuPaint(75, 0)	
+	addMenuPaint(75, 1)	
+	addMenuPaint(75, 2)	
+	addMenuPaint(20, 3)	
+	addMenuPaint(5, 4)	
+	addMenuPaint(0, 5)	
+
+	function addMenuMod(type) 
+		buttons = {}
+		vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+
+		local max = GetNumVehicleMods(vehicle, type)
+		for i = 0,max do
+			buttons[#buttons+1] = {
+				text = i,
+				hover = {
+					callback = function()
+						SetVehicleMod(
+							vehicle, 
+							type, 
+							i, 
+							false -- always 0
+						)
+					end
+				},
+			}
+		end
+		exports.bf:AddMenu("custom-mod-"..type, {
+			title = "Mod "..type,
+			position = 1,
+			buttons = buttons
+		})	
+	end
+
+	for i = 0,50 do
+		addMenuMod(i)
+	end
+	
 end

@@ -83,7 +83,7 @@ RegisterNetEvent('job:open:menu')
 AddEventHandler("job:open:menu", function(job)  
 	job = job[1] 
 	print(job.name)
-	if job.name == "lsms" or job.name == "lspd" or job.name == "newspapers" then
+	if job.name == "lsms" or job.name == "lspd" or job.name == "newspapers" or job.name == "bennys" then
 		exports.bf:OpenMenu(job.name)
 	end
 end)

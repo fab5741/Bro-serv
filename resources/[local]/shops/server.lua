@@ -56,7 +56,11 @@ AddEventHandler('shops:buy', function(type, amount, shop_item)
 													['@money'] = pricee *(1-tva),
 												},
 												function(res)
+													MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
+													{['@discord'] =  discord, ['@price'] = pricee * tva},
+													function(numRows)
 														TriggerClientEvent("bf:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
+													end)
 												end)
 											end)
 										end)
@@ -78,7 +82,11 @@ AddEventHandler('shops:buy', function(type, amount, shop_item)
 														['@money'] = pricee *(1-tva),
 													},
 													function(res)
+														MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
+														{['@discord'] =  discord, ['@price'] = pricee * tva},
+														function(numRows)
 															TriggerClientEvent("bf:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
+														end)
 													end)
 												end)
 											end)

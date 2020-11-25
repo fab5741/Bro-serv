@@ -12,7 +12,6 @@ end)
 RegisterNetEvent('bf:liquid')
 
 AddEventHandler("bf:liquid", function(liquid) 
-	print(liquid)
   local buttons = {}
 	buttons[1] =     {
 		text = "Liquide : " .. liquid.. " $",

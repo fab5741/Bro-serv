@@ -131,21 +131,8 @@ RegisterNetEvent("jobs:sell")
 
 AddEventHandler('jobs:sell', function (item, price, shop)
     local source = source
-        for k,v in pairs(GetPlayerIdentifiers(source))do                
-            if string.sub(v, 1, string.len("steam:")) == "steam:" then
-            steamid = v
-            elseif string.sub(v, 1, string.len("license:")) == "license:" then
-            license = v
-            elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-            xbl  = v
-            elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-            ip = v
-            elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-            discord = v
-            elseif string.sub(v, 1, string.len("live:")) == "live:" then
-            liveid = v
-            end
-    end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
 
     MySQL.ready(function ()
         MySQL.Async.fetchAll('select money from shops where id = @id',{['id'] = shop},
@@ -191,21 +178,8 @@ AddEventHandler('job:safe:deposit', function (withdraw, amount, job)
     local source = source
     local withdraw = withdraw
     local amount = tonumber(amount)
-        for k,v in pairs(GetPlayerIdentifiers(source))do               
-            if string.sub(v, 1, string.len("steam:")) == "steam:" then
-            steamid = v
-            elseif string.sub(v, 1, string.len("license:")) == "license:" then
-            license = v
-            elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-            xbl  = v
-            elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-            ip = v
-            elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-            discord = v
-            elseif string.sub(v, 1, string.len("live:")) == "live:" then
-            liveid = v
-            end
-    end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
     MySQL.ready(function ()
         if withdraw then
             MySQL.Async.fetchAll('select money from jobs where name = @job',{['job'] = job},
@@ -256,21 +230,8 @@ RegisterNetEvent("job:parking:get")
 
 AddEventHandler('job:parking:get', function (cb, id, job)
     local source = source
-        for k,v in pairs(GetPlayerIdentifiers(source))do               
-            if string.sub(v, 1, string.len("steam:")) == "steam:" then
-            steamid = v
-            elseif string.sub(v, 1, string.len("license:")) == "license:" then
-            license = v
-            elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-            xbl  = v
-            elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-            ip = v
-            elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-            discord = v
-            elseif string.sub(v, 1, string.len("live:")) == "live:" then
-            liveid = v
-            end
-    end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
     MySQL.ready(function ()
         MySQL.Async.execute('Update job_vehicle SET parking="" where id = @id',{['id'] = id},
         function(affectedRows)
@@ -350,21 +311,8 @@ RegisterNetEvent("job:clock")
 
 AddEventHandler("job:clock", function (isIn, job)
     local sourceValue = source
-    for k,v in pairs(GetPlayerIdentifiers(source))do
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-    end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
     local isIn = isIn
     local job = job
     MySQL.ready(function ()
@@ -383,3 +331,64 @@ AddEventHandler("job:clock", function (isIn, job)
     end)
 end)
 
+
+-- job service manage
+
+
+RegisterNetEvent("job:service:recruit")
+
+AddEventHandler("job:service:recruit", function (job, player)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(player)
+    MySQL.ready(function ()
+        MySQL.Async.fetchScalar("SELECT min(grade), id FROM `job_grades` where job = @job",
+        {
+            ['@job'] = job,
+        }, function(job_grade)
+            MySQL.Async.execute('Update players SET job_grade = @job_grade where discord = @discord',
+            {
+                ['@discord'] = discord,
+                ['@job_grade'] = job_grade
+            },function(affectedRows)
+                if affectedRows > 0 then
+                    print(affectedRows)
+                end
+            end)
+        end)
+    end)
+end)
+
+RegisterNetEvent("job:service:promote")
+
+AddEventHandler("job:service:promote", function (player)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(player)
+    MySQL.ready(function ()
+        MySQL.Async.execute('Update players SET job_grade = @job_grade+1 where discord = @discord',
+        {
+            ['@discord'] = discord,
+            ['@job_grade'] = job_grade
+        },function(affectedRows)
+            if affectedRows > 0 then
+                print(affectedRows)
+            end
+        end)
+    end)
+end)
+RegisterNetEvent("job:service:demote")
+
+AddEventHandler("job:service:demote", function (player)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(player)
+    MySQL.ready(function ()
+        MySQL.Async.execute('Update players SET job_grade = @job_grade-1 where discord = @discord',
+        {
+            ['@discord'] = discord,
+            ['@job_grade'] = job_grade
+        },function(affectedRows)
+            if affectedRows > 0 then
+                print(affectedRows)
+            end
+        end)
+    end)
+end)

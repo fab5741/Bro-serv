@@ -8,7 +8,7 @@ function menus()
 				text = "SOIN",
 				exec = {
 					callback = function()
-						reviveClosestPlayer(closest)
+						reviveClosestPlayer()
 					end
 				},
 			},
@@ -708,4 +708,69 @@ function menus()
 		addMenuMod(i)
 	end
 	
+
+	exports.bf:AddMenu("taxi", {
+		title = "Menu Taxi",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+		{
+			text = "Vehicules",
+			exec = {
+				callback = function()
+					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
+				end
+			},
+		},
+		{
+			text = "Gestion service",
+			exec = {
+				callback = function()
+					TriggerServerEvent("job:isChef", "jobs:service:manage")
+				end
+			},
+		},
+	}
+	})
+
+	exports.bf:AddMenu("service", {
+		title = "Menu Service",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "Recruter",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:get", "job:recruit")
+					end
+				},
+			},
+			{
+				text = "Promouvoir",
+				exec = {
+					callback = function()
+						promoteClosestPlayer()
+					end
+				},
+			},
+			{
+				text = "Rétrograder",
+				exec = {
+					callback = function()
+						demoteClosestPlayer()
+					end
+				},
+			},
+			{
+				text = "Virer",
+				exec = {
+					callback = function()
+						fireClosestPlayer()
+					end
+				},
+			},
+		}
+	})
+
 end

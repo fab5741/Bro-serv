@@ -1,4 +1,21 @@
 RegisterNetEvent("vehicle:buy")
+RegisterNetEvent("vehicle:job:buy")
+RegisterNetEvent("vehicle:ds")
+RegisterNetEvent("vehicle:shop:get:all")
+RegisterNetEvent("vehicle:shop:job:get:all")
+RegisterNetEvent("vehicle:parking:get:all")
+RegisterNetEvent("vehicles:get:all")
+RegisterNetEvent("vehicles:jobs:get:all")
+RegisterNetEvent("vehicle:parking:get")
+RegisterNetEvent("vehicle:job:store")
+RegisterNetEvent("vehicle:store")
+RegisterNetEvent("vehicle:permis:give")
+RegisterNetEvent("vehicle:set:id")
+RegisterNetEvent("vehicle:permis:get")
+RegisterNetEvent("vehicle:job:parking")
+RegisterNetEvent("vehicle:player:get")
+RegisterNetEvent("vehicle:player:save")
+RegisterNetEvent("vehicle:player:saveId")
 
 AddEventHandler("vehicle:buy", function(cb, id)
 	local sourceValue = source
@@ -44,7 +61,6 @@ AddEventHandler("vehicle:buy", function(cb, id)
       end)
 end)
 
-RegisterNetEvent("vehicle:job:buy")
 
 AddEventHandler("vehicle:job:buy", function(cb, id, job)
 	local sourceValue = source
@@ -83,7 +99,6 @@ AddEventHandler("vehicle:job:buy", function(cb, id, job)
       end)
 end)
 
-RegisterNetEvent("vehicle:ds")
 
 AddEventHandler("vehicle:ds", function(cb, price)
 	local sourceValue = source
@@ -107,7 +122,6 @@ AddEventHandler("vehicle:ds", function(cb, price)
 	end)
 end)
 
-RegisterNetEvent("vehicle:shop:get:all")
 
 AddEventHandler("vehicle:shop:get:all", function(cb)
 	local sourceValue = source
@@ -119,7 +133,6 @@ AddEventHandler("vehicle:shop:get:all", function(cb)
 	end)
 end)
 
-RegisterNetEvent("vehicle:shop:job:get:all")
 
 AddEventHandler("vehicle:shop:job:get:all", function(cb)
 	local sourceValue = source
@@ -147,7 +160,6 @@ AddEventHandler("vehicle:depots:get:all", function(cb)
 	end)
 end)
 
-RegisterNetEvent("vehicle:parking:get:all")
 
 AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	local sourceValue = source
@@ -164,7 +176,6 @@ AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	end)
 end)
 
-RegisterNetEvent("vehicles:get:all")
 
 AddEventHandler("vehicles:get:all", function(cb)
 	local sourceValue = source
@@ -180,7 +191,6 @@ AddEventHandler("vehicles:get:all", function(cb)
 end)
 
 
-RegisterNetEvent("vehicles:jobs:get:all")
 
 AddEventHandler("vehicles:jobs:get:all", function(cb, job)
 	local sourceValue = source
@@ -195,7 +205,6 @@ AddEventHandler("vehicles:jobs:get:all", function(cb, job)
 	end)
 end)
 
-RegisterNetEvent("vehicle:parking:get")
 
 AddEventHandler("vehicle:parking:get", function(id, cb)
 	local sourceValue = source
@@ -214,7 +223,6 @@ AddEventHandler("vehicle:parking:get", function(id, cb)
 end)
 
 
-RegisterNetEvent("vehicle:store")
 
 AddEventHandler("vehicle:store", function(vehicle, parking)
 	local sourceValue = source
@@ -229,7 +237,6 @@ AddEventHandler("vehicle:store", function(vehicle, parking)
 end)
 
 
-RegisterNetEvent("vehicle:job:store")
 
 AddEventHandler("vehicle:job:store", function(vehicle, parking)
 	local sourceValue = source
@@ -243,7 +250,6 @@ AddEventHandler("vehicle:job:store", function(vehicle, parking)
 	end)
 end)
 
-RegisterNetEvent("vehicle:set:id")
 
 AddEventHandler("vehicle:set:id", function(vehicle, id)
 	local sourceValue = source
@@ -258,7 +264,6 @@ end)
 
 
 -- Permis
-RegisterNetEvent("vehicle:permis:give")
 
 AddEventHandler("vehicle:permis:give", function()
 	local sourceValue = source
@@ -273,7 +278,6 @@ AddEventHandler("vehicle:permis:give", function()
 	end)
 end)
 
-RegisterNetEvent("vehicle:permis:get")
 
 AddEventHandler("vehicle:permis:get", function(cb)
 	local sourceValue = source
@@ -290,24 +294,8 @@ AddEventHandler("vehicle:permis:get", function(cb)
 end)
 
 
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(5000)
-		MySQL.ready(function ()
-				MySQL.Async.fetchAll('select * from player_vehicle, vehicles where parking = "" and vehicles.id = player_vehicle.vehicle',{},
-				function(res)
-					for k,v in pairs(res) do    
-				--	print(v.gameId)
-					end       
-				end)
-		end)
-	end
-end)
-
 
 --jobs
-RegisterNetEvent("vehicle:job:parking")
-
 AddEventHandler("vehicle:job:parking", function(cb, job)
 	local sourceValue = source
 	
@@ -319,5 +307,85 @@ AddEventHandler("vehicle:job:parking", function(cb, job)
 	end)
 end)
 
+AddEventHandler("vehicle:player:saveId", function(cb, gameId, lastGameId)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	print(gameId)
+	print(lastGameId)
+	MySQL.ready(function ()
+		MySQL.Async.execute("Update player_vehicle,players set player_vehicle.gameId= @gameId where players.discord = @discord and player_vehicle.gameId = @lastGameId",
+		{
+			['@discord'] = discord,
+			['@gameId'] = gameId,
+			['@lastGameId'] = lastGameId,
+		},function(rows)
+			print(rows)
+		end)
+	end)
+end)
 
 
+AddEventHandler("vehicle:player:save", function(cb,
+	gameId,
+	coords,
+	primaryColour,
+	secondaryColour,
+	dirtLevel,
+	doorLockStatus,
+	engineHealth,
+	livery,
+	numberPlateText,
+	petrolTankHealth,
+	roofLivery,
+	windowTint
+)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+
+	print(vehicle)
+	print(engineHealth)
+	if livery == -1 then
+		livery = nil
+	end
+	MySQL.ready(function ()
+		MySQL.Async.execute("Update player_vehicle,players set player_vehicle.x= @x, player_vehicle.y=@y, player_vehicle.z=@z, bodyHealth = @bodyHealth, primaryColour = @primaryColour, secondaryColour = @secondaryColour, dirtLevel = @dirtLevel,	doorLockStatus = @doorLockStatus, engineHealth = @engineHealth, livery = @livery, numberPlateText = @numberPlateText,	petrolTankHealth = petrolTankHealth,roofLivery = @roofLivery, windowTint = @windowTint where players.discord = @discord and player_vehicle.gameId = @gameId",
+		{
+			['@discord'] = discord,
+			['@gameId'] = gameId,
+			['@x'] = coords.x,
+			['@y'] = coords.y,
+			['@z'] = coords.z,
+			['@bodyHealth'] = GetVehicleBodyHealth(vehicle),
+			['@primaryColour'] = primaryColour,
+			['@secondaryColour'] = secondaryColour,
+			['@dirtLevel'] = dirtLevel,
+			['@doorLockStatus'] = doorLockStatus,
+			['@engineHealth'] = engineHealth,
+			['@fuelLevel'] = fuelLevel,
+			['@livery'] = livery,
+			['@numberPlateText'] = numberPlateText,
+			['@petrolTankHealth'] = petrolTankHealth,
+			['@roofLivery'] = roofLivery,
+			['@windowTint'] = windowTint,
+ 		},function(rows)
+			print(rows)
+		end)
+	end)
+end)
+
+
+AddEventHandler("vehicle:player:get", function(cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+	MySQL.ready(function ()
+		MySQL.Async.fetchAll("select player_vehicle.gameId, player_vehicle.x,player_vehicle.y, player_vehicle.z, vehicles.name,  player_vehicle.primaryColour, player_vehicle.secondaryColour,	player_vehicle.dirtLevel,player_vehicle.engineHealth from player_vehicle, players, vehicles where vehicles.id = player_vehicle.vehicle and players.discord = @discord and parking = ''",
+		{
+			['@discord'] = discord,
+			['@gameId'] = gameId,
+		},function(res)
+			TriggerClientEvent(cb, sourceValue, res)
+		end)
+	end)
+end)

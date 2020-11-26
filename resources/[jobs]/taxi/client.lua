@@ -18,8 +18,6 @@ config.JobLocations = {
 }
 
 config.DrawDistance               = 10.0 -- How close do you need to be for the markers to be drawn (in GTA units).
-
-config.NPCJobEarnings             = {min = 300, max = 600}
 config.MinimumDistance            = 0 -- Minimum NPC job destination distance from the pickup in GTA units, a higher number prevents nearby destionations.
 
 

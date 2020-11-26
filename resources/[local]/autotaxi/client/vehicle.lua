@@ -34,7 +34,7 @@ function CreateTaxi(x, y, z)
 				-- GetClosestVehicleNodeWithHeading(x, y, z, outPosition, outHeading, nodeType, p6, p7)
 				local sX, sY, sZ = table.unpack(vector)
 
-				DisplayNotify(i18n.translate("taxi_contact"), i18n.translate("taxi_dispatch"))
+				DisplayNotify("taxi_contact", "taxi_dispatch")
 				PlaySoundFrontend(-1, "Text_Arrive_Tone", "Phone_SoundSet_Default", 1)
 				Wait(2000)
 
@@ -55,7 +55,7 @@ function CreateTaxi(x, y, z)
 
 				return taxiVeh
 			else
-				DisplayNotify(i18n.translate("taxi_contact"), i18n.translate("drivers_busy"))
+				DisplayNotify("taxi_contact", "drivers_busy")
 			end
 		end
 	end	

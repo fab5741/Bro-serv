@@ -58,10 +58,8 @@ end
 --
 -- Spawn A car
 --
-function spawnCar(vehicleName, keep, pos, direct)
-    print("spawn car")
-    print(vehicleName)
-    print(pos)
+function spawnCar(vehicleName, keep, pos, direct, notp)
+    print(notp)
     -- check if the vehicle actually exists
     if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
         return false
@@ -81,6 +79,8 @@ function spawnCar(vehicleName, keep, pos, direct)
         pos = GetEntityCoords(playerPed) -- get the position of the local player ped
     end
 
+    ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
+
     -- create the vehicle
     local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
 
@@ -89,16 +89,20 @@ function spawnCar(vehicleName, keep, pos, direct)
 
     SetVehRadioStation(vehicle, "OFF")	
     
-	local netid = NetworkGetNetworkIdFromEntity(policevehicle)
+	local netid = NetworkGetNetworkIdFromEntity(vehicle)
 	SetNetworkIdCanMigrate(netid, true)
-	NetworkRegisterEntityAsNetworked(VehToNet(policevehicle))
+	NetworkRegisterEntityAsNetworked(VehToNet(vehicle))
 
-    if direct then
-        SetPedIntoVehicle(playerPed, vehicle, -1)
-    else
-        TaskWarpPedIntoVehicle(playerPed, policevehicle, -1)
+
+    if not notp then
+        print(notp)
+        if direct then
+            SetPedIntoVehicle(playerPed, vehicle, -1)
+        else
+            TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+        end
     end
-	SetEntityInvincible(policevehicle, false)	
+	SetEntityInvincible(vehicle, false)	
 
     -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
     if not keep then

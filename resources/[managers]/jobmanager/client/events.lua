@@ -83,7 +83,7 @@ RegisterNetEvent('job:open:menu')
 AddEventHandler("job:open:menu", function(job)  
 	job = job[1] 
 	print(job.name)
-	if job.name == "lsms" or job.name == "lspd" or job.name == "newspapers" or job.name == "bennys" then
+	if job.name == "lsms" or job.name == "lspd" or job.name == "newspapers" or job.name == "bennys"  or job.name == "taxi" then
 		exports.bf:OpenMenu(job.name)
 	end
 end)
@@ -208,10 +208,8 @@ end)
 RegisterNetEvent('jobs:service:manage')
 
 AddEventHandler("jobs:service:manage", function(grade)
-	exports.bf:OpenMenu("lspd-service")
-
 	if grade == 5 then
-		exports.bf:OpenMenu("service")
+		exports.bf:NextMenu("service")
 	else
 		exports.bf:Notification("~r~Vous n'êtes pas chef de service !")
 	end
@@ -222,4 +220,10 @@ RegisterNetEvent("jobs:refresh")
 
 AddEventHandler("jobs:refresh", function(job)
 	refresh(job[1])
+end)
+
+RegisterNetEvent("jobs:recruit")
+
+AddEventHandler("jobs:recruit", function(job) 
+	recruitClosestPlayer(job)
 end)

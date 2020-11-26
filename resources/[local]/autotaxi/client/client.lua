@@ -105,7 +105,7 @@ Citizen.CreateThread(function()
 								end
 
 								if GetGameTimer() > TaxiInfoTimer + 1000 and GetGameTimer() < TaxiInfoTimer + 10000 then
-									DisplayHelpMsg(i18n.translate("info_waypoint_message"))
+									DisplayHelpMsg("info_waypoint_message")
 								end
 							elseif DoesBlipExist(GetFirstBlipInfoId(8)) then
 								dx, dy, dz = table.unpack(Citizen.InvokeNative(0xFA7C7F0AADF25D09, GetFirstBlipInfoId(8), Citizen.ResultAsVector()))

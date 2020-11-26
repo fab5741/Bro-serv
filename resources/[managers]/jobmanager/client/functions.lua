@@ -424,6 +424,8 @@ function deleteMenuAndArea()
 	exports.bf:RemoveMenu("lspd")
 	exports.bf:RemoveMenu("lspd-service")
 	exports.bf:RemoveMenu("bennys")
+	exports.bf:RemoveMenu("service")
+	exports.bf:RemoveMenu("taxi")
 	for kk, vv in pairs(config.jobs) do
 		if vv.homes then
 			for k, v in pairs(vv.homes) do
@@ -1050,4 +1052,48 @@ function openArmory()
 	if not IsAmbientSpeechPlaying(armoryPed) then
 		PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_GREETSHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
 	end
+end
+
+-- service management
+function recruitClosestPlayer(job)
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+
+    if closestPlayerPed then
+        TriggerServerEvent('job:service:recruit', job[1].id, GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
+end
+
+function promoteClosestPlayer()
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+
+    if closestPlayerPed then
+        TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
+end
+
+
+
+function demmoteClosestPlayer()
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+
+    if closestPlayerPed then
+        TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
+end
+
+
+function fireClosestPlayer()
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+
+    if closestPlayerPed then
+        TriggerServerEvent('job:set', 19, "Chomeur")
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
 end

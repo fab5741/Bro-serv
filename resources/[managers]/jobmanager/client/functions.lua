@@ -1,216 +1,1135 @@
-function drawBlip(location)
-    if location.blip and location.coords then
-        local blip = AddBlipForCoord(location.coords)
-        SetBlipSprite(blip, location.blip.sprite)
-        SetBlipScale(blip, location.blip.scale)
-        SetBlipColour(blip, location.blip.color)
-        SetBlipAsShortRange(blip, true)
+-- LSMS Revive people
+function reviveClosestPlayer(closestPlayer)
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
 
-        BeginTextCommandSetBlipName('STRING')
-        AddTextComponentSubstringPlayerName(location.string)
-        EndTextCommandSetBlipName(blip)
+    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) then
+        local playerPed = PlayerPedId()
+        local lib, anim = 'mini@cpr@char_a@cpr_str', 'cpr_pumpchest'
+        exports.bf:Notification("Réanimation en cours")
+        for i=1, 15 do
+            Citizen.Wait(900)
+
+            if i % 15 == 0 then
+                exports.bf:Notification("Réanimation en cours "..i.."/15")
+            end
+			RequestAnimDict(lib)
+			TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
+        end
+        TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
     end
 end
 
-function DrawTextOnSCreen(x, y, string)
-    SetTextFont(0)
-    SetTextScale(0.0, 0.3)
-    SetTextColour(128, 128, 128, 255)
-    SetTextDropshadow(0, 0, 0, 0, 255)
-    SetTextEdge(0, 1, 0, 0, 255)
-    SetTextDropShadow()
-    SetTextOutline()
-    SetTextEntry("STRING")
-    AddTextComponentString(string)
-    DrawText(x, y)
+function RespawnPed(ped, coords, heading)
+	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
+	NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
+	SetPlayerInvincible(ped, false)
+    ClearPedBloodDamage(ped)
+	--TriggerEvent('spawn:spawn')
 end
 
-function ServiceOn()
-	isInService = true
-	TriggerServerEvent("job:takeService")
-end
 
-function ServiceOff()
-	isInService = false
-	TriggerServerEvent("job:breakService")
-	
-	if config.enableOtherCopsBlips == true then
-		allServiceCops = {}
-		
-		for k, existingBlip in pairs(blipsCops) do
-			RemoveBlip(existingBlip)
+-- LSPD menu function
+function DoTraffic()
+	Citizen.CreateThread(function()
+		if not IsPedInAnyVehicle(PlayerPedId(), false) then
+			TaskStartScenarioInPlace(PlayerPedId(), "WORLD_HUMAN_CAR_PARK_ATTENDANT", 0, false)
+			Citizen.Wait(60000)
+			ClearPedTasksImmediately(PlayerPedId())
+			exports.bf:Notification("menu_doing_traffic_notification")
+		else
+			exports.bf:Notification(GetLabelText("PEN_EXITV"))
 		end
-		blipsCops = {}
+	end)
+end
+
+function Note()
+	Citizen.CreateThread(function()
+		if not IsPedInAnyVehicle(PlayerPedId(), false) then
+			TaskStartScenarioInPlace(PlayerPedId(), "WORLD_HUMAN_CLIPBOARD", 0, false)
+			Citizen.Wait(20000)
+			ClearPedTasksImmediately(PlayerPedId())
+		else
+			exports.bf:Notification(GetLabelText("PEN_EXITV"))
+		end
+	end)
+end
+
+function StandBy()
+	Citizen.CreateThread(function()
+		if not IsPedInAnyVehicle(PlayerPedId(), false) then
+			TaskStartScenarioInPlace(PlayerPedId(), "WORLD_HUMAN_COP_IDLES", 0, true)
+			Citizen.Wait(20000)
+			ClearPedTasksImmediately(PlayerPedId())
+		else
+			exports.bf:Notification(GetLabelText("PEN_EXITV"))
+		end
+    end)
+end
+
+function StandBy2()
+	Citizen.CreateThread(function()
+		if not IsPedInAnyVehicle(PlayerPedId(), false) then
+			TaskStartScenarioInPlace(PlayerPedId(), "WORLD_HUMAN_GUARD_STAND", 0, 1)
+			Citizen.Wait(20000)
+			ClearPedTasksImmediately(PlayerPedId())
+		else
+			exports.bf:Notification(GetLabelText("PEN_EXITV"))
+		end
+	end)
+end
+
+function CancelEmote()
+	Citizen.CreateThread(function()
+        ClearPedTasksImmediately(PlayerPedId())
+    end)
+end
+
+function CheckInventory()
+	local t, distance = GetClosestPlayer()
+	if(distance ~= -1 and distance < 3) then
+		TriggerServerEvent("lspd:targetCheckInventory", GetPlayerServerId(t))
+	else
+		exports.bf:Notification("Pas de joueur à proximité")
 	end
 end
 
+function RemoveWeapons()
+    local t, distance = GetClosestPlayer()
+    if(distance ~= -1 and distance < 3) then
+        TriggerServerEvent("lspd:removeWeapons", GetPlayerServerId(t))
+    else
+        exports.bf:Notification("Pas de joueur à proximité")
+    end
+end
 
-function CloseMenu()
-	SendNUIMessage({
-		action = "close"
+function ToggleCuff()
+	local t, distance = GetClosestPlayer()
+
+	if(distance ~= -1 and distance < 3) then
+		TriggerServerEvent("lspd:cuffGranted", GetPlayerServerId(t))
+	else
+		exports.bf:Notification("Pas de joueur à proximité")
+	end
+end
+
+function DragPlayer()
+	local t, distance = GetClosestPlayer()
+	if(distance ~= -1 and distance < 3) then
+		TriggerServerEvent("lspd:dragRequest", GetPlayerServerId(t))
+		TriggerEvent("lspd:notify", "CHAR_ANDREAS", 1, "Porter", false, "" .. GetPlayerName(serverTargetPlayer) .. "")
+	else
+		exports.bf:Notification("Pas de joueur à proximité")
+	end
+end
+
+function Fines(amount)
+	local t, distance = GetClosestPlayer()
+	
+	if(distance ~= -1 and distance < 3) then
+		Citizen.Trace("Price : "..tonumber(amount))
+		if(tonumber(amount) == -1) then
+			DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8S", "", "", "", "", "", 20)
+			while (UpdateOnscreenKeyboard() == 0) do
+				DisableAllControlActions(0);
+				Wait(0);
+			end
+			if (GetOnscreenKeyboardResult()) then
+				local res = tonumber(GetOnscreenKeyboardResult())
+				if(res ~= nil and res ~= 0) then
+					amount = tonumber(res)
+				end
+			end
+			
+			if(tonumber(amount) ~= -1) then
+				TriggerServerEvent("lspd:finesGranted", GetPlayerServerId(t), tonumber(amount))
+			end
+		else
+			TriggerServerEvent("lspd:finesGranted", GetPlayerServerId(t), tonumber(amount))
+		end
+	else
+		exports.bf:Notification("Pas de joueur à proximité")
+	end
+end
+
+function DropVehicle()
+	Citizen.CreateThread(function()
+		local pos = GetEntityCoords(PlayerPedId())
+		local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+
+		local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+		local _, _, _, _, vehicleHandle = GetRaycastResult(rayHandle)
+		if DoesEntityExist(vehicleHandle) and IsEntityAVehicle(vehicleHandle) then
+			DeleteEntity(vehicleHandle)
+		else
+			exports.bf:Notification("no_veh_near_ped")
+		end
+	end)
+end
+
+function SpawnSpikesStripe()
+	if IsPedInAnyPoliceVehicle(PlayerPedId()) then
+		local modelHash = GetHashKey("P_ld_stinger_s")
+		local currentVeh = GetVehiclePedIsIn(PlayerPedId(), false)	
+		local x,y,z = table.unpack(GetOffsetFromEntityInWorldCoords(currentVeh, 0.0, -5.2, -0.25))
+
+		RequestScriptAudioBank("BIG_SCORE_HIJACK_01", true)
+		Citizen.Wait(500)
+
+		RequestModel(modelHash)
+		while not HasModelLoaded(modelHash) do
+			Citizen.Wait(0)
+		end
+
+		if HasModelLoaded(modelHash) then
+			SpikeObject = CreateObject(modelHash, x, y, z, true, false, true)
+			SetEntityNoCollisionEntity(SpikeObject, PlayerPedId(), 1)
+			SetEntityDynamic(SpikeObject, false)
+			ActivatePhysics(SpikeObject)
+
+			if DoesEntityExist(SpikeObject) then			
+				local height = GetEntityHeightAboveGround(SpikeObject)
+
+				SetEntityCoords(SpikeObject, x, y, z - height + 0.05)
+				SetEntityHeading(SpikeObject, GetEntityHeading(PlayerPedId())-80.0)
+				SetEntityCollision(SpikeObject, false, false)
+				PlaceObjectOnGroundProperly(SpikeObject)
+
+				SetEntityAsMissionEntity(SpikeObject, false, false)				
+				SetModelAsNoLongerNeeded(modelHash)
+				PlaySoundFromEntity(-1, "DROP_STINGER", PlayerPedId(), "BIG_SCORE_3A_SOUNDS", 0, 0)
+			end			
+			exports.bf:Notification("Spike stripe~g~ deployed~w~.")
+		end
+	else
+		exports.bf:Notification("You need to get ~y~inside~w~ a ~y~police vehicle~w~.")
+		PlaySoundFrontend(-1, "ERROR", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+	end
+end
+
+function DeleteSpike()
+	local model = GetHashKey("P_ld_stinger_s")
+	local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(), true))
+
+	if DoesObjectOfTypeExistAtCoords(x, y, z, 0.9, model, true) then
+		local spike = GetClosestObjectOfType(x, y, z, 0.9, model, false, false, false)
+		DeleteObject(spike)
+	end	
+end
+
+local propslist = {}
+
+function SpawnProps(model)
+	if(#propslist < 100) then
+		local prophash = GetHashKey(tostring(model))
+		RequestModel(prophash)
+		while not HasModelLoaded(prophash) do
+			Citizen.Wait(0)
+		end
+
+		local offset = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.75, 0.0)
+		local _, worldZ = GetGroundZFor_3dCoord(offset.x, offset.y, offset.z)
+		local propsobj = CreateObjectNoOffset(prophash, offset.x, offset.y, worldZ, true, true, true)
+		local heading = GetEntityHeading(PlayerPedId())
+
+		SetEntityHeading(propsobj, heading)
+		SetEntityAsMissionEntity(propsobj)
+		SetModelAsNoLongerNeeded(prophash)
+
+		propslist[#propslist+1] = ObjToNet(propsobj)
+	end
+end
+
+function RemoveLastProps()
+	DeleteObject(NetToObj(propslist[#propslist]))
+	propslist[#propslist] = nil
+end
+
+function RemoveAllProps()
+	for i, props in pairs(propslist) do
+		DeleteObject(NetToObj(props))
+		propslist[i] = nil
+	end
+
+end
+
+
+--armory
+function createArmoryPed()
+	if not DoesEntityExist(armoryPed) then
+		local model = GetHashKey("s_m_y_cop_01")
+
+		RequestModel(model)
+		while not HasModelLoaded(model) do
+			Wait(0)
+		end
+
+		local armoryPed = CreatePed(26, model, 454.165, -979.999, 30.690, 92.298, false, false)
+		SetEntityInvincible(armoryPed, true)
+		TaskTurnPedToFaceEntity(armoryPed, PlayerId(), -1)		
+
+		return armoryPed
+	end
+end
+
+basic_kit = {
+	"WEAPON_STUNGUN",
+	"WEAPON_NIGHTSTICK",
+	"WEAPON_FLASHLIGHT",
+	"WEAPON_PISTOL"
+}
+
+function giveBasicKit()
+	for k,v in pairs(basic_kit) do
+		GiveWeaponToPed(PlayerPedId(), GetHashKey(v), -1, true, false)
+		-- ADD_AMMO_TO_PED
+		AddAmmoToPed(
+			PlayerPedId() --[[ Ped ]], 
+			GetHashKey(v) --[[ Hash ]], 
+			50 --[[ integer ]]
+		)
+	end
+
+	SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"), true)
+	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+end
+
+function giveBasicPrisonKit()
+	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_PISTOL50"), -1, true, true)
+	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_STUNGUN"), -1, true, true)
+	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_NIGHTSTICK"), 200, true, true)
+	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_FLASHLIGHT"), 200, true, true)
+
+	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+end
+
+function addBulletproofVest()
+	if(GetEntityModel(PlayerPedId()) == hashSkin) then
+		SetPedComponentVariation(PlayerPedId(), 9, 4, 1, 2)
+	else
+		SetPedComponentVariation(PlayerPedId(), 9, 6, 1, 2)
+	end
+
+	SetPedArmour(PlayerPedId(), 100)
+	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+end
+
+function removeBulletproofVest()
+	SetPedComponentVariation(PlayerPedId(), 9, 0, 1, 2)
+
+	SetPedArmour(PlayerPedId(), 0)
+	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+end
+
+function GiveCustomWeapon(weaponData)
+	GiveWeaponToPed(PlayerPedId(), GetHashKey(weaponData), -1, false, true)
+	SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"), true)
+	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+end
+
+function CloseArmory()
+    if not IsAnySpeechPlaying(armoryPed) then
+    	PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_BYESHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
+    end
+
+    Wait(850)
+	RenderScriptCams(false, 1, 1000, 1, 0, 0)
+	SetCamActive(ArmoryRoomCam, false)
+	DestroyCam(ArmoryRoomCam, true)
+
+	DoScreenFadeOut(500)
+	Wait(600)
+
+	if DoesEntityExist(armoryPed) then
+		DeleteEntity(armoryPed)
+	end
+
+	FreezeEntityPosition(PlayerPedId(), false)
+
+	Citizen.Wait(500)
+	DoScreenFadeIn(500)
+end
+
+--redirect callbacks
+function isPedDrivingAVehicle()
+	local ped = GetPlayerPed(-1)
+	vehicle = GetVehiclePedIsIn(ped, false)
+	if IsPedInAnyVehicle(ped, false) then
+		-- Check if ped is in driver seat
+		if GetPedInVehicleSeat(vehicle, -1) == ped then
+			local class = GetVehicleClass(vehicle)
+			-- We don't want planes, helicopters, bicycles and trains
+			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+
+function addBeginArea() 
+	beginInProgress = true
+	exports.bf:RemoveArea("begin-current")
+	points_coords = points[math.random(1,#points)]
+	exports.bf:AddArea("begin-current", {
+		marker = {
+			type = 1,
+			weight = 1,
+			height = 1,
+			red = 255,
+			green = 255,
+			blue = 153,
+		},
+		trigger = {
+			weight = 1,
+			enter = {
+				callback = function()
+					if 	GetVehiclePedIsIn(PlayerPedId(), false) == vehicleLivraison then
+						TriggerServerEvent("account:player:liquid:add", nil, 0.30)
+						exports.bf:Notification("Vous avez gagné ~g~0.30$")
+					else
+						exports.bf:Notification("Ou est passé votre vehicule de livraison ? non payé")
+					end
+					addBeginArea()
+				end
+			},
+		},
+		blip = {
+			text = "Livraison",
+			colorId = 38,
+			imageId = 77,
+			route = true,
+		},
+		locations = {
+			{
+				x = points_coords.x,
+				y = points_coords.y,
+				z = points_coords.z,
+			}
+		},
 	})
+end
+
+function refresh(job)
+	deleteMenuAndArea()
+	createMenuAndArea(job)
+end
+
+
+function deleteMenuAndArea()
+	exports.bf:RemoveArea("center")
+	exports.bf:RemoveMenu("lsms")
+	exports.bf:RemoveMenu("lspd")
+	exports.bf:RemoveMenu("lspd-service")
+	exports.bf:RemoveMenu("bennys")
+	exports.bf:RemoveMenu("service")
+	exports.bf:RemoveMenu("taxi")
+	for kk, vv in pairs(config.jobs) do
+		if vv.homes then
+			for k, v in pairs(vv.homes) do
+				exports.bf:RemoveArea("homes"..kk..k)
+			end
+		end
+		if vv.repair then
+			for k, v in pairs(vv.repair) do
+				exports.bf:RemoveArea("repair"..kk..k)
+			end
+		end
+		if vv.lockers then
+			for k, v in pairs(vv.lockers) do
+				exports.bf:RemoveArea("lockers"..k)
+				exports.bf:RemoveMenu("lockers"..k)
+			end
+		end
+		if vv.collect then
+			for k, v in pairs(vv.collect) do
+				exports.bf:RemoveArea("collect"..k)
+				exports.bf:RemoveMenu("collect"..k)
+			end
+		end
+		if vv.process then
+			for k, v in pairs(vv.process) do
+				exports.bf:RemoveArea("process"..k)
+				exports.bf:RemoveMenu("process"..k)
+			end
+		end
+		if vv.safes then
+			for k, v in pairs(vv.safes) do
+				exports.bf:RemoveArea("safes"..k)
+				exports.bf:RemoveMenu("safes"..k)
+			end
+		end
+		if vv.armories then
+			for k, v in pairs(vv.armories) do
+				exports.bf:RemoveArea("armories"..k)
+				exports.bf:RemoveMenu("armories"..k)
+			end
+		end
+		if vv.parking then
+			for k, v in pairs(vv.parking) do
+			exports.bf:RemoveArea("parking"..k)
+			end
+		end
+		if vv.begin then
+			for k, v in pairs(vv.begin) do
+			exports.bf:RemoveArea("begin"..k)
+			end
+		end
+	end
+end
+
+function createMenuAndArea(job)
+	ClearAllBlipRoutes()
+
+	-- create menus
+	menus()
 	
-	anyMenuOpen.menuName = ""
-	anyMenuOpen.isActive = false
-end
+	exports.bf:AddArea("center", {
+		marker = {
+			weight = 1,
+			height = 1,
+		},
+		trigger = {
+			weight = 1,
+			enter = {
+				callback = function()
+					exports.bf:HelpPromt("Job Center Key : ~INPUT_PICKUP~")
+					zoneType = "center"
+					zone = "global"
+				end
+			},
+			exit = {
+				callback = function()
+					zoneType = nil
+				end
+			},
+		},
+		blip = {
+			text = "Job Center",
+			imageId	= config.center.sprite,
+			colorId = config.center.color,
+		},
+		locations = {
+			{
+				x = config.center.pos.x,
+				y = config.center.pos.y,
+				z = config.center.pos.z,
+			},
+		},
+	})
 
-function DisplayHelpText(str)
-	BeginTextCommandDisplayHelp("STRING")
-	AddTextComponentSubstringPlayerName(str)
-	EndTextCommandDisplayHelp(0, 0, 1, -1)
-end
+	-- global to everyone
+	for kk, vv in pairs(config.jobs) do
+		if vv.homes then
+			for k, v in pairs(vv.homes) do
+				exports.bf:AddArea("homes"..kk..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Accueil Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "homes"
+								avert = kk
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = vv.label,
+						imageId	= v.sprite,
+						colorId = vv.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+			end
+		end
+		if vv.repair then
+			for k, v in pairs(vv.repair) do
+				exports.bf:AddArea("repair"..kk..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Réparation Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "repair"
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = vv.label,
+						imageId	= v.sprite,
+						colorId = vv.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+			end
+		end
+	end
+	
+	-- Draw areas 
+	if job ~= nil and job.name ~= nil then
+		myjob = config.jobs[job.name]
+		if myjob then
+			if myjob.lockers then
+				for k, v in pairs(myjob.lockers) do
+					exports.bf:AddArea("lockers"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "lockers"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Vestiaire "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("lockers"..k, {
+						title = "Vestiaire "..k,
+						position = 1,
+						buttons = {
+							{
+								text = "Prendre le service",
+								exec = {
+									callback = function()
+										clockIn(job.name)
+									end
+								},
+							},
+							{
+								text = "Quitter le service",
+								exec = {
+									callback = function()
+										clockOut(job.name)
+									end
+								},
+							},
+						},
+					})
+				end
+			end
+			if myjob.collect then
+				for k, v in pairs(myjob.collect) do
+					exports.bf:AddArea("collect"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Récolte Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "collect"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Récolte "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("collect"..k, {
+						title = "Récolte "..k,
+						position = 1,
+					})
+				end
+			end
+			if myjob.process then
+				for k, v in pairs(myjob.process) do
+					exports.bf:AddArea("process"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Traitement Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "process"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Traitement "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("process"..k, {
+						title = "Traitement "..k,
+						position = 1,
+					})
+				end
+			end
+			if myjob.safes then
+				for k, v in pairs(myjob.safes) do
+					exports.bf:AddArea("safes"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Coffre Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "safes"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Coffre "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("safes"..k, {
+						title = job.label.." Coffre "..k,
+						position = 1,
+						
+					buttons = {
+						{
+							text = "Compte",
+							exec = {
+								callback = function()
+									TriggerServerEvent("job:get", "job:safe:open")			
+								end
+							},
+						},
+						{
+							text = "Inventaire",
+							exec = {
+								callback = function()	
+									TriggerServerEvent("job:get", "job:item:open")			
+								end
+							},
+						},
+					}
+					})
+					exports.bf:AddMenu("safes-account"..k, {
+						title = job.label.." Coffre "..k,
+						position = 1,
+						
+					buttons = {
+						{
+							text = "Retirer",
+							exec = {
+								callback = function()
+									print(job.job)
+									TriggerServerEvent('account:job:withdraw', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent("job:get", "job:safe:open")		
+								end
+							},
+						},
+						{
+							text = "Déposer",
+							exec = {
+								callback = function()
+									TriggerServerEvent('account:job:add', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent("job:get", "job:safe:open")		
+								end
+							},
+						},
+					}
+					})
 
-
-function DrawMyMarker(playerCoords, location, job)
-    local distance = #(playerCoords - location.coords)
-
-    if distance < config.DrawDistance then
-        DrawMarker(config.Marker.type,  location.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, config.Marker.x, config.Marker.y, config.Marker.z, config.Marker.r, config.Marker.g, config.Marker.b, config.Marker.a, false, false, 2, config.Marker.rotate, nil, nil, false)
-        if distance < config.Marker.x then
-            TriggerEvent('job:hasEnteredMarker', location, job)
-        end
-    end
-end
-
-local buttons = {}
-local isCollecting = false
-local lastLocation = false
-
-
-function collect(location, job)
-    buttons = {}
-
-    for k, v in pairs(location.items) do
-        buttons[#buttons+1] = {name = tostring(v.label), func = "collectItem", params = v.type}
-    end
-
-    buttons[#buttons+1] = {name = "Arreter le farming", func = "CloseMenu", params = ""}
-    
-    if anyMenuOpen.menuName ~= "collect" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Collecte",
-			subtitle = "Céréales",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "collect"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
+					exports.bf:AddMenu("safes-items", {
+						title = job.label.." Coffre ",
+						position = 1,
+					})
+					exports.bf:AddMenu("safes-items-item", {
+						title = job.label.." Coffre ",
+						position = 1,
+					})
+					exports.bf:AddMenu("safes-items-store", {
+						title = job.label.." Coffre ",
+						position = 1,
+					})
+				end
+			end
+			if myjob.armories then
+				for k, v in pairs(myjob.armories) do
+					exports.bf:AddArea("armories"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bf:HelpPromt("Armurerie Key : ~INPUT_PICKUP~")
+									zone = k
+									zoneType = "armories"
+								end
+							},
+							exit = {
+								callback = function()
+									zone = nil
+									zoneType = nil
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Armurerie "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bf:AddMenu("armories"..k, {
+						title = job.label.." Armurerie "..k,
+						position = 1,
+						closable = false,
+						buttons= {
+							{
+								text = "Kit de base",
+								exec = {
+									callback = function()
+										giveBasicKit()
+									end
+								},
+							},
+							{
+								text = "Mettre Gillet",
+								exec = {
+									callback = function()
+										addBulletproofVest()
+									end
+								},
+							},
+							{
+								text = "Enlever Gillet",
+								exec = {
+									callback = function()
+										removeBulletproofVest()
+									end
+								},
+							},
+							{
+								text = "Quitter",
+								exec = {
+									callback = function()
+										print("close")
+										CloseArmory()
+										exports.bf:CloseMenu("armories"..k)
+									end
+								},
+							}
+						}
+					})
+				end
+			end
+			if myjob.parking then
+				for k, v in pairs(myjob.parking) do
+				exports.bf:AddArea("parking"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Parking Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "parking"
+								spawn = v.spawn
+								heading = v.heading
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Parking "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				exports.bf:AddMenu("parking"..k, {
+					title = job.label.." Parking "..k,
+					position = 1,
+				})
+				exports.bf:AddMenu("parking-veh", {
+					title = "Parking",
+					position = 1,
+				})
+				end
+			end
+			if myjob.begin then
+				for k, v in pairs(myjob.begin) do
+				exports.bf:AddArea("begin"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Commencer la tournée Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "begin"
+								vehicle = v.vehicle
+								coords = v.coords
+								points = v.points
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Livraisons "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
+			if myjob.custom then
+				for k, v in pairs(myjob.custom) do
+				exports.bf:AddArea("custom"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Customisation Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "custom"
+							end
+						},
+						exit = {
+							callback = function()
+								zone = nil
+								zoneType = nil
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Customisation "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
 		end
 	end
 end
 
-local timeCollecting = 0
 
-function collectItem(item)
-    for k, v in pairs(lastLocation.items) do
-        if(item == v.type)then
-            item = v
-        end
-    end
-    isCollecting = true
-    Wait(timeCollecting)
-    TriggerServerEvent('items:add', item.type,  item.amount) 
-    TriggerEvent("notify:SendNotification", 
-    {text= "Vous avez collecté", type = "info", timeout = 5000})
-    CloseMenu()
-    isCollecting = false
-end
+function openArmory()
+	DoScreenFadeOut(500)
+	Wait(600)
 
+	Wait(800)
+	armoryPed = createArmoryPed()
 
-local buttons = {}
-local isprocessing = false
-local lastLocation = false
-function process(location, job)
-	for k in ipairs (buttons) do
-		buttons [k] = nil
+	if not DoesCamExist(ArmoryRoomCam) then
+		ArmoryRoomCam = CreateCam("DEFAULT_SCRIPTED_FLY_CAMERA", true)
+		AttachCamToEntity(ArmoryRoomCam, PlayerPedId(), 0.0, 0.0, 1.0, true)
+		PointCamAtEntity(ArmoryRoomCam, armoryPed, 0.0, -30.0, 1.0, true)
+
+		SetCamRot(ArmoryRoomCam, 0.0,0.0, GetEntityHeading(PlayerPedId()))
+		SetCamFov(ArmoryRoomCam, 70.0)							
 	end
 
-    for k, v in pairs(location.items) do
-        buttons[#buttons+1] = {name = tostring(v.label), func = "processItem", params = v.type}
-    end
+	Wait(100)
+	DoScreenFadeIn(500)
 
-    buttons[#buttons+1] = {name = "Arreter la transformation", func = "CloseMenu", params = ""}
-    
-    if anyMenuOpen.menuName ~= "process" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Transformation",
-			subtitle = "Moulin",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "process"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
+	if DoesEntityExist(armoryPed) then
+		TaskTurnPedToFaceEntity(PlayerPedId(), armoryPed, -1)
+	end							
+
+	Wait(300)
+	exports.bf:OpenMenu(zoneType..zone)
+	if not IsAmbientSpeechPlaying(armoryPed) then
+		PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_GREETSHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
 	end
 end
 
-local timeprocessing = 0
+-- service management
+function recruitClosestPlayer(job)
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
 
-function processItem(item)
-    for k, v in pairs(lastLocation.items) do
-        if(item == v.type)then
-            item = v
-        end
+    if closestPlayerPed then
+        TriggerServerEvent('job:service:recruit', job[1].id, GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
     end
-    isprocessing = true
-    Wait(timeprocessing)
-    
-    TriggerServerEvent('items:process', item.type,  item.amount, item.to,  item.amountTo) 
-    CloseMenu()
-    isprocessing = false
+end
+
+function promoteClosestPlayer()
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+
+    if closestPlayerPed then
+        TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
 end
 
 
 
-function sell(location, job)
-    buttons = {}
+function demmoteClosestPlayer()
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
 
-    for k, v in pairs(location.items) do
-        buttons[#buttons+1] = {name = tostring(v.label), func = "sellItems", params = v.type}
+    if closestPlayerPed then
+        TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
+    else
+        exports.bf:Notification("Pas de joueur à portée")
     end
-
-    buttons[#buttons+1] = {name = "Stopper la vente", func = "CloseMenu", params = ""}
-    
-    if anyMenuOpen.menuName ~= "process" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Revente",
-			subtitle = "Grossiste superette",
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "process"
-        anyMenuOpen.isActive = true
-        lastLocation = location
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
-end
-
-local timeprocessing = 0
-local isSelling = false
-
-function sellItems(item)
-    for k, v in pairs(lastLocation.items) do
-        if(item == v.type)then
-            item = v
-        end
-    end
-    isSelling = true
-    --Wait(isSelling)
-    
-    TriggerServerEvent('jobs:sell', item, "TwentyFourSeven")
-    CloseMenu()
-    isSelling = false
 end
 
 
+function fireClosestPlayer()
+	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+
+    if closestPlayerPed then
+        TriggerServerEvent('job:set', 19, "Chomeur")
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
+end

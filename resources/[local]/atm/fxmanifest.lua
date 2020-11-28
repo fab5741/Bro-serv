@@ -5,20 +5,16 @@ description '- Bro - ATM commands'
 
 version '0.0.1'
 
+dependencies {
+    "bf", 
+    "account"
+} 
+
 client_script {
+    'events.lua',
     'client.lua'
 }
 server_script {
     '@mysql-async/lib/MySQL.lua',
     'server.lua'
-}
-
-ui_page 'html/ui.html'
-
-files {
-	'html/ui.html',
-	'html/roboto.ttf',
-	'html/img/fleeca.png',
-	'html/css/app.css',
-	'html/scripts/app.js'
 }

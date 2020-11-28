@@ -1,4 +1,4 @@
-local job = {
+job = {
 	job = "Chomeur",
 	grade = "Chomeur"
 }
@@ -7,173 +7,93 @@ anyMenuOpen = {
 	menuName = "",
 	isActive = false
 }
+spawn = vector3(0,0,0)
+heading = 0
+avert = "LSPD"
+vehicleLivraison = 0
+beginInProgress = false
 RegisterNetEvent('job:get')
 
 AddEventHandler("job:get", function(job)
 	job = job[1]
-	-- Draw blips
-	v = config.jobs[job.job]
-	print(job.job)
-	if v then
-		drawBlip(v)
-		for k, v in pairs(v.lockers) do
-			drawBlip(v)
-		end
-		for k, v in pairs(v.collect) do
-			drawBlip(v)
-		end
-		for k, v in pairs(v.process) do
-			drawBlip(v)
-		end
-		for k, v in pairs(v.sell) do
-			drawBlip(v)
-		end
-	end
-	while true do
-		Citizen.Wait(0)
-		local playerCoords = GetEntityCoords(PlayerPedId())
-		local letSleep, isInMarker, hasExited = true, false, false
-		local currentstation, currentPart, currentPartNum
-
-		t = config.jobs[job.job]
-		if t then
-			for k, v in pairs(t.lockers) do
-				DrawMyMarker(playerCoords, v, job.job)
-			end
-			for k, v in pairs(t.collect) do
-				DrawMyMarker(playerCoords, v, job.job)
-			end
-			for k, v in pairs(t.process) do
-				DrawMyMarker(playerCoords, v, job.job)
-			end
-			for k, v in pairs(t.sell) do
-				DrawMyMarker(playerCoords, v, job.job)
-			end
-		end
-	end
+	RegisterNUICallback('amount', function(data)
+		TriggerServerEvent("job:safe:deposit", data.withdraw, data.amount, job.job)
+		amount = tonumber(data.amount)
+		SetNuiFocus(false, false)
+	end)
+	refresh(job)
 end)
-
-TriggerServerEvent("job:get", "job:get")
-
-
-RegisterNUICallback('sendAction', function(data, cb)
-	_G[data.action](data.params)
-    cb('ok')
-end)
-
---
---Threads
---
-local alreadyDead = false
-local playerStillDragged = false
-
+-- open menu loop
 Citizen.CreateThread(function()
+	TriggerServerEvent("job:get", "job:get")
+
+	-- create all menus
+	menus()
+
+	-- main loop
     while true do
-		Citizen.Wait(5)	
-		if(anyMenuOpen.isActive) then
-			DisableControlAction(1, 21)
-			DisableControlAction(1, 140)
-			DisableControlAction(1, 141)
-			DisableControlAction(1, 142)
-
-			SetDisableAmbientMeleeMove(PlayerPedId(), true)
-
-			if (IsControlJustPressed(1,172)) then
-				SendNUIMessage({
-					action = "keyup"
-				})
-				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-			elseif (IsControlJustPressed(1,173)) then
-				SendNUIMessage({
-					action = "keydown"
-				})
-				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-			elseif (anyMenuOpen.menuName == "cloackroom") then
-				if IsControlJustPressed(1, 176) then
-					SendNUIMessage({
-						action = "keyenter"
-					})
-
-					PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-					Citizen.Wait(500)
-					CloseMenu()
+		Citizen.Wait(0)	
+		if zone ~= nil and zoneType ~= nil and IsControlJustPressed(1,config.bindings.interact_position) then
+			if zoneType == "parking" then
+				if isPedDrivingAVehicle() then
+					exports.bf:SetMenuValue("parking-veh", {
+						buttons = {
+							{
+								text = "Stocker : " .. zone,
+								exec = {
+									callback = function()
+										TriggerServerEvent("vehicle:job:store", currentVehicle, "global")
+										currentVehicle = 0
+									
+										DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
+										exports.bf:CloseMenu("parking-veh")
+									end
+								},
+							}
+						}
+					})	
+					exports.bf:OpenMenu("parking-veh")
+				else
+					TriggerServerEvent("job:get", "job:parking:open")		
 				end
-			elseif (IsControlJustPressed(1,176)) then
-				SendNUIMessage({
-					action = "keyenter"
-				})
-				PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-			elseif (IsControlJustPressed(1,177)) then
-				if(anyMenuOpen.menuName == "cloackroom") then
-					CloseMenu()
+			elseif zoneType == "homes" then
+				TriggerServerEvent("job:avert:all", avert, "On vous demande à l'acceuil ~b~(".. avert.. ")")
+			elseif zoneType == "repair" then
+				if isPedDrivingAVehicle() then
+					exports.bf:OpenMenu("repair")
+				else
+					exports.bf:Notification("Montez dans un véhicule")
 				end
-			end
-		else
-			EnableControlAction(1, 21)
-			EnableControlAction(1, 140)
-			EnableControlAction(1, 141)
-			EnableControlAction(1, 142)
-		end
-	
-		--Control death events
-		if(config.useModifiedEmergency == false) then
-			if(IsPlayerDead(PlayerId())) then
-				if(alreadyDead == false) then
-					if(isInService) then
-						ServiceOff()
-					end
-					alreadyDead = true
+			elseif zoneType == "custom" then
+				if isPedDrivingAVehicle() then
+					exports.bf:OpenMenu("custom")
+				else
+					exports.bf:Notification("Montez dans un véhicule")
 				end
+			elseif zoneType == "center" then
+				exports.bf:OpenMenu("center")
+			elseif zoneType == "begin" then
+				if not beginInProgress then
+					vehicleLivraison = exports.bf:spawnCar(vehicle, true, nil, true)
+					addBeginArea() 
+				else
+					exports.bf:Notification("Vous avez déjà une course en cours !")
+				end
+			elseif zoneType == "safes" then
+				exports.bf:OpenMenu(zoneType..zone)
+			elseif zoneType == "collect" then
+				TriggerServerEvent("job:get", "job:collect:open")	
+			elseif zoneType == "process" then
+				TriggerServerEvent("job:get", "job:process:open")		
+			elseif zoneType == "armories" then
+				openArmory()
 			else
-				alreadyDead = false
+				exports.bf:OpenMenu(zoneType..zone)
 			end
 		end
-    end
-end)
 
---functions
-
-function isNearTakeService()
-	local distance = 10000
-	local pos = {}
-	t = config.jobs[job.job]
-	if t then
-		for k, v in pairs(t.lockers) do
-			local coords = GetEntityCoords(PlayerPedId(), 0)
-			local currentDistance = coords - v.coords
-			if(currentDistance < distance) then
-				distance = currentDistance
-				pos = v.coords
-			end
-		end
-	end
-	
-	if anyMenuOpen.menuName == "cloackroom" and anyMenuOpen.isActive and distance > 3 then
-		--CloseMenu()
-	end
-
-	if(distance < 30) then
-		if anyMenuOpen.menuName ~= "cloackroom" and not anyMenuOpen.isActive then
-			DrawMarker(1, pos.x, pos.y, pos.z-1, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 0, 155, 255, 200, 0, 0, 2, 0, 0, 0, 0)
-		end
-	end
-
-	if(distance < 2) then
-		return true
-	end
-end
-
-Citizen.CreateThread(function()
-    while true do
-		Citizen.Wait(5)	
-		if(isNearTakeService()) then
-			if not (anyMenuOpen.isActive) then
-				DisplayHelpText("Vestiaire".. GetLabelText("collision_8vlv02g"),0,1,0.5,0.8,0.6,255,255,255,255)
-				if IsControlJustPressed(1,config.bindings.interact_position) then
-					load_cloackroom(job)
-					OpenCloackroom(job)
-				end
-			end
+		if IsControlJustPressed(1,config.bindings.use_job_menu) then
+			TriggerServerEvent("job:get", "job:open:menu")
 		end
 	end
 end)

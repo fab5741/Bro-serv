@@ -1,162 +1,176 @@
 local buttons = {}
 
-local function printTable( t )
-
-    local printTable_cache = {}
-
-    local function sub_printTable( t, indent )
-
-        if ( printTable_cache[tostring(t)] ) then
-            print( indent .. "*" .. tostring(t) )
-        else
-            printTable_cache[tostring(t)] = true
-            if ( type( t ) == "table" ) then
-                for pos,val in pairs( t ) do
-                    if ( type(val) == "table" ) then
-                        print( indent .. "[" .. pos .. "] => " .. tostring( t ).. " {" )
-                        sub_printTable( val, indent .. string.rep( " ", string.len(pos)+8 ) )
-                        print( indent .. string.rep( " ", string.len(pos)+6 ) .. "}" )
-                    elseif ( type(val) == "string" ) then
-                        print( indent .. "[" .. pos .. '] => "' .. val .. '"' )
-                    else
-                        print( indent .. "[" .. pos .. "] => " .. tostring(val) )
-                    end
-                end
-            else
-                print( indent..tostring(t) )
-            end
-        end
-    end
-
-    if ( type(t) == "table" ) then
-        print( tostring(t) .. " {" )
-        sub_printTable( t, "  " )
-        print( "}" )
-    else
-        sub_printTable( t, "  " )
-    end
-end
-
-
-function load_cloackroom(job)
-	for k in ipairs (buttons) do
-		buttons [k] = nil
-	end
-	print(job)
-	buttons[#buttons+1] = {name = "Prendre le service", func = "clockIn", params = job}
-	buttons[#buttons+1] = {name = "Quitter le service", func = "clockOut", params = ""}
-end
-
 function clockIn(job)
-		ServiceOn()
-		SetSkin(job)
-
-		drawNotification("En service")
+	TriggerServerEvent("player:get", "job:add:uniform")
+	TriggerServerEvent("job:clock", true, job)
+	exports.bf:CloseMenu("lockers")
 end
 
-function clockOut()
-	ServiceOff()
-	removeUniforme()
-	drawNotification("break_service_notification")
+function clockOut(job)
+	TriggerServerEvent("player:get", "job:remove:uniform")
+	TriggerServerEvent("job:clock", false, job)
+	exports.bf:CloseMenu("lockers")
 end
 
-function SetSkin(job)
-	local skin ={
-		sex          = 0,
-		face         = 0,
-		skin         = 0,
-		beard_1      = 0,
-		beard_2      = 0,
-		beard_3      = 0,
-		beard_4      = 0,
-		hair_1       = 0,
-		hair_2       = 0,
-		hair_color_1 = 0,
-		hair_color_2 = 0,
-		tshirt_1     = 0,
-		tshirt_2     = 0,
-		torso_1      = 0,
-		torso_2      = 0,
-		decals_1     = 0,
-		decals_2     = 0,
-		arms         = 0,
-		pants_1      = 0,
-		pants_2      = 0,
-		shoes_1      = 0,
-		shoes_2      = 0,
-		mask_1       = 0,
-		mask_2       = 0,
-		bproof_1     = 0,
-		bproof_2     = 0,
-		chain_1      = 0,
-		chain_2      = 0,
-		helmet_1     = 0,
-		helmet_2     = 0,
-		glasses_1    = 0,
-		glasses_2    = 0,
+
+RegisterNetEvent("job:add:uniform")
+
+-- source is global here, don't add to function
+AddEventHandler('job:add:uniform', function(skin)
+	local clothes = {
+		recruit = {
+			male = {
+				tshirt_1 = 59,  tshirt_2 = 1,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = 46,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 36,  tshirt_2 = 1,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = 45,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		officer = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 0,   decals_2 = 0,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		sergeant = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 8,   decals_2 = 1,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 7,   decals_2 = 1,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		lieutenant = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 8,   decals_2 = 2,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 7,   decals_2 = 2,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		boss = {
+			male = {
+				tshirt_1 = 58,  tshirt_2 = 0,
+				torso_1 = 55,   torso_2 = 0,
+				decals_1 = 8,   decals_2 = 3,
+				arms = 41,
+				pants_1 = 25,   pants_2 = 0,
+				shoes_1 = 25,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			},
+			female = {
+				tshirt_1 = 35,  tshirt_2 = 0,
+				torso_1 = 48,   torso_2 = 0,
+				decals_1 = 7,   decals_2 = 3,
+				arms = 44,
+				pants_1 = 34,   pants_2 = 0,
+				shoes_1 = 27,   shoes_2 = 0,
+				helmet_1 = -1,  helmet_2 = 0,
+				chain_1 = 0,    chain_2 = 0,
+				ears_1 = 2,     ears_2 = 0
+			}
+		},
+	
+		bullet_wear = {
+			male = {
+				bproof_1 = 11,  bproof_2 = 1
+			},
+			female = {
+				bproof_1 = 13,  bproof_2 = 1
+			}
+		},
+	
+		gilet_wear = {
+			male = {
+				tshirt_1 = 59,  tshirt_2 = 1
+			},
+			female = {
+				tshirt_1 = 36,  tshirt_2 = 1
+			}
+		}
 	}
-	TriggerEvent('skinchanger:loadClothes', skin, config.jobs[job].grades.stagiaire.skin_male)
+	TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), clothes.recruit.male)
 	giveBasicKit()
-end
+end)
 
-function removeUniforme()
+RegisterNetEvent("job:remove:uniform")
+
+-- source is global here, don't add to function
+AddEventHandler('job:remove:uniform', function(skin)
 	RemoveAllPedWeapons(PlayerPedId())
 
-	-- release the player model
-	SetModelAsNoLongerNeeded(model)  
-	skin ={
-		sex          = 0,
-		face         = 0,
-		skin         = 0,
-		beard_1      = 0,
-		beard_2      = 0,
-		beard_3      = 0,
-		beard_4      = 0,
-		hair_1       = 0,
-		hair_2       = 0,
-		hair_color_1 = 0,
-		hair_color_2 = 0,
-		tshirt_1     = 0,
-		tshirt_2     = 0,
-		torso_1      = 0,
-		torso_2      = 0,
-		decals_1     = 0,
-		decals_2     = 0,
-		arms         = 0,
-		pants_1      = 0,
-		pants_2      = 0,
-		shoes_1      = 0,
-		shoes_2      = 0,
-		mask_1       = 0,
-		mask_2       = 0,
-		bproof_1     = 0,
-		bproof_2     = 0,
-		chain_1      = 0,
-		chain_2      = 0,
-		helmet_1     = 0,
-		helmet_2     = 0,
-		glasses_1    = 0,
-		glasses_2    = 0,
-	}
-
-	local clothes = {
-	}
-	TriggerEvent('skinchanger:loadClothes', skin, clothes)
-end
-
-function OpenCloackroom(job)
-	if anyMenuOpen.menuName ~= "cloackroom" and not anyMenuOpen.isActive then
-		SendNUIMessage({
-			title = "Vestiaire",
-			subtitle = job.label,
-			buttons = buttons,
-			action = "setAndOpen"
-		})
-		
-		anyMenuOpen.menuName = "cloackroom"
-		anyMenuOpen.isActive = true
-		if config.enableVersionNotifier then
-			TriggerServerEvent('job:UpdateNotifier')
-		end
-	end
-end
+	TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), clothes)
+	TriggerServerEvent("job:breakService")
+end)

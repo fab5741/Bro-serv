@@ -1,81 +1,93 @@
+-- Register net Events
+-- ATM #1
 RegisterNetEvent('atm:deposit')
+RegisterNetEvent('atm:withdraw')
 
+-- Event Handlers
+-- ATM #1
 AddEventHandler('atm:deposit', function(amount)
 	local sourceValue = source
 	local amounte = tonumber(amount)
-
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		
-			
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
-
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select liquid from players where fivem = @fivem',
-        {['fivem'] =  discord},
-		function(res)
-			if res[1] and res[1].liquid >= amounte then
-				MySQL.Async.fetchAll('UPDATE accounts, players set amount=amount+@amount, liquid=liquid-@amount where fivem = @fivem and accounts.player = players.id',
-				{['fivem'] =  discord,
-				['amount'] = amounte},
-				function(res)
-					TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot effectué", type = "info", timeout = 5000})
+		MySQL.Async.fetchScalar('select liquid from accounts, players, player_account where discord = @discord and player_account.player = players.id and player_account.account = accounts.id',
+        {['@discord'] =  discord},
+		function(liquid)
+			if liquid >= amounte then
+				MySQL.Async.execute('UPDATE accounts, players, player_account set amount=amount+@amount, liquid=liquid-@amount where discord = @discord and player_account.account = accounts.id and player_account.player = players.id',
+				{['@discord'] =  discord,
+				['@amount'] = amounte},
+				function(affectedRows)
+					if affectedRows == 2 then
+						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+							icon = "CHAR_BANK_MAZE",
+							type = 2,
+							text = "Depot effectué ~g~" .. amounte .. " $",
+							title = "MAZE BANK",
+							subTitle = "ATM" 
+						})
+					else
+						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+							icon = "CHAR_BANK_MAZE",
+							type = 2,
+							text = "~r~ Erreur lors du depot",
+							title = "MAZE BANK",
+							subTitle = "ATM" 
+						})
+					end
 				end)
 			else
-				print(discord)
-				TriggerClientEvent("notify:SendNotification", sourceValue, {text= "Depot loupé (Pas assez de liquide)", type = "info", timeout = 5000})
+				TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+					icon = "CHAR_BANK_MAZE",
+					type = 2,
+					text = "Depot loupé ~g~" .. amounte .. " $",
+					title = "MAZE BANK",
+					subTitle = "ATM" 
+				})
 			end
         end)
       end)
 end)
 
-RegisterNetEvent('atm:withdraw')
 AddEventHandler('atm:withdraw', function(amount)
 	local sourceValue = source
 	local amounte = tonumber(amount)
-
-	for k,v in pairs(GetPlayerIdentifiers(sourceValue))do
-		
-			
-		  if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamid = v
-		  elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		  elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xbl  = v
-		  elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			ip = v
-		  elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		  elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		  end
-	end
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select amount from accounts, players where fivem = @fivem and accounts.player = players.id',
-        {['fivem'] =  discord},
-		function(res)
-			if res[1] and res[1].amount >= amounte then
-				MySQL.Async.fetchAll('UPDATE accounts, players set amount=amount-@amount, liquid=liquid+@amount where fivem = @fivem and accounts.player = players.id',
-				{['fivem'] =  discord,
-				['amount'] = amounte},
-				function(res)
-					TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Retrait effectué ", false)
+		MySQL.Async.fetchScalar('select amount from accounts, players, player_account where discord = @discord and player_account.player = players.id and player_account.account = accounts.id',
+        {['@discord'] =  discord},
+		function(money)
+			if money >= amounte then
+				MySQL.Async.execute('UPDATE accounts, players, player_account set amount=amount-@amount, liquid=liquid+@amount where discord = @discord and player_account.account = accounts.id and player_account.player = players.id',
+				{['@discord'] =  discord,
+				['@amount'] = amounte},
+				function(affectedRows)
+					if affectedRows == 2 then
+						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+							icon = "CHAR_BANK_MAZE",
+							type = 2,
+							text = "Retrait effectué ~g~" .. amounte .. " $",
+							title = "MAZE BANK",
+							subTitle = "ATM" 
+						})
+					else
+						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+							icon = "CHAR_BANK_MAZE",
+							type = 2,
+							text = "~r~ Erreur lors du retrait",
+							title = "MAZE BANK",
+							subTitle = "ATM" 
+						})
+					end
 				end)
 			else
-				TriggerClientEvent("lspd:notify", sourceValue, "CHAR_AGENT14", 1,"Retrait loupé (Pas assez d'argent) ", false)
+				TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+					icon = "CHAR_BANK_MAZE",
+					type = 2,
+					text = "Retrait loupé ~g~" .. amounte .. " $",
+					title = "MAZE BANK",
+					subTitle = "ATM" 
+				})
 			end
         end)
       end)

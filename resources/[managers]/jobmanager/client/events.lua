@@ -64,16 +64,91 @@ end)
 RegisterNetEvent('job:safe:open2')
 
 AddEventHandler("job:safe:open2", function(amount) 
-	exports.bf:SetMenuValue(zoneType..zone, {
+	-- todo: test if chef de service
+	exports.bf:SetMenuValue("safes-account"..zone, {
 		menuTitle = "Compte ~r~"..amount.. " $"
 	})
-	exports.bf:OpenMenu(zoneType..zone)
+	TriggerServerEvent("job:isChef", "job:safe:open3")
+end)
+
+RegisterNetEvent('job:safe:open3')
+
+AddEventHandler("job:safe:open3", function(isChef) 
+	print(isChef)
+	if isChef then
+		exports.bf:NextMenu("safes-account"..zone)
+	else 
+		exports.bf:Notification("~r~Vous n'etes pas abilité")
+	end
+end)
+
+
+RegisterNetEvent('job:item:open')
+
+AddEventHandler("job:item:open", function(job) 
+	job = job[1].job
+	TriggerServerEvent("job:items:get", "job:item:open2", job)
+end)
+
+RegisterNetEvent('job:item:open:store')
+
+AddEventHandler("job:item:open:store", function(items) 
+	buttons = {}
+	for k, v in pairs(items) do
+		buttons[#buttons+1] = {
+			text = v.label .. " X " ..v.amount,
+			exec = {
+				callback = function() 
+					TriggerServerEvent("job:items:store", v.item, 1)
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons("safes-items-store", buttons)
+	exports.bf:NextMenu("safes-items-store")
+end)
+
+RegisterNetEvent('job:item:open2')
+
+AddEventHandler("job:item:open2", function(items) 
+	buttons = {}
+	buttons[#buttons+1] = {
+		text = "Stocker item",
+		exec = {
+			callback = function() 
+				TriggerServerEvent("items:get", "job:item:open:store")
+			end
+		},
+	}
+	for k, v in pairs(items) do
+		buttons[#buttons+1] = {
+			text = v.label .. " X " ..v.amount,
+			exec = {
+				callback = function() 
+					local buttons = {}
+					buttons[1] =     {
+						text = "Retirer",
+						exec = {
+							callback = function() 
+								TriggerServerEvent("job:items:withdraw", v.item, 1)
+							end
+						},
+					}
+					exports.bf:SetMenuButtons("safes-items-item", buttons)
+					exports.bf:NextMenu("safes-items-item")
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons("safes-items", buttons)
+	exports.bf:NextMenu("safes-items")
 end)
 
 RegisterNetEvent('job:safe:open')
 
 AddEventHandler("job:safe:open", function(job) 
 	job = job[1].job
+	print(job)
 	TriggerServerEvent("account:job:get", "job:safe:open2", job)		
 end)
 

@@ -55,3 +55,8 @@ AddEventHandler("items:drink", function()
         DeleteObject(prop)
     end)
 end)
+
+RegisterNetEvent("items:add")
+AddEventHandler("items:add", function(type, amount, message)
+    TriggerServerEvent("items:add", type, amount, message)
+end)

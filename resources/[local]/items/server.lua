@@ -5,7 +5,7 @@ RegisterNetEvent("items:add")
 -- source is global here, don't add to function
 AddEventHandler("items:add", function (type, amount, message)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+  local discord = exports.bf:GetDiscordFromSource(sourceValue)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('select id from players where discord = @discord',
     {['@discord'] =  discord},
@@ -15,20 +15,32 @@ AddEventHandler("items:add", function (type, amount, message)
           {
             ['@player'] = player,
           }, function(weight)
+            if weight == nil then
+              weight = 0
+            end
           MySQL.Async.fetchScalar("SELECT weight FROM `items` WHERE id = @type",
           {
             ['@type'] = type,
           }, function(newWeight)
             weight = (newWeight*amount)+weight
             if weight <= maxWeight then
-              MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
-              {['id'] = player,
-              ['amount'] = amount,
-              ['type'] = type},
-              function(res)
-                print(message)
-                TriggerClientEvent("bf:Notification", sourceValue, message)
-              end)
+              if amount < 0 then
+                MySQL.Async.execute('update `player_item` set amount=amount+@amount where player =@id and item = @type',
+                {['id'] = player,
+                ['amount'] = amount,
+                ['type'] = type},
+                function(res)
+                  TriggerClientEvent("bf:Notification", sourceValue, message)
+                end)
+              else
+                MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+                {['id'] = player,
+                ['amount'] = amount,
+                ['type'] = type},
+                function(res)
+                  TriggerClientEvent("bf:Notification", sourceValue, message)
+                end)
+              end
             else
               TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
             end

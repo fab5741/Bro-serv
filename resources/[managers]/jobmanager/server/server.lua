@@ -64,6 +64,92 @@ AddEventHandler('job:set', function (grade, notif)
 end)
 
 
+RegisterNetEvent("job:items:get")
+
+AddEventHandler('job:items:get', function (cb, job)
+    local sourceValue = source
+    local source = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.fetchAll('select items.label, job_item.amount, job_item.item from job_item, items where job = @job and items.id = job_item.item',
+        {['@job'] = job},
+        function(items)
+            TriggerClientEvent(cb, sourceValue, items)
+        end)
+      end)
+end)
+
+
+RegisterNetEvent("job:items:withdraw")
+
+AddEventHandler('job:items:withdraw', function (item, amount)
+    local sourceValue = source
+    local source = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.fetchScalar('select job_grades.job from players, job_grades where job_grades.id = players.job_grade and discord = @discord',
+        {['@discord'] = discord},
+        function(job)
+            MySQL.Async.fetchScalar('select amount from job_item where job = @job and item = @item',
+            {
+                ['@job'] = job,
+                ['@item'] = item
+            },
+            function(amountItems)
+                if amountItems > amount then
+                    MySQL.Async.execute('update job_item set amount = amount-@amount where job = @job and item = @item',
+                    {
+                        ['@job'] = job,
+                        ['@item'] = item,
+                        ['@amount'] = amount
+                    },function(numRows)
+                        TriggerClientEvent("items:add", sourceValue, item, amount, "Vous avez retiré des item")
+                    end)
+                else
+                    TriggerClientEvent("bf:Notification", sourceValue, "~r~Le stock n'est pas assez fourni")
+                end
+            end)
+        end)
+    end)
+end)
+
+RegisterNetEvent("job:items:store")
+
+AddEventHandler('job:items:store', function (item, amount)
+    local sourceValue = source
+    local source = source
+    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local amount = amount
+    local item = item
+    print(item)
+    MySQL.ready(function ()
+        MySQL.Async.fetchScalar('select job_grades.job from players, job_grades where job_grades.id = players.job_grade and discord = @discord',
+        {['@discord'] = discord},
+        function(job)
+            MySQL.Async.fetchScalar('select amount from player_item, players where players.id = player_item.player and discord = @discord and player_item.item= @item',
+            {
+                ['@discord'] = discord,
+                ['@item'] = item
+            },
+            function(amountItems)
+                if amountItems > amount then
+                    MySQL.Async.execute('INSERT INTO `job_item` (`job`, `item`, `amount`) VALUES (@job, @item, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount',
+                    {
+                        ['@job'] = job,
+                        ['@item'] = item,
+                        ['@amount'] = amount
+                    },function(numRows)
+                        TriggerClientEvent("items:add", sourceValue, item, -amount, "Vous avez déposé des items")
+                    end)
+                else
+                    TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez pas cet item")
+                end
+            end)
+        end)
+    end)
+end)
+
+
 -- time for each paycheck
 local moneyDutyTime = 60 *1000 *30
 

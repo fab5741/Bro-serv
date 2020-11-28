@@ -791,6 +791,29 @@ function createMenuAndArea(job)
 						
 					buttons = {
 						{
+							text = "Compte",
+							exec = {
+								callback = function()
+									TriggerServerEvent("job:get", "job:safe:open")			
+								end
+							},
+						},
+						{
+							text = "Inventaire",
+							exec = {
+								callback = function()	
+									TriggerServerEvent("job:get", "job:item:open")			
+								end
+							},
+						},
+					}
+					})
+					exports.bf:AddMenu("safes-account"..k, {
+						title = job.label.." Coffre "..k,
+						position = 1,
+						
+					buttons = {
+						{
 							text = "Retirer",
 							exec = {
 								callback = function()
@@ -810,6 +833,19 @@ function createMenuAndArea(job)
 							},
 						},
 					}
+					})
+
+					exports.bf:AddMenu("safes-items", {
+						title = job.label.." Coffre ",
+						position = 1,
+					})
+					exports.bf:AddMenu("safes-items-item", {
+						title = job.label.." Coffre ",
+						position = 1,
+					})
+					exports.bf:AddMenu("safes-items-store", {
+						title = job.label.." Coffre ",
+						position = 1,
 					})
 				end
 			end

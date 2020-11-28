@@ -80,7 +80,7 @@ Citizen.CreateThread(function()
 					exports.bf:Notification("Vous avez déjà une course en cours !")
 				end
 			elseif zoneType == "safes" then
-				TriggerServerEvent("job:get", "job:safe:open")		
+				exports.bf:OpenMenu(zoneType..zone)
 			elseif zoneType == "collect" then
 				TriggerServerEvent("job:get", "job:collect:open")	
 			elseif zoneType == "process" then

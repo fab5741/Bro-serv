@@ -326,6 +326,13 @@ config = {
                         ears_1 = 2,     ears_2 = 0
                     }
                }
+            },
+            safes = {
+                {
+                    coords = vector3(455.04360961914,-985.53869628906,30.689321517944),
+                    sprite = 568,
+
+                }
             }
         },
         newspapers = {

@@ -288,7 +288,9 @@ AddEventHandler("job:avert:all", function (job, message, silent)
         for k,v  in pairs (inService[job]) do
             TriggerClientEvent('bf:Notification', v, message)
         end
-        TriggerClientEvent('bf:Notification', sourceValue, "Votre appel à été émis pour le ~b~(".. job.. ")")
+        if not silent then
+            TriggerClientEvent('bf:Notification', sourceValue, "Votre appel à été émis pour le ~b~(".. job.. ")")
+        end
     end
 end)
 

@@ -28,7 +28,7 @@ AddEventHandler('account:player:add', function(cb, amount)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.execute('UPDATE accounts, player_account SET accounts.amount = accounts.amount + @amount WHERE players.discord = @discord and player_account.account= accounts.id ', 
+		MySQL.Async.execute('UPDATE accounts, player_account, players SET accounts.amount = accounts.amount + @amount WHERE player_account.player = players.id and players.discord = @discord and player_account.account= accounts.id ', 
 			{
 				['@discord'] = discord, 
 				['@amount'] = amount

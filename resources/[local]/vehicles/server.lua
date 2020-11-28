@@ -12,6 +12,7 @@ RegisterNetEvent("vehicle:store")
 RegisterNetEvent("vehicle:permis:give")
 RegisterNetEvent("vehicle:set:id")
 RegisterNetEvent("vehicle:permis:get")
+RegisterNetEvent("vehicle:permis:withdraw")
 RegisterNetEvent("vehicle:job:parking")
 RegisterNetEvent("vehicle:player:get")
 RegisterNetEvent("vehicle:player:save")
@@ -289,6 +290,22 @@ AddEventHandler("vehicle:permis:get", function(cb)
 		}, function(result)
 			print("get permis")
 			TriggerClientEvent(cb, sourceValue, result)
+		end)
+	end)
+end)
+
+
+
+AddEventHandler("vehicle:permis:withdraw", function(cb, amount)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local amount = amount
+	MySQL.ready(function ()
+		MySQL.Async.execute('update players set permis = permis-@amount where discord = @discord ', {
+			['@discord'] =  discord,
+			['@amount'] =  amount,
+		}, function(numRows)
+			TriggerClientEvent(cb, sourceValue)
 		end)
 	end)
 end)

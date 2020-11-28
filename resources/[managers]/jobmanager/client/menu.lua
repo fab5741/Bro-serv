@@ -451,157 +451,41 @@ function menus()
 				text = "Toit",
 				openMenu = "custom-mod-10"
 			},
-			{
-				text = "Moteur",
-				openMenu = "custom-mod-11"
-			},
-			{
-				text = "Freins",
-				openMenu = "custom-mod-12"
-			},
-			{
-				text = "Transmission",
-				openMenu = "custom-mod-13"
-			},
-			{
-				text = "Klaxon",
-				openMenu = "custom-mod-14"
-			},
-			{
-				text = "Suspension",
-				openMenu = "custom-mod-15"
-			},
-			{
-				text = "Blindage",
-				openMenu = "custom-mod-16"
-			},
-			{
-				text = "Bumpers (devant)",
-				openMenu = "custom-mod-18"
-			},
+		--	{
+		--		text = "Moteur",
+			--	openMenu = "custom-mod-11"
+		--	},
+		--	{
+		--		text = "Freins",
+		--		openMenu = "custom-mod-12"
+		--	},
+		--	{
+		--		text = "Transmission",
+		--		openMenu = "custom-mod-13"
+		--	},
+		--	{
+		--		text = "Klaxon",
+		--		openMenu = "custom-mod-14"
+		--	},
+		---	{
+			--	text = "Suspension",
+		--		openMenu = "custom-mod-15"
+			--},
+		--	{
+			--	text = "Blindage",
+		----		openMenu = "custom-mod-16"
+			--},
+		---	{
+			--	text = "Turbo",
+	--			openMenu = "custom-mod-18"
+			--},
 			{
 				text = "Roues",
 				openMenu = "custom-mod-19"
 			},
 			{
-				text = "",
-				openMenu = "custom-mod-20"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-21"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-22"
-			},
-			{
-				text = "",
+				text = "Roues avant (moto)",
 				openMenu = "custom-mod-23"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-24"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-25"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-26"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-27"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-28"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-29"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-30"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-31"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-32"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-33"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-34"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-35"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-36"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-37"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-38"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-39"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-40"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-41"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-42"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-43"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-44"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-45"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-46"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-47"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-48"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-49"
 			},
 			{
 				text = "",
@@ -681,12 +565,17 @@ function menus()
 		buttons = {}
 		vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 
+		SetVehicleModKit(
+			vehicle --[[ Vehicle ]], 
+			0 --[[ integer ]]
+		)
 		local max = GetNumVehicleMods(vehicle, type)
 		for i = 0,max do
 			buttons[#buttons+1] = {
 				text = i,
 				hover = {
 					callback = function()
+
 						SetVehicleMod(
 							vehicle, 
 							type, 
@@ -704,10 +593,12 @@ function menus()
 		})	
 	end
 
-	for i = 0,50 do
+	for i = 0,19 do
 		addMenuMod(i)
 	end
-	
+	addMenuMod(23)
+	addMenuMod(50)
+
 
 	exports.bf:AddMenu("taxi", {
 		title = "Menu Taxi",

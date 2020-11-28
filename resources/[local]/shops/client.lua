@@ -47,7 +47,7 @@ config.Zones = {
 	},
 }
 
-config.robLength = 2
+config.robLength = 60
 config.robMaxDistance = 20
 
 zoneType = ""
@@ -255,20 +255,22 @@ Citizen.CreateThread(function()
 
         if IsControlJustPressed(0, 58) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId(-1))
-
             if aiming then
                 local playerPed = GetPlayerPed(-1)
-
-                if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
-					if robbedRecently then
-						exports.bf:Notification('Trop rapide !')
-					elseif IsPedDeadOrDying(targetPed, true) then
-						exports.bf:Notification("L'épicier est mort")
-                    else
-                        robNpc(targetPed)
-                    end
-                end
-            end
+				if IsPedArmed(playerPed, 1) or IsPedArmed(playerPed, 4) then
+					if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
+						if robbedRecently then
+							exports.bf:Notification('Trop rapide !')
+						elseif IsPedDeadOrDying(targetPed, true) then
+							exports.bf:Notification("L'épicier est mort")
+						else
+							robNpc(targetPed)
+						end
+					end
+				else
+					exports.bf:Notification("Vous devez être armé")
+				end
+			end
         end
     end
 end)

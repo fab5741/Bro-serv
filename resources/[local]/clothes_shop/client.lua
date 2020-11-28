@@ -8,7 +8,6 @@ myclothesSkin = {
 }
 
 mySkin = {
-
 }
 
 function addMenu(max, part, variante, maxVariant, isSkin) 
@@ -78,7 +77,11 @@ function addMenu(max, part, variante, maxVariant, isSkin)
     end
 end
 
-Citizen.CreateThread(function()
+RegisterNetEvent('clothes_shop:skin:update')
+
+AddEventHandler('clothes_shop:skin:update', function(skin)
+    mySkin = json.decode(skin)
+    
 	exports.bf:AddMenu("clothes-shop", {
 		title = "Magasin Vêtements ",
 		position = 1,
@@ -90,6 +93,14 @@ Citizen.CreateThread(function()
             {
 				text = "Corps (variante)",
 				openMenu = "clothes-shop-torso2"
+            },
+            {
+				text = "T-Shirt",
+				openMenu = "clothes-shop-tshirt"
+            },
+            {
+				text = "T-Shirt2 (variante)",
+				openMenu = "clothes-shop-tshirt2"
             },
             {
 				text = "Bras",
@@ -167,22 +178,23 @@ Citizen.CreateThread(function()
 				text = "Valider la tenue",
                 exec = {
                     callback = function()
-                        --save to 
-                        -- TODO
-                     --   TriggerServerEvent("clothes:save", myclothesSkin)
-                      --  TriggerServerEvent("skin:save", mySkin)
+                        local price  = 10
+                        TriggerServerEvent("account:player:liquid:add", "", price * -1)
+                        exports.bf:Notification('Vous avez modifié vos vétements. ~g~'..price..'$')
+                        TriggerServerEvent('skin:save', mySkin)
+                        TriggerServerEvent('skin:clothes:save', myclothesSkin)
                     end
                 },
 			},
 		},
     })
     addMenu(290, "torso", true, 10, true)
+    addMenu(144, "tshirt", true, 10)
     addMenu(168, "arms", true, 10)
     addMenu(115, "pants", true, 10, true)
     addMenu(91, "shoes", true, 10)
     addMenu(148, "mask", true, 10)
     addMenu(132, "chain", true, 10)
-    addMenu(144, "shirt", true, 10)
     addMenu(136, "helmet", true, 10)
     addMenu(29, "glasses", true, 10)
     addMenu(31, "watches", true, 10)
@@ -219,52 +231,16 @@ Citizen.CreateThread(function()
         },
         locations = {
             {
-                x=72.2545394897461,  y=-1399.10229492188, z=29.3761386871338
+                x= 428.72677612305, y=-800.1708984375, z=29.49112701416
             },
             {
-                x=-703.77685546875,  y=-152.258544921875, z=37.4151458740234
-            },
-            {
-                x=-167.863754272461, y=-298.969482421875, z=39.7332878112793
-            },
-            {
-                x=428.694885253906,  y=-800.1064453125,   z=29.4911422729492
-            },
-            {
-                x=-829.413269042969, y=-1073.71032714844, z=11.3281078338623
-            },
-            {
-                x=-1447.7978515625,  y=-242.461242675781, z=49.8207931518555
-            },
-            {
-                x=11.6323690414429,  y=6514.224609375,    z=31.8778476715088
-            },
-            {
-                x=123.64656829834,   y=-219.440338134766, z=54.5578384399414
-            },
-            {
-                x=1696.29187011719,  y=4829.3125,         z=42.0631141662598
-            },
-            {
-                x=618.093444824219,  y=2759.62939453125,  z=42.0881042480469
-            },
-            {
-                x=1190.55017089844,  y=2713.44189453125,  z=38.2226257324219
-            },
-            {
-                x=-1193.42956542969, y=-772.262329101563, z=17.3244285583496
-            },
-            {
-                x=-3172.49682617188, y=1048.13330078125,  z=20.8632030487061
-            },
-            {
-                x=-1108.44177246094, y=2708.92358398438,  z=19.1078643798828
-            },
-            {
-                x=125.640, y=-763.056, z=45.752
+                x=72.586585998535, y=-1399.2108154297,z=29.376140594482
             },
         },
     })
+end)
+Citizen.CreateThread(function()
+    TriggerServerEvent('skin:getPlayerSkin', "clothes_shop:skin:update")
 end)
 
 

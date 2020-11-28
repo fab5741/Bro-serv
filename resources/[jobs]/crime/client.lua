@@ -143,3 +143,16 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
+Citizen.CreateThread(function()
+	while true do
+		Wait(0)
+		if IsPedShooting(GetPlayerPed(-1)) then
+			local random = math.random (0,100)
+			if random < 1 then
+				print("LEs flics ont étés alertés")
+				TriggerServerEvent("job:avert:all", "lspd", "Coups de feu en cour", true)
+			end				
+		end
+	end
+end)

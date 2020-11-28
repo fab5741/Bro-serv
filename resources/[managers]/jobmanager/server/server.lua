@@ -65,35 +65,37 @@ end)
 
 
 -- time for each paycheck
-local moneyDutyTime = 30 *1000 * 60
+local moneyDutyTime = 60 *1000 *30
 
 -- Key Controls
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(moneyDutyTime)
-        print("Time for paycheck")
-
         -- Check if people are working
         MySQL.ready(function()
             MySQL.Async.fetchAll('select players.gameId, jobs.id as job, job_grades.salary, players.id as player from players, jobs, job_grades where jobs.id = job_grades.job and onDuty = 1 and players.job_grade= job_grades.id',{},
                 function(res)
                     for k,v in pairs(res) do
-                        MySQL.Async.fetchScalar('select money from jobs where id=@job',
+                        MySQL.Async.fetchScalar('select amount from job_account, accounts where job_account.job = @job and accounts.id = job_account.account ',
                             {['@job'] = v.job},
-                        function(money)
+                        function(amount)
                             v.salary = v.salary/2
-                            if money > v.salary then
-                               MySQL.Async.execute('update jobs set money = money - @salary where id = @job',{
+                            if amount > v.salary then
+                               MySQL.Async.execute('update job_account, accounts set amount = amount - @salary where job_account.job = @job and accounts.id = job_account.account',{
                                    ['@salary'] = v.salary,
                                    ['@job'] = v.job
                                },
                                function(affectedRows)
-                                    MySQL.Async.execute('update accounts set amount = amount + @salary where accounts.player = @player',{
+                                    MySQL.Async.execute('update accounts, player_account set amount = amount + @salary where player_account.player = @player and player_account.account = accounts.id',{
                                         ['@salary'] = v.salary,
                                         ['@player'] = v.player
                                     },
                                     function(affectedRows)
-                                        TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~g~"..v.salary.." $")
+                                        if affectedRows == 1 then
+                                            TriggerClientEvent('bf:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
+                                        else
+                                            TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
+                                        end
                                     end)
                                end)
                             else
@@ -258,8 +260,6 @@ RegisterNetEvent("job:lsms:distress")
 
 AddEventHandler('job:lsms:distress', function(player)
     --check le nombre d'ambulanciers présent
-    print("appel recu de " .. player)
-
     --TODO disable or true, when phone woirking
     if #inService["lsms"] == 0 or true then
         TriggerClientEvent('job:lsms:revive', source)
@@ -276,12 +276,14 @@ end)
 -- homes
 RegisterNetEvent("job:avert:all")
 
-AddEventHandler("job:avert:all", function (job, message)
+AddEventHandler("job:avert:all", function (job, message, silent)
     local sourceValue = source
     local message = message
     
     if #inService[job] == 0 then
-        TriggerClientEvent('bf:Notification', sourceValue, "Personne n'est en service, démerdez vous. Job : ~b~(".. job.. ")")
+        if not silent then
+            TriggerClientEvent('bf:Notification', sourceValue, "Personne n'est en service, démerdez vous. Job : ~b~(".. job.. ")")
+        end
     else
         for k,v  in pairs (inService[job]) do
             TriggerClientEvent('bf:Notification', v, message)
@@ -296,7 +298,6 @@ RegisterNetEvent("job:clock:set")
 
 AddEventHandler("job:clock:set", function (isIn, job)
     local sourceValue = source
-    print(job)
     if isIn then
         inService[job][#inService[job]+1] = sourceValue
     else
@@ -351,7 +352,6 @@ AddEventHandler("job:service:recruit", function (job, player)
                 ['@job_grade'] = job_grade
             },function(affectedRows)
                 if affectedRows > 0 then
-                    print(affectedRows)
                 end
             end)
         end)
@@ -370,7 +370,6 @@ AddEventHandler("job:service:promote", function (player)
             ['@job_grade'] = job_grade
         },function(affectedRows)
             if affectedRows > 0 then
-                print(affectedRows)
             end
         end)
     end)
@@ -387,7 +386,6 @@ AddEventHandler("job:service:demote", function (player)
             ['@job_grade'] = job_grade
         },function(affectedRows)
             if affectedRows > 0 then
-                print(affectedRows)
             end
         end)
     end)

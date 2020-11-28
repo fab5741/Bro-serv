@@ -2,7 +2,11 @@ fx_version 'bodacious'
 game 'gta5'
 
 description '- Bro - clothes - shop'
-dependency "bf"
+dependencies  {
+    "bf", 
+    "skin",
+    "skinchanger"
+}
 
 version '0.0.1'
 
@@ -14,3 +18,5 @@ server_script {
     '@mysql-async/lib/MySQL.lua',
     'server.lua'
 }
+
+

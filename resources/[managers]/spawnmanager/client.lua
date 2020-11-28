@@ -8,7 +8,7 @@ Citizen.CreateThread(function()
             local ped = PlayerPedId()
             SetCanAttackFriendly(ped, true, true)
             NetworkSetFriendlyFireOption(true)
-            TriggerServerEvent('skin:getPlayerSkin', "spawn:spawn")
+            TriggerServerEvent('player:get', "spawn:spawn")
             spawned = true
         end 
     end
@@ -37,15 +37,30 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent("spawn:spawn")
-
-AddEventHandler('spawn:spawn', function (player)
+function spawnPlayerBegin(player)
+    print(player.skin)
     if player.skin == nil or player.skin == "" then
         TriggerEvent('nicoo_charcreator:CharCreator')
         Citizen.Wait(100)
     else
-        TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), nil)
+        TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), json.decode(player.clothes))
         Citizen.Wait(100)
     end
     spawnPlayer(player.x,player.y, player.z)
+end
+
+RegisterNetEvent("spawn:spawn")
+
+AddEventHandler('spawn:spawn', function (player)
+    if player == nil then
+        TriggerServerEvent("player:create", "spawn:spawn:2")
+    else
+        spawnPlayerBegin(player)
+    end
+end)
+
+RegisterNetEvent("spawn:spawn2")
+
+AddEventHandler('spawn:spawn', function (player)
+    spawnPlayerBegin(player)
 end)

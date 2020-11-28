@@ -5,7 +5,8 @@ dependencies {
     'bf',
     'vehicles',
     'lsms', 
-    'account'   
+    'account',
+    'spawnManager'
 }
 
 client_script {

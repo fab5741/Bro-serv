@@ -302,3 +302,49 @@ RegisterNetEvent("jobs:recruit")
 AddEventHandler("jobs:recruit", function(job) 
 	recruitClosestPlayer(job)
 end)
+
+
+RegisterNetEvent('weapon:store')
+
+AddEventHandler("weapon:store", function(weapons)  
+	buttons = {}
+	for k, v in pairs(weapons) do
+		buttons[#buttons+1] = {
+			text = v.weapon..' '..v.amount,
+			exec = {
+				callback = function()
+					TriggerServerEvent("weapon:get", "weapon:store:store", v.weapon)
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons("weapon-store", buttons)
+	exports.bf:NextMenu("weapon-store")
+end)
+
+RegisterNetEvent('weapon:store:store')
+
+AddEventHandler("weapon:store:store", function(weapon)  
+	print(weapon)
+	if weapon == "453432689" then
+		weapon = "WEAPON_PISTOL"
+	elseif weapon == "-1951375401" then
+		weapon = "WEAPON_FLASHLIGHT"
+	elseif weapon == "911657153" then
+		weapon = "WEAPON_STUNGUN"
+	elseif weapon == "1737195953" then
+		weapon = "WEAPON_NIGHTSTICK"
+	elseif weapon == "487013001" then
+		weapon = "WEAPON_PUMPSHOTGUN"
+	elseif weapon == "736523883" then
+		weapon = "WEAPON_SMG"
+	end
+	GiveWeaponToPed(
+		GetPlayerPed(-1) --[[ Ped ]], 
+		weapon --[[ Hash ]], 
+		100 --[[ integer ]], 
+		false --[[ boolean ]], 
+		true --[[ boolean ]]
+	)
+	CloseArmory()
+end)

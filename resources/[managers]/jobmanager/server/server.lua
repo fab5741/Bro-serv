@@ -478,3 +478,70 @@ AddEventHandler("job:service:demote", function (player)
         end)
     end)
 end)
+
+RegisterNetEvent("job:get:player")
+
+-- source is global here, don't add to function
+AddEventHandler('job:get:player', function(cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local cbe = cb
+    MySQL.ready(function ()
+        MySQL.Async.fetchAll('SELECT jobs.name, players.skin, job_grades.grade FROM players, job_grades, jobs WHERE job_grades.id = players.job_grade and job_grades.job = jobs.id and discord = @discord', {
+            ['@discord'] =  discord
+        }, function(res)
+            if res and res[1] then
+                TriggerClientEvent(cbe, sourceValue, res[1])
+            else
+                TriggerClientEvent(cbe, sourceValue)
+            end
+        end)
+    end)
+end)
+
+
+RegisterNetEvent("weapon:store")
+
+-- source is global here, don't add to function
+AddEventHandler('weapon:store', function(weapon)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.insert('update job_armory,players, job_grades, jobs set amount = amount+1 where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
+            ['@weapon'] =  weapon,
+            ['@discord'] =  discord
+        }, function(res)
+        end)
+    end)
+end)
+
+RegisterNetEvent("weapon:get:all")
+
+-- source is global here, don't add to function
+AddEventHandler('weapon:get:all', function(cb)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.fetchAll('select * from job_armory,players,job_grades,jobs  where jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
+            ['@discord'] =  discord
+        }, function(res)
+            TriggerClientEvent(cb, sourceValue, res)
+        end)
+    end)
+end)
+
+RegisterNetEvent("weapon:get")
+
+-- source is global here, don't add to function
+AddEventHandler('weapon:get', function(cb, weapon)
+    local sourceValue = source
+    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.insert('update job_armory,players, job_grades, jobs set amount = amount-1 where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
+            ['@weapon'] =  weapon,
+            ['@discord'] =  discord
+        }, function(res)
+            TriggerClientEvent(cb, sourceValue, weapon)
+        end)
+    end)
+end)

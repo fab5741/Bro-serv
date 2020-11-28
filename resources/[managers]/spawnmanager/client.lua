@@ -22,23 +22,43 @@ Citizen.CreateThread(function()
     end
 end)
 
+weaponsHashes = {
+    "WEAPON_PISTOL",
+    "WEAPON_STUNGUN",
+    "WEAPON_MACHETE",
+    "WEAPON_BAT",
+    "WEAPON_BALL",
+    "WEAPON_FLASHLIGHT",
+    "WEAPON_NIGHTSTICK",
+    "WEAPON_PUMPSHOTGUN",
+    "WEAPON_SMG"
+}
+
 RegisterNetEvent("player:saveCoords")
 
 -- source is global here, don't add to function
 AddEventHandler('player:saveCoords', function ()
-    TriggerServerEvent("player:saveCoordsServer", GetPlayerName(PlayerId()),GetEntityCoords(GetPlayerPed(-1)))
+    local weapons = {
+
+    }
+    for k,v in pairs(weaponsHashes) do
+        if HasPedGotWeapon(GetPlayerPed(-1), v, false) then 
+            weapons[#weapons+1] = v
+        end
+    end
+    TriggerServerEvent("player:saveCoordsServer", GetPlayerName(PlayerId()), GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons))
 end)
 
 -- boucle pour sauvegarder toutes les X s
 Citizen.CreateThread(function()
     while true do
         Wait(10000)
+        print("save coords")
         TriggerEvent("player:saveCoords")
     end
 end)
 
 function spawnPlayerBegin(player)
-    print(player.skin)
     if player.skin == nil or player.skin == "" then
         TriggerEvent('nicoo_charcreator:CharCreator')
         Citizen.Wait(100)
@@ -46,7 +66,11 @@ function spawnPlayerBegin(player)
         TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), json.decode(player.clothes))
         Citizen.Wait(100)
     end
+    local ped = GetPlayerPed(-1)
     spawnPlayer(player.x,player.y, player.z)
+    for k,v in pairs(json.decode(player.weapons)) do
+        GiveWeaponToPed(ped, GetHashKey(v), 100, false, false)
+    end
 end
 
 RegisterNetEvent("spawn:spawn")

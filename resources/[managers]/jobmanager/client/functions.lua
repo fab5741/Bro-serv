@@ -890,14 +890,14 @@ function createMenuAndArea(job)
 						position = 1,
 						closable = false,
 						buttons= {
-							{
-								text = "Kit de base",
-								exec = {
-									callback = function()
-										giveBasicKit()
-									end
-								},
-							},
+					--		{
+					--			text = "Kit de base",
+					--			exec = {
+					--				callback = function()
+					--					giveBasicKit()
+					--				end
+					--			},
+					--		},
 							{
 								text = "Mettre Gillet",
 								exec = {
@@ -915,16 +915,47 @@ function createMenuAndArea(job)
 								},
 							},
 							{
+								text = "Stocker armes",
+								exec = {
+									callback = function()
+										local found, weapon  = GetCurrentPedWeapon(
+											GetPlayerPed(-1),
+											1
+										)
+										if found then
+											print(weapon)
+											RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
+											CloseArmory()
+											TriggerServerEvent("weapon:store", weapon)
+											exports.bf:Notification("Arme stocké")
+										else
+											exports.bf:Notification("Pas d'arme sur vous")
+										end
+									end
+								},
+							},
+							{
+								text = "Retirer arme",
+								exec = {
+									callback = function()
+										TriggerServerEvent("weapon:get:all", "weapon:store")
+									end
+								},
+							},
+							{
 								text = "Quitter",
 								exec = {
 									callback = function()
-										print("close")
 										CloseArmory()
 										exports.bf:CloseMenu("armories"..k)
 									end
 								},
 							}
 						}
+					})
+					exports.bf:AddMenu("weapon-store", {
+						title = "weapon",
+						position = 1,
 					})
 				end
 			end

@@ -66,11 +66,7 @@ function spawnPlayerBegin(player)
         TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), json.decode(player.clothes))
         Citizen.Wait(100)
     end
-    local ped = GetPlayerPed(-1)
-    spawnPlayer(player.x,player.y, player.z)
-    for k,v in pairs(json.decode(player.weapons)) do
-        GiveWeaponToPed(ped, GetHashKey(v), 100, false, false)
-    end
+    spawnPlayer(player.x,player.y, player.z, player.weapons)
 end
 
 RegisterNetEvent("spawn:spawn")

@@ -12,7 +12,6 @@ AddEventHandler('player:saveCoordsServer', function(name, pos, weapons)
     local nameValue = name
     local weapons = weapons
 
-    print(weapons)
     MySQL.ready(function ()
         MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z, gameId = @gameId, weapons = @weapons WHERE discord = @discord', {
             ['@discord'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z, ['@gameId'] = sourceValue, ['@weapons'] = weapons

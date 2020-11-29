@@ -37,7 +37,7 @@ end
 local spawnLock = false
 
 -- spawns the current player at a certain spawn point index (or a random one, for that matter)
-function spawnPlayer(x, y, z)     
+function spawnPlayer(x, y, z, weapons)     
     if spawnLock then
         return
     end
@@ -106,6 +106,12 @@ function spawnPlayer(x, y, z)
         TriggerServerEvent("player:spawned")
         TriggerServerEvent("needs:spawned")
         
+        Wait(2000)
+        for k,v in pairs(json.decode(weapons)) do
+            print(v)
+            GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)
+        end
+
        spawnLock = false
     end)
 end

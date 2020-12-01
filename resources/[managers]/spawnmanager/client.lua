@@ -63,10 +63,15 @@ function spawnPlayerBegin(player)
         TriggerEvent('nicoo_charcreator:CharCreator')
         Citizen.Wait(100)
     else
-        TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), json.decode(player.clothes))
+        if(player.clothes ~= nil) then
+            TriggerEvent('skinchanger:loadClothes', json.decode(player.skin), json.decode(player.clothes))
+        else
+            TriggerEvent('skinchanger:loadSkin', json.decode(player.skin), function() end)
+        end
         Citizen.Wait(100)
     end
     spawnPlayer(player.x,player.y, player.z, player.weapons)
+
 end
 
 RegisterNetEvent("spawn:spawn")
@@ -79,8 +84,8 @@ AddEventHandler('spawn:spawn', function (player)
     end
 end)
 
-RegisterNetEvent("spawn:spawn2")
+RegisterNetEvent("spawn:spawn:2")
 
-AddEventHandler('spawn:spawn', function (player)
+AddEventHandler('spawn:spawn:2', function (player)
     spawnPlayerBegin(player)
 end)

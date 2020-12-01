@@ -10,6 +10,23 @@ myclothesSkin = {
 mySkin = {
 }
 
+
+
+RegisterNetEvent('clothes_shop:skin:update')
+
+AddEventHandler('clothes_shop:skin:update', function(skin)
+    if skin ~= nil then
+        mySkin = json.decode(skin)
+    end
+end)
+
+
+RegisterNetEvent('player:spawned:clothes')
+
+AddEventHandler('player:spawned:clothes', function()
+    TriggerServerEvent('skin:getPlayerSkin', "clothes_shop:skin:update")
+end)
+
 function addMenu(max, part, variante, maxVariant, isSkin) 
     buttons = {}
 	for i = 0,max do
@@ -28,6 +45,7 @@ function addMenu(max, part, variante, maxVariant, isSkin)
             hover = {
                 callback = function()
                     TriggerEvent('skinchanger:getSkin', function(skin)
+                        print(skin.sex)
                         clothesSkin = myclothesSkin
                         if isSkin then
                             for k,v in ipairs(mySkin) do
@@ -77,105 +95,103 @@ function addMenu(max, part, variante, maxVariant, isSkin)
     end
 end
 
-RegisterNetEvent('clothes_shop:skin:update')
 
-AddEventHandler('clothes_shop:skin:update', function(skin)
-    mySkin = json.decode(skin)
-    
-	exports.bf:AddMenu("clothes-shop", {
-		title = "Magasin Vêtements ",
-		position = 1,
-		buttons = {
-			{
-				text = "Corps",
-				openMenu = "clothes-shop-torso"
+-- open menu loop
+Citizen.CreateThread(function()
+    exports.bf:AddMenu("clothes-shop", {
+        title = "Magasin Vêtements ",
+        position = 1,
+        buttons = {
+            {
+                text = "Corps",
+                openMenu = "clothes-shop-torso"
             },
             {
-				text = "Corps (variante)",
-				openMenu = "clothes-shop-torso2"
+                text = "Corps (variante)",
+                openMenu = "clothes-shop-torso2"
             },
             {
-				text = "T-Shirt",
-				openMenu = "clothes-shop-tshirt"
+                text = "T-Shirt",
+                openMenu = "clothes-shop-tshirt"
             },
             {
-				text = "T-Shirt2 (variante)",
-				openMenu = "clothes-shop-tshirt2"
+                text = "T-Shirt2 (variante)",
+                openMenu = "clothes-shop-tshirt2"
             },
             {
-				text = "Bras",
-				openMenu = "clothes-shop-arms"
+                text = "Bras",
+                openMenu = "clothes-shop-arms"
             },
             {
-				text = "Bras (variante)",
-				openMenu = "clothes-shop-arms"
+                text = "Bras (variante)",
+                openMenu = "clothes-shop-arms"
             },
             {
-				text = "Pantalon",
-				openMenu = "clothes-shop-pants"
+                text = "Pantalon",
+                openMenu = "clothes-shop-pants"
             },
             {
-				text = "Pantalon (variante)",
-				openMenu = "clothes-shop-pants2"
+                text = "Pantalon (variante)",
+                openMenu = "clothes-shop-pants2"
             },
             {
-				text = "Chaussures",
-				openMenu = "clothes-shop-shoes"
+                text = "Chaussures",
+                openMenu = "clothes-shop-shoes"
             },
             {
-				text = "Chaussures (variante)",
-				openMenu = "clothes-shop-shoes2"
+                text = "Chaussures (variante)",
+                openMenu = "clothes-shop-shoes2"
             },
             {
-				text = "Masques",
-				openMenu = "clothes-shop-mask"
+                text = "Masques",
+                openMenu = "clothes-shop-mask"
             },
             {
-				text = "Masques (variante)",
-				openMenu = "clothes-shop-mask2"
+                text = "Masques (variante)",
+                openMenu = "clothes-shop-mask2"
             },
             {
-				text = "Cou",
-				openMenu = "clothes-shop-chain"
+                text = "Cou",
+                openMenu = "clothes-shop-chain"
             },
             {
-				text = "Cou (variante)",
-				openMenu = "clothes-shop-chain2"
-            },
-			{
-				text = "Tête",
-				openMenu = "clothes-shop-helmet"
+                text = "Cou (variante)",
+                openMenu = "clothes-shop-chain2"
             },
             {
-				text = "Tête (variante)",
-				openMenu = "clothes-shop-helmet2"
+                text = "Tête",
+                openMenu = "clothes-shop-helmet"
             },
             {
-				text = "Lunettes",
-				openMenu = "clothes-shop-glasses"
+                text = "Tête (variante)",
+                openMenu = "clothes-shop-helmet2"
             },
             {
-				text = "Lunettes (variante)",
-				openMenu = "clothes-shop-glasses2"
+                text = "Lunettes",
+                openMenu = "clothes-shop-glasses"
             },
             {
-				text = "Montres",
-				openMenu = "clothes-shop-glasses"
+                text = "Lunettes (variante)",
+                openMenu = "clothes-shop-glasses2"
             },
             {
-				text = "Montres (variante)",
-				openMenu = "clothes-shop-glasses2"
+                text = "Montres",
+                openMenu = "clothes-shop-glasses"
             },
             {
-				text = "Bracelets",
-				openMenu = "clothes-shop-bracelets"
+                text = "Montres (variante)",
+                openMenu = "clothes-shop-glasses2"
             },
             {
-				text = "Bracelets (variante)",
-				openMenu = "clothes-shop-bracelets2"
+                text = "Bracelets",
+                openMenu = "clothes-shop-bracelets"
             },
             {
-				text = "Valider la tenue",
+                text = "Bracelets (variante)",
+                openMenu = "clothes-shop-bracelets2"
+            },
+            {
+                text = "Valider la tenue",
                 exec = {
                     callback = function()
                         local price  = 10
@@ -185,8 +201,8 @@ AddEventHandler('clothes_shop:skin:update', function(skin)
                         TriggerServerEvent('skin:clothes:save', myclothesSkin)
                     end
                 },
-			},
-		},
+            },
+        },
     })
     addMenu(290, "torso", true, 10, true)
     addMenu(144, "tshirt", true, 10)
@@ -238,14 +254,6 @@ AddEventHandler('clothes_shop:skin:update', function(skin)
             },
         },
     })
-end)
-Citizen.CreateThread(function()
-    TriggerServerEvent('skin:getPlayerSkin', "clothes_shop:skin:update")
-end)
-
-
--- open menu loop
-Citizen.CreateThread(function()
 	-- main loop
     while true do
 		Citizen.Wait(0)	

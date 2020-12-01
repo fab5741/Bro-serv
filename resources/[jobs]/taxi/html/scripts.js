@@ -70,7 +70,7 @@ $(document).ready(function(){
   // On 'Esc' call close method
   document.onkeyup = function (data) {
     if (data.which == 27 ) {
-      $.post('http://vrp_taxi/close', JSON.stringify({}));
+      $.post('http://taxi/close', JSON.stringify({}));
     }
   };
 });

@@ -1,6 +1,3 @@
-ESX = nil
-
-TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 function GetProperty(name)
 	for i=1, #Config.Properties, 1 do
@@ -173,11 +170,11 @@ end)
 
 RegisterNetEvent('property:buyProperty')
 AddEventHandler('property:buyProperty', function(propertyName)
-	local xPlayer  = ESX.GetPlayerFromId(source)
+    local discord = exports.bf:GetDiscordFromSource(source)
 	local property = GetProperty(propertyName)
 
 	if property.price <= xPlayer.getMoney() then
-		xPlayer.removeMoney(property.price)
+		-- todo - remove player money
 		SetPropertyOwned(propertyName, property.price, false, xPlayer.identifier)
 	else
 		xPlayer.showNotification(_U('not_enough'))

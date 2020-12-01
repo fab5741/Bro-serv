@@ -333,6 +333,7 @@ RegisterNetEvent("phone:receiveMessage")
 AddEventHandler("phone:receiveMessage", function(message)
   -- SendNUIMessage({event = 'updateMessages', messages = messages})
   SendNUIMessage({event = 'newMessage', message = message})
+  print(message)
   table.insert(messages, message)
   if message.owner == 0 then
     local text = 'new_message'

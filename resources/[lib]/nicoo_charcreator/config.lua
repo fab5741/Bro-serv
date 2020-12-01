@@ -17,33 +17,6 @@ Config.FatherList = { "Benjamin", "Daniel", "Joshua", "Noah", "Andrew", "Juan", 
 -- Liste des tenues
 Config.Outfit = {
 	{
-		label = 'Sous-Vêtement',
-		id = {
-			male = {
-				tshirt = {15, 0},
-				torso = {15, 0},
-				decals = {0, 0},
-				arms = {15, 0},
-				pants = {61, 4},
-				shoes = {34, 0},
-				chain = {0, 0},
-				helmet = {-1, 0},
-				glasses = {0, 0}
-			},
-			female = {
-				tshirt = {15, 0},
-				torso = {5, 0},
-				decals = {0, 0},
-				arms = {15, 0},
-				pants = {57, 0},
-				shoes = {35, 0},
-				chain = {0, 0},
-				helmet = {-1, 0},
-				glasses = {0, 0}
-			}
-		}
-	},
-	{
 		label = 'Confortable',
 		id = {
 			male = {
@@ -58,15 +31,15 @@ Config.Outfit = {
 				glasses = {0, 0}
 			},
 			female = {
-				tshirt = {15, 0},
-				torso = {5, 0},
+				tshirt = {3, 0},
+				torso = {3, 0},
 				decals = {0, 0},
-				arms = {15, 0},
-				pants = {57, 0},
-				shoes = {35, 0},
+				arms = {3, 0},
+				pants = {4, 0},
+				shoes = {1, 0},
 				chain = {0, 0},
 				helmet = {-1, 0},
-				glasses = {0, 0}
+				glasses = {-1, 0}
 			}
 		}
 	},

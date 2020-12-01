@@ -11,6 +11,9 @@ inService = {
     wine = {
 
     },
+    taxi = {
+
+    }
 }
 
 RegisterNetEvent("job:get")
@@ -362,16 +365,20 @@ end)
 -- homes
 RegisterNetEvent("job:avert:all")
 
-AddEventHandler("job:avert:all", function (job, message, silent)
+AddEventHandler("job:avert:all", function (job, message, silent, pos)
     local sourceValue = source
     local message = message
-    
+    local pos = pos
+
     if #inService[job] == 0 then
         if not silent then
             TriggerClientEvent('bf:Notification', sourceValue, "Personne n'est en service, démerdez vous. Job : ~b~(".. job.. ")")
         end
     else
         for k,v  in pairs (inService[job]) do
+            if pos == true then
+                TriggerClientEvent("taxi:client:show", v, sourceValue)
+            end
             TriggerClientEvent('bf:Notification', v, message)
         end
         if not silent then
@@ -380,17 +387,22 @@ AddEventHandler("job:avert:all", function (job, message, silent)
     end
 end)
 
+RegisterNetEvent("job:inService:number")
+
+AddEventHandler("job:inService:number", function (cb, job)
+    TriggerClientEvent(cb, source, #inService[job])
+end)
+
 
 -- clock in
 RegisterNetEvent("job:clock:set")
 
-AddEventHandler("job:clock:set", function (isIn, job)
-    local sourceValue = source
+AddEventHandler("job:clock:set", function (isIn, source, job)
     if isIn then
-        inService[job][#inService[job]+1] = sourceValue
+        inService[job][#inService[job]+1] = source
     else
         for i = 1, #inService[job] do
-            if inService[job][i] == sourceValue then
+            if inService[job][i] == source then
                 inService[job][i] = nil
             end
         end
@@ -409,10 +421,10 @@ AddEventHandler("job:clock", function (isIn, job)
         function(affectedRows)
             if affectedRows > 0 then
                 if isIn then
-                    TriggerEvent("job:clock:set", true, job)
+                    TriggerEvent("job:clock:set", true, sourceValue, job)
                     TriggerClientEvent('bf:Notification', sourceValue, "Vous entrez en service")
                 else
-                    TriggerEvent("job:clock:set", false, job)
+                    TriggerEvent("job:clock:set", false, sourceValue, job)
                     TriggerClientEvent('bf:Notification', sourceValue, "Vous quittez le service")
                 end
             end

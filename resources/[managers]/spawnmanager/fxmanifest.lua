@@ -12,5 +12,6 @@ server_script {
 
 dependencies {
     "bf",
-    "skin"
+    "skin",
+    "skinchanger"
 }

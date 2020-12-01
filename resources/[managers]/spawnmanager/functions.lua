@@ -104,6 +104,7 @@ function spawnPlayer(x, y, z, weapons)
         ShutdownLoadingScreenNui()
 
         TriggerServerEvent("player:spawned")
+        TriggerServerEvent("player:spawned:clothes")
         TriggerServerEvent("needs:spawned")
         
         Wait(2000)

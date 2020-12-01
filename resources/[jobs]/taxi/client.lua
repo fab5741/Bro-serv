@@ -28,6 +28,9 @@ local costPerMile = 0.5
 local initialFare = 1.0 -- the cost to start a fare
 
 local testMode = true -- enables spawn car command
+local playerPed = PlayerPedId()
+local taxiVeh = nil
+local first = true
 
 DecorRegister("fares", 1)
 DecorRegister("miles", 1)
@@ -95,7 +98,7 @@ Citizen.CreateThread(function()
     if meterActive and GetPedInVehicleSeat(veh, -1) == ped then
       local _fare = DecorGetFloat(veh, "fares")
       local _miles = DecorGetFloat(veh, "miles")
-      local _fareCost = DecorGetFloat(veh, "fareCost")
+       _fareCost = DecorGetFloat(veh, "fareCost")
 
       if _fareCost ~= 0 then
         DecorSetFloat(veh, "fares", _fare + _fareCost)
@@ -183,26 +186,26 @@ if enableTaxiGui then
     
               if IsPedSittingInVehicle(CurrentCustomer, vehicle) then
                 if CustomerEnteredVehicle then
+                  if first then
+                    TriggerEvent('taxi:resetMeter')
+                    first = false
+                  end
                   local targetDistance = #(playerCoords - targetCoords)
     
                   if targetDistance <= 10.0 then
                     TaskLeaveVehicle(CurrentCustomer, vehicle, 0)
     
-                    exports.bf:Notification('Arrivé à destination')
+                    exports.bf:Notification('Arrivé à destination. Vous gagnez ~g~'..string.format("%.2f", farecost)..'$')
 
                     TaskGoStraightToCoord(CurrentCustomer, targetCoords.x, targetCoords.y, targetCoords.z, 1.0, -1, 0.0, 0.0)
                     SetEntityAsMissionEntity(CurrentCustomer, false, true)
-                    TriggerServerEvent('taxi:success')
+                    TriggerServerEvent("account:player:liquid:add", "", string.format("%.2f", farecost))
                     RemoveBlip(DestinationBlip)
-    
-                    local scope = function(customer)
-                      Wait(6000)
-                        DeletePed(customer)
-                    end
-    
-                    scope(CurrentCustomer)
-    
+
+                    Wait(6000)
+                    DeletePed(CurrentCustomer)    
                     CurrentCustomer, CurrentCustomerBlip, DestinationBlip, IsNearCustomer, CustomerIsEnteringVehicle, CustomerEnteredVehicle, targetCoords = nil, nil, nil, false, false, false, nil
+                    first = true
                   end
     
                   if targetCoords then
@@ -386,13 +389,73 @@ AddEventHandler('taxi:updatefare', function(veh)
   local playerName = GetPlayerName(id)
   local _fare = DecorGetFloat(veh, "fares")
   local _miles = DecorGetFloat(veh, "miles")
-  local farecost = _fare + (_miles * DecorGetFloat(veh, "costPerMile"))
+  farecost = _fare + (_miles * DecorGetFloat(veh, "costPerMile"))
 
-
-	SendNUIMessage({
+  SendNUIMessage({
 		updateBalance = true,
 		balance = string.format("%.2f", farecost),
     player = string.format("%.2f", _miles),
     meterActive = DecorGetBool(veh, "meteractive")
 	})
+end)
+
+
+RegisterNetEvent('taxi:call')
+AddEventHandler('taxi:call', function(number)
+  print("call taxi")
+  if number == 0 then
+    if not DoesEntityExist(taxiVeh) and not IsPedInAnyVehicle(playerPed, false)then 
+      Px, Py, Pz = table.unpack(GetEntityCoords(playerPed))
+  
+      taxiVeh = CreateTaxi(Px, Py, Pz)
+      while not DoesEntityExist(taxiVeh) do
+        Wait(1)
+      end
+  
+      taxiPed = CreateTaxiPed(taxiVeh)
+      while not DoesEntityExist(taxiPed) do
+        Wait(1)
+      end
+  
+      TaskVehicleDriveToCoord(taxiPed, taxiVeh, Px, Py, Pz, 26.0, 0, GetEntityModel(taxiVeh), 411, 10.0)
+      SetPedKeepTask(taxiPed, true)
+    end
+  else
+    exports.bf:Notification("Passez un appel aux taxis via le téléphone")
+  end
+end)
+
+
+RegisterCommand('taxi', function()
+  TriggerServerEvent("job:inService:number", "taxi:call", "taxi")
+end)
+
+
+RegisterCommand('taxi_reset', function()
+  exports.bf:Notification('Reset taxi')
+    
+  if DoesBlipExist(CurrentCustomerBlip) then
+    RemoveBlip(CurrentCustomerBlip)
+  end
+
+  if DoesBlipExist(DestinationBlip) then
+    RemoveBlip(DestinationBlip)
+  end
+
+  SetEntityAsMissionEntity(CurrentCustomer, false, true)
+
+  CurrentCustomer, CurrentCustomerBlip, DestinationBlip, IsNearCustomer, CustomerIsEnteringVehicle, CustomerEnteredVehicle, targetCoords = nil, nil, nil, false, false, false, nil
+end)
+
+
+RegisterNetEvent('taxi:client:show')
+AddEventHandler('taxi:client:show', function(client)
+printr("show blip")
+  local blip = AddBlipForEntity(GetPlayerPed(client))
+  SetBlipSprite(blip, 198)
+  SetBlipFlashes(blip, true)
+  SetBlipFlashTimer(blip, 5000)
+
+  Wait(5*1000*60)
+  RemoveBlip(blip)
 end)

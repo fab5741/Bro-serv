@@ -116,51 +116,105 @@ end)
 
 function addMessage(source, discord, phone_number, message)
     local sourcePlayer = tonumber(source)
-    MySQL.ready(function ()
-        MySQL.ready(function ()
-            MySQL.Async.fetchScalar("SELECT players.discord FROM players WHERE players.phone_number = @phone_number", {
-                ['@phone_number'] = phone_number
-            }, function(otherdiscord)
-                MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
-                {['@discord'] =  discord},
-                function(myPhone)
-                    MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
-                    {
-                        ['@transmitter'] = myPhone,
-                        ['@receiver'] = phone_number,
-                        ['@message'] = message,
-                        ['@isRead'] = 0,
-                        ['@owner'] = 0
-                    }, function(id)
-                        MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
-                            ['@id'] = id
-                        }, function(res)
-                            getSourceFromdiscord(otherdiscord, function (osou)
-                                if tonumber(osou) ~= nil then 
-                                    -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
-                                    TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
-                                end
-                            end) 
+    if message ~= nil then
+        if phone_number == "taxi" or phone_number == "lspd" or phone_number == "lsms" then
+            TriggerEvent("job:avert:all", phone_number, "Appel reçu", true)
+
+            MySQL.ready(function ()
+                MySQL.Async.fetchAll("SELECT players.discord FROM players, job_grades, jobs WHERE players.job_grade = job_grades.id and job_grades.job = jobs.id and jobs.name = @job", {
+                    ['@job'] = job
+                }, function(players)
+                    for k, v in pairs(players) do
+                        MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
+                        {['@discord'] =  v},
+                        function(playerPhone)
+                            MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
+                            {
+                                ['@transmitter'] = phone_number,
+                                ['@receiver'] = playerPhone,
+                                ['@message'] = message,
+                                ['@isRead'] = 0,
+                                ['@owner'] = 0
+                            }, function(id)
+                                MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
+                                    ['@id'] = id
+                                }, function(res)
+                                    getSourceFromdiscord(v, function (osou)
+                                        if tonumber(osou) ~= nil then 
+                                            -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
+                                            TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
+                                        end
+                                    end) 
+                                end)
+                            end)
                         end)
-                    end)
-                    MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
-                    {
-                        ['@transmitter'] = phone_number,
-                        ['@receiver'] = myPhone,
-                        ['@message'] = message,
-                        ['@isRead'] = 1,
-                        ['@owner'] = 1
-                    }, function(id)
-                        MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
-                            ['@id'] = id
-                        }, function(res)   
-                            TriggerClientEvent("phone:receiveMessage", sourcePlayer, memess)
+                    end
+                    MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
+                    {['@discord'] =  discord},
+                    function(myPhone)
+                        MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
+                        {
+                            ['@transmitter'] = phone_number,
+                            ['@receiver'] = myPhone,
+                            ['@message'] = message,
+                            ['@isRead'] = 1,
+                            ['@owner'] = 1
+                        }, function(id)
+                            MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
+                                ['@id'] = id
+                            }, function(res)   
+                                TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
+                            end)
                         end)
                     end)
                 end)
             end)
-        end)
-    end)
+        else
+            MySQL.ready(function ()
+                MySQL.Async.fetchScalar("SELECT players.discord FROM players WHERE players.phone_number = @phone_number", {
+                    ['@phone_number'] = phone_number
+                }, function(otherdiscord)
+                    MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
+                    {['@discord'] =  discord},
+                    function(myPhone)
+                        MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
+                        {
+                            ['@transmitter'] = myPhone,
+                            ['@receiver'] = phone_number,
+                            ['@message'] = message,
+                            ['@isRead'] = 0,
+                            ['@owner'] = 0
+                        }, function(id)
+                            MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
+                                ['@id'] = id
+                            }, function(res)
+                                getSourceFromdiscord(otherdiscord, function (osou)
+                                    if tonumber(osou) ~= nil then 
+                                        -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
+                                        TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
+                                    end
+                                end) 
+                            end)
+                        end)
+                        MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
+                        {
+                            ['@transmitter'] = phone_number,
+                            ['@receiver'] = myPhone,
+                            ['@message'] = message,
+                            ['@isRead'] = 1,
+                            ['@owner'] = 1
+                        }, function(id)
+                            MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
+                                ['@id'] = id
+                            }, function(res)   
+                                TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
+                            end)
+                        end)
+                    end)
+                end)
+            end)
+        end
+    end
 end
 
 function deleteMessage(msgId)

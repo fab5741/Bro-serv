@@ -2,6 +2,44 @@ local OwnedProperties, Blips, CurrentActionData = {}, {}, {}
 local CurrentProperty, CurrentPropertyOwner, LastProperty, LastPart, CurrentAction, CurrentActionMsg
 local firstSpawn, hasChest, hasAlreadyEnteredMarker = true, false, false
 
+exports.bf:AddMenu("property", {
+    title = "Propriété",
+    buttons = {
+        {
+			text = "Entrer",
+			exec=  {
+				callback = function ()
+				end
+			},
+		},
+		{
+			text = "Vendre",
+			exec=  {
+				callback = function ()
+					TriggerServerEvent('property:removeOwnedProperty', property.name)
+				end
+			},
+        },
+        {
+            text = "Acheter",
+			exec=  {
+				callback = function ()
+					TriggerServerEvent('property:buyProperty', property.name)
+				end
+			},
+        },
+        {
+            text = "Louer",
+			exec=  {
+				callback = function ()
+					TriggerServerEvent('property:rentProperty', property.name)
+				end
+			},
+        },
+    },
+})
+
+
 -- only used when script is restarting mid-session
 RegisterNetEvent('property:sendProperties')
 AddEventHandler('property:sendProperties', function(properties)
@@ -19,7 +57,7 @@ end
 function CreateBlips()
 	for i=1, #Config.Properties, 1 do
 		local property = Config.Properties[i]
-
+		--TODO use bf
 		if property.entering then
 			Blips[property.name] = AddBlipForCoord(property.entering.x, property.entering.y, property.entering.z)
 
@@ -225,29 +263,7 @@ function OpenPropertyMenu(property)
 		end
 	end
 
-	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'property', {
-		title    = property.label,
-		align    = 'top-left',
-		elements = elements
-	}, function(data, menu)
-		menu.close()
-
-		if data.current.value == 'enter' then
-			TriggerEvent('instance:create', 'property', {property = property.name, owner = ESX.GetPlayerData().identifier})
-		elseif data.current.value == 'leave' then
-			TriggerServerEvent('property:removeOwnedProperty', property.name)
-		elseif data.current.value == 'buy' then
-			TriggerServerEvent('property:buyProperty', property.name)
-		elseif data.current.value == 'rent' then
-			TriggerServerEvent('property:rentProperty', property.name)
-		end
-	end, function(data, menu)
-		menu.close()
-
-		CurrentAction     = 'property_menu'
-		CurrentActionMsg  = 'press_to_menu'
-		CurrentActionData = {property = property}
-	end)
+	exports.bf:OpenMenu("property")
 end
 
 function OpenGatewayMenu(property)
@@ -641,27 +657,27 @@ AddEventHandler('instance:loaded', function()
 	end)
 end)
 
-AddEventHandler('spawn:spawn', function()
-	if firstSpawn then
-		--	ESX.TriggerServerCallback('property:getLastProperty', function(propertyName)
-				if propertyName then
-					if propertyName ~= '' then
-						local property = GetProperty(propertyName)
-
-						for i=1, #property.ipls, 1 do
-							RequestIpl(property.ipls[i])
-
-							while not IsIplActive(property.ipls[i]) do
-								Citizen.Wait(0)
-							end
-						end
+--AddEventHandler('spawn:spawn', function()
+--	if firstSpawn then
+--		--	ESX.TriggerServerCallback('property:getLastProperty', function(propertyName)
+--				if propertyName then
+	--				if propertyName ~= '' then
+--						local property = GetProperty(propertyName)
+---
+--						for i=1, #property.ipls, 1 do
+--							RequestIpl(property.ipls[i])
+--
+--							while not IsIplActive(property.ipls[i]) do
+--								Citizen.Wait(0)
+--							end
+--						end
 
 			--			TriggerEvent('instance:create', 'property', {property = propertyName, owner = ESX.GetPlayerData().identifier})
-			end
-		end
-		firstSpawn = false
-	end
-end)
+--			end
+--		end
+--		firstSpawn = false
+--	end
+--end)
 
 AddEventHandler('property:getProperties', function(cb)
 	cb(GetProperties())

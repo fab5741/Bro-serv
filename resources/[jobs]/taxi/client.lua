@@ -23,7 +23,7 @@ config.MinimumDistance            = 0 -- Minimum NPC job destination distance fr
 
 -- Settings
 local enableTaxiGui = true -- Enables the GUI (Default: true)
-local fareCost = 0.001 --(1.66 = $100 per minute) Cost per second
+local fareCost = 0.001 --
 local costPerMile = 0.5
 local initialFare = 1.0 -- the cost to start a fare
 
@@ -31,6 +31,8 @@ local testMode = true -- enables spawn car command
 local playerPed = PlayerPedId()
 local taxiVeh = nil
 local first = true
+local parking = false
+local paid = false
 
 DecorRegister("fares", 1)
 DecorRegister("miles", 1)
@@ -359,24 +361,6 @@ AddEventHandler('taxi:resetMeter', function()
   end
 end)
 
-RegisterNetEvent('taxi:paycab')
-AddEventHandler('taxi:paycab', function()
-  print("pay cab")
-  local ped = GetPlayerPed(-1)
-  local veh = GetVehiclePedIsIn(ped, false)
-  local _fare = DecorGetFloat(veh, "fares")
-  local _miles = DecorGetFloat(veh, "miles")
-  DecorSetFloat(veh, "initialFare", initialFare)
-  DecorSetFloat(veh, "costPerMile", costPerMile)
-  DecorSetFloat(veh, "fareCost", fareCost)
-  DecorSetFloat(veh, "fares", DecorGetFloat(veh, "initialFare"))
-  DecorSetFloat(veh, "miles", 0.0)
-  TriggerEvent('taxi:updatefare', veh)
-  --TODO - pay cab
-  TriggerServerEvent("account:player:liquid:add", "", string.format("%.2f", farecost))
-  exports.bf:Notification('Arrivé à destination. Vous payez ~g~'..string.format("%.2f", farecost)..'$')
-  end)
-
 -- Check if player is in a vehicle
 function IsInVehicle()
   local ply = GetPlayerPed(-1)
@@ -421,10 +405,9 @@ end)
 
 RegisterNetEvent('taxi:call')
 AddEventHandler('taxi:call', function(number)
-  print("call taxi")
   if number == 0 then
     DeleteTaxi(taxiVeh, taxiPed)
-
+    paid = false
     if not DoesEntityExist(taxiVeh) and not IsPedInAnyVehicle(playerPed, false)then 
       Px, Py, Pz = table.unpack(GetEntityCoords(playerPed))
   
@@ -489,25 +472,14 @@ Citizen.CreateThread(function()
 		player = PlayerId()
 		playerPed = PlayerPedId()
 
+    if not IsPedInAnyVehicle(playerPed, false) or not IsPedInAnyTaxi(playerPed) then
+      if IsControlJustPressed(0, 168) then
+        TriggerServerEvent("job:inService:number", "taxi:call", "taxi")
+      end
+    end
+
 		if NetworkIsGameInProgress() and IsPlayerPlaying(player) then
 			if not DoesEntityExist(taxiVeh) then 
-				if not IsPedInAnyVehicle(playerPed, false) or not IsPedInAnyTaxi(playerPed) then
-					if IsControlJustPressed(0, 168) then
-						Px, Py, Pz = table.unpack(GetEntityCoords(playerPed))
-						taxiVeh = CreateTaxi(Px, Py, Pz)
-						while not DoesEntityExist(taxiVeh) do
-							Wait(1)
-						end
-
-						taxiPed = CreateTaxiPed(taxiVeh)
-						while not DoesEntityExist(taxiPed) do
-							Wait(1)
-						end
-
-						TaskVehicleDriveToCoord(taxiPed, taxiVeh, Px, Py, Pz, 26.0, 0, GetEntityModel(taxiVeh), 411, 10.0)
-						SetPedKeepTask(taxiPed, true)
-					end
-				end
 			else
 				Px, Py, Pz = table.unpack(GetEntityCoords(playerPed))
 				vehX, vehY, vehZ = table.unpack(GetEntityCoords(taxiVeh))
@@ -523,7 +495,7 @@ Citizen.CreateThread(function()
 							TaskEnterVehicle(playerPed, taxiVeh, -1, 2, 1.0, 1, 0)
 							PlayerEntersTaxi = true
 							TaxiInfoTimer = GetGameTimer()
-						end
+            end
 					else
 						if IsPedInVehicle(playerPed, taxiVeh, false) then
 							local blip = GetBlipFromEntity(taxiVeh)
@@ -536,6 +508,7 @@ Citizen.CreateThread(function()
 									PlayAmbientSpeech1(taxiPed, "TAXID_WHERE_TO", "SPEECH_PARAMS_FORCE_NORMAL")
                   PlayerEntersTaxi = false
                   TriggerEvent('taxi:toggleHire')
+                  TriggerEvent('taxi:resetMeter')
 								end
 
 								if GetGameTimer() > TaxiInfoTimer + 1000 and GetGameTimer() < TaxiInfoTimer + 10000 then
@@ -563,8 +536,28 @@ Citizen.CreateThread(function()
 									PlayAmbientSpeech1(taxiPed, "TAXID_SPEED_UP", "SPEECH_PARAMS_FORCE_NORMAL")
 									TaskVehicleDriveToCoord(taxiPed, taxiVeh, dx, dy, z, 29.0, 0, GetEntityModel(taxiVeh), 318, 50.0)
 									SetPedKeepTask(taxiPed, true)
-								elseif GetDistanceBetweenCoords(GetEntityCoords(playerPed, true), dx, dy, z, true) <= 53.0 then
-									if not parking then
+                elseif GetDistanceBetweenCoords(GetEntityCoords(playerPed, true), dx, dy, z, true) <= 53.0 then
+                  local _fare = DecorGetFloat(veh, "fares")
+
+                  TriggerServerEvent("account:player:liquid:add", "", -string.format("%.2f", _fare))
+                  exports.bf:Notification('Arrivé à destination. Vous payez ~g~'..string.format("%.2f", _fare)..'$')
+    
+                  local _miles = DecorGetFloat(veh, "miles")
+                  DecorSetFloat(veh, "initialFare", initialFare)
+                  DecorSetFloat(veh, "costPerMile", costPerMile)
+                  DecorSetFloat(veh, "fareCost", fareCost)
+                  DecorSetFloat(veh, "fares", DecorGetFloat(veh, "initialFare"))
+                  DecorSetFloat(veh, "miles", 0.0)
+                  TriggerEvent('taxi:updatefare', veh)
+                  
+                  farecost = initialFare
+                  --disable meter
+                  SendNUIMessage({meterActive = false})
+                  meterActive = false
+                  DecorSetBool(veh, "meteractive", false)
+                  Citizen.Trace("Trigger OFF")
+
+                  if not parking then
 										ClearPedTasks(taxiPed)
 										PlayAmbientSpeech1(taxiPed, "TAXID_CLOSE_AS_POSS", "SPEECH_PARAMS_FORCE_NORMAL")
 										TaskVehicleTempAction(taxiPed, taxiVeh, 6, 2000)
@@ -573,12 +566,11 @@ Citizen.CreateThread(function()
 										SetPedKeepTask(taxiPed, true)
 										TaskLeaveVehicle(playerPed, taxiVeh, 512)
 										Wait(3000)
-										TriggerEvent("taxi:payCab")
 										parking = true
 									end
 								end
-							end
-						end
+							end           
+            end
 					end
 				end
 			end

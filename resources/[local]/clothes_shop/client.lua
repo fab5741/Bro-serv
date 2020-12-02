@@ -11,7 +11,6 @@ mySkin = {
 }
 
 
-
 RegisterNetEvent('clothes_shop:skin:update')
 
 AddEventHandler('clothes_shop:skin:update', function(skin)
@@ -45,7 +44,6 @@ function addMenu(max, part, variante, maxVariant, isSkin)
             hover = {
                 callback = function()
                     TriggerEvent('skinchanger:getSkin', function(skin)
-                        print(skin.sex)
                         clothesSkin = myclothesSkin
                         if isSkin then
                             for k,v in ipairs(mySkin) do
@@ -194,11 +192,18 @@ Citizen.CreateThread(function()
                 text = "Valider la tenue",
                 exec = {
                     callback = function()
-                        local price  = 10
-                        TriggerServerEvent("account:player:liquid:add", "", price * -1)
-                        exports.bf:Notification('Vous avez modifié vos vétements. ~g~'..price..'$')
-                        TriggerServerEvent('skin:save', mySkin)
-                        TriggerServerEvent('skin:clothes:save', myclothesSkin)
+                        TriggerEvent('skinchanger:getSkin', function(skin)
+                            local price  = 10
+                            clothesSkin = myclothesSkin
+                            for k,v in ipairs(mySkin) do
+                                skin[k] = v
+                            end
+                            TriggerServerEvent("account:player:liquid:add", "", price * -1)
+                            exports.bf:Notification('Vous avez modifié vos vétements. ~g~'..price..'$')
+                            TriggerServerEvent('skin:save', skin)
+                            TriggerServerEvent('skin:clothes:save', clothesSkin)
+                        end)
+
                     end
                 },
             },

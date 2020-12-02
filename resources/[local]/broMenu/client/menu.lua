@@ -263,10 +263,17 @@ exports.bf:AddMenu("bro-clothes", {
             },
         },
         {
+            text = "Masque",
+            exec = {
+                callback = function()
+                    TriggerEvent('bromenu:mask')
+                end
+            },
+        },
+        {
             text = "T-Shirt",
             exec = {
                 callback = function()
-                    print("bromenu")
                     TriggerEvent('bromenu:koszulka')
                 end
             },

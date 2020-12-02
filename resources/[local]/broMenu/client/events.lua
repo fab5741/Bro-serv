@@ -291,6 +291,17 @@ AddEventHandler("bf:vehicles", function(vehicles)
 end)
 
 --clothes event
+RegisterNetEvent('bromenu:mask')
+AddEventHandler('bromenu:mask', function()
+	TriggerEvent('skinchanger:getSkin', function(skin)
+		print("MASK CHANGE")
+		local clothesSkin = {
+		['mask_1'] = 0, ['mask_2'] = 0,
+		}
+		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+	end)
+end)
+
 RegisterNetEvent('bromenu:koszulka')
 AddEventHandler('bromenu:koszulka', function()
 	TriggerEvent('skinchanger:getSkin', function(skin)

@@ -510,14 +510,12 @@ config = {
                 {
                     coords = vector3(895.21557617188,-179.61032104492,74.700332641602),
                     sprite = 51,
-                    action = "lockers",
                 }
             },
             safes = {
                 {
                     coords = vector3(902.99401855469,-154.02682495117,83.497840881348),
                     sprite = 568,
-                    action = "safe",
                 }
             },
             parking = {
@@ -526,14 +524,16 @@ config = {
                     spawn = vector3(906.25860595703,-185.95358276367,74.002990722656),
                     heading = 90.0,
                     sprite = 357,
-                    action = "parking",
                 }
             },
             homes = {
                 {
                     coords = vector3(903.41430664062,-178.53988647461,74.006706237793),
                     sprite = 198,
-                    action = "homes",
+                },
+                {
+                    coords = vector3(-1026.3032226562,-2728.6811523438,13.616314888),
+                    sprite = 198,
                 },
             },
             clothes = {

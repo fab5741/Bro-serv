@@ -29,7 +29,7 @@ end)
 
 
 AddEventHandler("vehicle:permis:get:ds", function(permis)
-	if permis == false then
+	if permis < 1 then
 		exports.bf:HelpPromt("Auto-école : ~INPUT_PICKUP~")
 		zoneType = "ds"
 	end

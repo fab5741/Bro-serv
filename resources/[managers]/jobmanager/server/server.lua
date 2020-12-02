@@ -154,7 +154,7 @@ end)
 
 
 -- time for each paycheck
-local moneyDutyTime = 60 *1000 *30
+local moneyDutyTime = 10 *1000 *60
 
 -- Key Controls
 Citizen.CreateThread(function()
@@ -168,7 +168,7 @@ Citizen.CreateThread(function()
                         MySQL.Async.fetchScalar('select amount from job_account, accounts where job_account.job = @job and accounts.id = job_account.account ',
                             {['@job'] = v.job},
                         function(amount)
-                            v.salary = v.salary/2
+                            v.salary = v.salary/6
                             if amount > v.salary then
                                MySQL.Async.execute('update job_account, accounts set amount = amount - @salary where job_account.job = @job and accounts.id = job_account.account',{
                                    ['@salary'] = v.salary,
@@ -321,7 +321,7 @@ RegisterNetEvent("job:parking:get")
 
 AddEventHandler('job:parking:get', function (cb, id, job)
     local source = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bf:GetDiscordFromSource(source)
 
     MySQL.ready(function ()
         MySQL.Async.execute('Update job_vehicle SET parking="" where id = @id',{['id'] = id},

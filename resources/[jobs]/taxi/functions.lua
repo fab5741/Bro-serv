@@ -28,8 +28,8 @@ function CreateTaxi(x, y, z)
             while not HasModelLoaded(taxiModel) do
                 Wait(1)
             end
-            
-            local _, vector = GetNthClosestVehicleNode(x, y, z, math.random(5, 10), 0, 0, 0)
+            local playerPos = GetEntityCoords(GetPlayerPed(-1))
+            local _, vector = GetNthClosestVehicleNode(x, y, z, math.random(5, 10), playerPos.x, playerPos.y, playerPos.z)
             -- GetClosestVehicleNodeWithHeading(x, y, z, outPosition, outHeading, nodeType, p6, p7)
             local sX, sY, sZ = table.unpack(vector)
 
@@ -81,26 +81,9 @@ function DeleteTaxi(vehicle, driver)
 	end
 end
 
-RegisterNetEvent("autotaxi:payment-status")
-AddEventHandler("autotaxi:payment-status", function(state)
-	local player = PlayerId()
-	Wait(1200)
-	
-	if state then
-		PlayAmbientSpeech1(taxiPed, "THANKS", "SPEECH_PARAMS_FORCE_NORMAL")
-	else
-		PlayAmbientSpeech1(taxiPed, "TAXID_NO_MONEY", "SPEECH_PARAMS_FORCE_NORMAL")
-		Wait(1000)
-		if not IsPlayerWantedLevelGreater(player, 0) then
-			SetPlayerWantedLevel(player, 3, false)
-			SetPlayerWantedLevelNow(player, true)
-			SetDispatchCopsForPlayer(player, true)
-		end
-	end
 
-	TaskVehicleDriveWander(taxiPed, taxiVeh, 20.0, 319)
-	Wait(20000)
-	DeleteTaxi(taxiVeh, taxiPed)
-	parking = false
-	PlayerEntersTaxi = false
-end)
+function getGroundZ(x, y, z)
+	local result, groundZ = GetGroundZFor_3dCoord(x+0.0, y+0.0, z+0.0, Citizen.ReturnResultAnyway())
+	return groundZ
+  end
+  

@@ -6,7 +6,7 @@ Config.Locale = 'fr'
 
 -- Location du spawn joueur après la création du personnage
 -- Rental of player spawn after character creation
-Config.PlayerSpawn = {x = -1042.635, y =-2745.828, z = 21.359, h = -30.0}
+Config.PlayerSpawn = {x = -1031.9937744141, y =-2733.0832519531, z = 13.756637573242, h = -30.0}
 
 -- Name of parents for inheritance (Do not add / remove character, you can just replace them)
 -- Nom des parents pour l'héritage (Ne pas ajouter / supprimer de personnage, vous pouvez juste les remplacés)

@@ -1,15 +1,10 @@
-RegisterNetEvent("atm:liquid")
-
-AddEventHandler('atm:liquid', function(data)
-	liquid = data
-	TriggerServerEvent("account:player:get", "atm:get")
-end)
-
 RegisterNetEvent("atm:get")
 
-AddEventHandler('atm:get', function(data)
-	Wait(0)
-	account = data
+AddEventHandler('atm:get', function(account, liquid)
+	print(account)
+	print(liquid)
+	account = account
+	liquid = liquid
 	exports.bf:SetMenuValue("atm", {
 		menuTitle = "LQD ~g~" .. liquid .. " $~s~ / CMP ~g~" .. account.." $",
 	})
@@ -23,7 +18,6 @@ AddEventHandler('onResourceStop', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
 	  return
     end
-    print("on nettoie le caca")
 	exports.bf:RemoveMenu("atm")
 	exports.bf:RemoveArea("atm")
   end)

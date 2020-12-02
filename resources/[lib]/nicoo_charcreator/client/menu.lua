@@ -394,7 +394,7 @@ RageUI.CreateWhile(1.0, mainMenu, nil, function()
             end)
 		end
 	end, function()
-		if Panel.-.enable then
+		if Panel.ColourPanel.enable then
 			RageUI.ColourPanel(Panel.ColourPanel.name, Panel.ColourPanel.Color, Panel.ColourPanel.index_one, Panel.ColourPanel.index_two, function(Hovered, Active, MinimumIndex, CurrentIndex)
 				if Panel.ColourPanel.lastItem == Panel.ColourPanel.currentItem then
 					Panel.ColourPanel.index_one = MinimumIndex

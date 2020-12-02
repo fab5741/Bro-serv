@@ -69,7 +69,7 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 		if zoneType == "atm" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("account:player:liquid:get", "atm:liquid")
+			TriggerServerEvent("atm:get", "atm:get")
 		end
 	end
-end)
+end) 

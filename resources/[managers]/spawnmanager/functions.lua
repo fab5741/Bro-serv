@@ -108,11 +108,12 @@ function spawnPlayer(x, y, z, weapons)
         TriggerServerEvent("needs:spawned")
         
         Wait(2000)
-        for k,v in pairs(json.decode(weapons)) do
-            print(v)
-            GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)
+        if weapons ~= nil then
+            for k,v in pairs(json.decode(weapons)) do
+                print(v)
+                GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)
+            end
         end
-
        spawnLock = false
     end)
 end

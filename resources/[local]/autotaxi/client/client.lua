@@ -27,28 +27,6 @@ function getGroundZ(x, y, z)
   return groundZ
 end
 
-RegisterCommand('taxi', function()
-	local playerPed = PlayerPedId()
-
-	if not DoesEntityExist(taxiVeh) then 
-		if not IsPedInAnyVehicle(playerPed, false) or not IsPedInAnyTaxi(playerPed) then
-			Px, Py, Pz = table.unpack(GetEntityCoords(playerPed))
-
-			taxiVeh = CreateTaxi(Px, Py, Pz)
-			while not DoesEntityExist(taxiVeh) do
-				Wait(1)
-			end
-
-			taxiPed = CreateTaxiPed(taxiVeh)
-			while not DoesEntityExist(taxiPed) do
-				Wait(1)
-			end
-
-			TaskVehicleDriveToCoord(taxiPed, taxiVeh, Px, Py, Pz, 26.0, 0, GetEntityModel(taxiVeh), 411, 10.0)
-			SetPedKeepTask(taxiPed, true)
-		end
-	end
-end)
 
 Citizen.CreateThread(function()
 	while true do

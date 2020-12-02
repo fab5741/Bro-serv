@@ -19,6 +19,14 @@ AddEventHandler('atm:deposit', function(amount)
 				['@amount'] = amounte},
 				function(affectedRows)
 					if affectedRows == 2 then
+
+						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
+							if liquid > 1000 then
+								TriggerClientEvent("account:suitcase:on", sourceValue)
+							elseif liquid < 1000 then
+								TriggerClientEvent("account:suitcase:off", sourceValue)
+							end
+						end)
 						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
 							icon = "CHAR_BANK_MAZE",
 							type = 2,
@@ -63,6 +71,13 @@ AddEventHandler('atm:withdraw', function(amount)
 				['@amount'] = amounte},
 				function(affectedRows)
 					if affectedRows == 2 then
+						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
+							if liquid > 1000 then
+								TriggerClientEvent("account:suitcase:on", sourceValue)
+							elseif liquid < 1000 then
+								TriggerClientEvent("account:suitcase:off", sourceValue)
+							end
+						end)
 						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
 							icon = "CHAR_BANK_MAZE",
 							type = 2,

@@ -21,7 +21,7 @@ RegisterNetEvent("vehicle:player:saveId")
 AddEventHandler("vehicle:buy", function(cb, id)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
+	local tva = 0.20
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid, id, permis from players where discord = @discord',
         {['discord'] =  discord},
@@ -109,7 +109,7 @@ AddEventHandler("vehicle:ds", function(cb, price)
 		MySQL.Async.fetchAll('select liquid, id, permis from players where discord = @discord',
         {['discord'] =  discord},
 		function(res)
-			if res[1] and res[1].liquid >= price and res[1].permis == false then
+			if res[1] and res[1].liquid >= price and res[1].permis <1 then
 				MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where discord = @discord',
 				{['discord'] =  discord,
 				['price'] = price},
@@ -271,7 +271,7 @@ AddEventHandler("vehicle:permis:give", function()
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('UPDATE `players` SET permis= 1 WHERE discord = @discord ', {
+		MySQL.Async.fetchAll('UPDATE `players` SET permis= 12 WHERE discord = @discord ', {
 			['discord'] =  discord,
 		}, function(result)
 			TriggerClientEvent("bf:Notification", sourceValue, "Permis enregistré")

@@ -9,6 +9,9 @@ RegisterNetEvent("account:player:liquid:add")
 RegisterNetEvent("account:job:get")
 RegisterNetEvent("account:job:add")
 RegisterNetEvent("account:job:withdraw")
+-- atm #4
+RegisterNetEvent("atm:get")
+
 
 -- Event Handlers
 -- Player #1
@@ -58,13 +61,20 @@ AddEventHandler('account:player:liquid:add', function(cb, amount)
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local amount=amount
 	MySQL.ready(function ()
-		MySQL.Async.execute(
+		MySQL.Async.insert(
 			'update players set liquid=liquid+@amount where discord = @discord',
 			{
 				['@discord'] = discord,
 				['@amount'] = amount,
-			}, function(numRows)
-				TriggerClientEvent(cb, sourceValue, numRows == 1)
+			}, function(id)
+				MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
+					if liquid > 1000 then
+						TriggerClientEvent("account:suitcase:on", sourceValue)
+					elseif liquid < 1000 then
+						TriggerClientEvent("account:suitcase:off", sourceValue)
+					end
+					TriggerClientEvent(cb, sourceValue, id ~= nil)
+				end)
 		end)
 	end)
 end)
@@ -121,6 +131,27 @@ AddEventHandler('account:job:withdraw', function(cb, job, amount)
 			else
 				TriggerClientEvent('bf:Notification', sourceValue,  "L'entreprise n'a pas assez d'argent")
 			end
+		end)
+	end)
+end)
+
+-- ATM
+AddEventHandler('atm:get', function(cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local data = {
+
+	}
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, player_account, players where players.discord = @discord and players.id = player_account.player and accounts.id = player_account.account', {
+			['@discord'] = discord
+		}, function(amount)
+			MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+				{
+					['@discord'] = discord
+				}, function(liquid)
+					TriggerClientEvent(cb, sourceValue, amount, liquid)
+			end)
 		end)
 	end)
 end)

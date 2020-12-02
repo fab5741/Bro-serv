@@ -9,8 +9,8 @@ RegisterNUICallback('use', function(data)
         TriggerServerEvent("needs:change", 0, 60)
     end
     if data.label == "Jus de raisin" then
-        TriggerServerEvent("needs:change", 1, 80)
-        TriggerServerEvent("needs:change", 0, 10)
+        TriggerServerEvent("needs:change", 0, 80)
+        TriggerServerEvent("needs:change", 1, 10)
     end
 
     TriggerServerEvent("items:sub", data.item, data.amount)

@@ -387,7 +387,7 @@ function addBeginArea()
 			enter = {
 				callback = function()
 					if 	GetVehiclePedIsIn(PlayerPedId(), false) == vehicleLivraison then
-						TriggerServerEvent("account:player:liquid:add", nil, 0.30)
+						TriggerServerEvent("account:player:liquid:add", "", 0.30)
 						exports.bf:Notification("Vous avez gagné ~g~0.30$")
 					else
 						exports.bf:Notification("Ou est passé votre vehicule de livraison ? non payé")

@@ -20,7 +20,11 @@ exports.bf:AddMenu("bro", {
             },
         },
         {
-            text = "Vehicules",
+            text = "Vehicule",
+            openMenu = "bro-vehicle"
+        },
+        {
+            text = "Assurance (véhicules)",
             exec = {
                 callback = function()
                     TriggerServerEvent("vehicles:get:all", "bf:vehicles")
@@ -91,6 +95,156 @@ exports.bf:AddMenu("bro-wallet-character", {
             }
         },
     },
+})
+
+exports.bf:AddMenu("bro-vehicle", {
+    title = "Véhicule",
+    position = 1,
+    buttons = {
+        {
+            text = "Verrouiller",
+            exec = {
+                callback = function()
+                    local player = GetPlayerPed(-1)
+                    vehicle = GetVehiclePedIsIn(player,true)
+                    local islocked = GetVehicleDoorLockStatus(vehicle)
+                    local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(player), GetEntityCoords(vehicle), 1)
+                        if DoesEntityExist(vehicle) then
+                            if distanceToVeh <= lockDistance then
+                                if (islocked == 1)then
+                                SetVehicleDoorsLocked(vehicle, 2)
+                                exports.bf:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+                                else
+                                SetVehicleDoorsLocked(vehicle,1)
+                                exports.bf:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+                                end
+                            else
+                                exports.bf:Notification("~r~vous devez être dans un véhicule")
+                            end
+                        else
+                            exports.bf:Notification("~r~Pas de voiture sauvegardée")
+                        end
+                end
+            }
+        },
+        {
+            text = "Moteur",
+            exec = {
+                callback = function()
+                    local player = GetPlayerPed(-1)
+	
+                    if (IsPedSittingInAnyVehicle(player)) then 
+                        local vehicle = GetVehiclePedIsIn(player,false)
+                        
+                        if IsEngineOn == true then
+                            IsEngineOn = false
+                            SetVehicleEngineOn(vehicle,false,false,false)
+                        else
+                            IsEngineOn = true
+                            SetVehicleUndriveable(vehicle,false)
+                            SetVehicleEngineOn(vehicle,true,false,false)
+                        end
+                        
+                        while (IsEngineOn == false) do
+                            SetVehicleUndriveable(vehicle,true)
+                            Citizen.Wait(0)
+                        end
+                    end
+                end
+            }
+        },
+        {
+            text = "Coffre",
+            exec = {
+                callback = function()
+                    local player = GetPlayerPed(-1)
+                    vehicle = GetVehiclePedIsIn(player,true)
+                    
+                    local isopen = GetVehicleDoorAngleRatio(vehicle,5)
+                    local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(player), GetEntityCoords(vehicle), 1)
+                    
+                    if distanceToVeh <= interactionDistance then
+                        if (isopen == 0) then
+                            print("open doors")
+                        SetVehicleDoorOpen(vehicle,5,0,0)
+                        else
+                        SetVehicleDoorShut(vehicle,5,0)
+                        end
+                    else
+                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                    end
+                end
+            }
+        },
+        {
+            text = "Porte avant",
+            exec = {
+                callback = function()
+                    local player = GetPlayerPed(-1)
+                    vehicle = GetVehiclePedIsIn(player,true)
+                    local isopen = GetVehicleDoorAngleRatio(vehicle,0) and GetVehicleDoorAngleRatio(vehicle,1)
+                    local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(player), GetEntityCoords(vehicle), 1)
+                    
+                    if distanceToVeh <= interactionDistance then
+                        if (isopen == 0) then
+                        SetVehicleDoorOpen(vehicle,0,0,0)
+                        SetVehicleDoorOpen(vehicle,1,0,0)
+                        else
+                        SetVehicleDoorShut(vehicle,0,0)
+                        SetVehicleDoorShut(vehicle,1,0)
+                        end
+                    else
+                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                    end
+                end
+            }
+        },
+        {
+            text = "Porte arriéres",
+            exec = {
+                callback = function()
+                    local player = GetPlayerPed(-1)
+                    vehicle = GetVehiclePedIsIn(player,true)
+                    local isopen = GetVehicleDoorAngleRatio(vehicle,2) and GetVehicleDoorAngleRatio(vehicle,3)
+                    local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(player), GetEntityCoords(vehicle), 1)
+                    
+                    if distanceToVeh <= interactionDistance then
+                        if (isopen == 0) then
+                        SetVehicleDoorOpen(vehicle,2,0,0)
+                        SetVehicleDoorOpen(vehicle,3,0,0)
+                        else
+                        SetVehicleDoorShut(vehicle,2,0)
+                        SetVehicleDoorShut(vehicle,3,0)
+                        end
+                    else
+                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                    end
+                end
+            }
+        },
+        {
+            text = "Capot",
+            exec = {
+                callback = function()
+                        local player = GetPlayerPed(-1)
+                        vehicle = GetVehiclePedIsIn(player,true)
+                            
+                        local isopen = GetVehicleDoorAngleRatio(vehicle,4)
+                        local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(player), GetEntityCoords(vehicle), 1)
+                        
+                        if distanceToVeh <= interactionDistance then
+                            if (isopen == 0) then
+                            SetVehicleDoorOpen(vehicle,4,0,0)
+                            else
+                            SetVehicleDoorShut(vehicle,4,0)
+                            end
+                        else
+                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                    end
+                end
+            }
+        },
+    }
 })
 exports.bf:AddMenu("bro-vehicles", {
     title = "Vehicules",

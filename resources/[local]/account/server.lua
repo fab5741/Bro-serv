@@ -12,7 +12,6 @@ RegisterNetEvent("account:job:withdraw")
 -- atm #4
 RegisterNetEvent("atm:get")
 
-
 -- Event Handlers
 -- Player #1
 AddEventHandler('account:player:get', function(cb)
@@ -36,6 +35,7 @@ AddEventHandler('account:player:add', function(cb, amount)
 				['@discord'] = discord, 
 				['@amount'] = amount
 			}, function(numRows)
+				TriggerClientEvent("phone:account:get", sourceValue)
 				TriggerClientEvent(cb, sourceValue, numRows == 1)
 		end)
 	end)
@@ -92,16 +92,31 @@ AddEventHandler('account:job:get', function(cb, job)
 	end)
 end)
 
-AddEventHandler('account:job:add', function(cb, amount, job)
+AddEventHandler('account:job:add', function(cb, job, amount)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local job = job
 	MySQL.ready(function ()
-		MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
-			{
-				['@job'] = job, 
-				['@amount'] = amount
-			}, function(numRows)
-				TriggerClientEvent(cb, sourceValue, numRows == 1)
+		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {
+			['@discord'] = discord
+		}, function(money)
+			if money > amount then
+				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
+				{
+					['@job'] = job,
+					['@amount'] = amount
+				}, function(result)
+					MySQL.Async.execute('UPDATE players SET liquid = liquid - @amount WHERE discord = @discord', {
+						['@discord'] = discord,
+						['@amount'] = amount
+					}, function(result)
+						TriggerClientEvent(cb, sourceValue, result)
+						TriggerClientEvent('bf:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
+					end)
+				end)
+			else
+				TriggerClientEvent('bf:Notification', sourceValue,  "Vous n'avez pas cet argent !")
+			end
 		end)
 	end)
 end)
@@ -110,10 +125,12 @@ AddEventHandler('account:job:withdraw', function(cb, job, amount)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local job = job
+	print(amount)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where job_account.job = @job and accounts.id = job_account.account', {
 			['@job'] = job
 		}, function(money)
+			print(money)
 			if money > amount then
 				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount - @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
 				{

@@ -155,16 +155,16 @@ function menus()
 				},
 			},
 			{
-				text = "Porter",
-				exec = {
-					callback = function()
-						DragPlayer()
-					end
-				},
-			},
-			{
 				text = "Amendes",
 				openMenu = "lspd-citizens-fines"
+			},
+			{
+				text = "Donner permis arme",
+				exec = {
+					callback = function()
+						giveWeaponLicence()
+					end
+				},
 			},
 		},
 	})

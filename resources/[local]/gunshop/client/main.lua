@@ -64,7 +64,7 @@ AddEventHandler("gun:shop2", function (job)
 	local buttons = {}
 	for k,v in pairs(config.weapons) do
 		buttons[#buttons+1] =     {
-			text = v.name.." prix :" ..v.price,
+			text = v.label.." prix : ~g~" ..v.price.."$",
 			exec = {
 				callback = function()
 					TriggerServerEvent("gun:buy", "gun:buy:ok", v.price, v.name)
@@ -75,7 +75,7 @@ AddEventHandler("gun:shop2", function (job)
 	if job[1].name == "lspd" then
 		for k,v in pairs(config.weaponsLspd) do
 			buttons[#buttons+1] =     {
-				text = v.name.." prix :" ..v.price,
+				text = v.label.." prix : ~g~" ..v.price.."$",
 				exec = {
 					callback = function()
 						TriggerServerEvent("gun:buy", "gun:buy:ok", v.price, v.name)

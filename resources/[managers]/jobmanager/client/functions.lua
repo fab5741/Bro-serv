@@ -86,48 +86,27 @@ function CancelEmote()
     end)
 end
 
-function CheckInventory()
-	local t, distance = GetClosestPlayer()
-	if(distance ~= -1 and distance < 3) then
-		TriggerServerEvent("lspd:targetCheckInventory", GetPlayerServerId(t))
-	else
-		exports.bf:Notification("Pas de joueur à proximité")
-	end
-end
-
 function RemoveWeapons()
-    local t, distance = GetClosestPlayer()
-    if(distance ~= -1 and distance < 3) then
-        TriggerServerEvent("lspd:removeWeapons", GetPlayerServerId(t))
+	local t = exports.bf:GetPlayerServerIdInDirection(3)
+    if t then
+        TriggerServerEvent("job:removeWeapons", t)
     else
         exports.bf:Notification("Pas de joueur à proximité")
     end
 end
 
 function ToggleCuff()
-	local t, distance = GetClosestPlayer()
-
-	if(distance ~= -1 and distance < 3) then
-		TriggerServerEvent("lspd:cuffGranted", GetPlayerServerId(t))
-	else
-		exports.bf:Notification("Pas de joueur à proximité")
-	end
-end
-
-function DragPlayer()
-	local t, distance = GetClosestPlayer()
-	if(distance ~= -1 and distance < 3) then
-		TriggerServerEvent("lspd:dragRequest", GetPlayerServerId(t))
-		TriggerEvent("lspd:notify", "CHAR_ANDREAS", 1, "Porter", false, "" .. GetPlayerName(serverTargetPlayer) .. "")
+    local t = exports.bf:GetPlayerServerIdInDirection(3)
+    if t then
+		TriggerServerEvent("job:cuffGranted", t)
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
 	end
 end
 
 function Fines(amount)
-	local t, distance = GetClosestPlayer()
-	
-	if(distance ~= -1 and distance < 3) then
+    local t = exports.bf:GetPlayerServerIdInDirection(3)
+    if t then
 		Citizen.Trace("Price : "..tonumber(amount))
 		if(tonumber(amount) == -1) then
 			DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8S", "", "", "", "", "", 20)
@@ -143,15 +122,26 @@ function Fines(amount)
 			end
 			
 			if(tonumber(amount) ~= -1) then
-				TriggerServerEvent("lspd:finesGranted", GetPlayerServerId(t), tonumber(amount))
+				TriggerServerEvent("job:finesGranted", GetPlayerServerId(t), tonumber(amount))
 			end
 		else
-			TriggerServerEvent("lspd:finesGranted", GetPlayerServerId(t), tonumber(amount))
+			TriggerServerEvent("job:finesGranted", GetPlayerServerId(t), tonumber(amount))
 		end
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
 	end
 end
+
+
+function giveWeaponLicence()
+    local t = exports.bf:GetPlayerServerIdInDirection(3)
+    if t then
+		TriggerServerEvent("job:weapon:licence", t, true)
+	else
+		exports.bf:Notification("Pas de joueur à proximité")
+	end
+end
+
 
 function DropVehicle()
 	Citizen.CreateThread(function()
@@ -818,7 +808,7 @@ function createMenuAndArea(job)
 							exec = {
 								callback = function()
 									print(job.job)
-									TriggerServerEvent('account:job:withdraw', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
 									TriggerServerEvent("job:get", "job:safe:open")		
 								end
 							},
@@ -827,7 +817,7 @@ function createMenuAndArea(job)
 							text = "Déposer",
 							exec = {
 								callback = function()
-									TriggerServerEvent('account:job:add', job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+									TriggerServerEvent('account:job:add', "", job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
 									TriggerServerEvent("job:get", "job:safe:open")		
 								end
 							},

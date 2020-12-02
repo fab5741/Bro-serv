@@ -203,9 +203,6 @@ function RespawnPed(ped, coords, heading)
 	NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
 	SetPlayerInvincible(ped, false)
 	ClearPedBloodDamage(ped)
-
-	TriggerServerEvent('esx:onPlayerSpawn')
-	TriggerEvent('esx:onPlayerSpawn')
 	TriggerEvent('playerSpawned') -- compatibility with old scripts, will be removed soon
 end
 
@@ -348,3 +345,71 @@ AddEventHandler("weapon:store:store", function(weapon)
 	)
 	CloseArmory()
 end)
+
+
+RegisterNetEvent('job:removeWeapons')
+AddEventHandler('job:removeWeapons', function()
+    RemoveAllPedWeapons(PlayerPedId(), true)
+end)
+
+
+RegisterNetEvent('job:handcuff')
+AddEventHandler('job:handcuff', function()
+	handCuffed = not handCuffed
+	if(handCuffed) then
+		exports.bf:AdvancedNotification({
+			text = "Menotté",
+			title = "LSPD",
+			icon = "CHAR_AGENT14",
+		})
+	else
+		exports.bf:AdvancedNotification({
+			text = "Démenotté",
+			title = "LSPD",
+			icon = "CHAR_AGENT14",
+		})
+		cuffing = false
+		ClearPedTasksImmediately(PlayerPedId())
+	end
+end)
+
+
+local lockAskingFine = false
+RegisterNetEvent('job:payFines')
+AddEventHandler('job:payFines', function(amount, sender)
+	Citizen.CreateThread(function()
+		
+		if(lockAskingFine ~= true) then
+			lockAskingFine = true
+			local notifReceivedAt = GetGameTimer()
+			exports.bf:Notification("Amende de " .. amount .. "$. Y pour accepter")
+			while(true) do
+				Wait(0)
+				
+				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
+					TriggerServerEvent('job:finesETA', sender, 2)
+					exports.bf:Notification("Amende expirée")
+					lockAskingFine = false
+					break
+				end
+				
+				if IsControlPressed(1, config.bindings.accept_fine) then
+					TriggerServerEvent("account:player:add", "", -amount)
+					exports.bf:Notification("Amende de " .. amount .. "$ payée")
+					TriggerServerEvent('job:finesETA', sender, 0)
+					lockAskingFine = false
+					break
+				end
+				
+				if IsControlPressed(1, config.bindings.refuse_fine) then
+					TriggerServerEvent('job:finesETA', sender, 3)
+					lockAskingFine = false
+					break
+				end
+			end
+		else
+			TriggerServerEvent('job:finesETA', sender, 1)
+		end
+	end)
+end)
+

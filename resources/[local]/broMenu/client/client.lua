@@ -2,8 +2,14 @@ firstname = "John"
 lastname = "Smith"
 birth = "00/00/0000"
 
-CharacterDad = 0
-CharacterMom = 0
+IsEngineOn = true
+interactionDistance = 3.5 --The radius you have to be in to interact with the vehicle.
+lockDistance = 25 --The radius you have to be in to lock your vehicle.
+
+--  V A R I A B L E S --
+engineoff = false
+saved = false
+controlsave_bool = false
 
 Citizen.CreateThread(function()
 	-- main loop

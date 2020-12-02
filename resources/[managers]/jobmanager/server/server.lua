@@ -124,7 +124,6 @@ AddEventHandler('job:items:store', function (item, amount)
     local discord = exports.bf:GetDiscordFromSource(sourceValue)
     local amount = amount
     local item = item
-    print(item)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar('select job_grades.job from players, job_grades where job_grades.id = players.job_grade and discord = @discord',
         {['@discord'] = discord},
@@ -181,6 +180,7 @@ Citizen.CreateThread(function()
                                     },
                                     function(affectedRows)
                                         if affectedRows == 1 then
+                                            TriggerClientEvent("phone:account:get", sourceValue)
                                             TriggerClientEvent('bf:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
                                         else
                                             TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
@@ -556,4 +556,74 @@ AddEventHandler('weapon:get', function(cb, weapon)
             TriggerClientEvent(cb, sourceValue, weapon)
         end)
     end)
+end)
+
+--- LSPD
+RegisterNetEvent("job:weapon:licence")
+
+AddEventHandler('job:weapon:licence', function (t,  bool)
+    local discord = exports.bf:GetDiscordFromSource(t)
+    MySQL.ready(function ()
+        MySQL.Async.insert('update players set gun_permis= @bool where discord = @discord', {
+            ['@discord'] =  discord,
+            ['@bool'] =  bool
+        }, function(res)
+        end)
+    end)
+end)
+
+RegisterServerEvent('job:removeWeapons')
+AddEventHandler('job:removeWeapons', function(t)
+	TriggerClientEvent("job:removeWeapons", t)
+end)
+
+RegisterServerEvent('job:cuffGranted')
+AddEventHandler('job:cuffGranted', function(t)
+    local sourceValue = source
+	TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+        icon = "CHAR_AGENT14",
+        title = 'LSPD', false, 
+        text = "Vous avez menotté un joueur"
+    })
+	TriggerClientEvent('job:handcuff', t)
+end)
+RegisterServerEvent('job:finesGranted')
+AddEventHandler('job:finesGranted', function(target, amount)
+    local sourceValue = source
+
+    TriggerClientEvent('job:payFines', target, amount, sourceValue)
+    TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+        icon = "CHAR_AGENT14",
+        title = 'LSPD', false, 
+        text = "vous avez amendé pour ~g~"..amount.."$"
+    })
+end)
+
+RegisterServerEvent('job:finesETA')
+AddEventHandler('job:finesETA', function(officer, code)
+    if(code==1) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'LSPD', false, 
+            text = "Amende déjà en cours"
+        })
+    elseif(code==2) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'LSPD', false, 
+            text = "Fin de la requête (amende)"
+        })
+    elseif(code==3) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'LSPD', false, 
+            text = "Amende refusée"
+        })
+    elseif(code==0) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'LSPD', false, 
+            text = "Amende acceptée"
+        })
+	end
 end)

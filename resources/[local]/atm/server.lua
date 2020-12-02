@@ -27,6 +27,8 @@ AddEventHandler('atm:deposit', function(amount)
 								TriggerClientEvent("account:suitcase:off", sourceValue)
 							end
 						end)
+						TriggerClientEvent("phone:account:get", sourceValue)
+
 						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
 							icon = "CHAR_BANK_MAZE",
 							type = 2,
@@ -78,6 +80,8 @@ AddEventHandler('atm:withdraw', function(amount)
 								TriggerClientEvent("account:suitcase:off", sourceValue)
 							end
 						end)
+						TriggerClientEvent("phone:account:get", sourceValue)
+
 						TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
 							icon = "CHAR_BANK_MAZE",
 							type = 2,

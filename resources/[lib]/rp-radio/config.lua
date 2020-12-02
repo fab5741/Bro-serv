@@ -1,8 +1,8 @@
 radioConfig = {
     Controls = {
         Activator = { -- Open/Close Radio
-            Name = "INPUT_REPLAY_START_STOP_RECORDING_SECONDARY", -- Control name
-            Key = 289, -- F2
+            Name = "INPUT_SELECT_CHARACTER_FRANKLIN", -- Control name
+            Key = 167, -- F6
         },
         Secondary = {
             Name = "INPUT_SPRINT",

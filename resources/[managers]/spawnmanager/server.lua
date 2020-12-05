@@ -6,12 +6,10 @@ end)
 RegisterNetEvent("player:saveCoordsServer")
 
 -- source is global here, don't add to function
-AddEventHandler('player:saveCoordsServer', function(name, pos, weapons)
+AddEventHandler('player:saveCoordsServer', function(pos, weapons)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-    local nameValue = name
     local weapons = weapons
-
     MySQL.ready(function ()
         MySQL.Async.execute('UPDATE players SET x= @x, y =@y, z = @z, gameId = @gameId, weapons = @weapons WHERE discord = @discord', {
             ['@discord'] = discord, ['x'] = pos.x, ['y'] = pos.y, ['z'] = pos.z, ['@gameId'] = sourceValue, ['@weapons'] = weapons

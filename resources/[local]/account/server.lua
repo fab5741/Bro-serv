@@ -68,9 +68,9 @@ AddEventHandler('account:player:liquid:add', function(cb, amount)
 				['@amount'] = amount,
 			}, function(id)
 				MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
-					if liquid > 1000 then
+					if liquid > 100000 then
 						TriggerClientEvent("account:suitcase:on", sourceValue)
-					elseif liquid < 1000 then
+					elseif liquid < 100000 then
 						TriggerClientEvent("account:suitcase:off", sourceValue)
 					end
 					TriggerClientEvent(cb, sourceValue, id ~= nil)

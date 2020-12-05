@@ -46,7 +46,7 @@ AddEventHandler('player:saveCoords', function ()
             weapons[#weapons+1] = v
         end
     end
-    TriggerServerEvent("player:saveCoordsServer", GetPlayerName(PlayerId()), GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons))
+    TriggerServerEvent("player:saveCoordsServer", GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons))
 end)
 
 -- boucle pour sauvegarder toutes les X s

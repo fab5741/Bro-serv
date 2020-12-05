@@ -457,11 +457,6 @@ function deleteMenuAndArea()
 				exports.bf:RemoveMenu("armories"..k)
 			end
 		end
-		if vv.parking then
-			for k, v in pairs(vv.parking) do
-			exports.bf:RemoveArea("parking"..k)
-			end
-		end
 		if vv.begin then
 			for k, v in pairs(vv.begin) do
 			exports.bf:RemoveArea("begin"..k)
@@ -947,54 +942,6 @@ function createMenuAndArea(job)
 						title = "weapon",
 						position = 1,
 					})
-				end
-			end
-			if myjob.parking then
-				for k, v in pairs(myjob.parking) do
-				exports.bf:AddArea("parking"..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
-					trigger = {
-						weight = 1,
-						enter = {
-							callback = function()
-								exports.bf:HelpPromt("Parking Key : ~INPUT_PICKUP~")
-								zone = k
-								zoneType = "parking"
-								spawn = v.spawn
-								heading = v.heading
-							end
-						},
-						exit = {
-							callback = function()
-								zone = nil
-								zoneType = nil
-							end
-						},
-					},
-					blip = {
-						text = job.label.. " Parking "..k,
-						imageId	= v.sprite,
-						colorId = myjob.color,
-					},
-					locations = {
-						{
-							x = v.coords.x,
-							y = v.coords.y,
-							z = v.coords.z,
-						},
-					},
-				})
-				exports.bf:AddMenu("parking"..k, {
-					title = job.label.." Parking "..k,
-					position = 1,
-				})
-				exports.bf:AddMenu("parking-veh", {
-					title = "Parking",
-					position = 1,
-				})
 				end
 			end
 			if myjob.begin then

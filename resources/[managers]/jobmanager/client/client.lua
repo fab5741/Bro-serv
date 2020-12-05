@@ -44,29 +44,7 @@ Citizen.CreateThread(function()
     while true do
 		Citizen.Wait(0)	
 		if zone ~= nil and zoneType ~= nil and IsControlJustPressed(1,config.bindings.interact_position) then
-			if zoneType == "parking" then
-				if isPedDrivingAVehicle() then
-					exports.bf:SetMenuValue("parking-veh", {
-						buttons = {
-							{
-								text = "Stocker : " .. zone,
-								exec = {
-									callback = function()
-										TriggerServerEvent("vehicle:job:store", currentVehicle, "global")
-										currentVehicle = 0
-									
-										DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-										exports.bf:CloseMenu("parking-veh")
-									end
-								},
-							}
-						}
-					})	
-					exports.bf:OpenMenu("parking-veh")
-				else
-					TriggerServerEvent("job:get", "job:parking:open")		
-				end
-			elseif zoneType == "homes" then
+			if zoneType == "homes" then
 				TriggerServerEvent("job:avert:all", avert, "On vous demande à l'acceuil ~b~(".. avert.. ")")
 			elseif zoneType == "repair" then
 				if isPedDrivingAVehicle() then
@@ -76,6 +54,7 @@ Citizen.CreateThread(function()
 				end
 			elseif zoneType == "custom" then
 				if isPedDrivingAVehicle() then
+					customMenu()
 					exports.bf:OpenMenu("custom")
 				else
 					exports.bf:Notification("Montez dans un véhicule")
@@ -102,6 +81,9 @@ Citizen.CreateThread(function()
 			end
 		end
 
+		if zone ~= "custom" then
+			customMenuRemove()
+		end
 		if IsControlJustPressed(1,config.bindings.use_job_menu) then
 			TriggerServerEvent("job:get", "job:open:menu")
 		end

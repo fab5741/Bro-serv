@@ -14,9 +14,9 @@ RegisterNetEvent("vehicle:get")
 RegisterNetEvent("vehicle:depots:get")
 RegisterNetEvent("vehicle:spawn")
 RegisterNetEvent("vehicle:refresh")
+RegisterNetEvent("vehicle:mods:refresh")
 
 AddEventHandler("ds:belt", function(belt)
-	print(belt)
 	if not belt then
 		exports.bf:Notification('Pas de ceinture ! Permis annulé')
 		exports.bf:DisableArea("checkpoints-1")
@@ -38,11 +38,13 @@ end)
 
 
 AddEventHandler("vehicle:permis:get:depot", function(permis)
-	if permis then
+	print(permis)
+	if permis > 0 then
 		exports.bf:HelpPromt("Fourrière : ~INPUT_PICKUP~")
 		zoneType = "depots"
+	else
+		exports.bf:Notification("Vous n'avez pas le permis")
 	end
-	exports.bf:Notification("Vous n'avez pas le permis")
 end)
 
 
@@ -83,100 +85,25 @@ end)
 
 
 AddEventHandler("vehicle:job:buy:ok", function(name, id)
-	print(name)
-	local vehicleName = name
-	currentVehicle = id
-    -- load the model
-    RequestModel(vehicleName)
-    local playerPed = PlayerPedId() -- get the local player ped
-
-    -- wait for the model to load
-   while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-    end
-	ClearAreaOfVehicles(374.59939575195, -1619.4310302734, 29.29193687439, 5.0, false, false, false, false, false)
-    local vehicle = CreateVehicle(vehicleName, 374.59939575195, -1619.4310302734, 29.29193687439, 338.41, true, false)
-
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
-
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-	SetEntityAsNoLongerNeeded(vehicle)
-
-    -- release the model
-	SetModelAsNoLongerNeeded(vehicleName)
-
+	data = {}
+	data.gameId = 0
+	data.name = name
+	spawnACar(data, false)
 	exports.bf:CloseMenu("shops-job")
 end)
 
 
 AddEventHandler("vehicle:buy:ok", function(name, id)
-	print(name)
-	local vehicleName = name
-	currentVehicle = id
-    -- load the model
-    RequestModel(vehicleName)
-    local playerPed = PlayerPedId() -- get the local player ped
-
-    -- wait for the model to load
-   while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-    end
-
-	ClearAreaOfVehicles(-29.2, -1087.02, 25.53, 5.0, false, false, false, false, false)
-    local vehicle = CreateVehicle(vehicleName, -29.2, -1087.02, 25.53, 338.41, true, false)
-
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
-
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-	SetEntityAsNoLongerNeeded(vehicle)
-
-    -- release the model
-	SetModelAsNoLongerNeeded(vehicleName)
-
+	data = {}
+	data.x = -29.2
+	data.y = -1087.02
+	data.z =  25.53
+	data.gameId = 0
+	data.name = name
+	spawnACar(data, false, true)
 	exports.bf:CloseMenu("shops")
 end)
 
-
-AddEventHandler("vehicle:parking:get", function(data, id)
-	local vehicleName = data.name
-	currentVehicle = data.id
-	menuOpened = 0
-	TriggerEvent("menu:delete", "vehiclesShop") 
-
-    -- load the model
-    RequestModel(vehicleName)
-    local playerPed = PlayerPedId() -- get the local player ped
-
-    -- wait for the model to load
-    while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-	end
-	
-
-	coords = exports.bf:GetPlayerCoords()
-
-	ClearAreaOfVehicles(coords.x, coords.y, coords.z, 5.0, false, false, false, false, false)
-    -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, coords.x, coords.y, coords.z, 150.5, true, false)
-
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
-
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-    SetEntityAsNoLongerNeeded(vehicle)
-
-    -- release the model
-	SetModelAsNoLongerNeeded(vehicleName)
-	
-	TriggerServerEvent("vehicle:parking:get", data.id)
-end)
-
-
-AddEventHandler("vehicle:menu:closed", function()
-	menuOpened = 0
-end)
 
 RegisterNetEvent("vehicle:job:shop")
 
@@ -242,20 +169,34 @@ AddEventHandler("vehicle:shop", function(vehicles)
 			}
 	}
 	end
+	
 	exports.bf:SetMenuButtons("shops", buttons)
 	exports.bf:OpenMenu("shops")
 end)
 
 
 
-AddEventHandler("vehicle:depots", function(vehicles)
+AddEventHandler("vehicle:depots", function(vehicles, vehicles2)
 	local buttons = {}
 	
 	for k, v in ipairs (vehicles) do
 		buttons[k] =     {
-			text = v.label,
+			text = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
 			exec = {
 				callback = function() 
+					
+					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
+				end
+		}
+	}
+	end
+		
+	for k, v in ipairs (vehicles2) do
+		buttons[k] =     {
+			text = v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+			exec = {
+				callback = function() 
+					
 					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
 				end
 		}
@@ -285,103 +226,137 @@ end)
 
 
 AddEventHandler("vehicle:get", function(data)
-	print("go")
-	local vehicleName = data.name
-	currentVehicle = data.id
-	menuOpened = 0
-    -- check if the vehicle actually exists
-    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-        TriggerEvent('chat:addMessage', {
-            args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-        })
-        return
-    end
-
-    -- load the model
-    RequestModel(vehicleName)
-    local playerPed = PlayerPedId() -- get the local player ped
-
-    -- wait for the model to load
-    while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-    end
-
-	ClearAreaOfVehicles(232.19, -788.63, 30.63, 5.0, false, false, false, false, false)
-    -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, 232.19, -788.63, 29.83, 150.5, true, false)
-
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
-
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-    SetEntityAsNoLongerNeeded(vehicle)
-
-    -- release the model
-	SetModelAsNoLongerNeeded(vehicleName)
-	
-	TriggerServerEvent("vehicle:parking:get", data.id)
-	
 	exports.bf:CloseMenu("parking-foot")
+	TriggerServerEvent("vehicle:parking:get", data.id, "")
+	data.x = nil
+	data.y = nil
+	data.z = nil
+	spawnACar(data, true)
 end)
 
 
 AddEventHandler("vehicle:depots:get", function(data)
-	local vehicleName = data.name
-	currentVehicle = data.id
-	menuOpened = 0
-    -- check if the vehicle actually exists
-    if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
-        TriggerEvent('chat:addMessage', {
-            args = { 'It might have been a good thing that you tried to spawn a ' .. vehicleName .. '. Who even wants their spawning to actually ^*succeed?' }
-        })
-        return
-    end
+	TriggerServerEvent("vehicle:parking:get", data.id, "")
+	data.x = nil
+	data.y = nil
+	data.z = nil
+	spawnACar(data, false)
 
-    -- load the model
-    RequestModel(vehicleName)
-    local playerPed = PlayerPedId() -- get the local player ped
-
-    -- wait for the model to load
-    while not HasModelLoaded(vehicleName) do
-        Wait(500) -- often you'll also see Citizen.Wait
-    end
+	local price = 0
 	
-	ClearAreaOfVehicles(384.67245483398,-1622.2377929688, 29.291933059692, 5.0, false, false, false, false, false)
-    -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, 384.67245483398,-1622.2377929688, 29.291933059692, -30.0, true, false)
-
-    -- set the player ped into the vehicle's driver seat
-    SetPedIntoVehicle(playerPed, vehicle, -1)
-
-    -- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-    SetEntityAsNoLongerNeeded(vehicle)
-
-    -- release the model
-	SetModelAsNoLongerNeeded(vehicleName)
-	
-	TriggerServerEvent("vehicle:parking:get", data.id)
-	
-	exports.bf:CloseMenu("parking-foot")
+	if data.parking == "" then
+		price = data.price*(0.01)
+	else
+		price = data.price*(0.10)
+	end
+	TriggerServerEvent("account:player:add", "", -price)
+	exports.bf:Notification("Vous avez payé ~g~".. price.."$")
+	exports.bf:CloseMenu("depots")
 end)
 
-AddEventHandler("vehicle:spawn", function(vehicles)
-    for k,v in pairs(vehicles) do
-        vehicle = exports.bf:spawnCar(v.name, true, vector3(v.x, v.y, v.z), false, true)
-        SetVehicleColours(vehicle, v.primaryColour, v.secondaryColour)
-        SetVehicleDirtLevel(vehicle, v.dirtLevel)
-        SetVehicleEngineHealth(vehicle, v.engineHealth)
+function spawnACar(v, new, tpIn)
+	-- delete old if exist
+	DeleteEntity(v.gameId)
 
-        TriggerServerEvent("vehicle:player:saveId", "", vehicle, v.gameId)
+	--spawn
+	if v.x == nil or v.y == nil or v.z == nil then
+		vehicle = exports.bf:spawnCar(v.name, true, nil, true)
+	else
+		if tpIn then
+			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), true, false, v.heading)
+		else
+			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), false, true, v.heading)
+		end
+	end
+	TriggerServerEvent("vehicle:saveId", vehicle, v.gameId)
+	currentVehicle = vehicle
+
+	if new == false then
+		Wait(2000)
+		if v.livery == -1 then
+			v.livery = 0
+		end
+		if v.engineHealth == "-nan" then
+			v.engineHealth = -1
+		end
+	
+		if v.bodyHealth == "-nan" then
+			v.bodyHealth = -1
+		end
+	
+		if v.fuelLevel == nil then
+			v.fuelLevel = 30
+		end
+		if v.dirtLevel == nil then
+			v.dirtLevel = 0
+		end
+	
+		if v.bodyHealth == nil then
+			v.bodyHealth = 0
+		end
+	
+		if v.heading == nil then
+			v.heading = 0
+		end
+		
+--	print("DEBUG")
+--	print(vehicle)
+--	print(v.x)
+--	print(v.y)
+--	print(v.z)
+--	print(v.name)
+
+--	print("Health")
+--	print(v.bodyHealth)
+--	print(v.engineHealth)
+--	print("Colours")
+--	print(v.primaryColour)
+--	print(v.secondaryColour)
+
+--	print(v.dirtLevel)
+--	print("MISC")
+--	print(v.doorLockStatus)
+--	print(v.livery)
+--	print(v.roofLivery)
+--	print(v.windowTint)
+--	print(v.doorLockStatus)
+--	print("PLATE")
+--	print(v.numberPlateText)
+
+--	print("FUEL")
+--	print(v.fuelLevel)
+--	print("DEBUG")
+		SetVehicleColours(vehicle, v.primaryColour, v.secondaryColour)
+		SetVehicleDirtLevel(vehicle, (v.dirtLevel+v.dirtLevel)/2)
+		SetVehicleBodyHealth(vehicle, (v.bodyHealth+ v.bodyHealth)/2)
+		SetVehicleEngineHealth(vehicle, (v.engineHealth+ v.engineHealth)/2)
+		SetVehicleDoorsLocked(vehicle, v.doorLockStatus)
+		SetVehicleLivery(vehicle, v.livery)
+		if v.numberPlateText ~= nil then
+			SetVehicleNumberPlateText(vehicle, v.numberPlateText)
+		end
+		SetVehicleRoofLivery(vehicle, v.roofLivery)
+		SetVehicleWindowTint(vehicle, v.windowTint)
+		--SetVehicleFuelLevel(vehicle, (v.fuelLevel+ v.fuelLevel)/2)
+	end
+end
+
+AddEventHandler("vehicle:spawn", function(vehicles)
+	for k,v in pairs(vehicles) do
+		spawnACar(v, false)
     end
 end)
 
 AddEventHandler("vehicle:refresh", function(vehicles)
     for k,v in pairs(vehicles) do
         local ped = GetPlayerPed(-1)
-        local primaryColour, secondaryColour = GetVehicleColours(v.gameId)
-        TriggerServerEvent("vehicle:player:save", "", 
+		local primaryColour, secondaryColour = GetVehicleColours(v.gameId)
+		local bodyHealth = GetVehicleBodyHealth(v.gameId)
+        TriggerServerEvent("vehicle:save", "", 
         v.gameId,
         GetEntityCoords(v.gameId),
+        GetEntityHeading(v.gameId),
+        bodyHealth,
         primaryColour,
         secondaryColour,
         GetVehicleDirtLevel(v.gameId),
@@ -391,7 +366,25 @@ AddEventHandler("vehicle:refresh", function(vehicles)
         GetVehicleNumberPlateText(v.gameId),
         GetVehiclePetrolTankHealth(v.gameId),
         GetVehicleRoofLivery(v.gameId),
-        GetVehicleWindowTint(v.gameId)
-    )
+        GetVehicleWindowTint(v.gameId),
+		GetVehicleFuelLevel(v.gameId)
+	)
+
     end
+end)
+
+
+AddEventHandler("vehicle:mods:refresh", function(vehicle, mods)
+	SetVehicleModKit(
+		vehicle, 
+		0
+	)
+	for k,v in pairs(mods) do
+			SetVehicleMod(
+				vehicle, 
+				v.type, 
+				v.value, 
+				false -- always 0
+			)
+	end
 end)

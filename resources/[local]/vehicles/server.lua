@@ -15,13 +15,16 @@ RegisterNetEvent("vehicle:permis:get")
 RegisterNetEvent("vehicle:permis:withdraw")
 RegisterNetEvent("vehicle:job:parking")
 RegisterNetEvent("vehicle:player:get")
-RegisterNetEvent("vehicle:player:save")
-RegisterNetEvent("vehicle:player:saveId")
+RegisterNetEvent("vehicle:job:get")
+RegisterNetEvent("vehicle:save")
+RegisterNetEvent("vehicle:saveId")
+RegisterNetEvent("vehicle:mods:save")
+
+local tva = 0.20
 
 AddEventHandler("vehicle:buy", function(cb, id)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-	local tva = 0.20
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid, id, permis from players where discord = @discord',
         {['discord'] =  discord},
@@ -33,21 +36,26 @@ AddEventHandler("vehicle:buy", function(cb, id)
 							{['discord'] =  discord,
 							['price'] = res2[1].price},
 							function(res3)
-								MySQL.Async.insert("INSERT INTO `player_vehicle` (`id`, `player`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @player , @vehicle, '', 0)",
+								MySQL.Async.insert("INSERT INTO `vehicle_mod` (`id`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @id, '', 0)",
 								{
-									['player'] = res[1].id,
-									['vehicle'] = res2[1].id
+									['@id'] = res2[1].id,
 								},
-								function(insertId)
-										MySQL.Async.execute('UPDATE jobs set money = money + @money where id = @gouv',
+								function(inserted)
+									MySQL.Async.insert("INSERT INTO `player_vehicle` (`id`, `player`, `vehicle_mod` ) VALUES (NULL, @player , @vehicle_mod)",
+									{
+										['@player'] = res[1].id,
+										['@vehicle_mod'] = inserted
+									},
+									function(insertId)
+										MySQL.Async.execute('UPDATE accounts set amount = amount + @money where id = 1',
 										{
-											['@gouv'] = 7,
 											['@money'] = res2[1].price *(tva),
 										},
 										function(res)
 											TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
 											TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
 										end)
+									end)
 								end)
 							end)
 					else
@@ -78,16 +86,22 @@ AddEventHandler("vehicle:job:buy", function(cb, id, job)
 							{['discord'] =  discord,
 							['price'] = res2[1].price},
 							function(res3)
-								MySQL.Async.insert("INSERT INTO `job_vehicle` (`id`, `job`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @job , @vehicle, '', 0)",
+								MySQL.Async.insert("INSERT INTO `vehicle_mod` (`id`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @id, '', 0)",
 								{
-									['job'] = res[1].job,
-									['vehicle'] = res2[1].id
+									['@id'] = res2[1].id
 								},
-								function(insertId)
-									TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
-									TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
+								function(inserted)
+									MySQL.Async.insert("INSERT INTO `job_vehicle` (`id`, `job`, `vehicle_mod`) VALUES (NULL, @job , @vehicle_mod)",
+									{
+										['job'] = res[1].job,
+										['vehicle_mod'] = inserted
+									},
+									function(insertId)
+										TriggerClientEvent("bf:Notification", sourceValue, "Vous avez acheté une ~o~".. res2[1].label)
+										TriggerClientEvent(cb, sourceValue, res2[1].name, insertId)
 								end)
 							end)
+						end)
 					else
 						TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas le permis !")
 
@@ -150,13 +164,15 @@ RegisterNetEvent("vehicle:depots:get:all")
 AddEventHandler("vehicle:depots:get:all", function(cb)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
-
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.player = players.id and players.discord = @discord and player_vehicle.parking = "depot"', {
+		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.price, vehicles.label from players, player_vehicle, vehicles, vehicle_mod where vehicle_mod.id = player_vehicle.vehicle_mod and vehicle_mod.vehicle = vehicles.id and player_vehicle.player = players.id and players.discord = @discord and vehicle_mod.parking = "depot"', {
 			['discord'] =  discord,
-		}, function(result)
-				TriggerClientEvent(cb, sourceValue, result)
+		}, function(res)
+			MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.price, vehicles.label from players, player_vehicle, vehicles, vehicle_mod where vehicle_mod.id = player_vehicle.vehicle_mod and vehicle_mod.vehicle = vehicles.id and player_vehicle.player = players.id and players.discord = @discord and vehicle_mod.parking = ""', {
+				['discord'] =  discord,
+			}, function(res2)
+				TriggerClientEvent(cb, sourceValue, res, res2)
+			end)
 		end)
 	end)
 end)
@@ -165,13 +181,12 @@ end)
 AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
-	local ide = id
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.player = players.id and players.discord = @discord and player_vehicle.parking = @id', {
+		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod where vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id', {
 			['discord'] =  discord,
 			['id'] =  id,
 		}, function(result)
+			print(("trigger job:parking"))
 				TriggerClientEvent(cb, sourceValue, result)
 		end)
 	end)
@@ -183,7 +198,7 @@ AddEventHandler("vehicles:get:all", function(cb)
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label, player_vehicle.parking from players, player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id', {
+		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label, vehicle_mod.parking from players, player_vehicle, vehicles, vehicle_mod where player_vehicle.vehicle_mod = vehicle_mod.id and vehicle_mod.vehicle = vehicles.id', {
 			['discord'] =  discord,
 		}, function(result)
 				TriggerClientEvent(cb, sourceValue, result)
@@ -210,10 +225,10 @@ end)
 AddEventHandler("vehicle:parking:get", function(id, cb)
 	local sourceValue = source
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = "" WHERE `player_vehicle`.`id` = @id ', {
+		MySQL.Async.fetchAll('UPDATE `vehicle_mod` SET parking = "" WHERE `vehicle_mod`.`id` = @id ', {
 			['id'] =  id,
 		}, function(result)
-			MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label from player_vehicle, vehicles where player_vehicle.vehicle = vehicles.id and player_vehicle.id = @id', {
+			MySQL.Async.fetchAll('select vehicle_mod.id as vehicle_mod,  vehicles.name, vehicles.label, vehicles.price,  vehicle_mod.* from vehicles, vehicle_mod where vehicle_mod.vehicle = vehicles.id and vehicle_mod.id = @id', {
 				['discord'] =  discord,
 				['id'] =  id,
 			}, function(result)
@@ -228,7 +243,7 @@ end)
 AddEventHandler("vehicle:store", function(vehicle, parking)
 	local sourceValue = source
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('UPDATE `player_vehicle` SET parking = @parking WHERE `player_vehicle`.`id` = @vehicle ', {
+		MySQL.Async.fetchAll('UPDATE `vehicle_mod` SET parking = @parking WHERE `vehicle_mod`.`gameId` = @vehicle ', {
 			['vehicle'] =  vehicle,
 			['parking'] =  parking,
 		}, function(result)
@@ -288,7 +303,6 @@ AddEventHandler("vehicle:permis:get", function(cb)
 		MySQL.Async.fetchScalar('select permis from players where discord = @discord ', {
 			['discord'] =  discord,
 		}, function(result)
-			print("get permis")
 			TriggerClientEvent(cb, sourceValue, result)
 		end)
 	end)
@@ -313,38 +327,25 @@ end)
 
 
 --jobs
-AddEventHandler("vehicle:job:parking", function(cb, job)
-	local sourceValue = source
-	
-	MySQL.ready(function ()
-		MySQL.Async.fetchAll('SELECT vehicles.label, job_vehicle.id from job_vehicle, vehicles, jobs where job_vehicle.parking = "global" and vehicles.id = job_vehicle.vehicle and job_vehicle.job = jobs.id and jobs.id = @job', {['@job'] = job
-		}, function(result)
-			TriggerClientEvent(cb, sourceValue, result)
-		end)
-	end)
-end)
-
-AddEventHandler("vehicle:player:saveId", function(cb, gameId, lastGameId)
+AddEventHandler("vehicle:saveId", function(gameId, lastGameId)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-	print(gameId)
-	print(lastGameId)
 	MySQL.ready(function ()
-		MySQL.Async.execute("Update player_vehicle,players set player_vehicle.gameId= @gameId where players.discord = @discord and player_vehicle.gameId = @lastGameId",
+		MySQL.Async.execute("Update vehicle_mod set gameId= @gameId where gameId = @lastGameId",
 		{
-			['@discord'] = discord,
 			['@gameId'] = gameId,
 			['@lastGameId'] = lastGameId,
 		},function(rows)
-			print(rows)
 		end)
 	end)
 end)
 
 
-AddEventHandler("vehicle:player:save", function(cb,
+AddEventHandler("vehicle:save", function(cb,
 	gameId,
 	coords,
+	heading,
+	bodyHealth,
 	primaryColour,
 	secondaryColour,
 	dirtLevel,
@@ -354,55 +355,147 @@ AddEventHandler("vehicle:player:save", function(cb,
 	numberPlateText,
 	petrolTankHealth,
 	roofLivery,
-	windowTint
+	windowTint,
+	fuelLevel
 )
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 
-
-	print(vehicle)
-	print(engineHealth)
 	if livery == -1 then
-		livery = nil
+		livery = 0
 	end
-	MySQL.ready(function ()
-		MySQL.Async.execute("Update player_vehicle,players set player_vehicle.x= @x, player_vehicle.y=@y, player_vehicle.z=@z, bodyHealth = @bodyHealth, primaryColour = @primaryColour, secondaryColour = @secondaryColour, dirtLevel = @dirtLevel,	doorLockStatus = @doorLockStatus, engineHealth = @engineHealth, livery = @livery, numberPlateText = @numberPlateText,	petrolTankHealth = petrolTankHealth,roofLivery = @roofLivery, windowTint = @windowTint where players.discord = @discord and player_vehicle.gameId = @gameId",
-		{
-			['@discord'] = discord,
-			['@gameId'] = gameId,
-			['@x'] = coords.x,
-			['@y'] = coords.y,
-			['@z'] = coords.z,
-			['@bodyHealth'] = GetVehicleBodyHealth(vehicle),
-			['@primaryColour'] = primaryColour,
-			['@secondaryColour'] = secondaryColour,
-			['@dirtLevel'] = dirtLevel,
-			['@doorLockStatus'] = doorLockStatus,
-			['@engineHealth'] = engineHealth,
-			['@fuelLevel'] = fuelLevel,
-			['@livery'] = livery,
-			['@numberPlateText'] = numberPlateText,
-			['@petrolTankHealth'] = petrolTankHealth,
-			['@roofLivery'] = roofLivery,
-			['@windowTint'] = windowTint,
- 		},function(rows)
-			print(rows)
-		end)
-	end)
-end)
+	if engineHealth == "-nan" then
+		engineHealth = -1
+	end
 
+	if heading == nil then
+		heading = 0
+	end
+
+--	print("DEBUG")
+--	print(gameId)
+--	print(coords.x)
+--	print(coords.y)
+--	print(coords.z)
+--	print(heading)
+
+--	print("Health")
+--	print(bodyHealth)
+--	print(engineHealth)
+--	print("Colours")
+--	print(primaryColour)
+--	print(secondaryColour)
+
+--	print(dirtLevel)
+--	print("MISC")
+--	print(doorLockStatus)
+--	print(livery)
+--	print(roofLivery)
+--	print(windowTint)
+--	print(doorLockStatus)
+--
+--	print("FUEL")
+--	print(fuelLevel)
+--
+--	print("DEBUG")
+
+	if gameId ~= 0 then
+		MySQL.ready(function ()
+			MySQL.Async.execute("Update vehicle_mod set vehicle_mod.x= @x, vehicle_mod.y=@y, vehicle_mod.z=@z, vehicle_mod.heading = @heading, bodyHealth = @bodyHealth, primaryColour = @primaryColour, secondaryColour = @secondaryColour, dirtLevel = @dirtLevel,	doorLockStatus = @doorLockStatus, engineHealth = @engineHealth, livery = @livery, numberPlateText = @numberPlateText,	petrolTankHealth = petrolTankHealth,roofLivery = @roofLivery, windowTint = @windowTint, fuelLevel = @fuelLevel where vehicle_mod.gameId = @gameId",
+			{
+				['@gameId'] = gameId,
+				['@x'] = coords.x,
+				['@y'] = coords.y,
+				['@z'] = coords.z,
+				['@heading'] = heading,
+				['@bodyHealth'] = bodyHealth,
+				['@primaryColour'] = primaryColour,
+				['@secondaryColour'] = secondaryColour,
+				['@dirtLevel'] = dirtLevel,
+				['@doorLockStatus'] = doorLockStatus,
+				['@engineHealth'] = engineHealth,
+				['@livery'] = livery,
+				['@numberPlateText'] = numberPlateText,
+				['@petrolTankHealth'] = petrolTankHealth,
+				['@roofLivery'] = roofLivery,
+				['@windowTint'] = windowTint,
+				['@fuelLevel'] = fuelLevel,
+			},function(rows)
+				print(rows)
+			end)
+		end)
+	end
+end)
 
 AddEventHandler("vehicle:player:get", function(cb)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll("select player_vehicle.gameId, player_vehicle.x,player_vehicle.y, player_vehicle.z, vehicles.name,  player_vehicle.primaryColour, player_vehicle.secondaryColour,	player_vehicle.dirtLevel,player_vehicle.engineHealth from player_vehicle, players, vehicles where vehicles.id = player_vehicle.vehicle and players.discord = @discord and parking = ''",
+		MySQL.Async.fetchAll("SELECT vehicle_mod.id as vehicle_mod, vehicle_mod.*, vehicles.name FROM `player_vehicle`, players, vehicles, vehicle_mod WHERE players.discord = @discord and players.id = player_vehicle.player and vehicle_mod.id = player_vehicle.vehicle_mod and vehicles.id = vehicle_mod.vehicle and vehicle_mod.parking = ''",
 		{
 			['@discord'] = discord,
-			['@gameId'] = gameId,
 		},function(res)
-			TriggerClientEvent(cb, sourceValue, res)
+				for k,v in pairs(res) do
+					MySQL.Async.fetchAll("SELECT vehicle_mod_type.* from vehicle_mod_type where vehicle_mod = @vehicle_mod",
+					{
+						['@vehicle_mod'] = v.vehicle_mod,
+					},function(mods)
+						TriggerClientEvent("vehicle:mods:refresh", sourceValue, v.gameId, mods)
+					end)
+				end
+				TriggerClientEvent(cb, sourceValue, res)
 		end)
 	end)
+end)
+
+
+AddEventHandler("vehicle:job:get", function(cb)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT jobs.id from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and discord = @discord',
+        {['discord'] =  discord},
+         function(job)
+                if(job) then
+					MySQL.Async.fetchAll("SELECT vehicle_mod.id as vehicle_mod, vehicle_mod.*, vehicles.name FROM `job_vehicle`, vehicles, vehicle_mod WHERE job_vehicle.job = @job and vehicle_mod.id = job_vehicle.vehicle_mod and vehicles.id = vehicle_mod.vehicle and vehicle_mod.parking = ''",
+					{
+						['@job'] = job,
+					},function(res)
+						for k,v in pairs(res) do
+							MySQL.Async.fetchAll("SELECT vehicle_mod_type.* from vehicle_mod_type where vehicle_mod = @vehicle_mod",
+							{
+								['@vehicle_mod'] = v.vehicle_mod,
+							},function(mods)
+								TriggerClientEvent("vehicle:mods:refresh", sourceValue, v.gameId, mods)
+							end)
+						end
+						TriggerClientEvent(cb, sourceValue, res)
+				end)
+			end
+		end)
+	end)
+end)
+
+AddEventHandler("vehicle:mods:save", function(gameid, mods)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('select id from vehicle_mod where gameId =@gameid ', {
+			['@gameid'] =  gameid,
+		}, function(vehicle_mod)
+				for i = 0,49 do
+					MySQL.Async.execute("INSERT INTO `vehicle_mod_type` (`vehicle_mod`, `type`, `value`) VALUES (@vehicle_mod, @i, @value) ON DUPLICATE KEY UPDATE type = @i, value = @value",
+					{
+						['@vehicle_mod'] = vehicle_mod,
+						['@i'] = i,
+						['@value'] = mods[i]
+					},function(rows)
+						print(rows)
+					end)
+				end
+			end)
+		end)
 end)

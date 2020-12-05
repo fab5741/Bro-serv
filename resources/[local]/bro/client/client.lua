@@ -1116,3 +1116,18 @@ function RotAnglesToVec(rot) -- input vector3
 	local num = math.abs(math.cos(x))
 	return vector3(-math.sin(z)*num, math.cos(z)*num, math.sin(x))
 end
+
+-- WEATHER
+Citizen.CreateThread(function()
+    while true 
+    	do
+		
+		SetWeatherTypePersist("XMAS")
+        SetWeatherTypeNowPersist("XMAS")
+        SetWeatherTypeNow("XMAS")
+        SetOverrideWeather("XMAS")
+    	
+		Citizen.Wait(1)
+	end
+
+end)

@@ -58,7 +58,7 @@ RegisterNetEvent('job:parking:open')
 
 AddEventHandler("job:parking:open", function(job)  
 	job = job[1]
-	TriggerServerEvent("vehicle:job:parking", "job:parking", job.job)
+	TriggerServerEvent("vehicle:parking:get:all", "job:parking", job.name)
 end)
 
 RegisterNetEvent('job:safe:open2')
@@ -412,4 +412,3 @@ AddEventHandler('job:payFines', function(amount, sender)
 		end
 	end)
 end)
-

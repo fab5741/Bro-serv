@@ -24,14 +24,6 @@ exports.bf:AddMenu("bro", {
             openMenu = "bro-vehicle"
         },
         {
-            text = "Assurance (véhicules)",
-            exec = {
-                callback = function()
-                    TriggerServerEvent("vehicles:get:all", "bf:vehicles")
-                end
-            },
-        },
-        {
             text = "Vetements",
             openMenu = "bro-clothes"
         },

@@ -416,15 +416,13 @@ AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOf
         MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
         function(srcPhone)
-            local destPlayer = getdiscordByPhoneNumber(phone_number)
-            local is_valid = destPlayer ~= nil and destPlayer ~= discord
             AppelsEnCours[indexCall] = {
                 id = indexCall,
                 transmitter_src = sourcePlayer,
                 transmitter_num = srcPhone,
                 receiver_src = nil,
                 receiver_num = phone_number,
-                is_valid = destPlayer ~= nil,
+                is_valid = true,
                 is_accepts = false,
                 hidden = hidden,
                 rtcOffer = rtcOffer,
@@ -434,9 +432,11 @@ AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOf
                 AppelsEnCours[indexCall].srcPhone = extraData.useNumber
             end
         
-            if is_valid == true then
-                getSourceFromdiscord(destPlayer, function (srcTo)
+            MySQL.Async.fetchScalar('select gameId from  players where phone_number = @phone_number',
+            {['@phone_number'] =  phone_number},
+            function(srcTo)
                     if srcTo ~= nill then
+                        print(srcTo)
                         AppelsEnCours[indexCall].receiver_src = srcTo
                         TriggerEvent('phone:addCall', AppelsEnCours[indexCall])
                         TriggerClientEvent('phone:waitingCall', sourcePlayer, AppelsEnCours[indexCall], true)
@@ -445,11 +445,7 @@ AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOf
                         TriggerEvent('phone:addCall', AppelsEnCours[indexCall])
                         TriggerClientEvent('phone:waitingCall', sourcePlayer, AppelsEnCours[indexCall], true)
                     end
-                end)
-            else
-                TriggerEvent('phone:addCall', AppelsEnCours[indexCall])
-                TriggerClientEvent('phone:waitingCall', sourcePlayer, AppelsEnCours[indexCall], true)
-            end
+            end)
         end)
     end)
 end)
@@ -681,19 +677,4 @@ function onRejectFixePhone(source, infoCall, rtcAnswer)
         saveAppels(AppelsEnCours[id])
     end
     AppelsEnCours[id] = nil 
-end
---====================================================================================
---  Utils
---====================================================================================
-function getSourceFromdiscord(discord, cb)
-    TriggerEvent("es:getPlayers", function(players)
-        for k , user in pairs(players) do
-        
-            if (user.getdiscord ~= nil and user.getdiscord() == discord) or (user.discord == discord) then
-                cb(k)
-                return
-            end
-        end
-    end)
-    cb(nil)
 end

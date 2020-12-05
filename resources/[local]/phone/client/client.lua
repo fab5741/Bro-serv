@@ -594,8 +594,10 @@ end)
 RegisterNUICallback('reponseText', function(data, cb)
   local limit = data.limit or 255
   local text = data.text or ''
-
-  cb(json.encode({text = tostring(exports.bf:OpenTextInput())}))
+  local text = exports.bf:OpenTextInput()
+  if text ~= nil then
+    cb(json.encode({text = tostring(text)}))
+  end
 end)
 --====================================================================================
 --  Event - Messages

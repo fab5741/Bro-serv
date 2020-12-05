@@ -280,7 +280,7 @@ end)
 RegisterNetEvent('jobs:service:manage')
 
 AddEventHandler("jobs:service:manage", function(grade)
-	if grade == 5 then
+	if grade >= 4 then
 		exports.bf:NextMenu("service")
 	else
 		exports.bf:Notification("~r~Vous n'êtes pas chef de service !")

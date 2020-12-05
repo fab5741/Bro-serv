@@ -76,20 +76,16 @@ RegisterNetEvent("items:use")
 -- source is global here, don't add to function
 AddEventHandler("items:use", function (type, amount)
     local source = source
-    if(type == 13) then
+    if(type == 3) then
         -- EAT bread
         TriggerClientEvent("items:eat", source)
         TriggerClientEvent("needs:change", source, 0, 60)
-    end
-    if(type == 14) then
+    elseif(type == 5) then
+      -- drink juice
       TriggerClientEvent("items:drink", source)
-      TriggerClientEvent("needs:change", source, 1, 60)
-  end
-  if(type == 19) then
-    TriggerClientEvent("items:drink", source)
-    TriggerClientEvent("needs:change", source, 0, 80)
-    TriggerClientEvent("needs:change", source, 1, 10)
-  end
+      TriggerClientEvent("needs:change", source, 0, 70)
+      TriggerClientEvent("needs:change", source, 1, 10)
+    end
     sub(source, type, amount)
 end)
 
@@ -108,10 +104,6 @@ RegisterNetEvent("items:process")
 AddEventHandler("items:process", function (type, amount, typeTo, amountTo, message)
     local sourceValue = source
     local discord = exports.bf:GetDiscordFromSource(sourceValue) 
-    print(type)
-    print(amount)
-    print(typeTo)
-    print(amountTo)
     MySQL.ready(function ()
       MySQL.Async.fetchAll('select id, amount from players, player_item where discord = @discord and player_item.item = @type and player_item.player = players.id',
       {['discord'] =  discord,

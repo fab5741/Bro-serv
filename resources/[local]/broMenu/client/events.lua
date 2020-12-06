@@ -3,7 +3,7 @@ RegisterNetEvent('bf:open')
 AddEventHandler("bf:open", function(job) 
 	job = job[1]
 	exports.bf:SetMenuValue("bro", {
-		menuTitle = job.label
+		menuTitle = job.grade.." "..job.label
 	})
 	exports.bf:OpenMenu("bro")
 end)

@@ -4,6 +4,7 @@ RegisterNetEvent("account:player:get")
 RegisterNetEvent("account:player:add")
 -- Player liquid #2
 RegisterNetEvent("account:player:liquid:get")
+RegisterNetEvent("account:player:liquid:get:facture")
 RegisterNetEvent("account:player:liquid:add")
 -- Jobs #3
 RegisterNetEvent("account:job:get")
@@ -56,6 +57,20 @@ AddEventHandler('account:player:liquid:get', function(cb)
 	end)
 end)
 
+AddEventHandler('account:player:liquid:get:facture', function(cb, amount, sender, job)
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+			{
+				['@discord'] = discord
+			}, function(liquid)
+			TriggerClientEvent(cb, sourceValue, liquid, amount, sender, job)
+		end)
+	end)
+end)
+
 AddEventHandler('account:player:liquid:add', function(cb, amount)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
@@ -92,7 +107,7 @@ AddEventHandler('account:job:get', function(cb, job)
 	end)
 end)
 
-AddEventHandler('account:job:add', function(cb, job, amount)
+AddEventHandler('account:job:add', function(cb, job, amount, silent)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local job = job
@@ -111,11 +126,15 @@ AddEventHandler('account:job:add', function(cb, job, amount)
 						['@amount'] = amount
 					}, function(result)
 						TriggerClientEvent(cb, sourceValue, result)
-						TriggerClientEvent('bf:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
+						if not silent then
+							TriggerClientEvent('bf:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
+						end
 					end)
 				end)
 			else
-				TriggerClientEvent('bf:Notification', sourceValue,  "Vous n'avez pas cet argent !")
+				if not silent then
+					TriggerClientEvent('bf:Notification', sourceValue,  "Vous n'avez pas cet argent !")
+				end
 			end
 		end)
 	end)

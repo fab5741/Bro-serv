@@ -158,7 +158,7 @@ RegisterNetEvent('job:open:menu')
 AddEventHandler("job:open:menu", function(job)  
 	job = job[1] 
 	print(job.name)
-	if job.name == "lsms" or job.name == "lspd" or job.name == "newspapers" or job.name == "bennys"  or job.name == "taxi" then
+	if job.name == "lspd" or job.name == "lsms" or job.name == "farm" or job.name == "wine"  or job.name == "taxi"  or job.name=="bennys" or job.name=="newspapers" then
 		exports.bf:OpenMenu(job.name)
 	end
 end)
@@ -323,17 +323,17 @@ RegisterNetEvent('weapon:store:store')
 
 AddEventHandler("weapon:store:store", function(weapon)  
 	print(weapon)
-	if weapon == "453432689" then
+	if weapon == "0x1B06D571" then
 		weapon = "WEAPON_PISTOL"
-	elseif weapon == "-1951375401" then
+	elseif weapon == "0x8BB05FD7" then
 		weapon = "WEAPON_FLASHLIGHT"
-	elseif weapon == "911657153" then
+	elseif weapon == "0x3656C8C1" then
 		weapon = "WEAPON_STUNGUN"
-	elseif weapon == "1737195953" then
+	elseif weapon == "0x678B81B1" then
 		weapon = "WEAPON_NIGHTSTICK"
-	elseif weapon == "487013001" then
+	elseif weapon == "0x1D073A89" then
 		weapon = "WEAPON_PUMPSHOTGUN"
-	elseif weapon == "736523883" then
+	elseif weapon == "0x2BE6766B" then
 		weapon = "WEAPON_SMG"
 	end
 	GiveWeaponToPed(
@@ -411,4 +411,59 @@ AddEventHandler('job:payFines', function(amount, sender)
 			TriggerServerEvent('job:finesETA', sender, 1)
 		end
 	end)
+end)
+
+lockAskingFacture = false
+RegisterNetEvent('job:facture')
+AddEventHandler('job:facture', function(amount, motif, job, sender)
+	Citizen.CreateThread(function()
+		
+		if(lockAskingFacture ~= true) then
+			lockAskingFacture = true
+			local notifReceivedAt = GetGameTimer()
+			exports.bf:AdvancedNotification({
+				text = "Facture de " .. amount .. "$. Y pour accepter",
+				title = job,
+				icon = "char_AGENT14"
+			})
+			while(true) do
+				Wait(0)
+				
+				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
+					TriggerServerEvent('job:facture2', sender, 2)
+					exports.bf:Notification("Facture expirée")
+					lockAskingFacture = false
+					break
+				end
+				
+				if IsControlPressed(1, config.bindings.accept_fine) then
+					TriggerServerEvent("account:player:liquid:get:facture", "job:facture:accept", amount, sender)
+					break
+				end
+				
+				if IsControlPressed(1, config.bindings.refuse_fine) then
+					TriggerServerEvent('job:facture2', sender, 3)
+					lockAskingFacture = false
+					break
+				end
+			end
+		else
+			TriggerServerEvent('job:finesETA', sender, 1)
+		end
+	end)
+end)
+
+RegisterNetEvent("job:facture:accept")
+AddEventHandler("job:facture:accept", function(liquid, amount, sender, job)
+	amount = tonumber(amount)
+	if liquid >= amount then
+		TriggerServerEvent("account:player:liquid:add", "", amount*(-1))
+		TriggerServerEvent("account:job:add", "", job, amount*(1-tva), true)
+		TriggerServerEvent("account:job:add", "", 1, amount*tva, true)
+		exports.bf:Notification("Facture de " .. amount .. "$ payée")
+		TriggerServerEvent('job:facture2', sender, 0)
+		lockAskingFacture = false
+	else
+		exports.bf:Notification("Vous n'avez pas assez d'argent")
+	end
 end)

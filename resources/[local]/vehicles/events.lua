@@ -12,6 +12,7 @@ RegisterNetEvent("vehicle:depots")
 RegisterNetEvent("vehicle:foot")
 RegisterNetEvent("vehicle:get")
 RegisterNetEvent("vehicle:depots:get")
+RegisterNetEvent("vehicle:depots:job:get")
 RegisterNetEvent("vehicle:spawn")
 RegisterNetEvent("vehicle:refresh")
 RegisterNetEvent("vehicle:mods:refresh")
@@ -176,31 +177,61 @@ end)
 
 
 
-AddEventHandler("vehicle:depots", function(vehicles, vehicles2)
+AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehicles4)
 	local buttons = {}
 	
-	for k, v in ipairs (vehicles) do
-		buttons[k] =     {
-			text = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
-			exec = {
-				callback = function() 
-					
-					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
-				end
+	if vehicles ~= nil then
+		for k, v in ipairs (vehicles) do
+			buttons[k] =     {
+				text = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
+				exec = {
+					callback = function() 
+						
+						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
+					end
+			}
 		}
-	}
+		end
 	end
-		
-	for k, v in ipairs (vehicles2) do
-		buttons[k] =     {
-			text = v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
-			exec = {
-				callback = function() 
-					
-					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
-				end
+
+	if vehicles2 ~= nil then
+		for k, v in ipairs (vehicles2) do
+			buttons[k] =     {
+				text = v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+				exec = {
+					callback = function() 
+						
+						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
+					end
+			}
 		}
-	}
+		end
+	end
+
+	if vehicles3 ~= nil then
+		for k, v in ipairs (vehicles3) do
+			buttons[k] =     {
+				text = "Entreprise : "..v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+				exec = {
+					callback = function() 
+						
+						TriggerServerEvent("vehicle:parking:job:get", v.id, "vehicle:depots:job:get")
+					end
+			}
+		}
+		end
+	end
+	if vehicles4 ~= nil then
+		for k, v in ipairs (vehicles4) do
+			buttons[k] =     {
+				text = "Entreprise : ".. v.label.. " ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+				exec = {
+					callback = function() 
+						TriggerServerEvent("vehicle:parking:job:get", v.id, "vehicle:depots:job:get")
+					end
+			}
+		}
+	end
 	end
 	exports.bf:SetMenuButtons("depots", buttons)
 	exports.bf:OpenMenu("depots")
@@ -236,7 +267,6 @@ end)
 
 
 AddEventHandler("vehicle:depots:get", function(data)
-	TriggerServerEvent("vehicle:parking:get", data.id, "")
 	data.x = nil
 	data.y = nil
 	data.z = nil
@@ -250,6 +280,27 @@ AddEventHandler("vehicle:depots:get", function(data)
 		price = data.price*(0.10)
 	end
 	TriggerServerEvent("account:player:add", "", -price)
+	TriggerServerEvent("account:job:add", "", 1, price, true)
+	exports.bf:Notification("Vous avez payé ~g~".. price.."$")
+	exports.bf:CloseMenu("depots")
+end)
+
+AddEventHandler("vehicle:depots:job:get", function(data, job)
+	print(job)
+	data.x = nil
+	data.y = nil
+	data.z = nil
+	spawnACar(data, false)
+
+	local price = 0
+	
+	if data.parking == "" then
+		price = data.price*(0.01)
+	else
+		price = data.price*(0.10)
+	end
+	TriggerServerEvent("account:job:add", "", job, -price, true)
+	TriggerServerEvent("account:job:add", "", 1, price, true)
 	exports.bf:Notification("Vous avez payé ~g~".. price.."$")
 	exports.bf:CloseMenu("depots")
 end)

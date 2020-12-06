@@ -1,27 +1,4 @@
 function menus() 
-	exports.bf:AddMenu("lsms", {
-		title = "Menu LSMS",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "SOIN",
-				exec = {
-					callback = function()
-						reviveClosestPlayer()
-					end
-				},
-			},
-		},
-		{
-			text = "Vehicules",
-			exec = {
-				callback = function()
-					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
-				end
-			},
-		},
-	})
 	exports.bf:AddMenu("lspd", {
 		title = "Menu LSPD",
 		menuTitle = "Job",
@@ -44,10 +21,19 @@ function menus()
 				openMenu = "lspd-props"
 			},
 			{
-				text = "Vehicules",
+				text = "Facturer",
 				exec = {
 					callback = function()
-						TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 2)
+						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local t = exports.bf:GetPlayerServerIdInDirection(3)
+						--test only
+						if t then
+							TriggerServerEvent("job:facture", t, motif, price, 2)
+						else
+							exports.bf:Notification("Pas de joueur à proximité")
+						end
+						exports.bf:CloseMenu("lspd")
 					end
 				},
 			},
@@ -60,31 +46,6 @@ function menus()
 				},
 			},
 		},	
-	})
-	exports.bf:AddMenu("jobs-vehicles", {
-		title = "Menu  assurance",
-		menuTitle = "Job",
-		position = 1,
-	})
-	
-	exports.bf:AddMenu("newspapers", {
-		title = "Menu Livreurs de journaux",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "Stopper les livraisons",
-				exec = {
-					callback = function()
-						beginInProgress = false
-						-- on nettoie la merde
-						exports.bf:RemoveArea("begin-current")
-						vehicleLivraison = 0
-						ClearAllBlipRoutes()
-					end
-				},
-			},
-		},
 	})
 	exports.bf:AddMenu("lspd-animations", {
 		title = "LSPD",
@@ -306,7 +267,7 @@ function menus()
 		},
 	})
 
-	exports.bf:AddMenu("lspd-service", {
+	exports.bf:AddMenu("lsms", {
 		title = "Menu LSMS",
 		menuTitle = "Job",
 		position = 1,
@@ -315,20 +276,151 @@ function menus()
 				text = "SOIN",
 				exec = {
 					callback = function()
-						closest = GetClosestPlayer()
-						revivePlayer(closest)
+						reviveClosestPlayer()
 					end
 				},
 			},
-		},
-		{
-			text = "Vehicules",
-			exec = {
-				callback = function()
-					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
-				end
+			{
+				text = "Facturer",
+				exec = {
+					callback = function()
+						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local t = exports.bf:GetPlayerServerIdInDirection(3)
+						--test only
+						if t then
+							TriggerServerEvent("job:facture", t, motif, price, 2)
+						else
+							exports.bf:Notification("Pas de joueur à proximité")
+						end
+						exports.bf:CloseMenu("lspd")
+					end
+				},
 			},
-		},
+			{
+				text = "Gestion service",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			},
+		}
+	})
+
+    -- job center
+    buttons = {}
+    for k, v in pairs(config.center.jobs) do
+        buttons[#buttons+1] = {
+            text = v.label,
+            exec = {
+                callback = function()
+					TriggerServerEvent("job:set", 18, "Livreur de journaux")
+					Wait(100)
+					TriggerServerEvent("job:get", "jobs:refresh")
+					exports.bf:CloseMenu("center")
+                end
+            },
+        }
+    end
+
+	exports.bf:AddMenu("farm", {
+		title = "Menu Fermier",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "Facturer",
+				exec = {
+					callback = function()
+						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local t = exports.bf:GetPlayerServerIdInDirection(3)
+						--test only
+						if t then
+							TriggerServerEvent("job:facture", t, motif, price, 4)
+						else
+							exports.bf:Notification("Pas de joueur à proximité")
+						end
+						exports.bf:CloseMenu("ferm")
+					end
+				},
+			},
+			{
+				text = "Gestion service",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			},
+		}
+	})
+
+	exports.bf:AddMenu("wine", {
+		title = "Menu Vigneron",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "Facturer",
+				exec = {
+					callback = function()
+						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local t = exports.bf:GetPlayerServerIdInDirection(3)
+						--test only
+						if t then
+							TriggerServerEvent("job:facture", t, motif, price, 5)
+						else
+							exports.bf:Notification("Pas de joueur à proximité")
+						end
+						exports.bf:CloseMenu("wine")
+					end
+				},
+			},
+			{
+				text = "Gestion service",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			},
+		}
+	})
+
+	exports.bf:AddMenu("taxi", {
+		title = "Menu Taxi",
+		menuTitle = "Job",
+		position = 1,
+		buttons = {
+			{
+				text = "Facturer",
+				exec = {
+					callback = function()
+						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local t = exports.bf:GetPlayerServerIdInDirection(3)
+						--test only
+						if t then
+							TriggerServerEvent("job:facture", t, motif, price, 6)
+						else
+							exports.bf:Notification("Pas de joueur à proximité")
+						end
+						exports.bf:CloseMenu("taxi")
+					end
+				},
+			},
+			{
+				text = "Gestion service",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			},
+		}
 	})
 
 	exports.bf:AddMenu("bennys", {
@@ -350,81 +442,54 @@ function menus()
 					end
 				},
 			},
-		},
-	})
-
-    -- job center
-    buttons = {}
-    for k, v in pairs(config.center.jobs) do
-        buttons[#buttons+1] = {
-            text = v.label,
-            exec = {
-                callback = function()
-					TriggerServerEvent("job:set", 18, "Livreur de journaux")
-					Wait(100)
-					TriggerServerEvent("job:get", "jobs:refresh")
-					exports.bf:CloseMenu("center")
-                end
-            },
-        }
-    end
-
-    exports.bf:AddMenu("center", {
-        title = "LSJC",
-        menuTitle = "Prendre un emploi",
-        position = 1,
-        buttons = buttons
-	})
-
-
-	exports.bf:AddMenu("repair", {
-        title = "Réparation",
-		position = 1,
-		buttons = {
 			{
-				text = "Réparer carrosserie (10$)",
+				text = "Facturer",
 				exec = {
 					callback = function()
-						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-
-						SetVehicleFixed(vehicle)
-						SetVehicleDeformationFixed(vehicle)
-						SetVehicleUndriveable(vehicle, false)
-						ClearPedTasksImmediately(playerPed)
-						TriggerServerEvent("account:player:liquid:add", "", -10.0)
-						exports.bf:Notification("Véhicle réparé")
-						exports.bf:CloseMenu("repair")
+						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local t = exports.bf:GetPlayerServerIdInDirection(3)
+						--test only
+						if t then
+							TriggerServerEvent("job:facture", t, motif, price, 7)
+						else
+							exports.bf:Notification("Pas de joueur à proximité")
+						end
+						exports.bf:CloseMenu("bennys")
 					end
 				},
 			},
-		}
+			{
+				text = "Gestion service",
+				exec = {
+					callback = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			},
+		},
 	})
 
-
-
-	exports.bf:AddMenu("taxi", {
-		title = "Menu Taxi",
+	exports.bf:AddMenu("newspapers", {
+		title = "Menu Livreurs de journaux",
 		menuTitle = "Job",
 		position = 1,
 		buttons = {
-		{
-			text = "Vehicules",
-			exec = {
-				callback = function()
-					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
-				end
+			{
+				text = "Stopper les livraisons",
+				exec = {
+					callback = function()
+						beginInProgress = false
+						-- on nettoie la merde
+						exports.bf:RemoveArea("begin-current")
+						vehicleLivraison = 0
+						ClearAllBlipRoutes()
+					end
+				},
 			},
 		},
-		{
-			text = "Gestion service",
-			exec = {
-				callback = function()
-					TriggerServerEvent("job:isChef", "jobs:service:manage")
-				end
-			},
-		},
-	}
 	})
+
 
 	exports.bf:AddMenu("service", {
 		title = "Menu Service",
@@ -460,6 +525,38 @@ function menus()
 				exec = {
 					callback = function()
 						fireClosestPlayer()
+					end
+				},
+			},
+		}
+	})
+
+
+	exports.bf:AddMenu("center", {
+        title = "LSJC",
+        menuTitle = "Prendre un emploi",
+        position = 1,
+        buttons = buttons
+	})
+
+
+	exports.bf:AddMenu("repair", {
+        title = "Réparation",
+		position = 1,
+		buttons = {
+			{
+				text = "Réparer carrosserie (10$)",
+				exec = {
+					callback = function()
+						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+
+						SetVehicleFixed(vehicle)
+						SetVehicleDeformationFixed(vehicle)
+						SetVehicleUndriveable(vehicle, false)
+						ClearPedTasksImmediately(playerPed)
+						TriggerServerEvent("account:player:liquid:add", "", -10.0)
+						exports.bf:Notification("Véhicle réparé")
+						exports.bf:CloseMenu("repair")
 					end
 				},
 			},

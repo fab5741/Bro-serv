@@ -199,7 +199,7 @@ function showFixePhoneHelper (coords)
       coords.x, coords.y, coords.z, 1)
     if dist <= 2.5 then
       SetTextComponentFormat("STRING")
-      AddTextComponentString(_U('use_fixed', data.name, number))
+      AddTextComponentString('use_fixed'.. data.name.. number)
       DisplayHelpTextFromStringLabel(0, 0, 0, -1)
       if IsControlJustPressed(1, Config.KeyTakeCall) then
         startFixeCall(number)

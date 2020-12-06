@@ -180,7 +180,7 @@ Citizen.CreateThread(function()
                                     },
                                     function(affectedRows)
                                         if affectedRows == 1 then
-                                            TriggerClientEvent("phone:account:get", sourceValue)
+                                           -- TriggerClientEvent("phone:account:get", sourceValue)
                                             TriggerClientEvent('bf:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
                                         else
                                             TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
@@ -624,6 +624,48 @@ AddEventHandler('job:finesETA', function(officer, code)
             icon = "CHAR_AGENT14",
             title = 'LSPD', false, 
             text = "Amende acceptée"
+        })
+	end
+end)
+
+
+RegisterNetEvent("job:facture")
+
+AddEventHandler("job:facture", function(t, motif, price, job)
+    local sourceValue = source
+    TriggerClientEvent('job:facture', t, price, motif, job, sourceValue)
+    TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
+        icon = "CHAR_AGENT14",
+        title = job, false, 
+        text = "Vous présentez une facture de  ~g~ "..price.."$"
+    })
+end)
+
+RegisterServerEvent('job:facture2')
+AddEventHandler('job:facture2', function(officer, code)
+    if(code==1) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'JOB', false, 
+            text = "Facture déjà en cours"
+        })
+    elseif(code==2) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'JOB', false, 
+            text = "Fin de la requête (facture)"
+        })
+    elseif(code==3) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'JOB', false, 
+            text = "Facture refusée"
+        })
+    elseif(code==0) then
+        TriggerClientEvent("bf:AdvancedNotification", officer, {
+            icon = "CHAR_AGENT14",
+            title = 'JOB', false, 
+            text = "Facture acceptée"
         })
 	end
 end)

@@ -168,12 +168,12 @@ RegisterNetEvent("shops:open")
 AddEventHandler('shops:open', function(items)
 	buttons = {}
 	for k, v in pairs(items) do
-		if v.item == 13 then
+		if v.item == 3 then
 			v.price = 5
-		elseif v.item == 14 then
+		elseif v.item == 5 then
 			v.price = 5
-		elseif v.item == 19 then
-			v.price = 5
+		else 
+			v.price = 10
 		end
         buttons[#buttons+1] = {
             text = v.label.. " ~g~"..v.price.." $",

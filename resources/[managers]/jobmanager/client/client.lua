@@ -12,7 +12,7 @@ heading = 0
 avert = "LSPD"
 vehicleLivraison = 0
 beginInProgress = false
-
+tva = 0.20
 -- police vars
 handCuffed = false
 
@@ -76,6 +76,16 @@ Citizen.CreateThread(function()
 				TriggerServerEvent("job:get", "job:process:open")		
 			elseif zoneType == "armories" then
 				openArmory()
+			elseif zoneType == "fourriere" then
+				-- Mise en fourriére
+				vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+				if vehicle ~= nil then
+					TriggerServerEvent("vehicle:parking:store", vehicle, "depot", "")
+					exports.bf:Notification("Vous avez mis le véhicle en fourriére")
+					DeleteEntity(vehicle)
+				else
+					exports.bf:Notification("Vous n'êtes pas dans un véhicule")
+				end
 			else
 				exports.bf:OpenMenu(zoneType..zone)
 			end

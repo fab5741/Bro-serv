@@ -1023,6 +1023,38 @@ function createMenuAndArea(job)
 				})
 				end
 			end
+			if myjob.fourriere then
+				for k, v in pairs(myjob.fourriere) do
+				exports.bf:AddArea("fourriere"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bf:HelpPromt("Mise en fourriére Key : ~INPUT_PICKUP~")
+								zone = k
+								zoneType = "fourriere"
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Fourriére "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
 		end
 	end
 end
@@ -1052,7 +1084,7 @@ function openArmory()
 	end							
 
 	Wait(300)
-	exports.bf:OpenMenu(zoneType..zone)
+	exports.bf:OpenMenu("armories1")
 	if not IsAmbientSpeechPlaying(armoryPed) then
 		PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_GREETSHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
 	end

@@ -9,12 +9,12 @@ AddEventHandler('shops:buy', function(type, amount, shop_item)
 
 	local tva = 0.2
 	local price = 0
-	if type == 13 then
+	if type == 3 then
 		price = 5
-	elseif type == 14 then 
+	elseif type == 5 then 
 		price =5
-	elseif type == 19 then 
-		price =5
+	else
+		price =10
 	end
 
 	MySQL.ready(function ()
@@ -159,12 +159,12 @@ AddEventHandler('shops:sell', function(shop, type, amount)
 	local maxInShop = 100
 
 	local price = 0
-	if type == 13 then
+	if type == 3 then
 		price = 3
-	elseif type == 14 then 
+	elseif type == 5 then 
 		price =3
-	elseif type == 19 then 
-		price =3
+	else
+		price =10
 	end
 
 	MySQL.ready(function ()

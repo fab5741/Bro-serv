@@ -26,10 +26,10 @@ function menus()
 					callback = function()
 						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local t = exports.bf:GetPlayerServerIdInDirection(3)
-						--test only
-						if t then
-							TriggerServerEvent("job:facture", t, motif, price, 2)
+						local closestPlayer, dist = GetClosestPlayer()
+
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
 						else
 							exports.bf:Notification("Pas de joueur à proximité")
 						end
@@ -286,10 +286,10 @@ function menus()
 					callback = function()
 						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local t = exports.bf:GetPlayerServerIdInDirection(3)
-						--test only
-						if t then
-							TriggerServerEvent("job:facture", t, motif, price, 2)
+						local closestPlayer, dist = GetClosestPlayer()
+
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 3)
 						else
 							exports.bf:Notification("Pas de joueur à proximité")
 						end
@@ -335,14 +335,30 @@ function menus()
 					callback = function()
 						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local t = exports.bf:GetPlayerServerIdInDirection(3)
-						--test only
-						if t then
-							TriggerServerEvent("job:facture", t, motif, price, 4)
+						local closestPlayer, dist = GetClosestPlayer()
+
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 4)
 						else
 							exports.bf:Notification("Pas de joueur à proximité")
 						end
 						exports.bf:CloseMenu("ferm")
+					end
+				},
+			},
+			{
+				text = "Commencer la revente",
+				exec = {
+					callback = function()
+						beginSell("farm")
+					end
+				},
+			},
+			{
+				text = "Finir la revente",
+				exec = {
+					callback = function()
+						removeSell("farm")
 					end
 				},
 			},
@@ -356,6 +372,11 @@ function menus()
 			},
 		}
 	})
+	
+	exports.bf:AddMenu("sell", {
+		title = "Revente ",
+		position = 2,
+	})
 
 	exports.bf:AddMenu("wine", {
 		title = "Menu Vigneron",
@@ -368,14 +389,30 @@ function menus()
 					callback = function()
 						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local t = exports.bf:GetPlayerServerIdInDirection(3)
-						--test only
-						if t then
-							TriggerServerEvent("job:facture", t, motif, price, 5)
+						local closestPlayer, dist = GetClosestPlayer()
+
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 5)
 						else
 							exports.bf:Notification("Pas de joueur à proximité")
 						end
 						exports.bf:CloseMenu("wine")
+					end
+				},
+			},
+			{
+				text = "Commencer la revente",
+				exec = {
+					callback = function()
+						beginSell("wine")
+					end
+				},
+			},
+			{
+				text = "Finir la revente",
+				exec = {
+					callback = function()
+						removeSell("wine")
 					end
 				},
 			},
@@ -401,10 +438,10 @@ function menus()
 					callback = function()
 						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local t = exports.bf:GetPlayerServerIdInDirection(3)
-						--test only
-						if t then
-							TriggerServerEvent("job:facture", t, motif, price, 6)
+						local closestPlayer, dist = GetClosestPlayer()
+
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 6)
 						else
 							exports.bf:Notification("Pas de joueur à proximité")
 						end
@@ -448,10 +485,10 @@ function menus()
 					callback = function()
 						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local t = exports.bf:GetPlayerServerIdInDirection(3)
-						--test only
-						if t then
-							TriggerServerEvent("job:facture", t, motif, price, 7)
+						local closestPlayer, dist = GetClosestPlayer()
+
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 7)
 						else
 							exports.bf:Notification("Pas de joueur à proximité")
 						end

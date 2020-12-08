@@ -13,6 +13,9 @@ avert = "LSPD"
 vehicleLivraison = 0
 beginInProgress = false
 tva = 0.20
+lockCollect = false
+nbSold = 0
+
 -- police vars
 handCuffed = false
 
@@ -74,6 +77,8 @@ Citizen.CreateThread(function()
 				TriggerServerEvent("job:get", "job:collect:open")	
 			elseif zoneType == "process" then
 				TriggerServerEvent("job:get", "job:process:open")		
+			elseif zoneType == "sell" then
+				TriggerServerEvent("job:get", "job:sell:open")		
 			elseif zoneType == "armories" then
 				openArmory()
 			elseif zoneType == "fourriere" then

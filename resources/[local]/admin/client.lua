@@ -40,3 +40,22 @@ RegisterCommand('coords', function(source, args, rawCommand)
 		coords = ""..coords.x..","..coords.y..","..coords.z..""
 	})
 end)
+
+
+RegisterCommand("admin", function(source, args) 
+    pos= vector3(-1106.8178710938,-830.57391357422,-46.269847869873)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+end)
+
+RegisterCommand("prison", function(source, args) 
+    pos= vector3(1691.6459960938, 2565.0712578125,45.56489944458)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+end)
+
+
+RegisterCommand("fight", function(source, args) 
+    pos= vector3(925.22357177734,-1782.4407958984,31.275489807129)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+end)
+
+

@@ -24,7 +24,7 @@ config.MinimumDistance            = 0 -- Minimum NPC job destination distance fr
 -- Settings
 local enableTaxiGui = true -- Enables the GUI (Default: true)
 local fareCost = 0.001 --
-local costPerMile = 0.5
+local costPerMile = 1.2
 local initialFare = 1.0 -- the cost to start a fare
 
 local testMode = true -- enables spawn car command

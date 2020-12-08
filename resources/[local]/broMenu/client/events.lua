@@ -172,11 +172,7 @@ AddEventHandler("bf:items", function(inventory)
 								local current = nil
 
 								
-								local player = GetClosestPlayer()
-								local me = GetPlayerServerId(i)
-								local coords = GetEntityCoords(GetPlayerPed(i))
-								local mycoords = GetEntityCoords(GetPlayerPed(player))
-								local dist = Vdist(mycoords, coords)
+								local player, dist = GetClosestPlayer()
 								if dist < 10  then
 									TriggerServerEvent("items:give", v.id, 1, player)
 								end

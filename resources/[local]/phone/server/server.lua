@@ -188,11 +188,14 @@ function addMessage(source, discord, phone_number, message)
                             MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
                                 ['@id'] = id
                             }, function(res)
-                                getSourceFromdiscord(otherdiscord, function (osou)
-                                    if tonumber(osou) ~= nil then 
-                                        -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
-                                        TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
-                                    end
+                                MySQL.Async.fetchScalar("SELECT gameId from players WHERE `discord` = @discord", {
+                                    ['@discord'] = otherdiscord
+                                }, function(res)
+                                        if tonumber(osou) ~= nil then 
+                                            -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
+                                            TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
+                                        end
+                                    end) 
                                 end) 
                             end)
                         end)
@@ -212,7 +215,7 @@ function addMessage(source, discord, phone_number, message)
                         end)
                     end)
                 end)
-            end)
+            end
         end
     end
 end

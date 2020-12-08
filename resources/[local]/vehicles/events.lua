@@ -33,8 +33,9 @@ AddEventHandler("vehicle:permis:get:ds", function(permis)
 	if permis < 1 then
 		exports.bf:HelpPromt("Auto-école : ~INPUT_PICKUP~")
 		zoneType = "ds"
+	else
+		exports.bf:Notification("Vous avez déjà le permis")
 	end
-	exports.bf:Notification("Vous avez déjà le permis")
 end)
 
 

@@ -79,12 +79,11 @@ AddEventHandler("items:use", function (type, amount)
     if(type == 3) then
         -- EAT bread
         TriggerClientEvent("items:eat", source)
-        TriggerClientEvent("needs:change", source, 0, 60)
+        TriggerClientEvent("needs:change", source, 1, 75)
     elseif(type == 5) then
       -- drink juice
       TriggerClientEvent("items:drink", source)
-      TriggerClientEvent("needs:change", source, 0, 70)
-      TriggerClientEvent("needs:change", source, 1, 10)
+      TriggerClientEvent("needs:change", source, 0, 75)
     end
     sub(source, type, amount)
 end)
@@ -132,7 +131,6 @@ AddEventHandler("items:process", function (type, amount, typeTo, amountTo, messa
 end)
 
 
-
 RegisterNetEvent("items:get")
 
 -- source is global here, don't add to function
@@ -147,6 +145,22 @@ AddEventHandler("items:get", function (cb)
     end)
   end)
 end)
+
+RegisterNetEvent("item:get")
+
+-- source is global here, don't add to function
+AddEventHandler("item:get", function (cb, type)
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  MySQL.ready(function ()
+    MySQL.Async.fetchScalar('SELECT amount FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and discord = @discord and item = @item',
+    {['@discord'] =  discord, ['@item']  =item},
+    function(amount)
+        TriggerClientEvent(cb, sourceValue, amount)
+    end)
+  end)
+end)
+
 
 RegisterNetEvent("items:give")
 

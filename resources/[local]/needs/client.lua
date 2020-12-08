@@ -2,7 +2,7 @@
 local hunger = 100
 local thirsty = 100
 
-local thirstTickRate = 30 * 1000
+local thirstTickRate = 90 * 1000
 
 Citizen.CreateThread(function()
     TriggerEvent("bf:progress:create", "hunger") 

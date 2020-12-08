@@ -1,8 +1,43 @@
+function GetPlayers()
+    local players = {}
+
+    for _, player in ipairs(GetActivePlayers()) do
+        if NetworkIsPlayerActive(player) then
+            table.insert(players, player)
+        end
+    end
+
+    return players
+end
+
+
+function GetClosestPlayer()
+	local players = GetPlayers()
+	local closestDistance = -1
+	local closestPlayer = -1
+	local ply = PlayerPedId()
+	local plyCoords = GetEntityCoords(ply, 0)
+	
+	for index,value in ipairs(players) do
+		local target = GetPlayerPed(value)
+		if(target ~= ply) then
+			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
+			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
+			if(closestDistance == -1 or closestDistance > distance) then
+				closestPlayer = value
+				closestDistance = distance
+			end
+		end
+	end
+	
+	return closestPlayer, closestDistance
+end
+
 -- LSMS Revive people
 function reviveClosestPlayer(closestPlayer)
-	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+	local closestPlayerPed, dist = GetClosestPlayer()
 
-    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) then
+    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
         local playerPed = PlayerPedId()
         local lib, anim = 'mini@cpr@char_a@cpr_str', 'cpr_pumpchest'
         exports.bf:Notification("Réanimation en cours")
@@ -15,7 +50,8 @@ function reviveClosestPlayer(closestPlayer)
 			RequestAnimDict(lib)
 			TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
         end
-        TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayer))
+		TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayerPed))
+		exports.bf:CloseMenu("lsms")
     else
         exports.bf:Notification("Pas de joueur à portée")
     end
@@ -87,26 +123,29 @@ function CancelEmote()
 end
 
 function RemoveWeapons()
-	local t = exports.bf:GetPlayerServerIdInDirection(3)
-    if t then
-        TriggerServerEvent("job:removeWeapons", t)
+	local closestPlayer, dist = GetClosestPlayer()
+
+    if closestPlayer and dist <=1 then
+        TriggerServerEvent("job:removeWeapons", GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à proximité")
     end
 end
 
 function ToggleCuff()
-    local t = exports.bf:GetPlayerServerIdInDirection(3)
-    if t then
-		TriggerServerEvent("job:cuffGranted", t)
+	local closestPlayer, dist = GetClosestPlayer()
+
+    if closestPlayer and dist <=1 then
+		TriggerServerEvent("job:cuffGranted", GetPlayerServerId(closestPlayer))
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
 	end
 end
 
 function Fines(amount)
-    local t = exports.bf:GetPlayerServerIdInDirection(3)
-    if t then
+	local closestPlayer, dist = GetClosestPlayer()
+
+    if closestPlayer and dist <=1 then
 		Citizen.Trace("Price : "..tonumber(amount))
 		if(tonumber(amount) == -1) then
 			DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8S", "", "", "", "", "", 20)
@@ -122,10 +161,10 @@ function Fines(amount)
 			end
 			
 			if(tonumber(amount) ~= -1) then
-				TriggerServerEvent("job:finesGranted", GetPlayerServerId(t), tonumber(amount))
+				TriggerServerEvent("job:finesGranted", GetPlayerServerId(closestPlayer), tonumber(amount))
 			end
 		else
-			TriggerServerEvent("job:finesGranted", GetPlayerServerId(t), tonumber(amount))
+			TriggerServerEvent("job:finesGranted", GetPlayerServerId(closestPlayer), tonumber(amount))
 		end
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
@@ -134,9 +173,10 @@ end
 
 
 function giveWeaponLicence()
-    local t = exports.bf:GetPlayerServerIdInDirection(3)
-    if t then
-		TriggerServerEvent("job:weapon:licence", t, true)
+	local closestPlayer, dist = GetClosestPlayer()
+
+    if closestPlayer and dist <=1 then
+		TriggerServerEvent("job:weapon:licence", closestPlayer, true)
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
 	end
@@ -608,6 +648,7 @@ function createMenuAndArea(job)
 							},
 							exit = {
 								callback = function()
+									exports.bf:CloseMenu(zoneType..zone)
 									zone = nil
 									zoneType = nil
 								end
@@ -668,6 +709,8 @@ function createMenuAndArea(job)
 							},
 							exit = {
 								callback = function()
+					exports.bf:CloseMenu(zoneType..zone)
+
 									zone = nil
 									zoneType = nil
 								end
@@ -688,7 +731,7 @@ function createMenuAndArea(job)
 					})
 					exports.bf:AddMenu("collect"..k, {
 						title = "Récolte "..k,
-						position = 1,
+						position = 0,
 					})
 				end
 			end
@@ -710,6 +753,7 @@ function createMenuAndArea(job)
 							},
 							exit = {
 								callback = function()
+								exports.bf:CloseMenu(zoneType..zone)
 									zone = nil
 									zoneType = nil
 								end
@@ -730,7 +774,7 @@ function createMenuAndArea(job)
 					})
 					exports.bf:AddMenu("process"..k, {
 						title = "Traitement "..k,
-						position = 1,
+						position = 0,
 					})
 				end
 			end
@@ -752,6 +796,7 @@ function createMenuAndArea(job)
 							},
 							exit = {
 								callback = function()
+									exports.bf:CloseMenu(zoneType..zone)
 									zone = nil
 									zoneType = nil
 								end
@@ -852,6 +897,7 @@ function createMenuAndArea(job)
 							},
 							exit = {
 								callback = function()
+								exports.bf:CloseMenu(zoneType..zone)
 									zone = nil
 									zoneType = nil
 								end
@@ -1092,9 +1138,9 @@ end
 
 -- service management
 function recruitClosestPlayer(job)
-	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayerPed then
+    if closestPlayer and dist <=1 then
         TriggerServerEvent('job:service:recruit', job[1].id, GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1102,9 +1148,9 @@ function recruitClosestPlayer(job)
 end
 
 function promoteClosestPlayer()
-	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayerPed then
+    if closestPlayer and dist <=1 then
         TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1114,9 +1160,9 @@ end
 
 
 function demmoteClosestPlayer()
-	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayerPed then
+    if closestPlayer and dist <=1 then
         TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1125,11 +1171,63 @@ end
 
 
 function fireClosestPlayer()
-	closestPlayerPed = exports.bf:GetPlayerServerIdInDirection(5)
+	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayerPed then
-        TriggerServerEvent('job:set', 19, "Chomeur")
+	if closestPlayer and dist <=1 then
+		--todo
+      --  TriggerServerEvent('job:set', closestPlayer, "")
     else
         exports.bf:Notification("Pas de joueur à portée")
     end
+end
+
+
+function beginSell(job)
+	local nb = math.random(1,#config.jobs[job].sell.pos)
+	local currentSell = config.jobs[job].sell.pos[nb]
+	exports.bf:AddArea("sell", {
+		marker = {
+			weight = 1,
+			height = 2,
+		},
+		trigger = {
+			weight = 1,
+			enter = {
+				callback = function()
+					exports.bf:HelpPromt("Vendre Key : ~INPUT_PICKUP~")
+					zone = 1
+					zoneType = "sell"
+				end
+			},
+			exit = {
+				callback = function()
+					exports.bf:CloseMenu("sell")
+					zone = nil
+					zoneType = nil
+				end
+			},
+		},
+		blip = {
+			text = "Revente",
+			imageId	= config.jobs[job].sell.sprite,
+			colorId = config.jobs[job].color,
+			route = true,
+		},
+		locations = {
+			{
+				x = currentSell.coords.x,
+				y = currentSell.coords.y,
+				z = currentSell.coords.z,
+			},
+		},
+	})
+	exports.bf:CloseMenu(job)
+	exports.bf:CloseMenu("sell")
+end
+
+
+function removeSell(job)
+	exports.bf:RemoveArea("sell")
+	exports.bf:CloseMenu(job)
+	exports.bf:CloseMenu("sell")
 end

@@ -1,4 +1,4 @@
-local config = {
+	local config = {
     hospitals = {	
 		CentralLosSantos = {
             Blip = {
@@ -123,7 +123,6 @@ AddEventHandler('player:dead', function(data)
 end)
 
 AddEventHandler('player:alive', function()
-	print("ALIVE")
 	isDead = false
 end)
 
@@ -168,7 +167,7 @@ end)
 
 Citizen.CreateThread(function()
 	while true do
-		Citizen.Wait(5)
+		Citizen.Wait(5)	
 
 		if CurrentBed ~= nil and IsControlJustReleased(0, 38) then
 			local PlayerPed = PlayerPedId()

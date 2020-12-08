@@ -218,55 +218,11 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent("jobs:sell")
-
-AddEventHandler('jobs:sell', function (item, price, shop)
-    local source = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
-
-    MySQL.ready(function ()
-        MySQL.Async.fetchAll('select money from shops where id = @id',{['id'] = shop},
-        function(res)
-            if res and res[1] and res[1].money > price then
-                MySQL.Async.execute('Update shops SET money=money-@price where id = @id',{['price'] = price, ['id'] = shop},
-                function(affectedRows)
-                    if(affectedRows == 1) then
-                        MySQL.Async.execute('Update players SET liquid=liquid+@price where discord = @discord',{['price'] = price, ['discord'] = discord},
-                        function(affectedRows)
-                            if(affectedRows == 1) then
-                                TriggerEvent("items:sub", item, 1)
-                                MySQL.Async.execute('INSERT INTO shop_item (id, shop, item, amount) VALUES(1, @shop, @item, 1) ON DUPLICATE KEY UPDATE amount=amount+1',{
-                                    ['shop'] = shop,
-                                    ['item'] = item,
-                                },
-                                function(affectedRows)
-                                    if(affectedRows == 1) then
-                                        TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Transaction effectué", false)
-                                    end
-                                end)
-                            else
-                                TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Error 4", false)
-                            end
-                        end)
-                    else
-                        TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Error 3", false)
-                    end
-                end)
-            else
-                TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Le magasin ne peut pas vous payer !", false)
-            end
-        end)
-    end)
-end)
-
-
-
 --- safe
 RegisterNetEvent("job:safe:deposit")
 
 AddEventHandler('job:safe:deposit', function (withdraw, amount, job)
-    local source = source
+    local sourceValue = source
     local withdraw = withdraw
     local amount = tonumber(amount)
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
@@ -282,13 +238,13 @@ AddEventHandler('job:safe:deposit', function (withdraw, amount, job)
                             MySQL.Async.execute('Update jobs SET money=money-@amount where name = @job',{['amount'] = amount, ['job'] = job},
                             function(affectedRows)
                                 if affectedRows == 1 then
-                                    TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Vous avez retiré ".. amount .. " $", false)
+                                    TriggerClientEvent("lspd:notify",  sourceValue,  "CHAR_BANK_FLEECA", -1,"Vous avez retiré ".. amount .. " $", false)
                                 end
                             end)
                         end
                     end)
                 else
-                    TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Le compte de l'entreprise n'est pas aussi rempli !", false)
+                    TriggerClientEvent("lspd:notify",  sourceValue,  "CHAR_BANK_FLEECA", -1,"Le compte de l'entreprise n'est pas aussi rempli !", false)
                 end
             end)
         else
@@ -301,13 +257,13 @@ AddEventHandler('job:safe:deposit', function (withdraw, amount, job)
                             MySQL.Async.execute('Update jobs SET money=money+@amount where name = @job',{['amount'] = amount, ['job'] = job},
                             function(affectedRows)
                                 if affectedRows == 1 then
-                                    TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Vous avez déposé ".. amount .. " $", false)
+                                    TriggerClientEvent("lspd:notify",  sourceValue,  "CHAR_BANK_FLEECA", -1,"Vous avez déposé ".. amount .. " $", false)
                                 end
                             end)
                         end
                     end)
                 else
-                    TriggerClientEvent("lspd:notify",  source,  "CHAR_BANK_FLEECA", -1,"Volus n'avez pas tant d'argent !", false)
+                    TriggerClientEvent("lspd:notify",  sourceValue,  "CHAR_BANK_FLEECA", -1,"Volus n'avez pas tant d'argent !", false)
                 end
             end)
         end
@@ -340,22 +296,24 @@ end)
 RegisterNetEvent("job:lsms:revive")
 
 AddEventHandler('job:lsms:revive', function (player)
-    local source = source
-    TriggerClientEvent("job:revive", player)
+    print(player)
+    print(revive)
+    TriggerClientEvent("job:lsms:revive", player)
 end)
 
 
 RegisterNetEvent("job:lsms:distress")
 
 AddEventHandler('job:lsms:distress', function(player)
+    local sourceValue = source
     --check le nombre d'ambulanciers présent
     --TODO disable or true, when phone woirking
-    if #inService["lsms"] == 0 or true then
-        TriggerClientEvent('job:lsms:revive', source)
+    if #inService["lsms"] == 0 then
+        TriggerClientEvent('job:lsms:revive', sourceValue)
     else
         TriggerClientEvent('bf:Notification', sourceValue, "Appel en cours")
-        for k,v in pairs(inService["LSMS"])do
-            TriggerClientEvent('bf:Notification', v, "Appel en cours")
+        for k,v in pairs(inService["lsms"])do
+            TriggerClientEvent('bf:Notification', v, "Appel en cours, venant de ")
         end
     end
 end)
@@ -668,4 +626,46 @@ AddEventHandler('job:facture2', function(officer, code)
             text = "Facture acceptée"
         })
 	end
+end)
+
+RegisterNetEvent("job:sell")
+
+-- source is global here, don't add to function
+AddEventHandler("job:sell", function (type, job, price, message)
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  print(type)
+  print(price)
+  print(job)
+  MySQL.ready(function ()
+    MySQL.Async.fetchScalar('SELECT amount FROM `player_item`, players where players.id = player_item.player and discord = @discord and item = @item',
+    {
+        ['@discord'] =  discord,
+        ['@item']  = type
+    },
+    function(amount)
+        print(amount)
+        if amount > 0 then
+            MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
+            {
+                ['@job'] = job,
+                ['@amount'] = price
+            }, function(result)
+                if result == 1 then
+                    MySQL.Async.execute('UPDATE player_item, players set amount = amount -1 where players.id = player_item.player and discord = @discord and item = @item ', 
+                    {
+                        ['@discord'] =  discord,
+                        ['@item']  =type
+                    }, function(result)
+                        if result == 1 then
+                            TriggerClientEvent("bf:Notification", message)
+                        end
+                    end)
+                end
+            end)
+        else
+            TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez pas cet item")
+        end
+    end)
+  end)
 end)

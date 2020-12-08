@@ -22,8 +22,34 @@ AddEventHandler("job:process:open", function(job)
 			text = "Traitement "..v.label,
 			exec = {
 				callback = function()
-					TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo, 'Vous avez transformé : '..v.label.. " X "..v.amount) 
-					exports.bf:CloseMenu(zoneType..zone)
+					local playerPed = GetPlayerPed(-1)
+					if lockCollect == false then
+						if not  IsPedInAnyVehicle(playerPed, false) then
+							local time = 4000
+							TriggerEvent("bf:progressBar:create", time, "Transformation en cours")
+							lockCollect = true 
+							Citizen.CreateThread(function ()
+								FreezeEntityPosition(playerPed)
+								
+								local dict = "amb@world_human_gardener_plant@male@enter"
+								local anim = "enter"
+								RequestAnimDict(dict)
+
+								while not HasAnimDictLoaded(dict) do
+									Citizen.Wait(150)
+								end
+								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+								Wait(time)
+								lockCollect = false
+								TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo, 'Vous avez transformé : '..v.label.. " X "..v.amount) 
+							end)
+						else
+							exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+						end
+					else 
+						exports.bf:Notification("~r~Tranformation en cours")
+					end
 				end
 			},
 		}
@@ -32,6 +58,56 @@ AddEventHandler("job:process:open", function(job)
 	exports.bf:OpenMenu(zoneType..zone)
 end)
 
+RegisterNetEvent('job:sell:open')
+
+AddEventHandler("job:sell:open", function(job)  
+	job = job[1]	
+	buttons = {}
+	for k, v in pairs(config.jobs[job.name].sell.items) do
+		buttons[#buttons+1] = {
+			text = "Vente de " ..v.label,
+			exec = {
+				callback = function()
+					local playerPed = GetPlayerPed(-1)
+					if lockCollect == false then
+							local time = 4000
+							TriggerEvent("bf:progressBar:create", time, "Revente en cours")
+							lockCollect = true 
+							Citizen.CreateThread(function ()
+								FreezeEntityPosition(playerPed)
+								
+								local dict = "amb@world_human_gardener_plant@male@enter"
+								local anim = "enter"
+								RequestAnimDict(dict)
+
+								while not HasAnimDictLoaded(dict) do
+									Citizen.Wait(150)
+								end
+								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+								Wait(time)
+								lockCollect = false
+								nbSold = nbSold +1
+								if nbSold >= config.jobs[job.name].sell.maxSold then
+									nbSold = 0
+									removeSell(job.name)
+									beginSell(job.name)
+									exports.bf:Notification("J'en ai trop, va vendre ailleurs.")
+								end
+								TriggerServerEvent("job:sell", v.type, job.job, v.price, 'Vous avez vendu : '..v.label.. " X "..v.amount.." pour ~g~".. v.price.." $")
+							end)
+					else 
+						exports.bf:Notification("~r~Vente en cours")
+					end
+				end
+			},
+		}
+	end
+	exports.bf:SetMenuButtons("sell", buttons)
+	exports.bf:OpenMenu("sell")
+end)
+
+
 
 RegisterNetEvent('job:collect:open')
 
@@ -39,13 +115,38 @@ AddEventHandler("job:collect:open", function(job)
 	job = job[1]	
 	buttons = {}
 	for k, v in pairs(config.jobs[job.name].collect[zone].items) do
-
 		buttons[#buttons+1] = {
 			text = "Collecter "..v.label,
 			exec = {
 				callback = function()
-					TriggerServerEvent('items:add', v.type,  v.amount, 'Vous avez collecté : '..v.label.. " X "..v.amount) 
-					exports.bf:CloseMenu(zoneType..zone)
+					local playerPed = GetPlayerPed(-1)
+					if lockCollect == false then
+						if not  IsPedInAnyVehicle(playerPed, false) then
+							local time = 4000
+							TriggerEvent("bf:progressBar:create", time, "Collecte")
+							lockCollect = true 
+							Citizen.CreateThread(function ()
+								FreezeEntityPosition(playerPed)
+								
+								local dict = "amb@world_human_gardener_plant@male@enter"
+								local anim = "enter"
+								RequestAnimDict(dict)
+
+								while not HasAnimDictLoaded(dict) do
+									Citizen.Wait(150)
+								end
+								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+								Wait(time)
+								lockCollect = false
+								TriggerServerEvent('items:add', v.type,  v.amount, 'Vous avez collecté : '..v.label.. " X "..v.amount) 
+							end)
+						else
+							exports.bf:Notification("~r~Vous ne pouvez pas récolter en véhicule")
+						end
+					else 
+						exports.bf:Notification("~r~Collecte en cours")
+					end
 				end
 			},
 		}
@@ -233,6 +334,7 @@ AddEventHandler("job:lsms:revive", function()
 
 	StopScreenEffect('DeathFailOut')
 	DoScreenFadeIn(800)
+	Wait(0)
 	TriggerEvent("player:alive")
 end)
 

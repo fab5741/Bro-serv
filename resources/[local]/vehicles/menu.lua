@@ -25,6 +25,7 @@ function createMenus()
 			},
 			exit = {
 				callback = function()
+					exports.bf:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end
@@ -71,6 +72,7 @@ function createMenus()
 			},
 			exit = {
 				callback = function()
+					exports.bf:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end
@@ -121,6 +123,7 @@ function createMenus()
 				},
 				exit = {
 					callback = function()
+						exports.bf:CloseMenu(zoneType..zone)
 						zoneType = nil
 						zone = nil
 					end
@@ -137,11 +140,11 @@ function createMenus()
 	
 
 	--depots
-	exports.bf:AddMenu("depots", {
+	exports.bf:AddMenu("depots-fourriere", {
 		title = "Fourrière",
 		position = 1,
 	})
-	exports.bf:AddArea("depots", {
+	exports.bf:AddArea("depots-fourriere", {
 		marker = {
 			type = 1,
 			weight = 1,
@@ -159,6 +162,7 @@ function createMenus()
 			},
 			exit = {
 				callback = function()
+					exports.bf:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end
@@ -196,6 +200,7 @@ function createMenus()
 			},
 			exit = {
 				callback = function()
+					exports.bf:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end

@@ -14,6 +14,7 @@ vehicleLivraison = 0
 beginInProgress = false
 tva = 0.20
 lockCollect = false
+lockRepare = false
 nbSold = 0
 
 -- police vars

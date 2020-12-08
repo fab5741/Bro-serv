@@ -40,9 +40,9 @@ config = {
              sell = {
                 sprite = 366,
                 items = {
-                    {label = "Bro'Bab", type = 3, amount = 1, price = 3}
+                    {label = "Bro'Bab", type = 3, amount = 5, price = 5}
                 },
-                maxSold = 2,
+                maxSold = 100,
                 pos = {
                     {
                         coords = vector3(25.886821746826,-1339.4995117188,29.497024536133),
@@ -241,7 +241,7 @@ config = {
             sell = {
                 sprite = 366,
                 items = {
-                    {label = "Le jus des bros", type = 3, amount = 1, price = 3}
+                    {label = "Le jus des bros", type = 3, amount = 5, price = 5}
                 },
                 maxSold = 20,
                 pos = {

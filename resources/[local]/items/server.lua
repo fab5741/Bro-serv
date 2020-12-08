@@ -254,22 +254,35 @@ AddEventHandler("item:vehicle:get", function (vehicle, item, amount)
         {
           ['discord'] = discord,
         }, function(playerId)
-          MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+          MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, player_item  WHERE player_item.item= items.id and player_item.player = @player",
           {
-            ['id'] = playerId,
-            ['type'] = item,
-            ['amount'] = amount,
-          },
-          function(affectedRows)
-            MySQL.Async.execute('UPDATE `vehicle_item` SET `amount` = amount-@amount WHERE  vehicle_mod = @vehicle and item = @item',
-            {
-              ['vehicle'] = vehicle,
-              ['item'] = item,
-              ['amount'] = amount,
-            },
-            function(affectedRows)
-              TriggerClientEvent("bf:Notification", sourceValue, "Item récupéré")
-            end)
+            ['@player'] = player,
+          }, function(weight)
+            if weight == nil then
+              weight = 0
+            end
+            weight = (newWeight*amount)+weight
+            if weight <= maxWeight then
+              MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+              {
+                ['id'] = playerId,
+                ['type'] = item,
+                ['amount'] = amount,
+              },
+              function(affectedRows)
+                MySQL.Async.execute('UPDATE `vehicle_item` SET `amount` = amount-@amount WHERE  vehicle_mod = @vehicle and item = @item',
+                {
+                  ['vehicle'] = vehicle,
+                  ['item'] = item,
+                  ['amount'] = amount,
+                },
+                function(affectedRows)
+                  TriggerClientEvent("bf:Notification", sourceValue, "Item récupéré")
+                end)
+              end)
+            else
+              TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+            end
           end)
       end)
       else
@@ -303,24 +316,37 @@ AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
         if vehicleId == nil then
           TriggerClientEvent("bf:Notification", sourceValue, "~r~Ce véhicule est volé")
         else
-          MySQL.Async.execute('INSERT INTO `vehicle_item` (`vehicle_mod`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+          MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, vehicle_item  WHERE vehicle_item.item= items.id and vehicle_item.vehicle_mod = @vehicle",
           {
-            ['id'] = vehicleId,
-            ['type'] = item,
-            ['amount'] = amount,
-          },
-          function(affectedRows)
-            MySQL.Async.execute('UPDATE `player_item`, players SET `amount` = amount-@amount WHERE players.id = player_item.player and players.discord = @discord AND `player_item`.`item` = @item',
-            {
-              ['discord'] = discord,
-              ['item'] = item,
-              ['amount'] = amount,
-            },
-            function(affectedRows)
-              TriggerClientEvent("bf:Notification", sourceValue, "Item stocké")
-            end)
+            ['@vehicle'] = vehicleId,
+          }, function(weight)
+            if weight == nil then
+              weight = 0
+            end
+            weight = (newWeight*amount)+weight
+            if weight <= maxWeight then
+              MySQL.Async.execute('INSERT INTO `vehicle_item` (`vehicle_mod`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+              {
+                ['id'] = vehicleId,
+                ['type'] = item,
+                ['amount'] = amount,
+              },
+              function(affectedRows)
+                MySQL.Async.execute('UPDATE `player_item`, players SET `amount` = amount-@amount WHERE players.id = player_item.player and players.discord = @discord AND `player_item`.`item` = @item',
+                {
+                  ['discord'] = discord,
+                  ['item'] = item,
+                  ['amount'] = amount,
+                },
+                function(affectedRows)
+                  TriggerClientEvent("bf:Notification", sourceValue, "Item stocké")
+                end)
+              end)
+            else
+              TriggerClientEvent("bf:Notification", sourceValue, "~r~ Le véhicule est trop chargé")
+            end
           end)
-        end
+          end
       end)
       else
         TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez plus d'item")

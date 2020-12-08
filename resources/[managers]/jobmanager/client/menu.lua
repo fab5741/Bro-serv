@@ -466,16 +466,270 @@ function menus()
 		position = 1,
 		buttons = {
 			{
-				text = "Réparer voiture",
+					text = "Réparer vitres",
+					exec = {
+					callback = function()
+						local playerPed = GetPlayerPed(-1)
+						coords = GetEntityCoords(GetPlayerPed(-1), true)
+						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local prop_name = 'prop_cs_wrench'
+
+						if lockRepare == false then
+							if vehicle and vehicle ~= 0 then
+								if not IsPedInAnyVehicle(playerPed, false) then
+									local time = 4000
+									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+									exports.bf:CloseMenu("repair")
+									lockRepare = true 
+									Citizen.CreateThread(function ()
+										FreezeEntityPosition(playerPed)
+										FreezeEntityPosition(vehicle)
+										local x,y,z = table.unpack(GetEntityCoords(playerPed))
+										local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+										local boneIndex = GetPedBoneIndex(playerPed, 18905)
+										AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+								   
+										local dict = "amb@world_human_vehicle_mechanic@male@exit"
+										local anim = "exit"
+										RequestAnimDict(dict)
+		
+										while not HasAnimDictLoaded(dict) do
+											Citizen.Wait(150)
+										end
+										TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+		
+										Wait(time)
+										lockRepare = false
+										FixVehicleWindow(vehicle, 0)
+										FixVehicleWindow(vehicle, 1)
+										FixVehicleWindow(vehicle, 2)
+										FixVehicleWindow(vehicle, 3)
+										FixVehicleWindow(vehicle, 4)
+										FixVehicleWindow(vehicle, 5)
+										FixVehicleWindow(vehicle, 6)
+										exports.bf:Notification("Véhicle réparé")
+										ClearPedSecondaryTask(playerPed)
+										DeleteObject(prop)
+									end)
+								else
+									exports.bf:Notification("~r~Sortez du véhicle")
+								end
+							else
+								exports.bf:Notification("~r~Pas de véhicule à portée")
+							end
+						else 
+							exports.bf:Notification("~r~Répération en cours")
+						end
+					end
+				},
+			},
+			{
+					text = "Réparer Pneus",
+					exec = {
+					callback = function()
+						local playerPed = GetPlayerPed(-1)
+						coords = GetEntityCoords(GetPlayerPed(-1), true)
+						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						if lockRepare == false then
+							if vehicle and vehicle ~= 0 then
+								if not IsPedInAnyVehicle(playerPed, false) then
+									local time = 4000
+									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+									exports.bf:CloseMenu("repair")
+									lockRepare = true 
+									Citizen.CreateThread(function ()
+										FreezeEntityPosition(playerPed)
+										FreezeEntityPosition(vehicle)
+										local x,y,z = table.unpack(GetEntityCoords(playerPed))
+										local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+										local boneIndex = GetPedBoneIndex(playerPed, 18905)
+										AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+								   
+										local dict = "amb@world_human_vehicle_mechanic@male@exit"
+										local anim = "exit"
+										RequestAnimDict(dict)
+		
+										while not HasAnimDictLoaded(dict) do
+											Citizen.Wait(150)
+										end
+										TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+		
+										Wait(time)
+										lockRepare = false
+										SetVehicleTyreFixed(vehicle, 0)
+										SetVehicleTyreFixed(vehicle, 1)
+										SetVehicleTyreFixed(vehicle, 2)
+										SetVehicleTyreFixed(vehicle, 3)
+										SetVehicleTyreFixed(vehicle, 4)
+										SetVehicleTyreFixed(vehicle, 5)
+										SetVehicleTyreFixed(vehicle, 6)
+										exports.bf:Notification("Véhicle réparé")
+										ClearPedSecondaryTask(playerPed)
+										DeleteObject(prop)
+									end)
+								else
+									exports.bf:Notification("~r~Sortez du véhicle")
+								end
+							else
+								exports.bf:Notification("~r~Pas de véhicule à portée")
+							end
+						else 
+							exports.bf:Notification("~r~Répération en cours")
+						end
+					end
+				},
+			},
+			{
+				text = "Nettoyer Carroserie",
 				exec = {
 					callback = function()
-						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-						SetVehicleFixed(vehicle)
-						SetVehicleDeformationFixed(vehicle)
-						SetVehicleUndriveable(vehicle, false)
-						ClearPedTasksImmediately(playerPed)
-						exports.bf:Notification("Véhicle réparé")
-						exports.bf:CloseMenu("repair")
+						local playerPed = GetPlayerPed(-1)
+						coords = GetEntityCoords(GetPlayerPed(-1), true)
+						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local prop_name = 'prop_rag_01'
+						if lockRepare == false then
+							if vehicle and vehicle ~= 0 then
+								if not IsPedInAnyVehicle(playerPed, false) then
+									local time = 4000
+									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+									exports.bf:CloseMenu("repair")
+									lockRepare = true 
+									Citizen.CreateThread(function ()
+										FreezeEntityPosition(playerPed)
+										FreezeEntityPosition(vehicle)
+										local x,y,z = table.unpack(GetEntityCoords(playerPed))
+										local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+										local boneIndex = GetPedBoneIndex(playerPed, 0xDEAD)
+										AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+								   
+										local dict = "timetable@maid@cleaning_window@base"
+										local anim = "base"
+										RequestAnimDict(dict)
+		
+										while not HasAnimDictLoaded(dict) do
+											Citizen.Wait(150)
+										end
+										TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+		
+										Wait(time)
+										lockRepare = false
+										SetVehicleDirtLevel(vehicle, 0.0)
+										exports.bf:Notification("Véhicle réparé")
+										ClearPedSecondaryTask(playerPed)
+										DeleteObject(prop)
+									end)
+								else
+									exports.bf:Notification("~r~Sortez du véhicle")
+								end
+							else
+								exports.bf:Notification("~r~Pas de véhicule à portée")
+							end
+						else 
+							exports.bf:Notification("~r~Répération en cours")
+						end
+					end
+				},
+			},
+			{
+				text = "Réparer Carroserie",
+				exec = {
+					callback = function()
+						local playerPed = GetPlayerPed(-1)
+						coords = GetEntityCoords(GetPlayerPed(-1), true)
+						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local prop_name = 'prop_cs_wrench'
+						if lockRepare == false then
+							if vehicle and vehicle ~= 0 then
+								if not IsPedInAnyVehicle(playerPed, false) then
+									local time = 4000
+									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+									exports.bf:CloseMenu("repair")
+									lockRepare = true 
+									Citizen.CreateThread(function ()
+										FreezeEntityPosition(playerPed)
+										FreezeEntityPosition(vehicle)
+										
+										local dict = "amb@world_human_vehicle_mechanic@male@exit"
+										local anim = "exit"
+										RequestAnimDict(dict)
+		
+										while not HasAnimDictLoaded(dict) do
+											Citizen.Wait(150)
+										end
+										TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+		
+										Wait(time)
+										lockRepare = false
+										SetVehicleBodyHealth(vehicle, 1000.0)
+										SetVehiclePetrolTankHealth(vehicle, 1000.0)
+										SetVehicleDeformationFixed(vehicle)
+										exports.bf:Notification("Véhicle réparé")
+										ClearPedSecondaryTask(playerPed)
+										DeleteObject(prop)
+									end)
+								else
+									exports.bf:Notification("~r~Sortez du véhicle")
+								end
+							else
+								exports.bf:Notification("~r~Pas de véhicule à portée")
+							end
+						else 
+							exports.bf:Notification("~r~Répération en cours")
+						end
+					end
+				},
+			},
+			{
+				text = "Réparer Moteur",
+				exec = {
+					callback = function()
+						local playerPed = GetPlayerPed(-1)
+						coords = GetEntityCoords(GetPlayerPed(-1), true)
+						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local prop_name = 'prop_cs_wrench'
+
+						if lockRepare == false then
+							if vehicle and vehicle ~= 0 then
+								if not IsPedInAnyVehicle(playerPed, false) then
+									local time = 4000
+									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+									exports.bf:CloseMenu("repair")
+									lockRepare = true 
+									Citizen.CreateThread(function ()
+										FreezeEntityPosition(playerPed)
+										FreezeEntityPosition(vehicle)
+										local x,y,z = table.unpack(GetEntityCoords(playerPed))
+										local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+										local boneIndex = GetPedBoneIndex(playerPed, 18905)
+										AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+								   
+										local dict = "amb@world_human_vehicle_mechanic@male@exit"
+										local anim = "exit"
+										RequestAnimDict(dict)
+		
+										while not HasAnimDictLoaded(dict) do
+											Citizen.Wait(150)
+										end
+										TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+		
+										Wait(time)
+										lockRepare = false
+										SetVehicleEngineHealth(vehicle, 1000.0)
+										SetVehicleUndriveable(vehicle, false)
+										ClearPedTasksImmediately(playerPed)
+										exports.bf:Notification("Véhicle réparé")
+										ClearPedSecondaryTask(playerPed)
+										DeleteObject(prop)
+									end)
+								else
+									exports.bf:Notification("~r~Sortez du véhicle")
+								end
+							else
+								exports.bf:Notification("~r~Pas de véhicule à portée")
+							end
+						else 
+							exports.bf:Notification("~r~Répération en cours")
+						end
 					end
 				},
 			},

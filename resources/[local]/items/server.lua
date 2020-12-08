@@ -146,6 +146,24 @@ AddEventHandler("items:get", function (cb)
   end)
 end)
 
+
+RegisterNetEvent("items:vehicle:get")
+
+-- source is global here, don't add to function
+AddEventHandler("items:vehicle:get", function (cb, vehicle)
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue)
+  MySQL.ready(function ()
+    MySQL.Async.fetchAll('SELECT items.id, item, amount, label, weight, vehicle_mod FROM `vehicle_item`, items, vehicle_mod where vehicle_mod.gameId = @vehicle and vehicle_mod.id = vehicle_item.vehicle_mod and items.id = vehicle_item.item and vehicle_item.amount > 0',
+    {
+      ['vehicle'] =  vehicle
+     },
+    function(res)
+        TriggerClientEvent(cb, sourceValue, res)
+    end)
+  end)
+end)
+
 RegisterNetEvent("item:get")
 
 -- source is global here, don't add to function
@@ -209,6 +227,104 @@ AddEventHandler("items:give", function (type, amount, to)
           end)
         end)
       end)
+    end)
+  end)
+end)
+
+
+RegisterNetEvent("item:vehicle:get")
+
+-- source is global here, don't add to function
+AddEventHandler("item:vehicle:get", function (vehicle, item, amount)
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+
+  print(vehicle)
+  print(item)
+  MySQL.ready(function ()
+    MySQL.Async.fetchScalar("SELECT amount FROM `vehicle_item`, players WHERE vehicle_mod = @vehicle and item = @item",
+    {
+      ['vehicle'] = vehicle,
+      ['item'] = item,
+    }, function(amounte)
+      print(amounte)
+      print(amount)
+      if amounte and amounte >= amount then
+        MySQL.Async.fetchScalar("SELECT players.id FROM `players` WHERE discord = @discord",
+        {
+          ['discord'] = discord,
+        }, function(playerId)
+          MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+          {
+            ['id'] = playerId,
+            ['type'] = item,
+            ['amount'] = amount,
+          },
+          function(affectedRows)
+            MySQL.Async.execute('UPDATE `vehicle_item` SET `amount` = amount-@amount WHERE  vehicle_mod = @vehicle and item = @item',
+            {
+              ['vehicle'] = vehicle,
+              ['item'] = item,
+              ['amount'] = amount,
+            },
+            function(affectedRows)
+              TriggerClientEvent("bf:Notification", sourceValue, "Item récupéré")
+            end)
+          end)
+      end)
+      else
+        TriggerClientEvent("bf:Notification", sourceValue, "~r~Il n'ya plus d'item dans le coffre")
+      end
+    end)
+  end)
+end)
+
+
+RegisterNetEvent("item:vehicle:store")
+
+-- source is global here, don't add to function
+AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
+  local sourceValue = source
+  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  print(vehicle)
+  print(amount)
+  print(item)
+  MySQL.ready(function ()
+    MySQL.Async.fetchScalar("SELECT amount FROM `player_item`, players WHERE item = @item and players.discord = @discord and players.id = player_item.player",
+    {
+      ['discord'] = discord,
+      ['item'] = item,      
+    }, function(amounte)
+      if amounte and amounte >= amount then
+        MySQL.Async.fetchScalar("SELECT vehicle_mod.id FROM `vehicle_mod` WHERE gameId = @vehicle",
+        {
+          ['vehicle'] = vehicle,
+        }, function(vehicleId)
+        if vehicleId == nil then
+          TriggerClientEvent("bf:Notification", sourceValue, "~r~Ce véhicule est volé")
+        else
+          MySQL.Async.execute('INSERT INTO `vehicle_item` (`vehicle_mod`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+          {
+            ['id'] = vehicleId,
+            ['type'] = item,
+            ['amount'] = amount,
+          },
+          function(affectedRows)
+            MySQL.Async.execute('UPDATE `player_item`, players SET `amount` = amount-@amount WHERE players.id = player_item.player and players.discord = @discord AND `player_item`.`item` = @item',
+            {
+              ['discord'] = discord,
+              ['item'] = item,
+              ['amount'] = amount,
+            },
+            function(affectedRows)
+              TriggerClientEvent("bf:Notification", sourceValue, "Item stocké")
+            end)
+          end)
+        end
+      end)
+      else
+        TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez plus d'item")
+      end
     end)
   end)
 end)

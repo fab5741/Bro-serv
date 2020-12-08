@@ -10,6 +10,8 @@ lockDistance = 25 --The radius you have to be in to lock your vehicle.
 engineoff = false
 saved = false
 controlsave_bool = false
+lockGetCar = false
+lockStoreCar = false
 
 Citizen.CreateThread(function()
 	-- main loop

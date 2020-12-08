@@ -171,10 +171,58 @@ AddEventHandler("bf:items", function(inventory)
 								local distMin = 18515151515151515151515
 								local current = nil
 
-								
 								local player, dist = GetClosestPlayer()
 								if dist < 10  then
 									TriggerServerEvent("items:give", v.id, 1, player)
+								end
+							end
+						},
+					}
+					buttons[3] =     {
+						text = "Stocker vehicle",
+						exec = {
+							callback = function() 
+								coords = GetEntityCoords(GetPlayerPed(-1), true)
+								vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+								if vehicle and vehicle ~= 0 then
+									if GetVehicleDoorLockStatus(vehicle) == 1 then
+										
+										local playerPed = GetPlayerPed(-1)
+										if lockGetCar == false then
+											if not  IsPedInAnyVehicle(playerPed, false) then
+												nb = tonumber(exports.bf:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+											
+												local time = 4000
+												TriggerEvent("bf:progressBar:create", time, "Stockage en cours")
+												lockGetCar = true 
+												Citizen.CreateThread(function ()
+													FreezeEntityPosition(playerPed)
+													
+													local dict = "amb@world_human_gardener_plant@male@enter"
+													local anim = "enter"
+													RequestAnimDict(dict)
+					
+													while not HasAnimDictLoaded(dict) do
+														Citizen.Wait(150)
+													end
+													TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+					
+													Wait(time)
+													lockGetCar = false
+													TriggerServerEvent("item:vehicle:store", vehicle, v.id, nb)
+
+												end)
+											else
+												exports.bf:Notification("~r~Vous ne pouvez stocker en véhicule")
+											end
+										else 
+											exports.bf:Notification("~r~Stockage en cours")
+										end
+									else
+										exports.bf:Notification("~r~Ce véhicule est fermé")
+									end
+								else 
+									exports.bf:Notification("~r~Pas de véhicule à portée")
 								end
 							end
 						},
@@ -186,6 +234,78 @@ AddEventHandler("bf:items", function(inventory)
 		}
 		weight = weight + (v.amount*v.weight)
 	end
+	exports.bf:SetMenuButtons("bro-items", buttons)
+	if weight > (3/4*maxWeight) then
+		exports.bf:SetMenuValue("bro-items", {
+			menuTitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg",
+		})
+	else
+		exports.bf:SetMenuValue("bro-items", {
+			menuTitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg",
+		})
+	end
+	exports.bf:NextMenu("bro-items")
+end)
+
+
+
+RegisterNetEvent('vehicle:items:open')
+
+AddEventHandler("vehicle:items:open", function(inventory)
+	local buttons = {}
+	local weight = 0
+	local maxWeight = 100
+
+	for k, v in ipairs (inventory) do
+		buttons[k] =     {
+			text = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			exec = {
+				callback = function() 
+					local buttons = {}
+					buttons[1] =     {
+						text = "Récupérer",
+						exec = {
+							callback = function() 
+								local playerPed = GetPlayerPed(-1)
+								if lockGetCar == false then
+									if not  IsPedInAnyVehicle(playerPed, false) then
+										nb = tonumber(exports.bf:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+										local time = 4000
+										TriggerEvent("bf:progressBar:create", time, "Stockage en cours")
+										lockGetCar = true 
+										Citizen.CreateThread(function ()
+											FreezeEntityPosition(playerPed)
+											
+											local dict = "amb@world_human_gardener_plant@male@enter"
+											local anim = "enter"
+											RequestAnimDict(dict)
+			
+											while not HasAnimDictLoaded(dict) do
+												Citizen.Wait(150)
+											end
+											TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+			
+											Wait(time)
+											lockGetCar = false
+											TriggerServerEvent("item:vehicle:get", v.vehicle_mod, v.id, nb)
+										end)
+									else
+										exports.bf:Notification("~r~Vous ne pouvez stocker en véhicule")
+									end
+								else 
+									exports.bf:Notification("~r~Stockage en cours")
+								end
+							end
+						},
+					}
+					exports.bf:SetMenuButtons("bro-items-item", buttons)
+					exports.bf:NextMenu("bro-items-item")
+				end
+			},
+		}
+		weight = weight + (v.amount*v.weight)
+	end
+
 	exports.bf:SetMenuButtons("bro-items", buttons)
 	if weight > (3/4*maxWeight) then
 		exports.bf:SetMenuValue("bro-items", {

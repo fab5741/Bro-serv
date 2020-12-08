@@ -89,6 +89,8 @@ exports.bf:AddMenu("bro-wallet-character", {
     },
 })
 
+
+
 exports.bf:AddMenu("bro-vehicle", {
     title = "Véhicule",
     position = 1,
@@ -116,6 +118,16 @@ exports.bf:AddMenu("bro-vehicle", {
                         else
                             exports.bf:Notification("~r~Pas de voiture sauvegardée")
                         end
+                end
+            }
+        },
+        {
+            text = "Inventaire coffre",
+            exec = {
+                callback = function()
+                    coords = GetEntityCoords(GetPlayerPed(-1), true)
+                    vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+                    TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
                 end
             }
         },

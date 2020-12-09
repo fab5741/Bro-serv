@@ -35,7 +35,7 @@ config.items = {
 	}
 }
 
-config.robLength = 60
+config.robLength = 120000
 config.robMaxDistance = 20
 
 zoneType = ""
@@ -172,25 +172,27 @@ function robNpc(targetPed)
 		exports.bf:Notification('Braquage en cours')
 
 		-- If no luck, cops get averted
-		TriggerServerEvent("job:avert:all", "LSPD", "Un braquage est en cours")
+		if math.random(1,2) == 1 then
+			TriggerServerEvent("job:avert:all", "LSPD", "Un braquage est en cours", true)
+		end
 
-        Citizen.Wait(config.robLength * 1000)
+		TriggerEvent("bf:progressBar:create", config.robLength, "Braquage en cours")
 
-		local playerCoords = GetEntityCoords(PlayerPedId())
-
-		if(GetDistanceBetweenCoords(GetEntityCoords(targetPed), GetEntityCoords(GetPlayerPed(-1))) < config.robMaxDistance) then
-			local j = 0
-			for k,v in pairs(config.Zones) do
-				j = j+1
-				local distance = GetDistanceBetweenCoords(playerCoords, v.pos.x, v.pos.y, v.pos.z, true)
-
-				if distance < config.robMaxDistance then
-					--lets rob
-					TriggerServerEvent("shops:rob", v.id)
-				end
+		timeElapsed = 0
+		nb = 5
+		while timeElapsed <= config.robLength and robbedRecently do
+			Citizen.Wait(10000)
+			timeElapsed = timeElapsed + 10000
+			local playerCoords = GetEntityCoords(PlayerPedId())
+			if(GetDistanceBetweenCoords(GetEntityCoords(targetPed), GetEntityCoords(GetPlayerPed(-1))) < config.robMaxDistance) then
+				-- add valise
+				TriggerServerEvent("items:add", 8, nb)
+				exports.bf:Notification('Valises d\'argent : +~g~'..nb)
+			else
+				exports.bf:Notification('Vous vous êtes trop éloigné')
+				robbedRecently = false
+				TriggerEvent("bf:progressBar:delete")
 			end
-		else
-			exports.bf:Notification('Vous vous êtes trop éloigné')
 		end
         robbedRecently = false
     end)

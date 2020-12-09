@@ -8,8 +8,7 @@ version '1.0.4'
 
 dependency {
 	"bf",
-	"instance",
-	"cron"
+	"instance"
 }
 
 server_scripts {

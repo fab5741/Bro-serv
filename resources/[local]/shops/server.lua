@@ -40,34 +40,6 @@ AddEventHandler('shops:buy', function(type, amount, price)
       end)
 end)
 
-RegisterNetEvent('shops:rob')
-AddEventHandler('shops:rob', function(id)
-	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
-	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select money from shops where id = @id', {['id'] = id},
-		function(res)
-			print(res[1])
-			if res[1] ~= nil  and res[1].money ~= nil then
-				local amount = res[1].money * (math.random(40, 80)/100)
-				MySQL.Async.fetchAll('UPDATE players set liquid=liquid+@amount where discord = @discord',
-				{['discord'] =  discord,
-				['amount'] = amount},
-				function(res2)
-					MySQL.Async.execute('UPDATE shops SET money=money-@amount where id = @id', {['id'] = id, ['@amount'] = amount},
-					 function(res3)
-						TriggerClientEvent("bf:Notification", sourceValue, "vous avez braqué pour ~g~" .. amount.." $")
-					end)		
-				end)
-			else
-				TriggerClientEvent("bf:Notification", sourceValue, "Error")
-			end
-        end)
-	end)
-end)
-
-
 RegisterNetEvent('shops:sell')
 
 AddEventHandler('shops:sell', function(shop, type, amount)

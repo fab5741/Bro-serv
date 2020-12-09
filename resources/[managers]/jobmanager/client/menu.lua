@@ -315,7 +315,7 @@ function menus()
             text = v.label,
             exec = {
                 callback = function()
-					TriggerServerEvent("job:set:me", 18, "Livreur de journaux")
+					TriggerServerEvent("job:set:me", 34, "Livreur de journaux")
 					Wait(100)
 					TriggerServerEvent("job:get", "jobs:refresh")
 					exports.bf:CloseMenu("center")

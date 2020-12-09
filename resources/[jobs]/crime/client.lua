@@ -21,13 +21,15 @@ config = {
 					x = 144.16, y = -130.84, z = 54.83
 				}
 			},
-			sell = {
-				pos = {
-					x = 239.61, y = -2018.95, z = 18.31
-				},
-				pnj = {
-					model = "csb_ramp_gang", x = 241.01, y=-2018.03, z=18.32, h = 124.09
-				}
+		}
+	},
+	shops = {
+		{
+			coords = {
+				x = 239.61, y = -2018.95, z = 18.31
+			},
+			pnj = {
+				model = "csb_ramp_gang", x = 241.01, y=-2018.03, z=18.32, h = 124.09
 			}
 		}
 	}
@@ -35,23 +37,15 @@ config = {
 
 local isInRangeCollect = nil
 local isInRangeProcess = nil
-local isInRangeSell = nil
+local isInRangeSelling = false
 
+local isCollecting = false
+local isProcessing = false
+local isSelling = false
+isSellingMalette = false
+isSellingDrug = false
+nbMalettes = 0
 Citizen.CreateThread(function()
-	for k,v in pairs(config.drugs) do
-		vv = v.sell
-		RequestModel(GetHashKey(vv.pnj.model))
-		while not HasModelLoaded(GetHashKey(vv.pnj.model)) do
-			Wait(1)
-		end
-	
-	-- Spawn the bartender to the coordinates
-		bartender =  CreatePed(5, vv.pnj.model, vv.pnj.x, vv.pnj.y, vv.pnj.z, vv.pnj.h, false, true)
-		SetBlockingOfNonTemporaryEvents(bartender, true)
-		SetPedCombatAttributes(bartender, 46, true)
-		SetPedFleeAttributes(bartender, 0, 0)
-		SetPedRelationshipGroupHash(bartender, GetHashKey("CIVFEMALE"))
-	end
 	while true do
 		Wait(1000)
 		local coords = GetEntityCoords(PlayerPedId())
@@ -88,56 +82,134 @@ Citizen.CreateThread(function()
 					end
 				end
 			end
-			for kk,vv in pairs(v.sell) do
-				if GetDistanceBetweenCoords(coords, vv.x, vv.y, vv.z, true) < config.range then
-					if  isInRangeSell == nil  then
-						exports.bf:Notification("Je te prend un pochon")
-						isInRangeSell = vv
-					end
-				else
-					if  isInRangeSell == vv  then
-						isInRangeSell = nil
-					end
-				end
+		end
+		for kk,vv in pairs(config.shops) do
+			if GetDistanceBetweenCoords(coords, vv.x, vv.y, vv.z, true) < config.range then
+				exports.bf:Notification("PSST, tu sais pas ou trouver des malettes d'argent ?")
+				isInRangeSelling = true
+			else
+				isInRangeSelling = false
 			end
 		end
 	end
 end)
 
 Citizen.CreateThread(function()
+	for k,v in pairs(config.shops) do
+		RequestModel(GetHashKey(v.pnj.model))
+		while not HasModelLoaded(GetHashKey(v.pnj.model)) do
+			Wait(1)
+		end
+	
+	-- Spawn the bartender to the coordinates
+		bartender =  CreatePed(5, v.pnj.model, v.pnj.x, v.pnj.y, v.pnj.z, v.pnj.h, false, true)
+		SetBlockingOfNonTemporaryEvents(bartender, true)
+		SetPedCombatAttributes(bartender, 46, true)
+		SetPedFleeAttributes(bartender, 0, 0)
+		SetPedRelationshipGroupHash(bartender, GetHashKey("CIVFEMALE"))
+	end
 	while true do
 		Wait(5)
 		if isInRangeCollect ~= nil then
 			if (IsControlJustPressed(1,config.interactKey)) then
-				if not isCollecting then
-					isCollecting = true
-					Wait(5000)
-					TriggerServerEvent("items:add",  20, 1, "Vous récoltez un peu de ~g~weed (non traité)")
-					isCollecting = false
+				local playerPed = GetPlayerPed(-1)
+				if isCollecting == false then
+					if not  IsPedInAnyVehicle(playerPed, false) then
+						local time = 4000
+						TriggerEvent("bf:progressBar:create", time, "Récolte en cours")
+						isCollecting = true 
+						Citizen.CreateThread(function ()
+							FreezeEntityPosition(playerPed)
+							
+							local dict = "amb@world_human_gardener_plant@male@enter"
+							local anim = "enter"
+							RequestAnimDict(dict)
+
+							while not HasAnimDictLoaded(dict) do
+								Citizen.Wait(150)
+							end
+							TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+							Wait(time)
+							isCollecting = false
+							TriggerServerEvent("items:add",  6, 5, "Vous récoltez un peu de ~g~weed (non traité)")
+						end)
+					else
+						exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+					end
+				else 
+					exports.bf:Notification("~r~Récolte en cours")
 				end
 			end
 		end
 		if isInRangeProcess ~= nil then
 			if (IsControlJustPressed(1,config.interactKey)) then
-				if not isProcessing then
-					isProcessing = true
-					Wait(5000)
-					TriggerServerEvent("items:process",  20, 1, 21, 1)
-					exports.bf:Notification("Vous avez traité un pochon de weed")
-					isProcessing = false
+				local playerPed = GetPlayerPed(-1)
+				if isProcessing == false then
+					if not  IsPedInAnyVehicle(playerPed, false) then
+						local time = 4000
+						TriggerEvent("bf:progressBar:create", time, "Transformation en cours")
+						isProcessing = true 
+						Citizen.CreateThread(function ()
+							FreezeEntityPosition(playerPed)
+							
+							local dict = "amb@world_human_gardener_plant@male@enter"
+							local anim = "enter"
+							RequestAnimDict(dict)
+
+							while not HasAnimDictLoaded(dict) do
+								Citizen.Wait(150)
+							end
+							TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+							Wait(time)
+							isProcessing = false
+							TriggerServerEvent("items:process",  6, 10, 7, 5)
+						end)
+					else
+						exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+					end
+				else 
+					exports.bf:Notification("~r~Transformation en cours")
 				end
 			end
 		end
-		if isInRangeSell ~= nil then
+		if isInRangeSelling ~= nil then
 			if (IsControlJustPressed(1,config.interactKey)) then
-				if not isSelling then
-					isSelling = true
-					Wait(5000)
-					-- TODO test, if items in inventory
-					TriggerServerEvent("items:sub",  21, 1)
-					TriggerServerEvent("account:money:add",  8)
-					exports.bf:Notification("Vous avez vendu un pochon de weed")
-					isSelling = false
+				local playerPed = GetPlayerPed(-1)
+				if isSellingMalette == false then
+					if not  IsPedInAnyVehicle(playerPed, false) then
+						local time = 4000
+						nbMalettes = exports.bf:OpenTextInput(
+							{
+								title = "Combien ?",
+								 customTitle = true,
+								 maxInputLength = 10
+							}
+						)
+						TriggerEvent("bf:progressBar:create", time, "Vente en cours")
+						isSellingMalette = true 
+						Citizen.CreateThread(function ()
+							FreezeEntityPosition(playerPed)
+							
+							local dict = "amb@world_human_gardener_plant@male@enter"
+							local anim = "enter"
+							RequestAnimDict(dict)
+
+							while not HasAnimDictLoaded(dict) do
+								Citizen.Wait(150)
+							end
+							TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+							Wait(time)
+							isSellingMalette = false
+							TriggerServerEvent("item:get", "crime:malette:sell", 8)
+						end)
+					else
+						exports.bf:Notification("~r~Vous ne pouvez pas vendre en véhicule")
+					end
+				else 
+					exports.bf:Notification("~r~Vente en cours")
 				end
 			end
 		end
@@ -155,3 +227,115 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
+-- vente de rogues
+
+function Vente(pos1)
+    local player = PlayerPedId()
+    local playerloc = coords
+    local distance = GetDistanceBetweenCoords(pos1.x, pos1.y, pos1.z, playerloc['x'], playerloc['y'], playerloc['z'], true)
+
+	if distance <= 2 then
+		if isSelling == false then
+			local time = 4000
+			TriggerEvent("bf:progressBar:create", time, "Vente en cours")
+			isSelling = true 
+			Citizen.CreateThread(function ()
+				FreezeEntityPosition(player)
+				Wait(time)
+				isSelling = false
+				TriggerServerEvent('crime:drug:sell', playerloc)
+			end)
+		else 
+			exports.bf:Notification("~r~Vente en cours")
+		end
+    elseif distance > 2 then
+		exports.bf:Notification("Vous êtes trop éloigné")
+    end
+end
+
+
+Citizen.CreateThread(function()
+	while true do
+		Wait(15)
+		
+			local handle, ped = FindFirstPed()
+			repeat
+				if isSellingDrug then
+					coords = GetEntityCoords(PlayerPedId())
+					success, ped = FindNextPed(handle)
+					local pos = GetEntityCoords(ped)
+					local distance = GetDistanceBetweenCoords(pos.x, pos.y, pos.z, coords['x'], coords['y'], coords['z'], true)
+					if not IsPedInAnyVehicle(playerPed) then
+						if DoesEntityExist(ped) then
+							if not IsPedDeadOrDying(ped) then
+								if not IsPedInAnyVehicle(ped) then
+									local pedType = GetPedType(ped)
+									if pedType ~= 28 and not IsPedAPlayer(ped) then
+										currentped = pos
+										if distance <= 2 and ped ~= playerPed and ped ~= oldped then
+											DrawText3Ds(pos.x, pos.y, pos.z, "E")
+											if IsControlJustPressed(1, 86) then
+												oldped = ped
+												--SetEntityHeading(ped, 180)
+												TaskLookAtCoord(ped, coords['x'], coords['y'], coords['z'], -1, 2048, 3)
+												TaskStandStill(ped, 100.0)
+												SetEntityAsMissionEntity(ped)
+												local pos1 = GetEntityCoords(ped)
+												Vente(pos1)
+												Wait(2500)
+												SetPedAsNoLongerNeeded(oldped)
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+	until not success
+	EndFindPed(handle)
+	end
+end)
+
+
+function DrawText3Ds(x, y, z, text)
+	local onScreen,_x,_y=World3dToScreen2d(x,y,z)
+	local factor = #text / 370
+	local px,py,pz=table.unpack(GetGameplayCamCoords())
+	
+	SetTextScale(0.35, 0.35)
+	SetTextFont(4)
+	SetTextProportional(1)
+	SetTextColour(255, 255, 255, 215)
+	SetTextEntry("STRING")
+	SetTextCentre(1)
+	AddTextComponentString(text)
+	DrawText(_x,_y)
+	DrawRect(_x,_y + 0.0125, 0.015 + factor, 0.03, 0, 0, 0, 120)
+end
+RegisterNetEvent('crime:drug:poucave')
+AddEventHandler('crime:drug:poucave', function(posx, posy, posz)
+	TriggerServerEvent('phone:startCall', 'lspd', "deal en cours", { x = posx, y = posy, z = posz })
+end)
+RegisterNetEvent('crime:drug:sell')
+AddEventHandler('crime:drug:sell', function(price)
+	TriggerServerEvent("account:player:liquid:add", "", price)
+	TriggerServerEvent("items:sub", 7, 1)
+end)
+
+
+RegisterNetEvent('crime:malette:sell')
+AddEventHandler('crime:malette:sell', function(amount)
+	if amount >= tonumber(nbMalettes) then
+		TriggerServerEvent("account:player:liquid:add", "", nbMalettes * 50)
+		TriggerServerEvent("items:sub", 8, nbMalettes)
+		exports.bf:Notification("Vous avez vendu pour : ~g~ "..(nbMalettes*50).."$")
+	else
+		exports.bf:Notification("~r~Vous n'avez pas assez de malettes sur vous")
+	end
+end)
+
+
+
+

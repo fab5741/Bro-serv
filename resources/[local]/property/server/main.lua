@@ -183,7 +183,7 @@ AddEventHandler('property:buyProperty', function(propertyName)
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
 			{
 				['@discord'] = discord
-			}, function(liquid))
+			}, function(liquid)
 				if property.price <= liquid then
 					MySQL.Async.execute('update players set liquid = liquid-@price where discord = @discord',
 					{
@@ -341,39 +341,3 @@ AddEventHandler('property:removeOutfit', function(label)
 		store.set('dressing', dressing)
 	end)
 end)
-
-
-
-function payRent(d, h, m)
-	local tasks, timeStart = {}, os.clock()
-	print('[property] [^2INFO^7] Paying rent cron job started')
-
-	MySQL.Async.fetchAll('SELECT * FROM owned_properties WHERE rented = 1', {}, function(result)
-		for k,v in ipairs(result) do
-				local discord = exports.bf:GetDiscordFromSource(v.owner)
-				MySQL.Async.fetchScalar('SELECT amount FROM accounts,players, player_account WHERE players.discord = @discord and accounts.id = player_account.account and player_account.player and players.id = player_account.player', {
-					['@discord'] = discord
-				}, function(money)
-					if money >= v.price then
-						MySQL.Async.execute('update accounts,players, player_account set amount= amount - @amount WHERE players.discord = @discord and accounts.id = player_account.account and player_account.player and players.id = player_account.player', {
-							['@discord'] = discord,
-							['@amount'] = v.price,							
-						}, function(money)
-							TriggerClientEvent("bf:Notification", sourceValue, "Loyé payé :"..GetProperty(v.name).label.." ~g~"..v.price.." $" )
-						end)
-					else
-						RemoveOwnedProperty(v.name, v.owner, true)
-						TriggerClientEvent("bf:Notification", sourceValue, "Loyé non payé :"..GetProperty(v.name).label.." ~r~"..v.price.." $. Vous êtes expulsé !" )
-					end
-				cb()
-				end)
-		end
-
-		local elapsedTime = os.clock() - timeStart
-		print(('[property] [^2INFO^7] Paying rent cron job took %s seconds'):format(elapsedTime))
-	end)
-end
-
-TriggerEvent('cron:runAt', 22, 0, payRent)
-
-payRent()

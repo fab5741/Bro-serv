@@ -43,3 +43,12 @@ AddEventHandler("bf:progressBar:create", function(time, text)
 		text = text
 	})
 end)
+
+RegisterNetEvent("bf:progressBar:delete")
+
+AddEventHandler("bf:progressBar:delete", function()
+	SendNUIMessage({
+		action = "ui",
+		display = false
+	})
+end)

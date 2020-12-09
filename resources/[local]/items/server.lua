@@ -109,7 +109,7 @@ AddEventHandler("items:process", function (type, amount, typeTo, amountTo, messa
       ['amount'] = amount,
       ['type'] = type},
       function(res)
-          if res and res[1] and res[1].amount > 0 then
+          if res and res[1] and res[1].amount >= amount then
               MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount-@amount;',
               {['id'] = res[1].id,
               ['amount'] = amount,
@@ -124,7 +124,7 @@ AddEventHandler("items:process", function (type, amount, typeTo, amountTo, messa
                       end)
               end)
           else
-            TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez rien à transformer")
+            TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assé d'items à transformé")
           end
         end)
       end)
@@ -170,10 +170,12 @@ RegisterNetEvent("item:get")
 AddEventHandler("item:get", function (cb, type)
   local sourceValue = source
   local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  print(type)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('SELECT amount FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and discord = @discord and item = @item',
-    {['@discord'] =  discord, ['@item']  =item},
+    {['@discord'] =  discord, ['@item']  =type},
     function(amount)
+      print(amount)
         TriggerClientEvent(cb, sourceValue, amount)
     end)
   end)

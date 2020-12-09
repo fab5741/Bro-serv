@@ -2,20 +2,17 @@ fx_version 'adamant'
 
 game 'gta5'
 
-description 'ESX Property'
+description 'Instance'
 
-version '1.0.4'
+dependency "bf"
 
-dependency {
-	"bf",
-	"instance"
-}
+version '1.1.0'
 
 server_scripts {
-	'@mysql-async/lib/MySQL.lua',
 	'config.lua',
 	'server/main.lua'
 }
+
 
 client_scripts {
 	'config.lua',

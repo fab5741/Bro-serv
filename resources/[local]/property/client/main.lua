@@ -2,29 +2,18 @@ local OwnedProperties, Blips, CurrentActionData = {}, {}, {}
 local CurrentProperty, CurrentPropertyOwner, LastProperty, LastPart, CurrentAction, CurrentActionMsg
 local firstSpawn, hasChest, hasAlreadyEnteredMarker = true, false, false
 
+exports.bf:AddMenu("property-owned", {
+    title = "Propriété",
+})
+
 exports.bf:AddMenu("property", {
     title = "Propriété",
     buttons = {
         {
-			text = "Entrer",
-			exec=  {
-				callback = function ()
-				end
-			},
-		},
-		{
-			text = "Vendre",
-			exec=  {
-				callback = function ()
-					TriggerServerEvent('property:removeOwnedProperty', property.name)
-				end
-			},
-        },
-        {
             text = "Acheter",
 			exec=  {
 				callback = function ()
-					TriggerServerEvent('property:buyProperty', property.name)
+					TriggerServerEvent('property:buyProperty', LastProperty)
 				end
 			},
         },
@@ -32,7 +21,69 @@ exports.bf:AddMenu("property", {
             text = "Louer",
 			exec=  {
 				callback = function ()
-					TriggerServerEvent('property:rentProperty', property.name)
+					TriggerServerEvent('property:rentProperty', LastProperty)
+				end
+			},
+        },
+    },
+})
+
+
+
+exports.bf:AddMenu("property-gateway-bought", {
+    title = "Propriétés achetés",
+})
+
+exports.bf:AddMenu("property-gateway-avaiable", {
+    title = "Propriétés libres",
+})
+
+
+exports.bf:AddMenu("property-gateway", {
+    title = "Propriété Portail",
+    buttons = {
+        {
+			text = "Propriétés achetés",
+			exec = {
+				callback = function()
+					local gatewayProperties = GetGatewayProperties(LastProperty)
+					local buttons = {}
+					for i=1, #gatewayProperties, 1 do
+						if PropertyIsOwned(gatewayProperties[i]) then
+							buttons[#buttons+1] = {
+								text = gatewayProperties[i].label,
+								callback = function () 
+								end
+							}
+						end
+					end
+					exports.bf:SetMenuValue({
+						buttons = buttons
+					})
+					exports.bf:NextMenu("property-gateway-bought")
+				end
+			},
+		},
+		{
+			text = "Propriétés libres",
+			exec = {
+				callback = function()
+					local gatewayProperties = GetGatewayProperties(LastProperty)
+					local buttons = {}
+				
+					for i=1, #gatewayProperties, 1 do
+						if not PropertyIsOwned(gatewayProperties[i]) then
+							buttons[#buttons+1] = {
+								text = gatewayProperties[i].label,
+								callback = function () 
+								end
+							}
+						end
+					end
+					exports.bf:SetMenuValue({
+						buttons = buttons
+					})
+					exports.bf:NextMenu("property-gateway-avaiable")
 				end
 			},
         },
@@ -45,6 +96,14 @@ RegisterNetEvent('property:sendProperties')
 AddEventHandler('property:sendProperties', function(properties)
 	Config.Properties = properties
 	CreateBlips()
+	TriggerServerEvent('property:getOwnedProperties', 'property:sendProperties2')
+end)
+RegisterNetEvent('property:sendProperties2')
+AddEventHandler('property:sendProperties2', function(properties)
+	print(properties)
+	for k,v in ipairs(properties) do
+		SetPropertyOwned(v.name, true, v.rented)
+	end
 end)
 
 function DrawSub(text, time)
@@ -78,6 +137,7 @@ function GetProperties()
 end
 
 function GetProperty(name)
+	
 	for i=1, #Config.Properties, 1 do
 		if Config.Properties[i].name == name then
 			return Config.Properties[i]
@@ -140,7 +200,7 @@ function EnterProperty(name, owner)
 		DoScreenFadeIn(800)
 		DrawSub(property.label, 5000)
 	end)
-
+	exports.bf:CloseMenu("property")
 end
 
 function ExitProperty(name)
@@ -238,58 +298,36 @@ function PropertyIsOwned(property)
 end
 
 function OpenPropertyMenu(property)
-	local elements = {}
-
 	if PropertyIsOwned(property) then
-		table.insert(elements, {label ='enter', value = 'enter'})
-
-		-- add move out
-		if not Config.EnablePlayerManagement then
-			local leaveLabel = 'move_out'
-
-			if not OwnedProperties[property.name] then
-		--		leaveLabel = 'move_out_sold', ESX.Math.GroupDigits(ESX.Math.Round(property.price / Config.SellModifier))
-			end
-
-			table.insert(elements, {label = leaveLabel, value = 'leave'})
-		end
+		exports.bf:SetMenuValue("property-owned", {
+			buttons = {
+				{
+					text = "Entrer : "..property.name,
+					exec=  {
+						callback = function ()
+							TriggerEvent('instance:create', 'property', {property = property.name, owner = 1})
+						end
+					},
+				},
+				{
+					text = "Vendre",
+					exec=  {
+						callback = function ()
+							TriggerServerEvent('property:removeOwnedProperty', LastProperty)
+						end
+					},
+				},
+			}
+		})
+		exports.bf:OpenMenu("property-owned")
 	else
-		if not Config.EnablePlayerManagement then
-			table.insert(elements, {label = buy, property.price, value = 'buy'})
-
-			-- display rent price
-			local rent = property.price / Config.RentModifier
-			table.insert(elements, {label = 'rent', rent, value = 'rent'})
-		end
+		exports.bf:OpenMenu("property")
 	end
-
-	exports.bf:OpenMenu("property")
 end
 
 function OpenGatewayMenu(property)
-	if Config.EnablePlayerManagement then
-		OpenGatewayOwnedPropertiesMenu(gatewayProperties)
-	else
-		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'gateway', {
-			title    = property.name,
-			align    = 'top-left',
-			elements = {
-				{label = 'owned_properties',    value = 'owned_properties'},
-				{label = 'available_properties', value = 'available_properties'}
-		}}, function(data, menu)
-			if data.current.value == 'owned_properties' then
-				OpenGatewayOwnedPropertiesMenu(property)
-			elseif data.current.value == 'available_properties' then
-				OpenGatewayAvailablePropertiesMenu(property)
-			end
-		end, function(data, menu)
-			menu.close()
-
-			CurrentAction     = 'gateway_menu'
-			CurrentActionMsg  = 'press_to_menu'
-			CurrentActionData = {property = property}
-		end)
-	end
+	LastProperty = property
+	exports.bf:OpenMenu("property-gateway")
 end
 
 function OpenGatewayOwnedPropertiesMenu(property)
@@ -843,6 +881,7 @@ Citizen.CreateThread(function()
 			exports.bf:Notification(CurrentActionMsg)
 
 			if IsControlJustReleased(0, 38) then
+				print(CurrentAction)
 				if CurrentAction == 'property_menu' then
 					OpenPropertyMenu(CurrentActionData.property)
 				elseif CurrentAction == 'gateway_menu' then
@@ -854,6 +893,7 @@ Citizen.CreateThread(function()
 				elseif CurrentAction == 'room_menu' then
 					OpenRoomMenu(CurrentActionData.property, CurrentActionData.owner)
 				elseif CurrentAction == 'room_exit' then
+					ExitProperty(LastProperty)
 					TriggerEvent('instance:leave')
 				end
 

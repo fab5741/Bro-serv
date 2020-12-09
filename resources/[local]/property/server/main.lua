@@ -7,24 +7,27 @@ function GetProperty(name)
 	end
 end
 
-function SetPropertyOwned(name, price, rented, owner)
-	MySQL.Async.execute('INSERT INTO owned_properties (name, price, rented, owner) VALUES (@name, @price, @rented, @owner)', {
-		['@name']   = name,
-		['@price']  = price,
-		['@rented'] = (rented and 1 or 0),
-		['@owner']  = owner
-	}, function(rowsChanged)
-		local xPlayer = ESX.GetPlayerFromIdentifier(owner)
-
-		if xPlayer then
-			TriggerClientEvent('property:setPropertyOwned', xPlayer.source, name, true, rented)
-
-			if rented then
-				xPlayer.showNotification(_U('rent_for', ESX.Math.GroupDigits(price)))
-			else
-				xPlayer.showNotification(_U('buy_for', ESX.Math.GroupDigits(price)))
-			end
-		end
+function SetPropertyOwned(name, price, rented, source)
+    local discord = exports.bf:GetDiscordFromSource(source)
+	local property = GetProperty(propertyName)
+	MySQL.ready(function()
+		MySQL.Async.fetchScalar("select id from players where discord = @discord", {
+			['@discord'] = discord,
+		}, function(owner)
+			MySQL.Async.execute('INSERT INTO owned_properties (name, price, rented, owner) VALUES (@name, @price, @rented, @owner)', {
+			['@name']   = name,
+			['@price']  = price,
+			['@rented'] = (rented and 1 or 0),
+			['@owner']  = owner
+			}, function(rowsChanged)
+					TriggerClientEvent('property:setPropertyOwned', source, name, true, rented)
+				if rented then
+					TriggerClientEvent("bf:Notification", source, "Loué pour "..price)
+				else
+					TriggerClientEvent("bf:Notification", source, "Acheté pour"..price)
+				end
+			end)
+		end)
 	end)
 end
 
@@ -132,7 +135,9 @@ MySQL.ready(function()
 	end)
 end)
 
-AddEventHandler('esx_ownedproperty:getOwnedProperties', function(cb)
+RegisterNetEvent("property:getOwnedProperties")
+AddEventHandler('property:getOwnedProperties', function(cb)
+	local sourceValue = source
 	MySQL.Async.fetchAll('SELECT * FROM owned_properties', {}, function(result)
 		local properties = {}
 
@@ -146,13 +151,12 @@ AddEventHandler('esx_ownedproperty:getOwnedProperties', function(cb)
 				owner  = result[i].owner
 			})
 		end
-
-		cb(properties)
+		TriggerClientEvent(cb, sourceValue, properties)
 	end)
 end)
 
-AddEventHandler('property:setPropertyOwned', function(name, price, rented, owner)
-	SetPropertyOwned(name, price, rented, owner)
+AddEventHandler('property:setPropertyOwned', function(name, price, rented)
+	SetPropertyOwned(name, price, rented)
 end)
 
 AddEventHandler('property:removeOwnedProperty', function(name, owner)
@@ -165,20 +169,36 @@ AddEventHandler('property:rentProperty', function(propertyName)
 	local property = GetProperty(propertyName)
 	local rent     = ESX.Math.Round(property.price / Config.RentModifier)
 
-	SetPropertyOwned(propertyName, rent, true, xPlayer.identifier)
+	SetPropertyOwned(propertyName, rent, true)
 end)
 
 RegisterNetEvent('property:buyProperty')
 AddEventHandler('property:buyProperty', function(propertyName)
-    local discord = exports.bf:GetDiscordFromSource(source)
+	local sourcevalue = source
+    local discord = exports.bf:GetDiscordFromSource(sourcevalue)
 	local property = GetProperty(propertyName)
 
-	if property.price <= xPlayer.getMoney() then
-		-- todo - remove player money
-		SetPropertyOwned(propertyName, property.price, false, xPlayer.identifier)
-	else
-		xPlayer.showNotification(_U('not_enough'))
-	end
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+			{
+				['@discord'] = discord
+			}, function(liquid)
+				print(property.price)
+				print(liquid)
+				if property.price <= liquid then
+					MySQL.Async.execute('update players set liquid = liquid-@price where discord = @discord',
+					{
+						['@discord'] = discord,
+						['@price'] = property.price,
+					}, function(row)
+					-- todo - remove player money
+						SetPropertyOwned(propertyName, property.price, false, sourcevalue)
+					end)
+				else
+					TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assé d'argent")
+				end
+		end)
+	end)
 end)
 
 RegisterNetEvent('property:removeOwnedProperty')
@@ -193,20 +213,20 @@ end)
 
 RegisterNetEvent('property:saveLastProperty')
 AddEventHandler('property:saveLastProperty', function(property)
-	local xPlayer = ESX.GetPlayerFromId(source)
-
-	MySQL.Async.execute('UPDATE users SET last_property = @last_property WHERE identifier = @identifier', {
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	MySQL.Async.execute('UPDATE players SET last_property = @last_property WHERE discord = @discord', {
 		['@last_property'] = property,
-		['@identifier']    = xPlayer.identifier
+		['@discord']    = discord
 	})
 end)
 
 RegisterNetEvent('property:deleteLastProperty')
 AddEventHandler('property:deleteLastProperty', function()
-	local xPlayer = ESX.GetPlayerFromId(source)
-
-	MySQL.Async.execute('UPDATE users SET last_property = NULL WHERE identifier = @identifier', {
-		['@identifier'] = xPlayer.identifier
+	local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	MySQL.Async.execute('UPDATE players SET last_property = NULL WHERE discord = @discord', {
+		['@discord']    = discord
 	})
 end)
 

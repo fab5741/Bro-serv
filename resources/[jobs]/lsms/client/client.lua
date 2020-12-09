@@ -10,7 +10,7 @@
         }
 	}
 }
-config.BleedoutTimer = 90000 * 10 -- time til the player bleeds out
+config.BleedoutTimer = 900000 -- time til the player bleeds out 15 min
 
 -- Create blips
 Citizen.CreateThread(function()	
@@ -46,40 +46,12 @@ function StartDeathTimer()
 			end
 		end
 	end)
-
-	Citizen.CreateThread(function()
-        local text, timeHeld
-        
-		-- bleedout timer
-		while bleedoutTimer > 0 and isDead do
-			Citizen.Wait(0)
-			text = 'Respawn dans : ' .. bleedoutTimer
-
-            text = text .. "s"
-
-            if IsControlPressed(0, 38) and timeHeld > 60 then
-                RemoveItemsAfterRPDeath()
-                break
-            end
-
-			if IsControlPressed(0, 38) then
-				timeHeld = timeHeld + 1
-			else
-				timeHeld = 0
-            end
-            
-			SetTextEntry('STRING')
-			AddTextComponentString(text)
-			DrawText(0.5, 0.8)
-		end
-	end)
+	TriggerEvent("job:lsms:revive", true)
 end
 
 function SendDistressSignal()
 	local playerPed = PlayerPedId()
 	local coords = GetEntityCoords(playerPed)
-
-    print("Appel envoyé")
 	TriggerServerEvent('job:lsms:distress', playerPed)
 end
 

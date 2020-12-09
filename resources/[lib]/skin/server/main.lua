@@ -2,7 +2,6 @@ RegisterServerEvent('skin:save')
 AddEventHandler('skin:save', function(skin)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-	print(skin)
 	MySQL.ready(function ()
 		MySQL.Async.execute('UPDATE players SET skin = @skin WHERE discord = @discord', {
 			['@skin'] = json.encode(skin),

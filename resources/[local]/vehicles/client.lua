@@ -66,15 +66,15 @@ config.parkings = {
 		}
 	},
 	{
-		zone = "lspd",
+		zone = "taxi",
 		locations = {
 			{
-				x=454.60607910156,
-				y=-1020.1778564453,
-				z=27.95223236084
+				x=911.46813964844,
+				y=-169.29028320312,
+				z=74.229537963867
 			}
 		}
-	}	
+	},
 }
 
 function DeleteGivenVehicle( veh, timeoutMax )
@@ -127,7 +127,6 @@ Citizen.CreateThread(function()
 							text = "Stocker : " .. zone,
 							exec = {
 								callback = function()
-									print(currentVehicle)
 									TriggerServerEvent("vehicle:store", currentVehicle, zone)
 									currentVehicle = 0
 								
@@ -177,7 +176,6 @@ Citizen.CreateThread(function()
 	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
 	while true do
 		Wait(10000)
-		print("update cars")
 		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
 		TriggerServerEvent("vehicle:job:get", "vehicle:refresh")
 	end

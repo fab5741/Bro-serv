@@ -60,7 +60,6 @@ RegisterNetEvent("gun:shop2")
 
 -- source is global here, don't add to function
 AddEventHandler("gun:shop2", function (job)
-	print(job[1].name)
 	local buttons = {}
 	for k,v in pairs(config.weapons) do
 		buttons[#buttons+1] =     {

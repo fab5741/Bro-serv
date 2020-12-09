@@ -45,7 +45,6 @@ Citizen.CreateThread(function()
     end
     if takePhoto ~= true then
       if IsControlJustPressed(1, Config.KeyOpenClose) then -- On key press, will open the phone
-        print("open phone")
           TooglePhone()
       end
       if menuIsOpen == true then
@@ -288,7 +287,6 @@ Citizen.CreateThread(function ()
 end)
 
 function PlaySoundJS (sound, volume)
-  print("playSound")
   SendNUIMessage({ event = 'playSound', sound = sound, volume = volume })
 end
 
@@ -333,7 +331,6 @@ RegisterNetEvent("phone:receiveMessage")
 AddEventHandler("phone:receiveMessage", function(message)
   -- SendNUIMessage({event = 'updateMessages', messages = messages})
   SendNUIMessage({event = 'newMessage', message = message})
-  print(message)
   table.insert(messages, message)
   if message.owner == 0 then
     local text = 'new_message'
@@ -371,8 +368,6 @@ end
 --  Function client | Messages
 --====================================================================================
 function sendMessage(num, message)
-  print(num)
-  print(message)
   TriggerServerEvent('phone:sendMessage', num, message)
 end
 
@@ -514,7 +509,6 @@ end
 --====================================================================================
 
 RegisterNUICallback('startCall', function (data, cb)
-  print("START CALL")
   startCall(data.numero, data.rtcOffer, data.extraData)
   cb()
 end)
@@ -603,7 +597,6 @@ end)
 --  Event - Messages
 --====================================================================================
 RegisterNUICallback('getMessages', function(data, cb)
-  print(messages)
   cb(json.encode(messages))
 end)
 RegisterNUICallback('sendMessage', function(data, cb)
@@ -634,12 +627,9 @@ end)
 --  Event - Contacts
 --====================================================================================
 RegisterNUICallback('addContact', function(data, cb) 
-  print("add  contact")
-
   TriggerServerEvent('phone:addContact', data.display, data.phoneNumber)
 end)
 RegisterNUICallback('updateContact', function(data, cb)
-  print("update  contact")
   TriggerServerEvent('phone:updateContact', data.id, data.display, data.phoneNumber)
 end)
 RegisterNUICallback('deleteContact', function(data, cb)

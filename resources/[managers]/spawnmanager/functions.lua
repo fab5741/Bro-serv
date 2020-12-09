@@ -110,7 +110,6 @@ function spawnPlayer(x, y, z, weapons)
         Wait(2000)
         if weapons ~= nil then
             for k,v in pairs(json.decode(weapons)) do
-                print(v)
                 GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)
             end
         end

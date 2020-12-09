@@ -81,7 +81,7 @@ Citizen.CreateThread(function()
 			elseif zoneType == "sell" then
 				TriggerServerEvent("job:get", "job:sell:open")		
 			elseif zoneType == "armories" then
-				openArmory()
+				exports.bf:OpenMenu("armories1")
 			elseif zoneType == "fourriere" then
 				-- Mise en fourriére
 				vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
@@ -106,7 +106,6 @@ Citizen.CreateThread(function()
 
 
 		if (handCuffed == true) then
-			print(handCuffed)
 			local myPed = PlayerPedId()
 			local animation = 'idle'
 			local flags = 50				

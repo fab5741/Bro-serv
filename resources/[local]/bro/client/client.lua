@@ -558,7 +558,7 @@ local fuelColorOver = {255, 255, 255}       -- Color used to display fuel when g
 local fuelColorUnder = {255, 96, 96}        -- Color used to display fuel warning
 
 -- SEATBELT PARAMETERS
-local seatbeltInput = 311                   -- Toggle seatbelt on/off with K or DPAD down (controller)
+local seatbeltInput = 36                   -- Toggle seatbelt on/off with K or DPAD down (controller)
 local seatbeltPlaySound = true              -- Play seatbelt sound
 local seatbeltDisableExit = true            -- Disable vehicle exit when seatbelt is enabled
 local seatbeltEjectSpeed = 45.0             -- Speed threshold to eject player (MPH)
@@ -567,7 +567,7 @@ local seatbeltColorOn = {160, 255, 160}     -- Color used when seatbelt is on
 local seatbeltColorOff = {255, 96, 96}      -- Color used when seatbelt is off
 
 -- CRUISE CONTROL PARAMETERS
-local cruiseInput = 27		                     -- Toggle cruise on/off with CAPSLOCK or A button (controller)
+local cruiseInput = 19		                     -- Toggle cruise on/off with CAPSLOCK or A button (controller)
 local cruiseColorOn = {160, 255, 160}       -- Color used when seatbelt is on
 local cruiseColorOff = {255, 255, 255}      -- Color used when seatbelt is off
 

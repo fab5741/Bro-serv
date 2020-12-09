@@ -439,7 +439,6 @@ AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOf
             {['@phone_number'] =  phone_number},
             function(srcTo)
                     if srcTo ~= nill then
-                        print(srcTo)
                         AppelsEnCours[indexCall].receiver_src = srcTo
                         TriggerEvent('phone:addCall', AppelsEnCours[indexCall])
                         TriggerClientEvent('phone:waitingCall', sourcePlayer, AppelsEnCours[indexCall], true)
@@ -461,14 +460,12 @@ end)
 
 RegisterServerEvent('phone:candidates')
 AddEventHandler('phone:candidates', function (callId, candidates)
-    -- print('send cadidate', callId, candidates)
     if AppelsEnCours[callId] ~= nil then
         local _source = source
         local to = AppelsEnCours[callId].transmitter_src
         if _source == to then 
             to = AppelsEnCours[callId].receiver_src
         end
-        -- print('TO', to)
         TriggerClientEvent('phone:candidates', to, candidates)
     end
 end)

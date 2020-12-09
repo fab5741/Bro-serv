@@ -20,7 +20,7 @@ config.JobLocations = {
 config.DrawDistance               = 10.0 -- How close do you need to be for the markers to be drawn (in GTA units).
 config.MinimumDistance            = 0 -- Minimum NPC job destination distance from the pickup in GTA units, a higher number prevents nearby destionations.
 
-
+local faresStarted = false
 -- Settings
 local enableTaxiGui = true -- Enables the GUI (Default: true)
 local fareCost = 0.001 --
@@ -142,25 +142,26 @@ if enableTaxiGui then
 
           --
           if CurrentCustomer == nil then
-            if GetEntitySpeed(ped) > 0 and GetEntitySpeed(ped) < 50 then
-              print("on cherche un npc")
-              CurrentCustomer = GetRandomWalkingNPC()
-              if CurrentCustomer ~= nil then
-                CurrentCustomerBlip = AddBlipForEntity(CurrentCustomer)
+            if faresStarted then
+              if GetEntitySpeed(ped) > 0 and GetEntitySpeed(ped) < 50 then
+                CurrentCustomer = GetRandomWalkingNPC()
+                if CurrentCustomer ~= nil then
+                  CurrentCustomerBlip = AddBlipForEntity(CurrentCustomer)
 
-                SetBlipAsFriendly(CurrentCustomerBlip, true)
-                SetBlipColour(CurrentCustomerBlip, 2)
-                SetBlipCategory(CurrentCustomerBlip, 3)
-                SetBlipRoute(CurrentCustomerBlip, true)
+                  SetBlipAsFriendly(CurrentCustomerBlip, true)
+                  SetBlipColour(CurrentCustomerBlip, 2)
+                  SetBlipCategory(CurrentCustomerBlip, 3)
+                  SetBlipRoute(CurrentCustomerBlip, true)
 
-                SetEntityAsMissionEntity(CurrentCustomer, true, false)
-                ClearPedTasksImmediately(CurrentCustomer)
-                SetBlockingOfNonTemporaryEvents(CurrentCustomer, true)
+                  SetEntityAsMissionEntity(CurrentCustomer, true, false)
+                  ClearPedTasksImmediately(CurrentCustomer)
+                  SetBlockingOfNonTemporaryEvents(CurrentCustomer, true)
 
-                local standTime = GetRandomIntInRange(60000, 180000)
-                TaskStandStill(CurrentCustomer, standTime)
-                
-                exports.bf:Notification('Client trouvé')
+                  local standTime = GetRandomIntInRange(60000, 180000)
+                  TaskStandStill(CurrentCustomer, standTime)
+                  
+                  exports.bf:Notification('Client trouvé')
+                end
               end
             end
           else
@@ -198,14 +199,15 @@ if enableTaxiGui then
                     TaskLeaveVehicle(CurrentCustomer, vehicle, 0)
     
                     exports.bf:Notification('Arrivé à destination. Vous gagnez ~g~'..string.format("%.2f", farecost)..'$')
-
                     TaskGoStraightToCoord(CurrentCustomer, targetCoords.x, targetCoords.y, targetCoords.z, 1.0, -1, 0.0, 0.0)
                     SetEntityAsMissionEntity(CurrentCustomer, false, true)
-                    TriggerServerEvent("account:player:liquid:add", "", string.format("%.2f", farecost))
+                    TriggerServerEvent("account:job:add", "", 6, farecost, true)
                     RemoveBlip(DestinationBlip)
 
-                    Wait(6000)
-                   -- DeletePed(CurrentCustomer)    
+                    Wait(10000)
+                    if CurrentCustomer then
+                      DeleteEntity(CurrentCustomer)    
+                    end
                     CurrentCustomer, CurrentCustomerBlip, DestinationBlip, IsNearCustomer, CustomerIsEnteringVehicle, CustomerEnteredVehicle, targetCoords = nil, nil, nil, false, false, false, nil
                     first = true
                   end
@@ -327,7 +329,6 @@ end)
 
 RegisterNetEvent('taxi:toggleHire')
 AddEventHandler('taxi:toggleHire', function()
-  print("HIre taxi")
   local ped = GetPlayerPed(-1)
   local veh = GetVehiclePedIsIn(ped, false)
   if(IsInTaxi()) then
@@ -454,7 +455,6 @@ end)
 
 RegisterNetEvent('taxi:client:show')
 AddEventHandler('taxi:client:show', function(client)
-printr("show blip")
   local blip = AddBlipForEntity(GetPlayerPed(client))
   SetBlipSprite(blip, 198)
   SetBlipFlashes(blip, true)
@@ -576,4 +576,25 @@ Citizen.CreateThread(function()
 			end
 		end
 	end
+end)
+
+RegisterNetEvent('taxi:fares:start')
+AddEventHandler('taxi:fares:start', function()
+  faresStarted = true
+end)
+
+RegisterNetEvent('taxi:fares:stop')
+AddEventHandler('taxi:fares:stop', function()
+  faresStarted = false    
+  if DoesBlipExist(CurrentCustomerBlip) then
+    RemoveBlip(CurrentCustomerBlip)
+  end
+
+  if DoesBlipExist(DestinationBlip) then
+    RemoveBlip(DestinationBlip)
+  end
+
+  SetEntityAsMissionEntity(CurrentCustomer, false, true)
+
+  CurrentCustomer, CurrentCustomerBlip, DestinationBlip, IsNearCustomer, CustomerIsEnteringVehicle, CustomerEnteredVehicle, targetCoords = nil, nil, nil, false, false, false, nil
 end)

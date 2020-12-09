@@ -53,7 +53,6 @@ end)
 Citizen.CreateThread(function()
     while true do
         Wait(10000)
-        print("save coords")
         TriggerEvent("player:saveCoords")
     end
 end)

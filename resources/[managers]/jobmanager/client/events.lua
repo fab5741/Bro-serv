@@ -175,7 +175,6 @@ end)
 RegisterNetEvent('job:safe:open3')
 
 AddEventHandler("job:safe:open3", function(isChef) 
-	print(isChef)
 	if isChef then
 		exports.bf:NextMenu("safes-account"..zone)
 	else 
@@ -249,7 +248,6 @@ RegisterNetEvent('job:safe:open')
 
 AddEventHandler("job:safe:open", function(job) 
 	job = job[1].job
-	print(job)
 	TriggerServerEvent("account:job:get", "job:safe:open2", job)		
 end)
 
@@ -258,7 +256,6 @@ RegisterNetEvent('job:open:menu')
 
 AddEventHandler("job:open:menu", function(job)  
 	job = job[1] 
-	print(job.name)
 	if job.name == "lspd" or job.name == "lsms" or job.name == "farm" or job.name == "wine"  or job.name == "taxi"  or job.name=="bennys" or job.name=="newspapers" then
 		exports.bf:OpenMenu(job.name)
 	end
@@ -268,8 +265,6 @@ end)
 RegisterNetEvent('job:parking')
 
 AddEventHandler("job:parking", function(vehicles)  
-	print("open")
-
 	local buttons = {
 
 	}
@@ -320,7 +315,7 @@ end)
 
 RegisterNetEvent('job:lsms:revive')
 
-AddEventHandler("job:lsms:revive", function()  
+AddEventHandler("job:lsms:revive", function(isBleedout)  
 	local playerPed = PlayerPedId()
 	local coords = GetEntityCoords(playerPed)
 
@@ -332,10 +327,38 @@ AddEventHandler("job:lsms:revive", function()
 
 	RespawnPed(playerPed, coords, 0.0)
 
+	TriggerEvent("player:alive")
+	if isBleedout then
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			local clothesSkin = {
+				['mask_1'] = 0, ['mask_2'] = 0,
+				['tshirt_1'] = 15, ['tshirt_2'] = 0,
+				['torso_1'] = 15, ['torso_2'] = 0,
+				['arms'] = 15, ['arms_2'] = 0,
+				['pants_1'] = 21, ['pants_2'] = 0,
+				['shoes_1'] = 34, ['shoes_2'] = 0
+			}
+			TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+		end)
+		local PlayerPed = PlayerPedId()
+		FreezeEntityPosition(PlayerPedId(), true)
+		if not HasAnimDictLoaded("missfbi1") then
+			RequestAnimDict("missfbi1")
+	
+			while not HasAnimDictLoaded("missfbi1") do
+				Citizen.Wait(1)
+			end
+		end
+		SetEntityCoords(PlayerPed, vector3(304.0592956543,-573.39636230469,29.836771011353))
+		Wait(20)
+		TaskPlayAnim(PlayerPed, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
+		exports.bf:Notification("~g~F1~w~ pour vous relever")		
+		FreezeEntityPosition(PlayerPedId(), false)
+	end
+	
 	StopScreenEffect('DeathFailOut')
 	DoScreenFadeIn(800)
 	Wait(0)
-	TriggerEvent("player:alive")
 end)
 
 
@@ -408,8 +431,21 @@ RegisterNetEvent('weapon:store')
 AddEventHandler("weapon:store", function(weapons)  
 	buttons = {}
 	for k, v in pairs(weapons) do
+		if v.weapon == "0x1B06D571" then
+			v.label = "9mm"
+		elseif v.weapon == "0x8BB05FD7" then
+			v.label = "Lampe torche"
+		elseif v.weapon == "0x3656C8C1" then
+			v.label = "Tazer"
+		elseif v.weapon == "0x678B81B1" then
+			v.label = "Matraque"
+		elseif v.weapon == "0x1D073A89" then
+			v.label = "Fusil à pompe"
+		elseif v.weapon == "0x2BE6766B" then
+			v.label = "SMG"
+		end
 		buttons[#buttons+1] = {
-			text = v.weapon..' '..v.amount,
+			text = v.label..' x '..v.amount,
 			exec = {
 				callback = function()
 					TriggerServerEvent("weapon:get", "weapon:store:store", v.weapon)
@@ -423,29 +459,31 @@ end)
 
 RegisterNetEvent('weapon:store:store')
 
-AddEventHandler("weapon:store:store", function(weapon)  
-	print(weapon)
-	if weapon == "0x1B06D571" then
-		weapon = "WEAPON_PISTOL"
-	elseif weapon == "0x8BB05FD7" then
-		weapon = "WEAPON_FLASHLIGHT"
-	elseif weapon == "0x3656C8C1" then
-		weapon = "WEAPON_STUNGUN"
-	elseif weapon == "0x678B81B1" then
-		weapon = "WEAPON_NIGHTSTICK"
-	elseif weapon == "0x1D073A89" then
-		weapon = "WEAPON_PUMPSHOTGUN"
-	elseif weapon == "0x2BE6766B" then
-		weapon = "WEAPON_SMG"
+AddEventHandler("weapon:store:store", function(isOk, weapon)  
+	if isOk then
+		if weapon == "0x1B06D571" then
+			weapon = "WEAPON_PISTOL"
+		elseif weapon == "0x8BB05FD7" then
+			weapon = "WEAPON_FLASHLIGHT"
+		elseif weapon == "0x3656C8C1" then
+			weapon = "WEAPON_STUNGUN"
+		elseif weapon == "0x678B81B1" then
+			weapon = "WEAPON_NIGHTSTICK"
+		elseif weapon == "0x1D073A89" then
+			weapon = "WEAPON_PUMPSHOTGUN"
+		elseif weapon == "0x2BE6766B" then
+			weapon = "WEAPON_SMG"
+		end
+		GiveWeaponToPed(
+			GetPlayerPed(-1) --[[ Ped ]], 
+			weapon --[[ Hash ]], 
+			100 --[[ integer ]], 
+			false --[[ boolean ]], 
+			true --[[ boolean ]]
+		)
+	else
+		exports.bf:Notification("~r~ L'armurerie est vide")
 	end
-	GiveWeaponToPed(
-		GetPlayerPed(-1) --[[ Ped ]], 
-		weapon --[[ Hash ]], 
-		100 --[[ integer ]], 
-		false --[[ boolean ]], 
-		true --[[ boolean ]]
-	)
-	CloseArmory()
 end)
 
 

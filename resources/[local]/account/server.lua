@@ -144,12 +144,10 @@ AddEventHandler('account:job:withdraw', function(cb, job, amount)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local job = job
-	print(amount)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where job_account.job = @job and accounts.id = job_account.account', {
 			['@job'] = job
 		}, function(money)
-			print(money)
 			if money > amount then
 				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount - @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
 				{

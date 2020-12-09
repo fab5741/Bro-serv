@@ -40,7 +40,6 @@ end)
 
 
 AddEventHandler("vehicle:permis:get:depot", function(permis)
-	print(permis)
 	if permis > 0 then
 		exports.bf:HelpPromt("Fourrière : ~INPUT_PICKUP~")
 		zoneType = "depots"
@@ -187,7 +186,6 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 				text = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
 				exec = {
 					callback = function() 
-						
 						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
 					end
 			}
@@ -287,7 +285,6 @@ AddEventHandler("vehicle:depots:get", function(data)
 end)
 
 AddEventHandler("vehicle:depots:job:get", function(data, job)
-	print(job)
 	data.x = nil
 	data.y = nil
 	data.z = nil

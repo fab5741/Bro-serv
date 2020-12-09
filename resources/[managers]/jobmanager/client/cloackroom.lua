@@ -30,7 +30,6 @@ RegisterNetEvent("job:remove:uniform")
 
 -- source is global here, don't add to function
 AddEventHandler('job:remove:uniform', function(skin)
-	print("remove uniform")
 	if skin.clothes ~= nil then
 		TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), json.decode(skin.clothes))
 	else

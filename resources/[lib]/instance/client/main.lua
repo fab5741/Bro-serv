@@ -20,8 +20,6 @@ function EnterInstance(instance)
 	insideInstance = true
 	TriggerServerEvent('instance:enter', instance.host)
 
-	print(registeredInstanceTypes)
-	print(registeredInstanceTypes[instance.type].enter)
 	if registeredInstanceTypes[instance.type].enter then
 		registeredInstanceTypes[instance.type].enter(instance)
 	end

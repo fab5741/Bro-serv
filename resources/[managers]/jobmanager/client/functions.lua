@@ -358,29 +358,6 @@ function GiveCustomWeapon(weaponData)
 	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
 end
 
-function CloseArmory()
-    if not IsAnySpeechPlaying(armoryPed) then
-    	PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_BYESHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
-    end
-
-    Wait(850)
-	RenderScriptCams(false, 1, 1000, 1, 0, 0)
-	SetCamActive(ArmoryRoomCam, false)
-	DestroyCam(ArmoryRoomCam, true)
-
-	DoScreenFadeOut(500)
-	Wait(600)
-
-	if DoesEntityExist(armoryPed) then
-		DeleteEntity(armoryPed)
-	end
-
-	FreezeEntityPosition(PlayerPedId(), false)
-
-	Citizen.Wait(500)
-	DoScreenFadeIn(500)
-end
-
 --redirect callbacks
 function isPedDrivingAVehicle()
 	local ped = GetPlayerPed(-1)
@@ -847,7 +824,6 @@ function createMenuAndArea(job)
 							text = "Retirer",
 							exec = {
 								callback = function()
-									print(job.job)
 									TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
 									TriggerServerEvent("job:get", "job:safe:open")		
 								end
@@ -921,14 +897,6 @@ function createMenuAndArea(job)
 						position = 1,
 						closable = false,
 						buttons= {
-					--		{
-					--			text = "Kit de base",
-					--			exec = {
-					--				callback = function()
-					--					giveBasicKit()
-					--				end
-					--			},
-					--		},
 							{
 								text = "Mettre Gillet",
 								exec = {
@@ -954,9 +922,22 @@ function createMenuAndArea(job)
 											1
 										)
 										if found then
-											print(weapon)
 											RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
-											CloseArmory()
+
+											weapon = tostring(weapon)
+											if weapon == "453432689" then
+												weapon = "0x1B06D571"
+											elseif weapon == "-1951375401" then
+												weapon = "0x8BB05FD7"
+											elseif weapon == "911657153" then
+												weapon = "0x3656C8C1"
+											elseif weapon == "1737195953" then
+												weapon = "0x678B81B1"
+											elseif weapon == "911657153" then
+												weapon = "0x1D073A89"
+											elseif weapon == "736523883" then
+												weapon = "0x2BE6766B"
+											end
 											TriggerServerEvent("weapon:store", weapon)
 											exports.bf:Notification("Arme stocké")
 										else
@@ -977,7 +958,6 @@ function createMenuAndArea(job)
 								text = "Quitter",
 								exec = {
 									callback = function()
-										CloseArmory()
 										exports.bf:CloseMenu("armories"..k)
 									end
 								},
@@ -1085,6 +1065,13 @@ function createMenuAndArea(job)
 								zoneType = "fourriere"
 							end
 						},
+						exit = {
+							callback = function()
+								exports.bf:CloseMenu(zoneType..zone)
+								zoneType = nil
+								zone = nil
+							end
+						}
 					},
 					blip = {
 						text = job.label.. " Fourriére "..k,
@@ -1102,37 +1089,6 @@ function createMenuAndArea(job)
 				end
 			end
 		end
-	end
-end
-
-
-function openArmory()
-	DoScreenFadeOut(500)
-	Wait(600)
-
-	Wait(800)
-	armoryPed = createArmoryPed()
-
-	if not DoesCamExist(ArmoryRoomCam) then
-		ArmoryRoomCam = CreateCam("DEFAULT_SCRIPTED_FLY_CAMERA", true)
-		AttachCamToEntity(ArmoryRoomCam, PlayerPedId(), 0.0, 0.0, 1.0, true)
-		PointCamAtEntity(ArmoryRoomCam, armoryPed, 0.0, -30.0, 1.0, true)
-
-		SetCamRot(ArmoryRoomCam, 0.0,0.0, GetEntityHeading(PlayerPedId()))
-		SetCamFov(ArmoryRoomCam, 70.0)							
-	end
-
-	Wait(100)
-	DoScreenFadeIn(500)
-
-	if DoesEntityExist(armoryPed) then
-		TaskTurnPedToFaceEntity(PlayerPedId(), armoryPed, -1)
-	end							
-
-	Wait(300)
-	exports.bf:OpenMenu("armories1")
-	if not IsAmbientSpeechPlaying(armoryPed) then
-		PlayAmbientSpeechWithVoice(armoryPed, "WEPSEXPERT_GREETSHOPGEN", "WEPSEXP", "SPEECH_PARAMS_FORCE", 0)
 	end
 end
 
@@ -1175,7 +1131,7 @@ function fireClosestPlayer()
 
 	if closestPlayer and dist <=1 then
 		--todo
-      --  TriggerServerEvent('job:set', closestPlayer, "")
+        TriggerServerEvent('job:set', GetPlayerServerId(closestPlayer), nil, "Vous avez été viré", "Vous avez viré un employé")
     else
         exports.bf:Notification("Pas de joueur à portée")
     end

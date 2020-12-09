@@ -176,7 +176,6 @@ AddEventHandler("vehicle:depots:get:all", function(cb)
 				MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.price, vehicles.label from players, player_vehicle, vehicles, vehicle_mod where vehicle_mod.id = player_vehicle.vehicle_mod and vehicle_mod.vehicle = vehicles.id and player_vehicle.player = players.id and players.discord = @discord and vehicle_mod.parking = ""', {
 					['discord'] =  discord,
 				}, function(res2)
-					print(job)
 					MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.price, vehicles.label from job_vehicle, vehicles, vehicle_mod where vehicle_mod.id = job_vehicle.vehicle_mod and vehicle_mod.vehicle = vehicles.id and job_vehicle.job= @job and vehicle_mod.parking = ""', {
 						['@job'] =  job,
 					}, function(res3)
@@ -284,8 +283,6 @@ AddEventHandler("vehicle:parking:job:get", function(id, cb)
 				MySQL.Async.fetchScalar("select job_grades.job from players, job_grades where players.discord = @discord  and job_grades.id = players.job_grade", {
 					['@discord'] = discord
 				}, function(job)
-					print(job)
-					print(result[1])
 					TriggerClientEvent(cb, sourceValue, result[1], job)
 				end)
 			end)
@@ -302,7 +299,6 @@ AddEventHandler("vehicle:store", function(vehicle, parking)
 			['vehicle'] =  vehicle,
 			['parking'] =  parking,
 		}, function(result)
-			print("updated", parking)
 		end)
 	end)
 end)
@@ -316,7 +312,6 @@ AddEventHandler("vehicle:job:store", function(vehicle, parking)
 			['vehicle'] =  vehicle,
 			['parking'] =  parking,
 		}, function(result)
-			print("updated", parking)
 		end)
 	end)
 end)
@@ -476,7 +471,6 @@ AddEventHandler("vehicle:save", function(cb,
 				['@windowTint'] = windowTint,
 				['@fuelLevel'] = fuelLevel,
 			},function(rows)
-				print(rows)
 			end)
 		end)
 	end
@@ -548,7 +542,6 @@ AddEventHandler("vehicle:mods:save", function(gameid, mods)
 						['@i'] = i,
 						['@value'] = mods[i]
 					},function(rows)
-						print(rows)
 					end)
 				end
 			end)

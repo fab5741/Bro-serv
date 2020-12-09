@@ -5,9 +5,7 @@ AddEventHandler('shops:buy', function(type, amount, price)
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 
 	local amount = amount
-	print(type)
-	print(amount)
-	print(price)
+
 	local tva = 0.2
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid, id from players where discord = @discord',

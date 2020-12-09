@@ -48,9 +48,9 @@ AddEventHandler('job:isChef', function (cb)
       end)
 end)
 
-RegisterNetEvent("job:set")
+RegisterNetEvent("job:set:me")
 
-AddEventHandler('job:set', function (grade, notif)
+AddEventHandler('job:set:me', function (grade, notif)
     local sourceValue = source
     local source = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
@@ -62,6 +62,21 @@ AddEventHandler('job:set', function (grade, notif)
          ['@grade'] = gradee},
         function(res)
             TriggerClientEvent("bf:Notification", sourceValue, "Vous êtes maintenant ~g~"..notif)
+        end)
+      end)
+end)
+
+
+RegisterNetEvent("job:set")
+
+AddEventHandler('job:set', function (player, grade, notif, notif2)
+    MySQL.ready(function ()
+        MySQL.Async.fetchAll('UPDATE players set job_grade= @grade where player = @player',
+        {['@player'] =  player,
+         ['@grade'] = grade},
+        function(res)
+            TriggerClientEvent("bf:Notification", player, notif)
+            TriggerClientEvent("bf:Notification", sourceValue, notif2)
         end)
       end)
 end)
@@ -296,8 +311,6 @@ end)
 RegisterNetEvent("job:lsms:revive")
 
 AddEventHandler('job:lsms:revive', function (player)
-    print(player)
-    print(revive)
     TriggerClientEvent("job:lsms:revive", player)
 end)
 
@@ -475,7 +488,7 @@ RegisterNetEvent("weapon:store")
 -- source is global here, don't add to function
 AddEventHandler('weapon:store', function(weapon)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local discord = exports.bf:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.insert('update job_armory,players, job_grades, jobs set amount = amount+1 where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
             ['@weapon'] =  weapon,
@@ -507,11 +520,21 @@ AddEventHandler('weapon:get', function(cb, weapon)
     local sourceValue = source
     local discord = exports.bf:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
-        MySQL.Async.insert('update job_armory,players, job_grades, jobs set amount = amount-1 where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
-            ['@weapon'] =  weapon,
-            ['@discord'] =  discord
-        }, function(res)
-            TriggerClientEvent(cb, sourceValue, weapon)
+        MySQL.Async.fetchScalar("select amount from job_armory,players, job_grades, jobs where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job",
+    {
+        ['@weapon'] =  weapon,
+        ['@discord'] =  discord
+    }, function(amount)
+            if amount > 0 then
+                MySQL.Async.insert('update job_armory,players, job_grades, jobs set amount = amount-1 where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
+                    ['@weapon'] =  weapon,
+                    ['@discord'] =  discord
+                }, function(res)
+                    TriggerClientEvent(cb, sourceValue, true, weapon)
+                end)
+            else
+                TriggerClientEvent(cb, sourceValue, false, "")
+            end
         end)
     end)
 end)
@@ -634,9 +657,6 @@ RegisterNetEvent("job:sell")
 AddEventHandler("job:sell", function (type, job, price, message)
   local sourceValue = source
   local discord = exports.bf:GetDiscordFromSource(sourceValue) 
-  print(type)
-  print(price)
-  print(job)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('SELECT amount FROM `player_item`, players where players.id = player_item.player and discord = @discord and item = @item',
     {
@@ -644,7 +664,6 @@ AddEventHandler("job:sell", function (type, job, price, message)
         ['@item']  = type
     },
     function(amount)
-        print(amount)
         if amount > 0 then
             MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
             {
@@ -658,7 +677,7 @@ AddEventHandler("job:sell", function (type, job, price, message)
                         ['@item']  =type
                     }, function(result)
                         if result == 1 then
-                            TriggerClientEvent("bf:Notification", message)
+                            TriggerClientEvent("bf:Notification", sourceValue, message)
                         end
                     end)
                 end
@@ -668,4 +687,35 @@ AddEventHandler("job:sell", function (type, job, price, message)
         end
     end)
   end)
+end)
+
+
+
+RegisterNetEvent("job:repair:price")
+
+-- source is global here, don't add to function
+AddEventHandler("job:repair:price", function (type, name)
+    local sourceValue = source
+    MySQL.ready(function ()
+        MySQL.Async.fetchScalar('select price from vehicles where name = @name', {
+            ['@name'] = name
+        }, function(price)
+            MySQL.Async.fetchScalar('SELECT AVG(price) FROM `vehicles`', {
+            }, function(avg)
+            if price == nil then 
+                price = avg
+                end
+                if type == "window" then
+                    price = price *0.005
+                elseif type == "carroserie" then
+                    price = price *0.02
+                elseif type == "tyres" then
+                    price = price *0.015
+                elseif type == "motor" then
+                    price = price *0.05
+                end
+                TriggerClientEvent("bf:Notification", sourceValue, "Prix conseillé : ~g~"..price.." $")
+            end)
+        end)
+    end)
 end)

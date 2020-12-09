@@ -74,15 +74,6 @@ config = {
                     action = "safe",
                 }
             },
-            parking = {
-                {
-                    coords = vector3(2035.1791992188,4989.015625,39.695823669434),
-                    spawn = vector3(2036.4399414062,4986.6323242188,40.001270294189),
-                    heading = -100.0,
-                    sprite = 524,
-                    action = "parking",
-                }
-            },
             clothes = {
                 {
                 male = {
@@ -654,15 +645,6 @@ config = {
                     sprite = 51,
                 }
             },
-            parking = {
-                {
-                    coords = vector3(455.12176513672,-1020.779296875,28.307716369629),
-                    spawn = vector3(452.06982421875,-1020.469909668,28.381450653076),
-                    heading = 90.0,
-                    sprite = 357,
-                    action = "parking",
-                }
-            },
             armories = {
                 {
                     coords = vector3(451.75173950195,-980.27758789062,30.689315795898),
@@ -902,14 +884,6 @@ config = {
                     sprite = 568,
                 }
             },
-            parking = {
-                {
-                    coords = vector3(899.93090820312,-173.07524108887,74.034690856934),
-                    spawn = vector3(906.25860595703,-185.95358276367,74.002990722656),
-                    heading = 90.0,
-                    sprite = 357,
-                }
-            },
             homes = {
                 {
                     coords = vector3(903.41430664062,-178.53988647461,74.006706237793),
@@ -923,48 +897,23 @@ config = {
             clothes = {
                 {
                     male = {
-                        tshirt_1 = 29,  tshirt_2 = 1,
-                        torso_1 = 55,   torso_2 = 0,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
                         decals_1 = 0,   decals_2 = 0,
                         arms = 41,
-                        pants_1 = 25,   pants_2 = 0,
-                        shoes_1 = 25,   shoes_2 = 0,
-                        helmet_1 = 46,  helmet_2 = 0,
-                        chain_1 = 0,    chain_2 = 0,
-                        ears_1 = 2,     ears_2 = 0
-                    },
-                    female = {
-                        tshirt_1 = 36,  tshirt_2 = 1,
-                        torso_1 = 48,   torso_2 = 0,
-                        decals_1 = 0,   decals_2 = 0,
-                        arms = 44,
-                        pants_1 = 34,   pants_2 = 0,
-                        shoes_1 = 27,   shoes_2 = 0,
-                        helmet_1 = 45,  helmet_2 = 0,
-                        chain_1 = 0,    chain_2 = 0,
-                        ears_1 = 2,     ears_2 = 0
-                    }
-                },
-            
-                {
-                    male = {
-                        tshirt_1 = 58,  tshirt_2 = 0,
-                        torso_1 = 55,   torso_2 = 0,
-                        decals_1 = 0,   decals_2 = 0,
-                        arms = 41,
-                        pants_1 = 25,   pants_2 = 0,
-                        shoes_1 = 25,   shoes_2 = 0,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
                     },
                     female = {
-                        tshirt_1 = 35,  tshirt_2 = 0,
-                        torso_1 = 48,   torso_2 = 0,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
                         decals_1 = 0,   decals_2 = 0,
-                        arms = 44,
-                        pants_1 = 34,   pants_2 = 0,
-                        shoes_1 = 27,   shoes_2 = 0,
+                        arms = 41,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
@@ -973,23 +922,48 @@ config = {
             
                 {
                     male = {
-                        tshirt_1 = 58,  tshirt_2 = 0,
-                        torso_1 = 55,   torso_2 = 0,
-                        decals_1 = 8,   decals_2 = 1,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
                         arms = 41,
-                        pants_1 = 25,   pants_2 = 0,
-                        shoes_1 = 25,   shoes_2 = 0,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
                     },
                     female = {
-                        tshirt_1 = 35,  tshirt_2 = 0,
-                        torso_1 = 48,   torso_2 = 0,
-                        decals_1 = 7,   decals_2 = 1,
-                        arms = 44,
-                        pants_1 = 34,   pants_2 = 0,
-                        shoes_1 = 27,   shoes_2 = 0,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
+                        helmet_1 = -1,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    }
+                },
+            
+                {
+                    male = {
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
+                        helmet_1 = -1,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0
+                    },
+                    female = {
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
@@ -998,23 +972,23 @@ config = {
             
                  {
                     male = {
-                        tshirt_1 = 58,  tshirt_2 = 0,
-                        torso_1 = 55,   torso_2 = 0,
-                        decals_1 = 8,   decals_2 = 2,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
                         arms = 41,
-                        pants_1 = 25,   pants_2 = 0,
-                        shoes_1 = 25,   shoes_2 = 0,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
                     },
                     female = {
-                        tshirt_1 = 35,  tshirt_2 = 0,
-                        torso_1 = 48,   torso_2 = 0,
-                        decals_1 = 7,   decals_2 = 2,
-                        arms = 44,
-                        pants_1 = 34,   pants_2 = 0,
-                        shoes_1 = 27,   shoes_2 = 0,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
@@ -1023,46 +997,28 @@ config = {
             
                  {
                     male = {
-                        tshirt_1 = 58,  tshirt_2 = 0,
-                        torso_1 = 55,   torso_2 = 0,
-                        decals_1 = 8,   decals_2 = 3,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
                         arms = 41,
-                        pants_1 = 25,   pants_2 = 0,
-                        shoes_1 = 25,   shoes_2 = 0,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
                     },
                     female = {
-                        tshirt_1 = 35,  tshirt_2 = 0,
-                        torso_1 = 48,   torso_2 = 0,
-                        decals_1 = 7,   decals_2 = 3,
-                        arms = 44,
-                        pants_1 = 34,   pants_2 = 0,
-                        shoes_1 = 27,   shoes_2 = 0,
+                        tshirt_1 = 70,  tshirt_2 = 0,
+                        torso_1 = 25,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 41,
+                        pants_1 = 7,   pants_2 = 0,
+                        shoes_1 = 3,   shoes_2 = 0,
                         helmet_1 = -1,  helmet_2 = 0,
                         chain_1 = 0,    chain_2 = 0,
                         ears_1 = 2,     ears_2 = 0
                     }
                 },
-            
-                bullet_wear = {
-                    male = {
-                        bproof_1 = 11,  bproof_2 = 1
-                    },
-                    female = {
-                        bproof_1 = 13,  bproof_2 = 1
-                    }
-                },
-            
-                gilet_wear = {
-                    male = {
-                        tshirt_1 = 59,  tshirt_2 = 1
-                    },
-                    female = {
-                        tshirt_1 = 36,  tshirt_2 = 1
-                    }
-                }
             },
         }
     },

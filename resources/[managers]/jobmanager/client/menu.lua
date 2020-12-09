@@ -315,7 +315,7 @@ function menus()
             text = v.label,
             exec = {
                 callback = function()
-					TriggerServerEvent("job:set", 18, "Livreur de journaux")
+					TriggerServerEvent("job:set:me", 18, "Livreur de journaux")
 					Wait(100)
 					TriggerServerEvent("job:get", "jobs:refresh")
 					exports.bf:CloseMenu("center")
@@ -450,6 +450,26 @@ function menus()
 				},
 			},
 			{
+				text = "Commencer les courses",
+				exec = {
+					callback = function()
+						TriggerEvent("taxi:fares:start")
+						exports.bf:Notification("Les courses commencent")
+						exports.bf:CloseMenu("taxi")
+					end
+				},
+			},
+			{
+				text = "Stopper les courses",
+				exec = {
+					callback = function()
+						TriggerEvent("taxi:fares:stop")
+						exports.bf:Notification("Fin des courses")
+						exports.bf:CloseMenu("taxi")
+					end
+				},
+			},
+			{
 				text = "Gestion service",
 				exec = {
 					callback = function()
@@ -507,6 +527,7 @@ function menus()
 										FixVehicleWindow(vehicle, 4)
 										FixVehicleWindow(vehicle, 5)
 										FixVehicleWindow(vehicle, 6)
+										TriggerServerEvent("job:repair:price", "window", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
 										exports.bf:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
@@ -563,6 +584,7 @@ function menus()
 										SetVehicleTyreFixed(vehicle, 4)
 										SetVehicleTyreFixed(vehicle, 5)
 										SetVehicleTyreFixed(vehicle, 6)
+										TriggerServerEvent("job:repair:price", "tyres", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
 										exports.bf:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
@@ -663,6 +685,7 @@ function menus()
 										SetVehicleBodyHealth(vehicle, 1000.0)
 										SetVehiclePetrolTankHealth(vehicle, 1000.0)
 										SetVehicleDeformationFixed(vehicle)
+										TriggerServerEvent("job:repair:price", "carroserie", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
 										exports.bf:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
@@ -717,6 +740,7 @@ function menus()
 										SetVehicleEngineHealth(vehicle, 1000.0)
 										SetVehicleUndriveable(vehicle, false)
 										ClearPedTasksImmediately(playerPed)
+										TriggerServerEvent("job:repair:price", "motor", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
 										exports.bf:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)

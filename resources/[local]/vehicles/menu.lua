@@ -137,14 +137,13 @@ function createMenus()
 			locations = v.locations,
 		})
 	end
-	
 
 	--depots
-	exports.bf:AddMenu("depots-fourriere", {
+	exports.bf:AddMenu("depots", {
 		title = "Fourrière",
 		position = 1,
 	})
-	exports.bf:AddArea("depots-fourriere", {
+	exports.bf:AddArea("depots", {
 		marker = {
 			type = 1,
 			weight = 1,
@@ -157,12 +156,13 @@ function createMenus()
 			weight = 1,
 			enter = {
 				callback = function()
-					TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:depot")
+					zoneType = "depots"
+					zone = 1
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bf:CloseMenu(zoneType..zone)
+					exports.bf:CloseMenu("depots")
 					zoneType = nil
 					zone = nil
 				end
@@ -377,6 +377,8 @@ function removeMenus()
 
     --depots
     exports.bf:RemoveMenu("depots")
+	exports.bf:RemoveArea("depots")
+	exports.bf:RemoveMenu("depots")
     exports.bf:RemoveArea("depots")
     --Permis de conduire
     exports.bf:RemoveArea("ds")

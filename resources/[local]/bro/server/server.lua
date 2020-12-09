@@ -17,7 +17,6 @@ RegisterServerEvent('carwash:checkmoney')
 AddEventHandler('carwash:checkmoney', function ()
 local sourceValue = source
 local discord = exports.bf:GetDiscordFromSource(sourceValue)
-print("CHECKE MONETY")
 MySQL.ready(function ()
   MySQL.Async.fetchAll('select liquid from players where discord = @discord',
       {['discord'] =  discord},
@@ -30,7 +29,6 @@ MySQL.ready(function ()
 				TriggerClientEvent('carwash:success', sourceValue, price)
       end)
     else
-      print(discord)
       TriggerClientEvent('carwash:notenoughmoney', sourceValue)
     end
       end)

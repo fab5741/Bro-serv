@@ -22,9 +22,9 @@ function SetPropertyOwned(name, price, rented, source)
 			}, function(rowsChanged)
 					TriggerClientEvent('property:setPropertyOwned', source, name, true, rented)
 				if rented then
-					TriggerClientEvent("bf:Notification", source, "Loué pour "..price)
+					TriggerClientEvent("bf:Notification", source, "Loué pour  ~g~"..price.."$")
 				else
-					TriggerClientEvent("bf:Notification", source, "Acheté pour"..price)
+					TriggerClientEvent("bf:Notification", source, "Acheté pour ~g~"..price.."$")
 				end
 			end)
 		end)
@@ -156,7 +156,7 @@ AddEventHandler('property:getOwnedProperties', function(cb)
 end)
 
 AddEventHandler('property:setPropertyOwned', function(name, price, rented)
-	SetPropertyOwned(name, price, rented)
+	SetPropertyOwned(name, price, rented, sourceValue)
 end)
 
 AddEventHandler('property:removeOwnedProperty', function(name, owner)
@@ -165,26 +165,25 @@ end)
 
 RegisterNetEvent('property:rentProperty')
 AddEventHandler('property:rentProperty', function(propertyName)
-	local xPlayer  = ESX.GetPlayerFromId(source)
+	local sourceValue = source
+    local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local property = GetProperty(propertyName)
-	local rent     = ESX.Math.Round(property.price / Config.RentModifier)
+	local rent     = property.price / Config.RentModifier
 
-	SetPropertyOwned(propertyName, rent, true)
+	SetPropertyOwned(propertyName, rent, true, sourceValue)
 end)
 
 RegisterNetEvent('property:buyProperty')
 AddEventHandler('property:buyProperty', function(propertyName)
-	local sourcevalue = source
-    local discord = exports.bf:GetDiscordFromSource(sourcevalue)
+	local sourceValue = source
+    local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	local property = GetProperty(propertyName)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
 			{
 				['@discord'] = discord
-			}, function(liquid)
-				print(property.price)
-				print(liquid)
+			}, function(liquid))
 				if property.price <= liquid then
 					MySQL.Async.execute('update players set liquid = liquid-@price where discord = @discord',
 					{
@@ -192,10 +191,10 @@ AddEventHandler('property:buyProperty', function(propertyName)
 						['@price'] = property.price,
 					}, function(row)
 					-- todo - remove player money
-						SetPropertyOwned(propertyName, property.price, false, sourcevalue)
+						SetPropertyOwned(propertyName, property.price, false, sourceValue)
 					end)
 				else
-					TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assé d'argent")
+					TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assez d'argent")
 				end
 		end)
 	end)
@@ -343,55 +342,32 @@ AddEventHandler('property:removeOutfit', function(label)
 	end)
 end)
 
+
+
 function payRent(d, h, m)
 	local tasks, timeStart = {}, os.clock()
 	print('[property] [^2INFO^7] Paying rent cron job started')
 
 	MySQL.Async.fetchAll('SELECT * FROM owned_properties WHERE rented = 1', {}, function(result)
 		for k,v in ipairs(result) do
-			table.insert(tasks, function(cb)
-				local xPlayer = ESX.GetPlayerFromIdentifier(v.owner)
-
-				if xPlayer then
-					if xPlayer.getAccount('bank').money >= v.price then
-						xPlayer.removeAccountMoney('bank', v.price)
-						xPlayer.showNotification(_U('paid_rent', ESX.Math.GroupDigits(v.price), GetProperty(v.name).label))
+				local discord = exports.bf:GetDiscordFromSource(v.owner)
+				MySQL.Async.fetchScalar('SELECT amount FROM accounts,players, player_account WHERE players.discord = @discord and accounts.id = player_account.account and player_account.player and players.id = player_account.player', {
+					['@discord'] = discord
+				}, function(money)
+					if money >= v.price then
+						MySQL.Async.execute('update accounts,players, player_account set amount= amount - @amount WHERE players.discord = @discord and accounts.id = player_account.account and player_account.player and players.id = player_account.player', {
+							['@discord'] = discord,
+							['@amount'] = v.price,							
+						}, function(money)
+							TriggerClientEvent("bf:Notification", sourceValue, "Loyé payé :"..GetProperty(v.name).label.." ~g~"..v.price.." $" )
+						end)
 					else
-						xPlayer.showNotification(_U('paid_rent_evicted', GetProperty(v.name).label, ESX.Math.GroupDigits(v.price)))
 						RemoveOwnedProperty(v.name, v.owner, true)
+						TriggerClientEvent("bf:Notification", sourceValue, "Loyé non payé :"..GetProperty(v.name).label.." ~r~"..v.price.." $. Vous êtes expulsé !" )
 					end
-				else
-					MySQL.Async.fetchScalar('SELECT accounts FROM users WHERE identifier = @identifier', {
-						['@identifier'] = v.owner
-					}, function(accounts)
-						if accounts then
-							local playerAccounts = json.decode(accounts)
-
-							if playerAccounts and playerAccounts.bank then
-								if playerAccounts.bank >= v.price then
-									playerAccounts.bank = playerAccounts.bank - v.price
-
-									MySQL.Async.execute('UPDATE users SET accounts = @accounts WHERE identifier = @identifier', {
-										['@identifier'] = v.owner,
-										['@accounts'] = json.encode(playerAccounts)
-									})
-								else
-									RemoveOwnedProperty(v.name, v.owner, true)
-								end
-							end
-						end
-					end)
-				end
-
-				TriggerEvent('esx_addonaccount:getSharedAccount', 'society_realestateagent', function(account)
-					account.addMoney(v.price)
-				end)
-
 				cb()
-			end)
+				end)
 		end
-
-		Async.parallelLimit(tasks, 5, function(results) end)
 
 		local elapsedTime = os.clock() - timeStart
 		print(('[property] [^2INFO^7] Paying rent cron job took %s seconds'):format(elapsedTime))
@@ -399,3 +375,5 @@ function payRent(d, h, m)
 end
 
 TriggerEvent('cron:runAt', 22, 0, payRent)
+
+payRent()

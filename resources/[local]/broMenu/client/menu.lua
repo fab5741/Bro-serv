@@ -33,7 +33,7 @@ exports.bf:AddMenu("bro", {
                 callback = function()
                     if  exports.bf:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
                         -- on quitte le job
-                        TriggerServerEvent("job:set", 19, "Chomeur")
+                        TriggerServerEvent("job:set:me", 19, "Chomeur")
                         Wait(1000)
                         TriggerServerEvent("job:get", "jobs:refresh")
                     end
@@ -169,7 +169,6 @@ exports.bf:AddMenu("bro-vehicle", {
                     
                     if distanceToVeh <= interactionDistance then
                         if (isopen == 0) then
-                            print("open doors")
                         SetVehicleDoorOpen(vehicle,5,0,0)
                         else
                         SetVehicleDoorShut(vehicle,5,0)

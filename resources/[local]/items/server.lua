@@ -239,16 +239,12 @@ AddEventHandler("item:vehicle:get", function (vehicle, item, amount)
   local sourceValue = source
   local discord = exports.bf:GetDiscordFromSource(sourceValue) 
 
-  print(vehicle)
-  print(item)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar("SELECT amount FROM `vehicle_item`, players WHERE vehicle_mod = @vehicle and item = @item",
     {
       ['vehicle'] = vehicle,
       ['item'] = item,
     }, function(amounte)
-      print(amounte)
-      print(amount)
       if amounte and amounte >= amount then
         MySQL.Async.fetchScalar("SELECT players.id FROM `players` WHERE discord = @discord",
         {
@@ -299,9 +295,6 @@ RegisterNetEvent("item:vehicle:store")
 AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
   local sourceValue = source
   local discord = exports.bf:GetDiscordFromSource(sourceValue) 
-  print(vehicle)
-  print(amount)
-  print(item)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar("SELECT amount FROM `player_item`, players WHERE item = @item and players.discord = @discord and players.id = player_item.player",
     {

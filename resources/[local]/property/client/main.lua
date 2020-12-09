@@ -17,13 +17,13 @@ exports.bf:AddMenu("property", {
 				end
 			},
         },
-        {
-            text = "Louer",
-			exec=  {
-				callback = function ()
-					TriggerServerEvent('property:rentProperty', LastProperty)
-				end
-			},
+     --   {
+      --      text = "Louer",
+		--	exec=  {
+		--		callback = function ()
+		--			TriggerServerEvent('property:rentProperty', LastProperty)
+		--		end
+		--	},
         },
     },
 })
@@ -100,7 +100,6 @@ AddEventHandler('property:sendProperties', function(properties)
 end)
 RegisterNetEvent('property:sendProperties2')
 AddEventHandler('property:sendProperties2', function(properties)
-	print(properties)
 	for k,v in ipairs(properties) do
 		SetPropertyOwned(v.name, true, v.rented)
 	end

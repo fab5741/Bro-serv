@@ -348,7 +348,6 @@ end)
 RegisterNetEvent('bromenu:mask')
 AddEventHandler('bromenu:mask', function()
 	TriggerEvent('skinchanger:getSkin', function(skin)
-		print("MASK CHANGE")
 		local clothesSkin = {
 		['mask_1'] = 0, ['mask_2'] = 0,
 		}
@@ -359,7 +358,6 @@ end)
 RegisterNetEvent('bromenu:koszulka')
 AddEventHandler('bromenu:koszulka', function()
 	TriggerEvent('skinchanger:getSkin', function(skin)
-		print(skin)
 		local clothesSkin = {
 		['tshirt_1'] = 15, ['tshirt_2'] = 0,
 		['torso_1'] = 15, ['torso_2'] = 0,

@@ -1,8 +1,6 @@
 RegisterNetEvent("atm:get")
 
 AddEventHandler('atm:get', function(account, liquid)
-	print(account)
-	print(liquid)
 	account = account
 	liquid = liquid
 	exports.bf:SetMenuValue("atm", {

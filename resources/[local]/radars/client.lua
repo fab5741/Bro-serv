@@ -27,12 +27,11 @@ function round(number, decimals)
   return math.floor(number * power) / power
 end
 
-  function checkSpeed(speed, location)
+  function checkSpeed(maxspeed, location)
   local pP = GetPlayerPed(-1)
   local speed = GetEntitySpeed(pP)
   local vehicle = GetVehiclePedIsIn(pP, false)
   local driver = GetPedInVehicleSeat(vehicle, -1)
-  local maxspeed = speed
   local kmhspeed = math.ceil(speed*3.6)
     if kmhspeed > maxspeed and driver == pP then
       if GetVehicleClass(vehicle) == 18 then
@@ -41,8 +40,8 @@ end
         fine = kmhspeed - maxspeed
         nbPoints = (fine/40)+1
         nbPoints = math.floor(nbPoints)
-        fine = round(fine, 2)
-        Citizen.Wait(3000)
+        fine = round(fine*5, 2)
+        Citizen.Wait(math.random(1000,10000))
         TriggerServerEvent("vehicle:permis:withdraw", "", nbPoints)
         TriggerServerEvent("account:player:add", "", -fine)
         exports.bf:Notification("Vous avez été flashé ~r~".. kmhspeed.. " km/h~s~. Perte de ~r~"..nbPoints.."points ~s~. Amende de ~r~"..fine.."$")

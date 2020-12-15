@@ -82,7 +82,7 @@ function spawnCar(vehicleName, keep, pos, direct, notp, heading)
         heading = GetEntityHeading(playerPed)
     end
 
-    ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
+    ClearAreaOfVehicles(pos.x, pos.y, pos.z, 10.0, false, false, false, false, false)
 
     -- create the vehicle
     local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, heading, true, false)

@@ -33,7 +33,7 @@ exports.bf:AddMenu("bro", {
                 callback = function()
                     if  exports.bf:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
                         -- on quitte le job
-                        TriggerServerEvent("job:set:me", 19, "Chomeur")
+                        TriggerServerEvent("job:set:me", nil, "Chomeur")
                         Wait(1000)
                         TriggerServerEvent("job:get", "jobs:refresh")
                     end
@@ -96,15 +96,17 @@ exports.bf:AddMenu("bro-vehicle", {
     position = 1,
     buttons = {
         {
-            text = "Verrouiller",
+            text = "Verrouiller/Déverouiller",
             exec = {
                 callback = function()
                     local player = GetPlayerPed(-1)
-                    vehicle = GetVehiclePedIsIn(player,true)
+                    local pos = GetEntityCoords(PlayerPedId())
+                    local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+            
+                    local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+                    local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
                     local islocked = GetVehicleDoorLockStatus(vehicle)
-                    local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(player), GetEntityCoords(vehicle), 1)
-                        if DoesEntityExist(vehicle) then
-                            if distanceToVeh <= lockDistance then
+                        if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
                                 if (islocked == 1)then
                                 SetVehicleDoorsLocked(vehicle, 2)
                                 exports.bf:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
@@ -112,9 +114,6 @@ exports.bf:AddMenu("bro-vehicle", {
                                 SetVehicleDoorsLocked(vehicle,1)
                                 exports.bf:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
                                 end
-                            else
-                                exports.bf:Notification("~r~vous devez être dans un véhicule")
-                            end
                         else
                             exports.bf:Notification("~r~Pas de voiture sauvegardée")
                         end

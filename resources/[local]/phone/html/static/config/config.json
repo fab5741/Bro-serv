@@ -92,45 +92,38 @@
   },
 
   "serviceCall": [{
-      "display": "Police",
+      "display": "LSPD",
       "icon": "/html/static/img/icons_app/police.png",
       "subMenu": [{
           "title": "Send Message",
           "eventName": "phone:call",
           "type": {
-            "number": "police"
-          }
-        },
-        {
-          "title": "Call Police Station",
-          "eventName": "phone:autoCallNumber",
-          "type": {
-            "number": "911"
+            "number": "lspd"
           }
         }
       ]
     },
     {
-      "display": "Ambulance",
+      "display": "LSMS",
       "backgroundColor": "red",
       "subMenu": [{
         "title": "Send Message",
         "eventName": "phone:call",
         "type": {
-          "number": "ambulance"
+          "number": "lsms"
         }
       }]
     }
   ],
 
   "defaultContacts": [{
-      "number": "ambulance",
-      "display": "Ambulance",
+      "number": "lsms",
+      "display": "LSMS",
       "icon": "/html/static/img/icons_app/bank.png"
     },
     {
-      "number": "police",
-      "display": "Police",
+      "number": "lspd",
+      "display": "LSPD",
       "backgroundColor": "blue",
       "letter": "P"
     },

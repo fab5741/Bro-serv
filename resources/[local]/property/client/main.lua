@@ -8,24 +8,6 @@ exports.bf:AddMenu("property-owned", {
 
 exports.bf:AddMenu("property", {
     title = "Propriété",
-    buttons = {
-        {
-            text = "Acheter",
-			exec=  {
-				callback = function ()
-					TriggerServerEvent('property:buyProperty', LastProperty)
-				end
-			},
-        },
-     --   {
-      --      text = "Louer",
-		--	exec=  {
-		--		callback = function ()
-		--			TriggerServerEvent('property:rentProperty', LastProperty)
-		--		end
-		--	},
-        },
-    },
 })
 
 
@@ -320,6 +302,20 @@ function OpenPropertyMenu(property)
 		})
 		exports.bf:OpenMenu("property-owned")
 	else
+		exports.bf:SetMenuValue("property", {
+				buttons = {
+					{
+						text = "Acheter ~g~"..property.price.."$",
+						exec=  {
+							callback = function ()
+								TriggerServerEvent('property:buyProperty', LastProperty)
+								exports.bf:CloseMenu("property")
+							end
+						},
+					}
+				},
+			}
+		)
 		exports.bf:OpenMenu("property")
 	end
 end

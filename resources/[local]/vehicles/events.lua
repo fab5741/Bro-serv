@@ -245,7 +245,19 @@ AddEventHandler("vehicle:foot", function(vehicles)
 			text = v.label,
 			exec = {
 				callback = function() 
-					TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
+					if not lockParking then
+						local playerPed = GetPlayerPed(-1)
+						local time = 4000
+						TriggerEvent("bf:progressBar:create", time, "Vous sortez le véhicule du parking")
+						FreezeEntityPosition(playerPed, true)
+						lockParking = true
+						Wait(time)
+
+						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
+						exports.bf:CloseMenu("parking-veh")
+						FreezeEntityPosition(playerPed, false)
+						lockParking = false
+					end
 				end
 		}
 	}
@@ -261,7 +273,7 @@ AddEventHandler("vehicle:get", function(data)
 	data.x = nil
 	data.y = nil
 	data.z = nil
-	spawnACar(data, true)
+	spawnACar(data, false, true)
 end)
 
 
@@ -269,7 +281,7 @@ AddEventHandler("vehicle:depots:get", function(data)
 	data.x = nil
 	data.y = nil
 	data.z = nil
-	spawnACar(data, false)
+	spawnACar(data, false, true)
 
 	local price = 0
 	
@@ -288,7 +300,7 @@ AddEventHandler("vehicle:depots:job:get", function(data, job)
 	data.x = nil
 	data.y = nil
 	data.z = nil
-	spawnACar(data, false)
+	spawnACar(data, true, true)
 
 	local price = 0
 	
@@ -309,7 +321,7 @@ function spawnACar(v, new, tpIn)
 
 	--spawn
 	if v.x == nil or v.y == nil or v.z == nil then
-		vehicle = exports.bf:spawnCar(v.name, true, nil, true)
+		vehicle = exports.bf:spawnCar(v.name, true, nil, true, true)
 	else
 		if tpIn then
 			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), true, false, v.heading)
@@ -317,11 +329,12 @@ function spawnACar(v, new, tpIn)
 			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), false, true, v.heading)
 		end
 	end
+	print(vehicle)
 	TriggerServerEvent("vehicle:saveId", vehicle, v.gameId)
 	currentVehicle = vehicle
 
 	if new == false then
-		Wait(2000)
+	--	Wait(2000)
 		if v.livery == -1 then
 			v.livery = 0
 		end
@@ -392,12 +405,16 @@ end
 
 AddEventHandler("vehicle:spawn", function(vehicles)
 	for k,v in pairs(vehicles) do
-		spawnACar(v, false)
+		if v.x and v.y and v.z then
+			spawnACar(v, false)
+		end
     end
 end)
 
 AddEventHandler("vehicle:refresh", function(vehicles)
-    for k,v in pairs(vehicles) do
+	for k,v in pairs(vehicles) do
+		print(v.name)
+		print(GetEntityCoords(v.gameId))
         local ped = GetPlayerPed(-1)
 		local primaryColour, secondaryColour = GetVehicleColours(v.gameId)
 		local bodyHealth = GetVehicleBodyHealth(v.gameId)
@@ -418,7 +435,6 @@ AddEventHandler("vehicle:refresh", function(vehicles)
         GetVehicleWindowTint(v.gameId),
 		GetVehicleFuelLevel(v.gameId)
 	)
-
     end
 end)
 
@@ -428,12 +444,15 @@ AddEventHandler("vehicle:mods:refresh", function(vehicle, mods)
 		vehicle, 
 		0
 	)
-	for k,v in pairs(mods) do
-			SetVehicleMod(
-				vehicle, 
-				v.type, 
-				v.value, 
-				false -- always 0
-			)
+	if mods then 
+		for k,v in pairs(mods) do
+				SetVehicleMod(
+					vehicle, 
+					v.type, 
+					v.value, 
+					false -- always 0
+				)
+		end
 	end
+
 end)

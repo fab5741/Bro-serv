@@ -491,11 +491,14 @@ function menus()
 					callback = function()
 						local playerPed = GetPlayerPed(-1)
 						coords = GetEntityCoords(GetPlayerPed(-1), true)
-						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local pos = GetEntityCoords(PlayerPedId())
+						local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+				
+						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 						local prop_name = 'prop_cs_wrench'
-
 						if lockRepare == false then
-							if vehicle and vehicle ~= 0 then
+							if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
@@ -527,6 +530,8 @@ function menus()
 										FixVehicleWindow(vehicle, 4)
 										FixVehicleWindow(vehicle, 5)
 										FixVehicleWindow(vehicle, 6)
+										FixVehicleWindow(vehicle, 7)
+										FixVehicleWindow(vehicle, 8)
 										TriggerServerEvent("job:repair:price", "window", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
 										exports.bf:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
@@ -550,9 +555,14 @@ function menus()
 					callback = function()
 						local playerPed = GetPlayerPed(-1)
 						coords = GetEntityCoords(GetPlayerPed(-1), true)
-						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local pos = GetEntityCoords(PlayerPedId())
+						local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+				
+						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+						local prop_name = 'prop_cs_wrench'
 						if lockRepare == false then
-							if vehicle and vehicle ~= 0 then
+							if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
@@ -607,10 +617,14 @@ function menus()
 					callback = function()
 						local playerPed = GetPlayerPed(-1)
 						coords = GetEntityCoords(GetPlayerPed(-1), true)
-						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local pos = GetEntityCoords(PlayerPedId())
+						local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+				
+						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 						local prop_name = 'prop_rag_01'
 						if lockRepare == false then
-							if vehicle and vehicle ~= 0 then
+							if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
@@ -658,10 +672,14 @@ function menus()
 					callback = function()
 						local playerPed = GetPlayerPed(-1)
 						coords = GetEntityCoords(GetPlayerPed(-1), true)
-						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local pos = GetEntityCoords(PlayerPedId())
+						local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+				
+						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 						local prop_name = 'prop_cs_wrench'
 						if lockRepare == false then
-							if vehicle and vehicle ~= 0 then
+							if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
@@ -708,11 +726,15 @@ function menus()
 					callback = function()
 						local playerPed = GetPlayerPed(-1)
 						coords = GetEntityCoords(GetPlayerPed(-1), true)
-						vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
+						local pos = GetEntityCoords(PlayerPedId())
+						local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+				
+						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 						local prop_name = 'prop_cs_wrench'
 
 						if lockRepare == false then
-							if vehicle and vehicle ~= 0 then
+							if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")

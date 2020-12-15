@@ -368,6 +368,7 @@ end
 --  Function client | Messages
 --====================================================================================
 function sendMessage(num, message)
+  print(message)
   TriggerServerEvent('phone:sendMessage', num, message)
 end
 

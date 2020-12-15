@@ -23,6 +23,7 @@ AddEventHandler('job:add:uniform', function(job)
 	else
 		clothes = config.jobs[job.name].clothes[job.grade].female
 	end
+	print(clothes)
 	TriggerEvent('skinchanger:loadClothes', skin, clothes)
 end)
 

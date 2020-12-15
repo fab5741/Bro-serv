@@ -1,7 +1,50 @@
+function GetPlayers()
+    local players = {}
+
+    for _, player in ipairs(GetActivePlayers()) do
+        if NetworkIsPlayerActive(player) then
+            table.insert(players, player)
+        end
+    end
+
+    return players
+end
+
+
+function GetClosestPlayer()
+	local players = GetPlayers()
+	local closestDistance = -1
+	local closestPlayer = -1
+	local ply = PlayerPedId()
+	local plyCoords = GetEntityCoords(ply, 0)
+	
+	for index,value in ipairs(players) do
+		local target = GetPlayerPed(value)
+		if(target ~= ply) then
+			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
+			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
+			if(closestDistance == -1 or closestDistance > distance) then
+				closestPlayer = value
+				closestDistance = distance
+			end
+		end
+	end
+	
+	return closestPlayer, closestDistance
+end
+
+
 RegisterNetEvent('bf:open')
 
 AddEventHandler("bf:open", function(job) 
-	job = job[1]
+	if job[1] == nil then 
+		job = {
+			grade = "Chomeur",
+			label = ""
+		}
+	else
+		job = job[1]
+	end
 	exports.bf:SetMenuValue("bro", {
 		menuTitle = job.grade.." "..job.label
 	})
@@ -28,7 +71,35 @@ AddEventHandler("bf:liquid", function(liquid)
 		text = "Montrer carte d'identité",
 		exec = {
 			callback = function()
-				TriggerServerEvent("bro:get", "bro:show")
+				local playerPed = GetPlayerPed(-1)
+				if lockChanging == false then
+					if not  IsPedInAnyVehicle(playerPed, false) then
+						local time = 4000
+						TriggerEvent("bf:progressBar:create", time, "Vous sortez votre carte")
+						lockChanging = true 
+						Citizen.CreateThread(function ()
+							FreezeEntityPosition(playerPed, true)
+							
+							local dict = "amb@world_human_gardener_plant@male@enter"
+							local anim = "enter"
+							RequestAnimDict(dict)
+
+							while not HasAnimDictLoaded(dict) do
+								Citizen.Wait(150)
+							end
+							TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+							Wait(time)
+							lockChanging = false
+							TriggerServerEvent("bro:get", "bro:show")
+							FreezeEntityPosition(playerPed, false)
+						end)
+					else
+						exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+					end
+				else 
+					exports.bf:Notification("~r~Vous sortez votre carte")
+				end
 			end
 		}
 	}
@@ -36,7 +107,35 @@ AddEventHandler("bf:liquid", function(liquid)
 		text = "Montrer permis",
 		exec = {
 			callback = function()
-				TriggerServerEvent("vehicle:permis:get", "bro:permis")
+				local playerPed = GetPlayerPed(-1)
+				if lockChanging == false then
+					if not  IsPedInAnyVehicle(playerPed, false) then
+						local time = 4000
+						TriggerEvent("bf:progressBar:create", time, "Vous sortez votre carte")
+						lockChanging = true 
+						Citizen.CreateThread(function ()
+							FreezeEntityPosition(playerPed, true)
+							
+							local dict = "amb@world_human_gardener_plant@male@enter"
+							local anim = "enter"
+							RequestAnimDict(dict)
+
+							while not HasAnimDictLoaded(dict) do
+								Citizen.Wait(150)
+							end
+							TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+							Wait(time)
+							lockChanging = false
+							TriggerServerEvent("vehicle:permis:get", "bro:permis")
+							FreezeEntityPosition(playerPed, false)
+						end)
+					else
+						exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+					end
+				else 
+					exports.bf:Notification("~r~Vous sortez votre carte")
+				end
 			end
 		}
 	}
@@ -47,18 +146,18 @@ end)
 RegisterNetEvent('bro:permis')
 
 AddEventHandler("bro:permis", function(permis) 
-	peds = exports.bf:GetPlayerServerIdInDirection(5.0)
-	if peds ~= false then
-		TriggerServerEvent("bro:permis:show", permis, peds)
+	local closestPlayerPed, dist = GetClosestPlayer()
+	if closestPlayerPed  ~= -1 and dist < 2 then
+		TriggerServerEvent("bro:permis:show", permis, GetPlayerServerId(closestPlayerPed))
 	end
 end)
 
 RegisterNetEvent('bro:show')
 
 AddEventHandler("bro:show", function(player) 
-	peds = exports.bf:GetPlayerServerIdInDirection(5.0)
-	if peds ~= false then
-		TriggerServerEvent("bro:permis:show", permis, peds)
+	local closestPlayerPed, dist = GetClosestPlayer()
+	if closestPlayerPed ~= -1 and dist < 2 then
+		TriggerServerEvent("bro:card:show", permis, GetPlayerServerId(closestPlayerPed))
 	end
 end)
 
@@ -168,12 +267,11 @@ AddEventHandler("bf:items", function(inventory)
 						text = "Donner",
 						exec = {
 							callback = function() 
-								local distMin = 18515151515151515151515
-								local current = nil
-
 								local player, dist = GetClosestPlayer()
-								if dist < 10  then
-									TriggerServerEvent("items:give", v.id, 1, player)
+								if player ~= -1 and dist < 10  then
+									TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(player))
+								else 
+									exports.bf:Notification("Pas de joueur à portée")
 								end
 							end
 						},
@@ -183,8 +281,12 @@ AddEventHandler("bf:items", function(inventory)
 						exec = {
 							callback = function() 
 								coords = GetEntityCoords(GetPlayerPed(-1), true)
-								vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
-								if vehicle and vehicle ~= 0 then
+								local pos = GetEntityCoords(PlayerPedId())
+								local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+						
+								local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+								local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+								if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 									if GetVehicleDoorLockStatus(vehicle) == 1 then
 										
 										local playerPed = GetPlayerPed(-1)
@@ -347,48 +449,168 @@ end)
 --clothes event
 RegisterNetEvent('bromenu:mask')
 AddEventHandler('bromenu:mask', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		local clothesSkin = {
-		['mask_1'] = 0, ['mask_2'] = 0,
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
-	end)
+	if not lockChanging then
+		local time = 2000
+		local playerPed = GetPlayerPed(-1)
+		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		lockChanging = true 
+		Citizen.CreateThread(function ()
+			FreezeEntityPosition(playerPed, true)
+			
+			local dict = "amb@world_human_gardener_plant@male@enter"
+			local anim = "enter"
+			RequestAnimDict(dict)
+
+			while not HasAnimDictLoaded(dict) do
+				Citizen.Wait(150)
+			end
+			TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+			Wait(time)
+			lockChanging = false 
+			TriggerEvent('skinchanger:getSkin', function(skin)
+				local clothesSkin = {
+				['mask_1'] = 0, ['mask_2'] = 0,
+				}
+				TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+			end)
+			FreezeEntityPosition(playerPed, false)
+		end)
+	else
+		exports.bf:Notification("~r~Vous êtes occupé")
+	end
 end)
 
 RegisterNetEvent('bromenu:koszulka')
 AddEventHandler('bromenu:koszulka', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		local clothesSkin = {
-		['tshirt_1'] = 15, ['tshirt_2'] = 0,
-		['torso_1'] = 15, ['torso_2'] = 0,
-		['arms'] = 15, ['arms_2'] = 0
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
-	end)
+	if not lockChanging then
+		local time = 2000
+		local playerPed = GetPlayerPed(-1)
+		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		lockChanging = true 
+		Citizen.CreateThread(function ()
+			FreezeEntityPosition(playerPed, true)
+			
+			local dict = "amb@world_human_gardener_plant@male@enter"
+			local anim = "enter"
+			RequestAnimDict(dict)
+
+			while not HasAnimDictLoaded(dict) do
+				Citizen.Wait(150)
+			end
+			TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+			Wait(time)
+			lockChanging = false 
+			TriggerEvent('skinchanger:getSkin', function(skin)
+				local clothesSkin = {
+					['tshirt_1'] = 15, ['tshirt_2'] = 0,
+					['torso_1'] = 15, ['torso_2'] = 0,
+					['arms'] = 15, ['arms_2'] = 0
+					}
+					TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+			end)
+			FreezeEntityPosition(playerPed, false)
+		end)
+	else
+		exports.bf:Notification("~r~Vous êtes occupé")
+	end
 end)
 RegisterNetEvent('bromenu:spodnie')
 AddEventHandler('bromenu:spodnie', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		local clothesSkin = {
-		['pants_1'] = 21, ['pants_2'] = 0
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
-	end)
+	if not lockChanging then
+		local time = 2000
+		local playerPed = GetPlayerPed(-1)
+		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		lockChanging = true 
+		Citizen.CreateThread(function ()
+			FreezeEntityPosition(playerPed, true)
+			
+			local dict = "amb@world_human_gardener_plant@male@enter"
+			local anim = "enter"
+			RequestAnimDict(dict)
+
+			while not HasAnimDictLoaded(dict) do
+				Citizen.Wait(150)
+			end
+			TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+			Wait(time)
+			lockChanging = false 
+			TriggerEvent('skinchanger:getSkin', function(skin)
+				local clothesSkin = {
+					['pants_1'] = 21, ['pants_2'] = 0
+					}
+					TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+			end)
+			FreezeEntityPosition(playerPed, false)
+		end)
+	else
+		exports.bf:Notification("~r~Vous êtes occupé")
+	end
 end)
 
 RegisterNetEvent('bromenu:buty')
 AddEventHandler('bromenu:buty', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		local clothesSkin = {
-		['shoes_1'] = 34, ['shoes_2'] = 0
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
-	end)
+	if not lockChanging then
+		local time = 2000
+		local playerPed = GetPlayerPed(-1)
+		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		lockChanging = true 
+		Citizen.CreateThread(function ()
+			FreezeEntityPosition(playerPed, true)
+			
+			local dict = "amb@world_human_gardener_plant@male@enter"
+			local anim = "enter"
+			RequestAnimDict(dict)
+
+			while not HasAnimDictLoaded(dict) do
+				Citizen.Wait(150)
+			end
+			TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+			Wait(time)
+			lockChanging = false 
+			TriggerEvent('skinchanger:getSkin', function(skin)
+				local clothesSkin = {
+					['shoes_1'] = 34, ['shoes_2'] = 0
+					}
+					TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+			end)
+			FreezeEntityPosition(playerPed, false)
+		end)
+	else
+		exports.bf:Notification("~r~Vous êtes occupé")
+	end
 end)
 
 RegisterNetEvent('bromenu:skin:reset')
 AddEventHandler('bromenu:skin:reset', function(skin)
-		TriggerEvent('skinchanger:loadSkin', json.decode(skin))
+	if not lockChanging then
+		local time = 2000
+		local playerPed = GetPlayerPed(-1)
+		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		lockChanging = true 
+		Citizen.CreateThread(function ()
+			FreezeEntityPosition(playerPed, true)
+			
+			local dict = "amb@world_human_gardener_plant@male@enter"
+			local anim = "enter"
+			RequestAnimDict(dict)
+
+			while not HasAnimDictLoaded(dict) do
+				Citizen.Wait(150)
+			end
+			TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+			Wait(time)
+			lockChanging = false 
+			TriggerEvent('skinchanger:loadSkin', json.decode(skin))
+			FreezeEntityPosition(playerPed, false)
+		end)
+	else
+		exports.bf:Notification("~r~Vous êtes occupé")
+	end
 end)
 
 

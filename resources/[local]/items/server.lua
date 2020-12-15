@@ -315,6 +315,10 @@ AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
           {
             ['@vehicle'] = vehicleId,
           }, function(weight)
+            MySQL.Async.fetchScalar("SELECT weight FROM `items` where id = @id",
+            {
+              ['@id'] = item,
+            }, function(newWeight)
             if weight == nil then
               weight = 0
             end
@@ -336,12 +340,13 @@ AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
                 function(affectedRows)
                   TriggerClientEvent("bf:Notification", sourceValue, "Item stocké")
                 end)
-              end)
-            else
+            end)
+          else
               TriggerClientEvent("bf:Notification", sourceValue, "~r~ Le véhicule est trop chargé")
             end
           end)
-          end
+        end)
+      end
       end)
       else
         TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez plus d'item")

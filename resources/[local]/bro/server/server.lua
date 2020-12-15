@@ -1,6 +1,6 @@
 -- Ping kicker
 -- Ping Limit
-pingLimit = 400
+pingLimit = 1000
 
 RegisterServerEvent("checkMyPingBro")
 AddEventHandler("checkMyPingBro", function()

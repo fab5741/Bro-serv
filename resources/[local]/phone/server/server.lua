@@ -115,60 +115,32 @@ AddEventHandler('phone:_internalAddMessage', function(transmitter, receiver, mes
 end)
 
 function addMessage(source, discord, phone_number, message)
-    local sourcePlayer = tonumber(source)
+    local sourcePlayer = source
+    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
     if message ~= nil then
         if phone_number == "taxi" or phone_number == "lspd" or phone_number == "lsms" then
             TriggerEvent("job:avert:all", phone_number, "Appel reçu", true)
 
             MySQL.ready(function ()
-                MySQL.Async.fetchAll("SELECT players.discord FROM players, job_grades, jobs WHERE players.job_grade = job_grades.id and job_grades.job = jobs.id and jobs.name = @job", {
-                    ['@job'] = job
-                }, function(players)
-                    for k, v in pairs(players) do
-                        MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
-                        {['@discord'] =  v},
-                        function(playerPhone)
-                            MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
-                            {
-                                ['@transmitter'] = phone_number,
-                                ['@receiver'] = playerPhone,
-                                ['@message'] = message,
-                                ['@isRead'] = 0,
-                                ['@owner'] = 0
-                            }, function(id)
-                                MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
-                                    ['@id'] = id
-                                }, function(res)
-                                    getSourceFromdiscord(v, function (osou)
-                                        if tonumber(osou) ~= nil then 
-                                            -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
-                                            TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
-                                        end
-                                    end) 
-                                end)
-                            end)
-                        end)
-                    end
                     MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
-                    {['@discord'] =  discord},
-                    function(myPhone)
+                    {
+                        ['@discord'] =  discord}, function(player)
                         MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
                         {
                             ['@transmitter'] = phone_number,
-                            ['@receiver'] = myPhone,
+                            ['@receiver'] = player,
                             ['@message'] = message,
-                            ['@isRead'] = 1,
-                            ['@owner'] = 1
+                            ['@isRead'] = 0,
+                            ['@owner'] = 0
                         }, function(id)
                             MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
                                 ['@id'] = id
                             }, function(res)   
-                                TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
+                                    TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
                             end)
                         end)
                     end)
                 end)
-            end)
         else
             MySQL.ready(function ()
                 MySQL.Async.fetchScalar("SELECT players.discord FROM players WHERE players.phone_number = @phone_number", {
@@ -211,11 +183,10 @@ function addMessage(source, discord, phone_number, message)
                                 ['@id'] = id
                             }, function(res)   
                                 TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
-                            end)
                         end)
                     end)
                 end)
-            end
+            end)
         end
     end
 end

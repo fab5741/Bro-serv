@@ -25,7 +25,7 @@ config = {
 	},
 	shops = {
 		{
-			coords = {
+			pos = {
 				x = 239.61, y = -2018.95, z = 18.31
 			},
 			pnj = {
@@ -37,7 +37,7 @@ config = {
 
 local isInRangeCollect = nil
 local isInRangeProcess = nil
-local isInRangeSelling = false
+local isInRangeSelling = nil
 
 local isCollecting = false
 local isProcessing = false
@@ -45,6 +45,7 @@ local isSelling = false
 isSellingMalette = false
 isSellingDrug = false
 nbMalettes = 0
+
 Citizen.CreateThread(function()
 	while true do
 		Wait(1000)
@@ -84,11 +85,11 @@ Citizen.CreateThread(function()
 			end
 		end
 		for kk,vv in pairs(config.shops) do
-			if GetDistanceBetweenCoords(coords, vv.x, vv.y, vv.z, true) < config.range then
+			if GetDistanceBetweenCoords(coords, vv.pos.x, vv.pos.y, vv.pos.z, true) < config.range then
 				exports.bf:Notification("PSST, tu sais pas ou trouver des malettes d'argent ?")
 				isInRangeSelling = true
 			else
-				isInRangeSelling = false
+				isInRangeSelling = nil
 			end
 		end
 	end
@@ -187,24 +188,26 @@ Citizen.CreateThread(function()
 								 maxInputLength = 10
 							}
 						)
-						TriggerEvent("bf:progressBar:create", time, "Vente en cours")
-						isSellingMalette = true 
-						Citizen.CreateThread(function ()
-							FreezeEntityPosition(playerPed)
-							
-							local dict = "amb@world_human_gardener_plant@male@enter"
-							local anim = "enter"
-							RequestAnimDict(dict)
+						if nbMalettes ~= nil and nbMalettes ~= "" and tonumber(nbMalettes) > 0 then
+							TriggerEvent("bf:progressBar:create", time, "Vente en cours")
+							isSellingMalette = true 
+							Citizen.CreateThread(function ()
+								FreezeEntityPosition(playerPed)
+								
+								local dict = "amb@world_human_gardener_plant@male@enter"
+								local anim = "enter"
+								RequestAnimDict(dict)
 
-							while not HasAnimDictLoaded(dict) do
-								Citizen.Wait(150)
-							end
-							TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+								while not HasAnimDictLoaded(dict) do
+									Citizen.Wait(150)
+								end
+								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
 
-							Wait(time)
-							isSellingMalette = false
-							TriggerServerEvent("item:get", "crime:malette:sell", 8)
-						end)
+								Wait(time)
+								isSellingMalette = false
+								TriggerServerEvent("item:get", "crime:malette:sell", 8)
+							end)
+						end
 					else
 						exports.bf:Notification("~r~Vous ne pouvez pas vendre en véhicule")
 					end
@@ -327,7 +330,7 @@ end)
 
 RegisterNetEvent('crime:malette:sell')
 AddEventHandler('crime:malette:sell', function(amount)
-	if amount >= tonumber(nbMalettes) then
+	if amount ~= nil and amount >= tonumber(nbMalettes) then
 		TriggerServerEvent("account:player:liquid:add", "", nbMalettes * 50)
 		TriggerServerEvent("items:sub", 8, nbMalettes)
 		exports.bf:Notification("Vous avez vendu pour : ~g~ "..(nbMalettes*50).."$")

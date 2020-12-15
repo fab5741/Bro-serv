@@ -54,8 +54,13 @@ AddEventHandler('job:set:me', function (grade, notif)
     local sourceValue = source
     local source = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
+    local notif = notif
     local gradee = grade
+    if notif == nil then
+        notif = ""
+    end
+    print(grade)
+    print(notif)
     MySQL.ready(function ()
         MySQL.Async.fetchAll('UPDATE players set job_grade= @grade where discord = @discord',
         {['@discord'] =  discord,

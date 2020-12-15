@@ -59,9 +59,9 @@ config.parkings = {
 		zone = "lspd",
 		locations = {
 			{
-				x=455.12176513672,
-				z=-1020.779296875,
-				y=28.307716369629
+				x=453.52593994141,
+				y=-1020.6132202148,
+				z=28.33568572998
 			}
 		}
 	},
@@ -76,6 +76,8 @@ config.parkings = {
 		}
 	},
 }
+
+lockParking = false
 
 function DeleteGivenVehicle( veh, timeoutMax )
     local timeout = 0 
@@ -127,11 +129,21 @@ Citizen.CreateThread(function()
 							text = "Stocker : " .. zone,
 							exec = {
 								callback = function()
-									TriggerServerEvent("vehicle:store", currentVehicle, zone)
-									currentVehicle = 0
-								
-									DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-									exports.bf:CloseMenu("parking-veh")
+									if not lockParking then
+										local time = 4000
+										TriggerEvent("bf:progressBar:create", time, "Stockage véhicule en cours")
+										FreezeEntityPosition(playerPed, true)
+										FreezeEntityPosition(vehicle, true)
+										lockParking = true
+										Wait(time)
+
+										TriggerServerEvent("vehicle:store", currentVehicle, zone)
+										currentVehicle = 0
+										DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
+										exports.bf:CloseMenu("parking-veh")
+										FreezeEntityPosition(playerPed, false)
+										lockParking = false
+									end
 								end
 							},
 						}

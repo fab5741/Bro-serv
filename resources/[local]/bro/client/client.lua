@@ -800,10 +800,10 @@ Citizen.CreateThread(function ()
                     shown = false
 				end
                 if GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)),  garageCoords2[1], garageCoords2[2], garageCoords2[3], true ) < 5 then
-               --     if not shown then
-                 --      exports.bf:Notification("[~g~ENTER~s~] pour nettoyé votre véhicle")
-                   --     show = true
-                   -- end
+                   if not shown then
+                       exports.bf:Notification("[~g~ENTER~s~] pour nettoyé votre véhicle")
+                        show = true
+                    end
                     if IsControlJustPressed(1, Key) then
 						TriggerServerEvent('carwash:checkmoney')
 					end

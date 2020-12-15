@@ -196,7 +196,7 @@ AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	local sourceValue = source
 	local discord = exports.bf:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod where vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id', {
+		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod, players, player_vehicle where vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id and players.discord= @discord and player_vehicle.vehicle_mod = vehicle_mod.id and player_vehicle.vehicle_mod = vehicle_mod.id', {
 			['discord'] =  discord,
 			['id'] =  id,
 		}, function(result)
@@ -254,7 +254,7 @@ end)
 AddEventHandler("vehicle:parking:store", function(id, parking, cb)
 	local sourceValue = source
 	MySQL.ready(function ()
-		MySQL.Async.insert('UPDATE `vehicle_mod` SET parking = @parking WHERE gameId = @id ', {
+		MySQL.Async.insert('UPDATE `vehicle_mod` SET parking = @parking WHERE gameId = @id', {
 			['@id'] =  id,
 			['@parking'] =  parking,
 		}, function(insert)

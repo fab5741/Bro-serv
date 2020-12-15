@@ -59,3 +59,17 @@ RegisterCommand("fight", function(source, args)
 end)
 
 
+RegisterCommand("reset", function(source, args) 
+    TriggerEvent('nicoo_charcreator:CharCreator')
+end)
+
+
+RegisterCommand("tir1", function(source, args) 
+    pos= vector3(8.6765041351318,-1093.43359375,29.797025680542)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+end)
+
+RegisterCommand("tir2", function(source, args) 
+    pos= vector3(7.8053555488586,-1096.1379394531,29.797016143799)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+end)

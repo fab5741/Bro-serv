@@ -12,7 +12,7 @@ saved = false
 controlsave_bool = false
 lockGetCar = false
 lockStoreCar = false
-
+lockChanging = false
 Citizen.CreateThread(function()
 	-- main loop
   while true do

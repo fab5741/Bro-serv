@@ -31,16 +31,6 @@ function addMenu(max, part, variante, maxVariant, isSkin)
 	for i = 0,max do
         buttons[#buttons+1] = {
             text = i,
-            exec = {
-                callback = function()
-                    if isSkin then
-                        myclothesSkin[part.."_1"] = i
-                    else
-                        mySkin[part.."_1"] = i
-                    end
-
-                end
-            },
             hover = {
                 callback = function()
                     TriggerEvent('skinchanger:getSkin', function(skin)
@@ -70,6 +60,7 @@ function addMenu(max, part, variante, maxVariant, isSkin)
 		buttons = buttons
     })
 
+    buttons = {}
     if (variante == true) then
         for i = 0,maxVariant do
             buttons[#buttons+1] = {
@@ -77,7 +68,19 @@ function addMenu(max, part, variante, maxVariant, isSkin)
                 hover = {
                     callback = function()
                         TriggerEvent('skinchanger:getSkin', function(skin)
-                            clothesSkin[part.."_2"] = i
+                            clothesSkin = myclothesSkin
+                            if isSkin then
+                                for k,v in ipairs(mySkin) do
+                                    skin[k] = v
+                                end
+                                skin[part.."_2"] = i
+                            else
+                                if part == "arms" then
+                                    clothesSkin[part] = i
+                                else
+                                    clothesSkin[part.."_2"] = i
+                                end
+                            end
                             TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
                         end)
                     end
@@ -104,7 +107,7 @@ Citizen.CreateThread(function()
                 text = "Corps",
                 openMenu = "clothes-shop-torso"
             },
-            {
+           {
                 text = "Corps (variante)",
                 openMenu = "clothes-shop-torso2"
             },
@@ -118,10 +121,6 @@ Citizen.CreateThread(function()
             },
             {
                 text = "Bras",
-                openMenu = "clothes-shop-arms"
-            },
-            {
-                text = "Bras (variante)",
                 openMenu = "clothes-shop-arms"
             },
             {
@@ -153,7 +152,7 @@ Citizen.CreateThread(function()
                 openMenu = "clothes-shop-chain"
             },
             {
-                text = "Cou (variante)",
+                 text = "Cou (variante)",
                 openMenu = "clothes-shop-chain2"
             },
             {
@@ -211,7 +210,7 @@ Citizen.CreateThread(function()
     })
     addMenu(290, "torso", true, 10, true)
     addMenu(144, "tshirt", true, 10)
-    addMenu(168, "arms", true, 10)
+    addMenu(168, "arms", false)
     addMenu(115, "pants", true, 10, true)
     addMenu(91, "shoes", true, 10)
     addMenu(148, "mask", true, 10)

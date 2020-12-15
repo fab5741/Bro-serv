@@ -125,7 +125,7 @@ end
 function RemoveWeapons()
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
         TriggerServerEvent("job:removeWeapons", GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à proximité")
@@ -135,7 +135,7 @@ end
 function ToggleCuff()
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
 		TriggerServerEvent("job:cuffGranted", GetPlayerServerId(closestPlayer))
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
@@ -145,7 +145,7 @@ end
 function Fines(amount)
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
 		Citizen.Trace("Price : "..tonumber(amount))
 		if(tonumber(amount) == -1) then
 			DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8S", "", "", "", "", "", 20)
@@ -175,7 +175,7 @@ end
 function giveWeaponLicence()
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
 		TriggerServerEvent("job:weapon:licence", closestPlayer, true)
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
@@ -193,7 +193,7 @@ function DropVehicle()
 		if DoesEntityExist(vehicleHandle) and IsEntityAVehicle(vehicleHandle) then
 			DeleteEntity(vehicleHandle)
 		else
-			exports.bf:Notification("no_veh_near_ped")
+			exports.bf:Notification("Pas de véhicule à proximité")
 		end
 	end)
 end
@@ -1096,7 +1096,7 @@ end
 function recruitClosestPlayer(job)
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
         TriggerServerEvent('job:service:recruit', job[1].id, GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1106,7 +1106,7 @@ end
 function promoteClosestPlayer()
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
         TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1118,7 +1118,7 @@ end
 function demmoteClosestPlayer()
 	local closestPlayer, dist = GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 and dist <=1 then
         TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1129,7 +1129,7 @@ end
 function fireClosestPlayer()
 	local closestPlayer, dist = GetClosestPlayer()
 
-	if closestPlayer and dist <=1 then
+	if closestPlayer ~= -1 and dist <=1 then
 		--todo
         TriggerServerEvent('job:set', GetPlayerServerId(closestPlayer), nil, "Vous avez été viré", "Vous avez viré un employé")
     else

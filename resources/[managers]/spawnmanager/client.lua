@@ -70,7 +70,6 @@ function spawnPlayerBegin(player)
         Citizen.Wait(100)
     end
     spawnPlayer(player.x,player.y, player.z, player.weapons)
-
 end
 
 RegisterNetEvent("spawn:spawn")

@@ -164,21 +164,25 @@ end
 --
 -- TP player
 --
-function tpPlayer(ped, marker, pos)
+function tpPlayer(ped, marker, pos, exact)
     if marker and DoesBlipExist(GetFirstBlipInfoId(8)) then
         pos = GetBlipInfoIdCoord(GetFirstBlipInfoId(8))
     end
 
-    for height = 1, 1000 do
-        SetPedCoordsKeepVehicle(ped, pos["x"], pos["y"], height + 0.0)
-
-        local foundGround, zPos = GetGroundZFor_3dCoord(pos["x"], pos["y"], height + 0.0)
-
-        if foundGround then
+    if exact then
+        SetPedCoordsKeepVehicle(ped, pos["x"], pos["y"], pos["z"])
+    else
+        for height = 1, 1000 do
             SetPedCoordsKeepVehicle(ped, pos["x"], pos["y"], height + 0.0)
-            break
-        end
 
-        Citizen.Wait(5)
+            local foundGround, zPos = GetGroundZFor_3dCoord(pos["x"], pos["y"], height + 0.0)
+
+            if foundGround then
+                SetPedCoordsKeepVehicle(ped, pos["x"], pos["y"], height + 0.0)
+                break
+            end
+
+            Citizen.Wait(5)
+        end
     end
 end

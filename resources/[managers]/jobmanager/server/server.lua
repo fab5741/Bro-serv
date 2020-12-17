@@ -13,6 +13,9 @@ inService = {
     },
     taxi = {
 
+    },
+    bennys = {
+        
     }
 }
 
@@ -724,3 +727,29 @@ AddEventHandler("job:repair:price", function (type, name)
         end)
     end)
 end)
+
+AddEventHandler('playerDropped', function (reason)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+
+    local isIn = isIn
+    local job = job
+    MySQL.ready(function ()
+        MySQL.Async.fetchScalar("select jobs.name from players, job_grades,jobs where jobs.id = job_grades.job and players.job_grade = job_grades.id  and discord = @discord", {
+            ['@discord'] = discord,
+        }, function(job)
+            MySQL.Async.execute('Update players SET onDuty = 0 where discord= @discord',{['@discord'] = discord},
+            function(affectedRows)
+                if affectedRows > 0 then
+                    if isIn then
+                        TriggerEvent("job:clock:set", true, sourceValue, job)
+                        TriggerClientEvent('bf:Notification', sourceValue, "Vous entrez en service")
+                    else
+                        TriggerEvent("job:clock:set", false, sourceValue, job)
+                        TriggerClientEvent('bf:Notification', sourceValue, "Vous quittez le service")
+                    end
+                end
+            end)
+        end)
+    end)
+  end)

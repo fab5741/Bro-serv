@@ -14,7 +14,7 @@ RegisterCommand("tp", function(source, args)
     if args[1] and args[2] and args[3] then
         pos = vector3(tonumber(args[1]), tonumber(args[2]), tonumber(args[3]))
     else
-        pos= vector3(239.61, -2018.95, 18.31)
+        pos= vector3(239.61, -2018.95, 19.31)
     end
     exports.bf:tpPlayer(PlayerPedId(), false, pos)
 end)
@@ -43,19 +43,19 @@ end)
 
 
 RegisterCommand("admin", function(source, args) 
-    pos= vector3(-1106.8178710938,-830.57391357422,-46.269847869873)
-    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+    pos= vector3(-1094.0128173828,-842.43450927734,-46.269840240479)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos, true)
 end)
 
 RegisterCommand("prison", function(source, args) 
     pos= vector3(1691.6459960938, 2565.0712578125,45.56489944458)
-    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos, true)
 end)
 
 
 RegisterCommand("fight", function(source, args) 
     pos= vector3(925.22357177734,-1782.4407958984,31.275489807129)
-    exports.bf:tpPlayer(PlayerPedId(), false, pos)
+    exports.bf:tpPlayer(PlayerPedId(), false, pos, true)
 end)
 
 

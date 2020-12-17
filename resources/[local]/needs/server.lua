@@ -28,6 +28,34 @@ AddEventHandler('needs:get', function(bf)
     end)
 end)
 
+RegisterNetEvent("needs:get2")
+
+-- source is global here, don't add to function
+AddEventHandler('needs:get2', function(bf, isHunger, amount)
+    local sourceValue = source
+	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    MySQL.ready(function ()
+        MySQL.Async.fetchAll('select hunger, thirst from players where discord = @discord',
+        {['@discord'] =  discord},
+        function(res)
+            hunger = res[1].hunger
+            thirst = res[1].thirst
+            if(isHunger == 1) then
+                hunger = hunger + amount
+            else
+                thirst = thirst + amount
+            end
+            if(hunger >100) then
+                hunger = 100
+            end
+            if thirst >100 then
+                thirst = 100
+            end
+            TriggerClientEvent(bf, sourceValue, hunger, thirst)
+        end)
+    end)
+end)
+
 
 
 RegisterNetEvent("needs:set")

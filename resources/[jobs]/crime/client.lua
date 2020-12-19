@@ -261,7 +261,6 @@ end
 Citizen.CreateThread(function()
 	while true do
 		Wait(15)
-		
 			local handle, ped = FindFirstPed()
 			repeat
 				if isSellingDrug then
@@ -319,7 +318,8 @@ function DrawText3Ds(x, y, z, text)
 end
 RegisterNetEvent('crime:drug:poucave')
 AddEventHandler('crime:drug:poucave', function(posx, posy, posz)
-	TriggerServerEvent('phone:startCall', 'lspd', "deal en cours", { x = posx, y = posy, z = posz })
+	--TriggerServerEvent('phone:startCall', 'lspd', "deal en cours", { x = posx, y = posy, z = posz })
+	TriggerServerEvent("job:avert:all", "lspd", "Deal en cours", true, { x = posx, y = posy, z = posz })
 end)
 RegisterNetEvent('crime:drug:sell')
 AddEventHandler('crime:drug:sell', function(price)
@@ -340,5 +340,15 @@ AddEventHandler('crime:malette:sell', function(amount)
 end)
 
 
+RegisterNetEvent('crime:drug:sell:start')
+AddEventHandler('crime:drug:sell:start', function()
+	isSellingDrug = true
+	exports.bf:Notification("Revente de drogue lancée")
+end)
 
 
+RegisterNetEvent('crime:drug:sell:stop')
+AddEventHandler('crime:drug:sell:stop', function()
+	isSellingDrug = false
+	exports.bf:Notification("Revente de drogue stopée")
+end)

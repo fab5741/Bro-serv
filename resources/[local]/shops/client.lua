@@ -189,7 +189,7 @@ function robNpc(targetPed)
 				TriggerServerEvent("items:add", 8, nb)
 				exports.bf:Notification('Valises d\'argent : +~g~'..nb)
 			else
-				exports.bf:Notification('Vous vous êtes trop éloigné')
+				exports.bf:Notification('~r~Vous vous êtes trop éloigné')
 				robbedRecently = false
 				TriggerEvent("bf:progressBar:delete")
 			end
@@ -210,15 +210,15 @@ Citizen.CreateThread(function()
 				if IsPedArmed(playerPed, 1) or IsPedArmed(playerPed, 4) then
 					if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
 						if robbedRecently then
-							exports.bf:Notification('Trop rapide !')
+							exports.bf:Notification('~r~Trop rapide !')
 						elseif IsPedDeadOrDying(targetPed, true) then
-							exports.bf:Notification("L'épicier est mort")
+							exports.bf:Notification("~r~L'épicier est mort")
 						else
 							robNpc(targetPed)
 						end
 					end
 				else
-					exports.bf:Notification("Vous devez être armé")
+					exports.bf:Notification("~r~Vous devez être armé")
 				end
 			end
         end

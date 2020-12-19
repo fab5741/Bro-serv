@@ -329,7 +329,6 @@ function spawnACar(v, new, tpIn)
 			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), false, true, v.heading)
 		end
 	end
-	print(vehicle)
 	TriggerServerEvent("vehicle:saveId", vehicle, v.gameId)
 	currentVehicle = vehicle
 
@@ -413,8 +412,6 @@ end)
 
 AddEventHandler("vehicle:refresh", function(vehicles)
 	for k,v in pairs(vehicles) do
-		print(v.name)
-		print(GetEntityCoords(v.gameId))
         local ped = GetPlayerPed(-1)
 		local primaryColour, secondaryColour = GetVehicleColours(v.gameId)
 		local bodyHealth = GetVehicleBodyHealth(v.gameId)
@@ -455,4 +452,17 @@ AddEventHandler("vehicle:mods:refresh", function(vehicle, mods)
 		end
 	end
 
+end)
+
+RegisterNetEvent("vehicle:lock")
+AddEventHandler('vehicle:lock', function(vehicle)
+    local islocked = GetVehicleDoorLockStatus(vehicle)
+    -- test if its my vehicle
+    if (islocked == 1)then
+        SetVehicleDoorsLocked(vehicle, 2)
+        exports.bf:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+    else
+        SetVehicleDoorsLocked(vehicle,1)
+        exports.bf:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+    end
 end)

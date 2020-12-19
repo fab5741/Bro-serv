@@ -33,7 +33,6 @@ function GetClosestPlayer()
 	return closestPlayer, closestDistance
 end
 
-
 RegisterNetEvent('bf:open')
 
 AddEventHandler("bf:open", function(job) 
@@ -241,6 +240,17 @@ function GetClosestPlayer()
 	return closestPlayer, closestDistance
 end
 
+function giveToPlayer()
+	local closestPlayerPed, dist = GetClosestPlayer()
+	print(closestPlayerPed)
+	print(dist)
+	if closestPlayerPed ~= -1 and dist <=1 then
+		TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(closestPlayerPed))
+	else 
+		exports.bf:Notification("Pas de joueur à portée")
+	end
+end
+
 
 RegisterNetEvent('bf:items')
 
@@ -267,16 +277,11 @@ AddEventHandler("bf:items", function(inventory)
 						text = "Donner",
 						exec = {
 							callback = function() 
-								local player, dist = GetClosestPlayer()
-								if player ~= -1 and dist < 10  then
-									TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(player))
-								else 
-									exports.bf:Notification("Pas de joueur à portée")
-								end
+								giveToPlayer()
 							end
 						},
 					}
-					buttons[3] =     {
+				buttons[3] =     {
 						text = "Stocker vehicle",
 						exec = {
 							callback = function() 
@@ -329,6 +334,26 @@ AddEventHandler("bf:items", function(inventory)
 							end
 						},
 					}
+					if v.item == 7 then
+						buttons[4] =     {
+							text = "Commencer la revente",
+							exec = {
+								callback = function() 
+									TriggerEvent("crime:drug:sell:start")
+									exports.bf:CloseMenu("bromenu")
+								end
+							},
+						}
+						buttons[5] =     {
+							text = "Finir la revente",
+							exec = {
+								callback = function() 
+									TriggerEvent("crime:drug:sell:stop")
+									exports.bf:CloseMenu("bromenu")
+								end
+							},
+						}
+					end
 					exports.bf:SetMenuButtons("bro-items-item", buttons)
 					exports.bf:NextMenu("bro-items-item")
 				end
@@ -627,3 +652,4 @@ AddEventHandler('onResourceStop', function(resourceName)
 	exports.bf:RemoveMenu("bro-vehicles")
 	exports.bf:RemoveMenu("bro-clothes")
 end)
+

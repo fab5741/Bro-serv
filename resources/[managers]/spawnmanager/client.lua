@@ -19,6 +19,8 @@ Citizen.CreateThread(function()
         if(IsPedDeadOrDying(GetPlayerPed(-1)) and not isDead)then
             TriggerEvent("player:dead")
         end
+        Citizen.Wait(8000)
+        TriggerEvent("player:saveCoords")
     end
 end)
 
@@ -46,15 +48,7 @@ AddEventHandler('player:saveCoords', function ()
             weapons[#weapons+1] = v
         end
     end
-    TriggerServerEvent("player:saveCoordsServer", GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons))
-end)
-
--- boucle pour sauvegarder toutes les X s
-Citizen.CreateThread(function()
-    while true do
-        Wait(10000)
-        TriggerEvent("player:saveCoords")
-    end
+    TriggerServerEvent("player:saveCoordsServer", GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons), GetEntityHealth(GetPlayerPed(-1)))
 end)
 
 function spawnPlayerBegin(player)
@@ -69,7 +63,7 @@ function spawnPlayerBegin(player)
         end
         Citizen.Wait(100)
     end
-    spawnPlayer(player.x,player.y, player.z, player.weapons)
+    spawnPlayer(player.x,player.y, player.z, player.weapons,  player.health)
 end
 
 RegisterNetEvent("spawn:spawn")

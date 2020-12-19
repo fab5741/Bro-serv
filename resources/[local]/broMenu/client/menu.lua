@@ -91,6 +91,7 @@ exports.bf:AddMenu("bro-wallet-character", {
 
 
 
+
 exports.bf:AddMenu("bro-vehicle", {
     title = "Véhicule",
     position = 1,
@@ -105,17 +106,17 @@ exports.bf:AddMenu("bro-vehicle", {
             
                     local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
                     local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-                    local islocked = GetVehicleDoorLockStatus(vehicle)
+                    local vehicle2 = GetVehiclePedIsIn(player, false)
                         if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-                                if (islocked == 1)then
-                                SetVehicleDoorsLocked(vehicle, 2)
-                                exports.bf:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
-                                else
-                                SetVehicleDoorsLocked(vehicle,1)
-                                exports.bf:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
-                                end
+                                TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
+                        elseif DoesEntityExist(vehicle2) and IsEntityAVehicle(vehicle2)  then
+                            if GetPedInVehicleSeat(vehicle2, -1) == player then
+                                TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle2)
+                            else
+                                exports.bf:Notification("~r~Vous ne conduisez pas") 
+                            end
                         else
-                            exports.bf:Notification("~r~Pas de voiture sauvegardée")
+                            exports.bf:Notification("~r~Pas de voiture à portée")
                         end
                 end
             }
@@ -125,9 +126,22 @@ exports.bf:AddMenu("bro-vehicle", {
             exec = {
                 callback = function()
                     coords = GetEntityCoords(GetPlayerPed(-1), true)
-                    vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0)
-                    TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
+                    local player = GetPlayerPed(-1)
+                    local pos = GetEntityCoords(PlayerPedId())
+                    local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+                    local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+            
+                    local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+                    local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+                    local islocked = GetVehicleDoorLockStatus(vehicle)
+                    if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+                        if (islocked == 1)then
+                        TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
+                    end
+                else
+                    exports.bf:Notification("~r~Pas de voiture")
                 end
+        end
             }
         },
         {

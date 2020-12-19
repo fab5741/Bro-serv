@@ -10,7 +10,8 @@ dependencies {
     'account',
     'items',
     'vehicles',
-    'jobManager'
+    'jobManager',
+    'crime'
 }
 
 client_script  {

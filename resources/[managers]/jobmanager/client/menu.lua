@@ -273,7 +273,15 @@ function menus()
 		position = 1,
 		buttons = {
 			{
-				text = "SOIN",
+				text = "Soigner",
+				exec = {
+					callback = function()
+						healClosestPlayer()
+					end
+				},
+			},
+			{
+				text = "Réanimer",
 				exec = {
 					callback = function()
 						reviveClosestPlayer()

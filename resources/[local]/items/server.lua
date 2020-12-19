@@ -256,31 +256,36 @@ AddEventHandler("item:vehicle:get", function (vehicle, item, amount)
           {
             ['@player'] = player,
           }, function(weight)
-            if weight == nil then
-              weight = 0
-            end
-            weight = (newWeight*amount)+weight
-            if weight <= maxWeight then
-              MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
-              {
-                ['id'] = playerId,
-                ['type'] = item,
-                ['amount'] = amount,
-              },
-              function(affectedRows)
-                MySQL.Async.execute('UPDATE `vehicle_item` SET `amount` = amount-@amount WHERE  vehicle_mod = @vehicle and item = @item',
+            MySQL.Async.fetchScalar("SELECT weight FROM `items`  WHERE items.id = @item",
+            {
+              ['@item'] = item,
+            }, function(newWeight)
+              if weight == nil then
+                weight = 0
+              end
+              weight = (newWeight*amount)+weight
+              if weight <= maxWeight then
+                MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
                 {
-                  ['vehicle'] = vehicle,
-                  ['item'] = item,
+                  ['id'] = playerId,
+                  ['type'] = item,
                   ['amount'] = amount,
                 },
                 function(affectedRows)
-                  TriggerClientEvent("bf:Notification", sourceValue, "Item récupéré")
+                  MySQL.Async.execute('UPDATE `vehicle_item` SET `amount` = amount-@amount WHERE  vehicle_mod = @vehicle and item = @item',
+                  {
+                    ['vehicle'] = vehicle,
+                    ['item'] = item,
+                    ['amount'] = amount,
+                  },
+                  function(affectedRows)
+                    TriggerClientEvent("bf:Notification", sourceValue, "Item récupéré")
+                  end)
                 end)
-              end)
             else
               TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
             end
+          end)
           end)
       end)
       else

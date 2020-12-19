@@ -34,24 +34,80 @@ function GetClosestPlayer()
 end
 
 -- LSMS Revive people
-function reviveClosestPlayer(closestPlayer)
+function reviveClosestPlayer()
+	exports.bf:CloseMenu("lsms")
+	local playerPed = GetPlayerPed(-1)
 	local closestPlayerPed, dist = GetClosestPlayer()
 
-    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
-        local playerPed = PlayerPedId()
-        local lib, anim = 'mini@cpr@char_a@cpr_str', 'cpr_pumpchest'
-        exports.bf:Notification("Réanimation en cours")
-        for i=1, 15 do
-            Citizen.Wait(900)
+    if closestPlayerPed ~= -1 and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
+		if lockHeal == false then
+			if not  IsPedInAnyVehicle(playerPed, false) then
+				local time = 15000
+				TriggerEvent("bf:progressBar:create", time, "Réanimation en cours")
+				lockHeal = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed, true)
+					
+					local dict = "mini@cpr@char_a@cpr_str"
+					local anim = "cpr_pumpchest"
+					RequestAnimDict(dict)
 
-            if i % 15 == 0 then
-                exports.bf:Notification("Réanimation en cours "..i.."/15")
-            end
-			RequestAnimDict(lib)
-			TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
-        end
-		TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayerPed))
-		exports.bf:CloseMenu("lsms")
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockHeal = false
+					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayerPed))
+					FreezeEntityPosition(playerPed, false)
+				end)
+			else
+				exports.bf:Notification("~r~Vous ne pouvez pas réanimer en véhicule")
+			end
+		else 
+			exports.bf:Notification("~r~Rénimation en cours")
+		end
+    else
+        exports.bf:Notification("Pas de joueur à portée")
+    end
+end
+
+function healClosestPlayer()
+	exports.bf:CloseMenu("lsms")
+	local playerPed = GetPlayerPed(-1)
+	local closestPlayerPed, dist = GetClosestPlayer()
+    if closestPlayerPed ~= -1 and dist <=1 then
+		if lockHeal == false then
+			if not  IsPedInAnyVehicle(playerPed, false) then
+				local time = 5000
+				TriggerEvent("bf:progressBar:create", time, "Soin en cours")
+				lockHeal = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed, true)
+					
+					local dict = "mini@cpr@char_a@cpr_str"
+					local anim = "cpr_pumpchest"
+					RequestAnimDict(dict)
+
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockHeal = false
+					print("heal")
+					print(closestPlayerPed)
+					SetEntityHealth(closestPlayerPed, GetPedMaxHealth(closestPlayerPed))
+					FreezeEntityPosition(playerPed, false)
+				end)
+			else
+				exports.bf:Notification("~r~Vous ne pouvez pas soigner en véhicule")
+			end
+		else 
+			exports.bf:Notification("~r~Soin en cours")
+		end
     else
         exports.bf:Notification("Pas de joueur à portée")
     end

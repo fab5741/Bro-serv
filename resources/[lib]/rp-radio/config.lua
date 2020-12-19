@@ -30,11 +30,11 @@ radioConfig = {
         },
         Broadcast = {
             Name = "INPUT_VEH_PUSHBIKE_SPRINT", -- Control name
-            Key = 137, -- Caps Lock
+            Key = 37, -- Caps Lock
         },
         ToggleClicks = { -- Toggle radio click sounds
             Name = "INPUT_SELECT_WEAPON", -- Control name
-            Key = 37, -- Tab
+            Key = 137, -- Tab
         }
     },
     Frequency = {

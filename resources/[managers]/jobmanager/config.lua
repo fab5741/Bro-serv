@@ -15,7 +15,7 @@ config = {
                     sprite = 496,
                     action = "collect",
                     items = {
-                       {name="wheat", label="Blé", amount=1, type="1"},
+                       {name="wheat", label="Blé", amount=5, type="1"},
                     }
                 }
             },
@@ -25,7 +25,7 @@ config = {
                     sprite = 502,
                     action = "process",
                     items = {
-                        {name="wheat", label="Blé -> Farine", amount=1, type="1", to="2", amountTo=1},
+                        {name="wheat", label="Blé -> Farine", amount=5, type="1", to="2", amountTo=1},
                     }
                 },
                 {
@@ -33,7 +33,7 @@ config = {
                     sprite = 503,
                     action = "process",
                     items = {
-                        {name="flour", label="Farine -> Bro'Bab", amount=1, type="2", to="3", amountTo=1},
+                        {name="flour", label="Farine -> Bro'Bab", amount=5, type="2", to="3", amountTo=1},
                     }
                 }
              },
@@ -215,7 +215,7 @@ config = {
                     coords = vector3(-1819.93,2134.48,123.8),
                     sprite = 502,
                     items = {
-                        {name="Raisin", label="Raisin", amount="1", type="18"},
+                        {name="Raisin", label="Raisin", amount="5", type="18"},
                      }
                 }
             },
@@ -225,7 +225,7 @@ config = {
 				sprite = 503,
                 action = "process",
                 items = {
-                    {name="Raisin", label="Raisin", amount="1", type="18", to="19", amountTo="1"},
+                    {name="Raisin", label="Raisin", amount="5", type="18", to="19", amountTo="1"},
                 }
             }
             },

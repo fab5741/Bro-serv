@@ -104,6 +104,46 @@ Citizen.CreateThread(function()
         position = 1,
         buttons = {
             {
+                text = "Reset",
+                openMenu = "reset",
+                exec = {
+                    callback = function()
+                        TriggerEvent('skinchanger:getSkin', function(skin)
+                            local price  = 10
+                            for k,v in ipairs(mySkin) do
+                                skin[k] = v
+                            end
+                            skin["torso_1"] = 0
+                            skin["torso_2"] = 0
+                            skin["t_shirt_1"] = 15
+                            skin["t_shirt_2"] = 0
+                            skin["arms"] = 0
+                            skin["pants_1"] = 0
+                            skin["pants_2"] = 0 
+                            skin["shoes_1"] = 1
+                            skin["shoes_2"] = 0 
+                            skin["mask_1"] = 0
+                            skin["mask_2"] = 0 
+                            skin["chain_1"] = 0
+                            skin["chain_2"] = 0 
+                            skin["helmet_1"] = 8
+                            skin["helmet_2"] = 0 
+                            skin["glasses_1"] = 0
+                            skin["glasses_2"] = 0 
+                            skin["bracelets_1"] = -1
+                            skin["brecelets_2"] = -1
+                            skin["watches_1"] = -1
+                            skin["watches_2"] = -1
+                            clothesSkin = {}
+                            mySkin = {}
+                            TriggerServerEvent('skin:save', skin)
+                            TriggerServerEvent('skin:clothes:save', clothesSkin)
+                            TriggerEvent('skinchanger:loadClothes', skin, myclothesSkin)
+                        end)
+                    end
+                },
+            },
+            {
                 text = "Corps",
                 openMenu = "clothes-shop-torso"
             },
@@ -172,14 +212,6 @@ Citizen.CreateThread(function()
                 openMenu = "clothes-shop-glasses2"
             },
             {
-                text = "Montres",
-                openMenu = "clothes-shop-glasses"
-            },
-            {
-                text = "Montres (variante)",
-                openMenu = "clothes-shop-glasses2"
-            },
-            {
                 text = "Bracelets",
                 openMenu = "clothes-shop-bracelets"
             },
@@ -202,7 +234,6 @@ Citizen.CreateThread(function()
                             TriggerServerEvent('skin:save', skin)
                             TriggerServerEvent('skin:clothes:save', clothesSkin)
                         end)
-
                     end
                 },
             },

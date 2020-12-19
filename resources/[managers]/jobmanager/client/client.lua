@@ -16,7 +16,7 @@ tva = 0.20
 lockCollect = false
 lockRepare = false
 nbSold = 0
-
+lockHeal = false
 -- police vars
 handCuffed = false
 

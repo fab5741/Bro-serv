@@ -552,7 +552,7 @@ AddEventHandler('job:facture', function(amount, motif, job, sender)
 			lockAskingFacture = true
 			local notifReceivedAt = GetGameTimer()
 			exports.bf:AdvancedNotification({
-				text = "Facture de " .. amount .. "$. Y pour accepter",
+				text = "Facture de " .. amount .. "$. Y pour accepter, N pour refuser",
 				title = job,
 				icon = "char_AGENT14"
 			})

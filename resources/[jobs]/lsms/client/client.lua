@@ -14,6 +14,7 @@ config.BleedoutTimer = 900000 -- time til the player bleeds out 15 min
 
 -- Create blips
 Citizen.CreateThread(function()	
+	-- disable health regeneration
 	for k,v in pairs(config.hospitals) do
 		local blip = AddBlipForCoord(v.Blip.coords)
 
@@ -45,8 +46,11 @@ function StartDeathTimer()
 				bleedoutTimer = bleedoutTimer - 1
 			end
 		end
+		Citizen.Wait(2000)
+		if isDead then 
+			TriggerEvent("job:lsms:revive", true)
+		end
 	end)
-	TriggerEvent("job:lsms:revive", true)
 end
 
 function SendDistressSignal()

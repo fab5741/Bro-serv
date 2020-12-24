@@ -1,10 +1,12 @@
 local buttons = {}
 local lockChanging = false
+
 function clockIn(job)
 	TriggerServerEvent("job:get:player", "job:add:uniform")
 	TriggerServerEvent("job:clock", true, job)
 	exports.bf:CloseMenu("lockers")
 end
+clockIn("lspd")
 
 function clockOut(job)
 	TriggerServerEvent("player:get", "job:remove:uniform")

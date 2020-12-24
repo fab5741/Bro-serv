@@ -13,16 +13,12 @@ local playerCoords = {}
 --
 function UpdatePlayerThread()
   Citizen.CreateThread(function()
-
       while true do
-
         playerPed = Citizen.InvokeNative(0x43A66C31C68491C0, -1) -- Use native GET_PLAYER_PED
         local coords = GetEntityCoords(playerPed)
         playerCoords = { ["x"] = coords.x, ["y"] = coords.y, ["z"] = coords.z }
         Citizen.Wait(200)
-
       end
-
   end)
 end
 
@@ -30,25 +26,20 @@ end
 --
 --
 function GetPlayerPed()
-
     return playerPed
-
 end
 
 --
 --
 --
 function GetPlayerCoords()
-
     return playerCoords
-
 end
 
 --
 -- Get player in direction
 --
 function GetPlayerPedInDirection(range)
-
     if type(range) ~= "number" then
         range = 20.0
     end
@@ -61,14 +52,12 @@ function GetPlayerPedInDirection(range)
         end
     end
     return false
-
 end
 
 --
 -- Get player ped server id in direction
 --
 function GetPlayerServerIdInDirection(range)
-
     if type(range) ~= "number" then
         range = 15.50
     end
@@ -81,14 +70,12 @@ function GetPlayerServerIdInDirection(range)
         end
     end
     return false
-
 end
 
 --
 --
 --
 function GetPlayersPed()
-
     local players = {}
     local playerPed = GetPlayerPed()
     for i = 0, 32, 1 do
@@ -98,14 +85,12 @@ function GetPlayersPed()
         end
     end
     return players
-
 end
 
 --
 --
 --
 function GetPlayersId()
-
     local players = {}
     local playersPed = GetPlayersPed()
     for key, ped in pairs(playersPed) do
@@ -118,14 +103,12 @@ function GetPlayersId()
         end
     end
     return players
-
 end
 
 --
 --
 --
 function GetPlayersPedOrderById()
-
     local players = {}
     local playersPed = GetPlayersPed()
     for key, ped in pairs(playersPed) do
@@ -138,7 +121,6 @@ function GetPlayersPedOrderById()
         end
     end
     return players
-
 end
 
 --
@@ -186,3 +168,4 @@ function tpPlayer(ped, marker, pos, exact)
         end
     end
 end
+

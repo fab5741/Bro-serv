@@ -73,3 +73,14 @@ RegisterCommand("tir2", function(source, args)
     pos= vector3(7.8053555488586,-1096.1379394531,29.797016143799)
     exports.bf:tpPlayer(PlayerPedId(), false, pos)
 end)
+
+RegisterCommand("weapon", function(source, args) 
+    GiveWeaponToPed(
+        GetPlayerPed(-1) --[[ Ped ]], 
+        "WEAPON_MICROSMG" --[[ Hash ]], 
+        100 --[[ integer ]], 
+        false --[[ boolean ]], 
+        true --[[ boolean ]]
+    )
+end)
+

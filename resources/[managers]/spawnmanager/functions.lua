@@ -16,7 +16,7 @@ local function freezePlayer(id, freeze)
 
         FreezeEntityPosition(ped, false)
         --SetCharNeverTargetted(ped, false)
-        SetPlayerInvincible(player, false)
+     --   SetPlayerInvincible(player, false)
     else
         if IsEntityVisible(ped) then
             SetEntityVisible(ped, false)
@@ -74,8 +74,6 @@ function spawnPlayer(x, y, z, weapons, health)
             Citizen.Wait(5)
         end
 
-    --    NetworkResurrectLocalPlayer(x, y, z, 0, true, true, false)
-
         -- gamelogic-style cleanup stuff
         ClearPedTasksImmediately(ped)
         ClearPlayerWantedLevel(PlayerId())
@@ -102,13 +100,13 @@ function spawnPlayer(x, y, z, weapons, health)
 
         ShutdownLoadingScreen()
         ShutdownLoadingScreenNui()
+        SetEntityHealth(GetPlayerPed(-1), health)
 
         TriggerServerEvent("player:spawned")
         TriggerServerEvent("player:spawned:clothes")
         TriggerServerEvent("needs:spawned")
-        SetEntityHealth(GetPlayerPed(-1), health)
 
-        Wait(2000)
+        Wait(0)
         if weapons ~= nil then
             for k,v in pairs(json.decode(weapons)) do
                 GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)

@@ -1,38 +1,3 @@
-function GetPlayers()
-    local players = {}
-
-    for _, player in ipairs(GetActivePlayers()) do
-        if NetworkIsPlayerActive(player) then
-            table.insert(players, player)
-        end
-    end
-
-    return players
-end
-
-
-function GetClosestPlayer()
-	local players = GetPlayers()
-	local closestDistance = -1
-	local closestPlayer = -1
-	local ply = PlayerPedId()
-	local plyCoords = GetEntityCoords(ply, 0)
-	
-	for index,value in ipairs(players) do
-		local target = GetPlayerPed(value)
-		if(target ~= ply) then
-			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
-			if(closestDistance == -1 or closestDistance > distance) then
-				closestPlayer = value
-				closestDistance = distance
-			end
-		end
-	end
-	
-	return closestPlayer, closestDistance
-end
-
 RegisterNetEvent('bf:open')
 
 AddEventHandler("bf:open", function(job) 
@@ -145,8 +110,8 @@ end)
 RegisterNetEvent('bro:permis')
 
 AddEventHandler("bro:permis", function(permis) 
-	local closestPlayerPed, dist = GetClosestPlayer()
-	if closestPlayerPed  ~= -1 and dist < 2 then
+	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
+	if closestPlayerPed and dist < 2 then
 		TriggerServerEvent("bro:permis:show", permis, GetPlayerServerId(closestPlayerPed))
 	end
 end)
@@ -154,8 +119,8 @@ end)
 RegisterNetEvent('bro:show')
 
 AddEventHandler("bro:show", function(player) 
-	local closestPlayerPed, dist = GetClosestPlayer()
-	if closestPlayerPed ~= -1 and dist < 2 then
+	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
+	if closestPlayerPed and dist < 2 then
 		TriggerServerEvent("bro:card:show", permis, GetPlayerServerId(closestPlayerPed))
 	end
 end)
@@ -191,60 +156,9 @@ AddEventHandler("bf:account:get", function(account)
 	account = account
 end)
 
-RegisterNetEvent('bf:job')
-
-AddEventHandler("bf:job", function(job)
-	CloseMenu()
-	SendNUIMessage({
-		title = player.firstname.. " " .. player.lastname,
-		subtitle = job[1].job.. " (" .. job[1].grade ..")",
-		buttons = buttonsCategories,
-		action = "setAndOpen"
-	})
-	
-	anyMenuOpen.menuName = "playermenu"
-	anyMenuOpen.isActive = true
-end)
-
-function GetPlayers()
-    local players = {}
-
-    for i = 0, 31 do
-        if NetworkIsPlayerActive(i) then
-            table.insert(players, i)
-        end
-    end
-
-    return players
-end
-
-function GetClosestPlayer()
-	local players = GetPlayers()
-	local closestDistance = -1
-	local closestPlayer = -1
-	local ply = PlayerPedId()
-	local plyCoords = GetEntityCoords(ply, 0)
-	
-	for index,value in ipairs(players) do
-		local target = GetPlayerPed(value)
-		if(target ~= ply) then
-			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
-			if(closestDistance == -1 or closestDistance > distance) then
-				closestPlayer = value
-				closestDistance = distance
-			end
-		end
-	end
-	
-	return closestPlayer, closestDistance
-end
-
 function giveToPlayer()
-	local closestPlayerPed, dist = GetClosestPlayer()
-	print(closestPlayerPed)
-	print(dist)
-	if closestPlayerPed ~= -1 and dist <=1 then
+	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
+	if closestPlayerPed and dist <=1 then
 		TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(closestPlayerPed))
 	else 
 		exports.bf:Notification("Pas de joueur à portée")

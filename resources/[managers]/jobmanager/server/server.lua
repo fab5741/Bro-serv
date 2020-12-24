@@ -357,8 +357,19 @@ AddEventHandler("job:avert:all", function (job, message, silent, pos)
         for k,v  in pairs (inService[job]) do
             if pos == true then
                 TriggerClientEvent("taxi:client:show", v, sourceValue)
+            elseif pos ~= nil then
+                TriggerClientEvent('bf:Notification', v, message)
+                TriggerClientEvent('phone:receiveMessage', v, {
+                        transmitter = "lspd",
+                        receiver = "mynumber",
+                        isRead= 1,
+                        owner= 1,
+                        message = message.." "..pos
+                    }
+                )
+            else
+                TriggerClientEvent('bf:Notification', v, message)
             end
-            TriggerClientEvent('bf:Notification', v, message)
         end
         if not silent then
             TriggerClientEvent('bf:Notification', sourceValue, "Votre appel à été émis pour le ~b~(".. job.. ")")

@@ -923,7 +923,6 @@ function customMenuRemove()
 	exports.bf:RemoveMenu("custom")
 	exports.bf:RemoveMenu("custom-paint1")
 	exports.bf:RemoveMenu("custom-paint2")
-	
 
 	for i = 1,2 do
 		removeMenuPaint(75, 0, i)	
@@ -942,9 +941,6 @@ function customMenuRemove()
 	removeMenuMod(23)
 	removeMenuMod(50)
 end
-
-
-
 
 function addMenuPaint(max, type, nb) 
 	buttons = {}

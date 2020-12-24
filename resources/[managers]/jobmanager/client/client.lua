@@ -2,11 +2,6 @@ job = {
 	job = "Chomeur",
 	grade = "Chomeur"
 }
-
-anyMenuOpen = {
-	menuName = "",
-	isActive = false
-}
 spawn = vector3(0,0,0)
 heading = 0
 avert = "LSPD"
@@ -31,6 +26,7 @@ AddEventHandler("job:get", function(job)
 	end)
 	refresh(job)
 end)
+
 -- open menu loop
 Citizen.CreateThread(function()
 	

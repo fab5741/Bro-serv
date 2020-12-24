@@ -1,83 +1,29 @@
-function GetPlayers()
-    local players = {}
 
-    for _, player in ipairs(GetActivePlayers()) do
-        if NetworkIsPlayerActive(player) then
-            table.insert(players, player)
-        end
-    end
-
-    return players
-end
-
-
-function GetClosestPlayer()
-	local players = GetPlayers()
-	local closestDistance = -1
-	local closestPlayer = -1
-	local ply = PlayerPedId()
-	local plyCoords = GetEntityCoords(ply, 0)
-	
-	for index,value in ipairs(players) do
-		local target = GetPlayerPed(value)
-		if(target ~= ply) then
-			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
-			if(closestDistance == -1 or closestDistance > distance) then
-				closestPlayer = value
-				closestDistance = distance
-			end
-		end
-	end
-	
-	return closestPlayer, closestDistance
-end
 
 -- LSMS Revive people
 function reviveClosestPlayer()
 	exports.bf:CloseMenu("lsms")
 	local playerPed = GetPlayerPed(-1)
-	local closestPlayerPed, dist = GetClosestPlayer()
-
-    if closestPlayerPed ~= -1 and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
-		if lockHeal == false then
+	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
+   -- if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
 			if not  IsPedInAnyVehicle(playerPed, false) then
-				local time = 15000
-				TriggerEvent("bf:progressBar:create", time, "Réanimation en cours")
-				lockHeal = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed, true)
-					
-					local dict = "mini@cpr@char_a@cpr_str"
-					local anim = "cpr_pumpchest"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockHeal = false
-					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayerPed))
-					FreezeEntityPosition(playerPed, false)
+				exports.bro_core:actionPlayer(15000, "Réanimation en cours", "mini@cpr@char_a@cpr_str", "cpr_pumpchest",
+				function()
+					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(playerPed))
 				end)
 			else
 				exports.bf:Notification("~r~Vous ne pouvez pas réanimer en véhicule")
 			end
-		else 
-			exports.bf:Notification("~r~Rénimation en cours")
-		end
-    else
-        exports.bf:Notification("Pas de joueur à portée")
-    end
+--    else
+	    --exports.bf:Notification("Pas de joueur mourrant à portée")
+ --   end
 end
 
 function healClosestPlayer()
 	exports.bf:CloseMenu("lsms")
 	local playerPed = GetPlayerPed(-1)
-	local closestPlayerPed, dist = GetClosestPlayer()
-    if closestPlayerPed ~= -1 and dist <=1 then
+	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
+    if closestPlayerPed  and dist <=1 then
 		if lockHeal == false then
 			if not  IsPedInAnyVehicle(playerPed, false) then
 				local time = 5000
@@ -179,9 +125,9 @@ function CancelEmote()
 end
 
 function RemoveWeapons()
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer and dist <=1 then
         TriggerServerEvent("job:removeWeapons", GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à proximité")
@@ -189,9 +135,9 @@ function RemoveWeapons()
 end
 
 function ToggleCuff()
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer  and dist <=1 then
 		TriggerServerEvent("job:cuffGranted", GetPlayerServerId(closestPlayer))
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
@@ -199,9 +145,9 @@ function ToggleCuff()
 end
 
 function Fines(amount)
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer and dist <=1 then
 		Citizen.Trace("Price : "..tonumber(amount))
 		if(tonumber(amount) == -1) then
 			DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8S", "", "", "", "", "", 20)
@@ -229,9 +175,9 @@ end
 
 
 function giveWeaponLicence()
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer  and dist <=1 then
 		TriggerServerEvent("job:weapon:licence", closestPlayer, true)
 	else
 		exports.bf:Notification("Pas de joueur à proximité")
@@ -1150,9 +1096,9 @@ end
 
 -- service management
 function recruitClosestPlayer(job)
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer and dist <=1 then
         TriggerServerEvent('job:service:recruit', job[1].id, GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1160,9 +1106,9 @@ function recruitClosestPlayer(job)
 end
 
 function promoteClosestPlayer()
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer  and dist <=1 then
         TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1172,9 +1118,9 @@ end
 
 
 function demmoteClosestPlayer()
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer ~= -1 and dist <=1 then
+    if closestPlayer and dist <=1 then
         TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
     else
         exports.bf:Notification("Pas de joueur à portée")
@@ -1183,9 +1129,9 @@ end
 
 
 function fireClosestPlayer()
-	local closestPlayer, dist = GetClosestPlayer()
+	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer ~= -1 and dist <=1 then
+	if closestPlayer and dist <=1 then
 		--todo
         TriggerServerEvent('job:set', GetPlayerServerId(closestPlayer), nil, "Vous avez été viré", "Vous avez viré un employé")
     else

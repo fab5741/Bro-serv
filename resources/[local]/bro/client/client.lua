@@ -364,9 +364,9 @@ Citizen.CreateThread(function()
 end)
 
 Sit = function(wheelchairObject)
-	local closestPlayer, closestPlayerDist = GetClosestPlayer()
+	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer ~= nil and closestPlayerDist <= 1.5 then
+	if closestPlayer and closestPlayerDist <= 1.5 then
 		if IsEntityPlayingAnim(GetPlayerPed(closestPlayer), 'missfinale_c2leadinoutfin_c_int', '_leadin_loop2_lester', 3) then
 			ShowNotification("Somebody is already using the wheelchair!")
 			return
@@ -427,9 +427,9 @@ Sit = function(wheelchairObject)
 end
 
 PickUp = function(wheelchairObject)
-	local closestPlayer, closestPlayerDist = GetClosestPlayer()
+	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer ~= nil and closestPlayerDist <= 1.5 then
+	if closestPlayer and closestPlayerDist <= 1.5 then
 		if IsEntityPlayingAnim(GetPlayerPed(closestPlayer), 'anim@heists@box_carry@', 'idle', 3) then
 			ShowNotification("Somebody is already driving the wheelchair!")
 			return

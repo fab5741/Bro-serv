@@ -6,14 +6,12 @@ config = {
                 {
                     coords = vector3(2030.2646484375,4979.7456054688,42.098190307617),
                     sprite = 366,
-                    action = "lockers",
                 }
             },
             collect = {
                 {
                     coords = vector3(2572.38, 4523.48, 35.2),
                     sprite = 496,
-                    action = "collect",
                     items = {
                        {name="wheat", label="Blé", amount=5, type="1"},
                     }
@@ -23,7 +21,6 @@ config = {
                 {
                     coords = vector3(463.28,3566.37,32.2),
                     sprite = 502,
-                    action = "process",
                     items = {
                         {name="wheat", label="Blé -> Farine", amount=5, type="1", to="2", amountTo=1},
                     }
@@ -31,7 +28,6 @@ config = {
                 {
                     coords = vector3(470.25,3565.63,32.45),
                     sprite = 503,
-                    action = "process",
                     items = {
                         {name="flour", label="Farine -> Bro'Bab", amount=5, type="2", to="3", amountTo=1},
                     }
@@ -196,9 +192,8 @@ config = {
                     chain_1 = -1,    chain_2 = 0,
                     ears_1 = -1,     ears_2 = 0
                 }
+                },
             },
-            },
-            
         },
         wine = {
             color = 50,
@@ -207,7 +202,6 @@ config = {
                 {
                     coords = vector3(-1921.0443115234,2054.7062988281,140.73498535156),
                     sprite = 496,
-                    action = "lockers",
                 }
             },
             collect = {
@@ -223,7 +217,6 @@ config = {
                 {
                 coords = vector3(1731.98,3031.5,61.5),
 				sprite = 503,
-                action = "process",
                 items = {
                     {name="Raisin", label="Raisin", amount="5", type="18", to="19", amountTo="1"},
                 }
@@ -267,32 +260,129 @@ config = {
                     sprite = 524,
                 }
             },
-            grades = {
-                stagiaire = {
-                    label= "Stagiaire",
-                    skin_male = {
-                        tshirt_1 = 19,  tshirt_2 = 1,
-                        torso_1 = 55,   torso_2 = 0,
+            clothes = {
+                {
+                male = {
+                    tshirt_1 = -1,  tshirt_2 = -1,
+                    torso_1 = 16,   torso_2 = 0,
+                    decals_1 = 0,   decals_2 = 0,
+                    arms = 0,
+                    pants_1 = 90,   pants_2 = 0,
+                    shoes_1 = 56,   shoes_2 = 0,
+                    helmet_1 = -1,  helmet_2 = 0,
+                    chain_1 = -1,    chain_2 = 0,
+                    ears_1 = -1,     ears_2 = 0
+                },
+                female = {
+                    tshirt_1 = 36,  tshirt_2 = 1,
+                    torso_1 = 48,   torso_2 = 0,
+                    decals_1 = 0,   decals_2 = 0,
+                    arms = 44,
+                    pants_1 = 34,   pants_2 = 0,
+                    shoes_1 = 27,   shoes_2 = 0,
+                    helmet_1 = 45,  helmet_2 = 0,
+                    chain_1 = 0,    chain_2 = 0,
+                    ears_1 = 2,     ears_2 = 0
+                }
+                },
+                {
+                    male = {
+                        tshirt_1 = -1,  tshirt_2 = -1,
+                        torso_1 = 16,   torso_2 = 0,
                         decals_1 = 0,   decals_2 = 0,
-                        arms = 41,
-                        pants_1 = 5,   pants_2 = 0,
-                        shoes_1 = 25,   shoes_2 = 0,
-                        helmet_1 = 46,  helmet_2 = 0,
-                        chain_1 = 0,    chain_2 = 0,
-                        ears_1 = 2,     ears_2 = 0
+                        arms = 0,
+                        pants_1 = 90,   pants_2 = 0,
+                        shoes_1 = 56,   shoes_2 = 0,
+                        helmet_1 = -1,  helmet_2 = 0,
+                        chain_1 = -1,    chain_2 = 0,
+                        ears_1 = -1,     ears_2 = 0
                     },
-                    skin_female = {
-                        tshirt_1 = 36,  tshirt_2 = 1,
-                        torso_1 = 48,   torso_2 = 0,
+                    female = {
+                        tshirt_1 = -1,  tshirt_2 = -1,
+                        torso_1 = 16,   torso_2 = 0,
                         decals_1 = 0,   decals_2 = 0,
-                        arms = 44,
-                        pants_1 = 34,   pants_2 = 0,
-                        shoes_1 = 27,   shoes_2 = 0,
-                        helmet_1 = 45,  helmet_2 = 0,
-                        chain_1 = 0,    chain_2 = 0,
-                        ears_1 = 2,     ears_2 = 0
+                        arms = 0,
+                        pants_1 = 90,   pants_2 = 0,
+                        shoes_1 = 56,   shoes_2 = 0,
+                        helmet_1 = -1,  helmet_2 = 0,
+                        chain_1 = -1,    chain_2 = 0,
+                        ears_1 = -1,     ears_2 = 0
                     }
-               }
+                },
+            
+                {
+                    male = {
+                        tshirt_1 = -1,  tshirt_2 = -1,
+                        torso_1 = 16,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 0,
+                        pants_1 = 90,   pants_2 = 0,
+                        shoes_1 = 56,   shoes_2 = 0,
+                        helmet_1 = -1,  helmet_2 = 0,
+                        chain_1 = -1,    chain_2 = 0,
+                        ears_1 = -1,     ears_2 = 0
+                    },
+                    female = {
+                        tshirt_1 = -1,  tshirt_2 = -1,
+                        torso_1 = 16,   torso_2 = 0,
+                        decals_1 = 0,   decals_2 = 0,
+                        arms = 0,
+                        pants_1 = 90,   pants_2 = 0,
+                        shoes_1 = 56,   shoes_2 = 0,
+                        helmet_1 = -1,  helmet_2 = 0,
+                        chain_1 = -1,    chain_2 = 0,
+                        ears_1 = -1,     ears_2 = 0
+                    }
+                },
+            
+                {
+                male = {
+                    tshirt_1 = -1,  tshirt_2 = -1,
+                    torso_1 = 16,   torso_2 = 0,
+                    decals_1 = 0,   decals_2 = 0,
+                    arms = 0,
+                    pants_1 = 90,   pants_2 = 0,
+                    shoes_1 = 56,   shoes_2 = 0,
+                    helmet_1 = -1,  helmet_2 = 0,
+                    chain_1 = -1,    chain_2 = 0,
+                    ears_1 = -1,     ears_2 = 0
+                },
+                female = {
+                    tshirt_1 = -1,  tshirt_2 = -1,
+                    torso_1 = 16,   torso_2 = 0,
+                    decals_1 = 0,   decals_2 = 0,
+                    arms = 0,
+                    pants_1 = 90,   pants_2 = 0,
+                    shoes_1 = 56,   shoes_2 = 0,
+                    helmet_1 = -1,  helmet_2 = 0,
+                    chain_1 = -1,    chain_2 = 0,
+                    ears_1 = -1,     ears_2 = 0
+                }
+                },
+                {
+                male = {
+                    tshirt_1 = -1,  tshirt_2 = -1,
+                    torso_1 = 16,   torso_2 = 0,
+                    decals_1 = 0,   decals_2 = 0,
+                    arms = 0,
+                    pants_1 = 90,   pants_2 = 0,
+                    shoes_1 = 56,   shoes_2 = 0,
+                    helmet_1 = -1,  helmet_2 = 0,
+                    chain_1 = -1,    chain_2 = 0,
+                    ears_1 = -1,     ears_2 = 0
+                },
+                female = {
+                    tshirt_1 = -1,  tshirt_2 = -1,
+                    torso_1 = 16,   torso_2 = 0,
+                    decals_1 = 0,   decals_2 = 0,
+                    arms = 0,
+                    pants_1 = 90,   pants_2 = 0,
+                    shoes_1 = 56,   shoes_2 = 0,
+                    helmet_1 = -1,  helmet_2 = 0,
+                    chain_1 = -1,    chain_2 = 0,
+                    ears_1 = -1,     ears_2 = 0
+                }
+                },
             },
         },
         bennys = {
@@ -338,7 +428,6 @@ config = {
                 {
                     coords = vector3(-204.34022521973,-1327.9340820312,34.894428253174),
                     sprite = 568,
-                    action = "safe",
                 }
             },
             clothes = {
@@ -590,61 +679,7 @@ config = {
 
                     }
             },
-            {
-                label= "Stagiaire",
-                male = {
-                    tshirt_1 = 59,  tshirt_2 = 0,
-                    torso_1 = 95,   torso_2 = 0,
-                    decals_1 = 60,   decals_2 = 0,
-                    arms = 41,
-                    pants_1 = 24,   pants_2 = 0,
-                    shoes_1 = 9,   shoes_2 = 0,
-                    helmet_1 = 46,  helmet_2 = 0,
-                    chain_1 = 0,    chain_2 = 0,
-                    ears_1 = 2,     ears_2 = 0,
-                    chain_1 = 126, chain_1 = 0,
-                },
-                female = {
-                    tshirt_1 = 73,  tshirt_2 = 3,
-                    torso_1 = 73,   torso_2 = 0,
-                    decals_1 = 60,   decals_2 = 0,
-                    arms = 14,
-                    pants_1 = 37,   pants_2 = 5,
-                    shoes_1 = 1,   shoes_2 = 0,
-                    helmet_1 = 57,  helmet_2 = 0,
-                    chain_1 = 0,    chain_2 = 0,
-                    ears_1 = 2,     ears_2 = 0,
-                    chain_1 = 126, chain_2 = 0,
-                }
-        },
-        {
-            
-            label= "Stagiaire",
-            male = {
-                tshirt_1 = 15,  tshirt_2 = 0,
-                torso_1 = 133,   torso_2 = 0,
-                decals_1 = 60,   decals_2 = 0,
-                arms =  92,
-                pants_1 = 24,   pants_2 = 5,
-                shoes_1 = 9,   shoes_2 = 0,
-                helmet_1 = 8,  helmet_2 = 0,
-                chain_1 = 0,    chain_2 = 0,
-                ears_1 = 2,     ears_2 = 0,
-                chain_1 = 126, chain_2 = 0,
-            },
-            female = {
-                tshirt_1 = 73,  tshirt_2 = 3,
-                torso_1 = 73,   torso_2 = 0,
-                decals_1 = 60,   decals_2 = 0,
-                arms = 14,
-                pants_1 = 37,   pants_2 = 5,
-                shoes_1 = 1,   shoes_2 = 0,
-                helmet_1 = 57,  helmet_2 = 0,
-                chain_1 = 0,    chain_2 = 0,
-                ears_1 = 2,     ears_2 = 0,
-                chain_1 = 126, chain_2 = 0,
-            }
-        },   
+             },
         },
             safes = {
                 {
@@ -666,18 +701,15 @@ config = {
                 {
                     coords = vector3(451.75173950195,-980.27758789062,30.689315795898),
                     sprite = 110,
-                    action = "armories",
                 },
             },
             homes = {
                 {
                     coords = vector3(441.18566894531,-981.09637451172,30.689331054688),
                     sprite = 60,
-                    action = "homes",
                 },
             },
             clothes = {
-
                     { 
                       male = {
                         tshirt_1 = 29,  tshirt_2 = 1,
@@ -1037,7 +1069,6 @@ config = {
                     }
                 },
             },
-        }
     },
     center = {
         color = 37,

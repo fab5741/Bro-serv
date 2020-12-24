@@ -1,4 +1,19 @@
 local spawned = false
+weaponsHashes = {
+    "WEAPON_PISTOL",
+    "WEAPON_STUNGUN",
+    "WEAPON_MACHETE",
+    "WEAPON_BAT",
+    "WEAPON_BALL",
+    "WEAPON_FLASHLIGHT",
+    "WEAPON_NIGHTSTICK",
+    "WEAPON_PUMPSHOTGUN",
+    "WEAPON_SMG"
+}
+
+RegisterNetEvent("player:saveCoords")
+RegisterNetEvent("spawn:spawn")
+RegisterNetEvent("spawn:spawn:2")
 
 Citizen.CreateThread(function()
     -- wait for player to be spawned
@@ -23,20 +38,6 @@ Citizen.CreateThread(function()
         TriggerEvent("player:saveCoords")
     end
 end)
-
-weaponsHashes = {
-    "WEAPON_PISTOL",
-    "WEAPON_STUNGUN",
-    "WEAPON_MACHETE",
-    "WEAPON_BAT",
-    "WEAPON_BALL",
-    "WEAPON_FLASHLIGHT",
-    "WEAPON_NIGHTSTICK",
-    "WEAPON_PUMPSHOTGUN",
-    "WEAPON_SMG"
-}
-
-RegisterNetEvent("player:saveCoords")
 
 -- source is global here, don't add to function
 AddEventHandler('player:saveCoords', function ()
@@ -66,8 +67,6 @@ function spawnPlayerBegin(player)
     spawnPlayer(player.x,player.y, player.z, player.weapons,  player.health)
 end
 
-RegisterNetEvent("spawn:spawn")
-
 AddEventHandler('spawn:spawn', function (player)
     if player == nil then
         TriggerServerEvent("player:create", "spawn:spawn:2")
@@ -75,8 +74,6 @@ AddEventHandler('spawn:spawn', function (player)
         spawnPlayerBegin(player)
     end
 end)
-
-RegisterNetEvent("spawn:spawn:2")
 
 AddEventHandler('spawn:spawn:2', function (player)
     spawnPlayerBegin(player)

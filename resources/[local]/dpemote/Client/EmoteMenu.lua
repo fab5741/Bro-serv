@@ -158,8 +158,8 @@ function AddEmoteMenu(menu)
     if Config.SharedEmotesEnabled then
       sharemenu.OnItemSelect = function(sender, item, index)
         if ShareTable[index] ~= 'none' then
-          target, distance = GetClosestPlayer()
-          if(distance ~= -1 and distance < 3) then
+          target, distance = exports.bro_core:GetClosestPlayer()
+          if(distance and distance < 3) then
             _,_,rename = table.unpack(DP.Shared[ShareTable[index]])
             TriggerServerEvent("ServerEmoteRequest", GetPlayerServerId(target), ShareTable[index])
             SimpleNotify(Config.Languages[lang]['sentrequestto']..GetPlayerName(target))
@@ -170,8 +170,8 @@ function AddEmoteMenu(menu)
       end
 
       shareddancemenu.OnItemSelect = function(sender, item, index)
-        target, distance = GetClosestPlayer()
-        if(distance ~= -1 and distance < 3) then
+        target, distance = exports.bro_core:GetClosestPlayer()
+        if(distance and distance < 3) then
           _,_,rename = table.unpack(DP.Dances[DanceTable[index]])
           TriggerServerEvent("ServerEmoteRequest", GetPlayerServerId(target), DanceTable[index], 'Dances')
           SimpleNotify(Config.Languages[lang]['sentrequestto']..GetPlayerName(target)) 

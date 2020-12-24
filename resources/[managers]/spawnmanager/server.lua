@@ -1,9 +1,6 @@
--- source is global here, don't add to function
-AddEventHandler('playerDropped', function (reason)
-    TriggerEvent("player:saveCoords", source)
-end)
-
 RegisterNetEvent("player:saveCoordsServer")
+RegisterNetEvent("player:get")
+RegisterNetEvent("player:create")
 
 -- source is global here, don't add to function
 AddEventHandler('player:saveCoordsServer', function(pos, weapons, health)
@@ -18,7 +15,6 @@ AddEventHandler('player:saveCoordsServer', function(pos, weapons, health)
       end)
 end)
 
-RegisterNetEvent("player:get")
 
 -- source is global here, don't add to function
 AddEventHandler('player:get', function(cb)
@@ -39,7 +35,6 @@ AddEventHandler('player:get', function(cb)
 end)
 
 
-RegisterNetEvent("player:create")
 
 -- source is global here, don't add to function
 AddEventHandler('player:create', function(cb)

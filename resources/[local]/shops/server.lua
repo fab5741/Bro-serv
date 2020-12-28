@@ -2,7 +2,7 @@ RegisterNetEvent('shops:buy')
 
 AddEventHandler('shops:buy', function(type, amount, price)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	local amount = amount
 
@@ -46,7 +46,7 @@ AddEventHandler('shops:sell', function(shop, type, amount)
 	local sourceValue = source
 	local amounte = tonumber(amount)
 	local typee = tonumber(type)
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local maxInShop = 100
 
 	local price = 0
@@ -129,7 +129,7 @@ RegisterNetEvent('shops:stock')
 AddEventHandler('shops:stock', function(shop, type)
 	local sourceValue = source
 	local typee = tonumber(type)
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select amount from shop_item where shop=@shop and item = @type',

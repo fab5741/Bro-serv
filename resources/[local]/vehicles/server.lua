@@ -27,7 +27,7 @@ local tva = 0.20
 
 AddEventHandler("vehicle:buy", function(cb, id)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid, id, permis from players where discord = @discord',
         {['discord'] =  discord},
@@ -93,7 +93,7 @@ end)
 
 AddEventHandler("vehicle:job:buy", function(cb, id, job)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid, players.id, permis, job_grades.job as job from players, job_grades where discord = @discord and job_grades.id = players.job_grade',
@@ -137,7 +137,7 @@ end)
 
 AddEventHandler("vehicle:ds", function(cb, price)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select liquid, id, permis from players where discord = @discord',
@@ -183,7 +183,7 @@ RegisterNetEvent("vehicle:depots:get:all")
 
 AddEventHandler("vehicle:depots:get:all", function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar("select job_grades.job from players, job_grades where players.discord = @discord  and job_grades.id = players.job_grade", {
 			['@discord'] = discord
@@ -212,7 +212,7 @@ end)
 
 AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod, players, player_vehicle where vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id and players.discord= @discord and player_vehicle.vehicle_mod = vehicle_mod.id UNION select vehicle_mod.id, vehicles.name, vehicles.label from players, job_grades, job_vehicle, vehicle_mod, vehicles where discord = @discord and players.job_grade = job_grades.id and job_vehicle.job = job_grades.job and job_vehicle.vehicle_mod = vehicle_mod.id and vehicles.id = vehicle_mod.vehicle and vehicle_mod.parking = @id', {
 			['discord'] =  discord,
@@ -226,7 +226,7 @@ end)
 
 AddEventHandler("vehicles:get:all", function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select player_vehicle.id, vehicles.name, vehicles.label, vehicle_mod.parking from players, player_vehicle, vehicles, vehicle_mod where player_vehicle.vehicle_mod = vehicle_mod.id and vehicle_mod.vehicle = vehicles.id', {
@@ -241,7 +241,7 @@ end)
 
 AddEventHandler("vehicles:jobs:get:all", function(cb, job)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select job_vehicle.id, vehicles.name, vehicles.label, job_vehicle.parking from job_vehicle, vehicles where job_vehicle.vehicle = vehicles.id and job_vehicle.job = @job', {
@@ -289,7 +289,7 @@ end)
 
 AddEventHandler("vehicle:parking:job:get", function(id, cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.insert('UPDATE `vehicle_mod` SET parking = "" WHERE `vehicle_mod`.`id` = @id ', {
 			['id'] =  id,
@@ -351,7 +351,7 @@ end)
 
 AddEventHandler("vehicle:permis:give", function()
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('UPDATE `players` SET permis= 12 WHERE discord = @discord ', {
@@ -365,7 +365,7 @@ end)
 
 AddEventHandler("vehicle:permis:get", function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select permis from players where discord = @discord ', {
@@ -380,7 +380,7 @@ end)
 
 AddEventHandler("vehicle:permis:withdraw", function(cb, amount)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local amount = amount
 	MySQL.ready(function ()
 		MySQL.Async.execute('update players set permis = permis-@amount where discord = @discord ', {
@@ -397,7 +397,7 @@ end)
 --jobs
 AddEventHandler("vehicle:saveId", function(gameId, lastGameId)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.execute("Update vehicle_mod set gameId= @gameId where gameId = @lastGameId",
 		{
@@ -427,7 +427,7 @@ AddEventHandler("vehicle:save", function(cb,
 	fuelLevel
 )
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	if livery == -1 then
 		livery = 0
@@ -496,7 +496,7 @@ end)
 
 AddEventHandler("vehicle:player:get", function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll("SELECT vehicle_mod.id as vehicle_mod, vehicle_mod.*, vehicles.name FROM `player_vehicle`, players, vehicles, vehicle_mod WHERE players.discord = @discord and players.id = player_vehicle.player and vehicle_mod.id = player_vehicle.vehicle_mod and vehicles.id = vehicle_mod.vehicle and vehicle_mod.parking = ''",
@@ -519,7 +519,7 @@ end)
 
 AddEventHandler("vehicle:job:get", function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT jobs.id from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and discord = @discord',
@@ -547,7 +547,7 @@ end)
 
 AddEventHandler("vehicle:mods:save", function(gameid, mods)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select id from vehicle_mod where gameId =@gameid ', {
@@ -569,7 +569,7 @@ end)
 
 AddEventHandler("vehicle:lock", function(bf, vehicle)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('SELECT vehicle_mod.gameId FROM `vehicle_mod`, job_vehicle, players, job_grades where vehicle_mod.gameId = @gameId and job_vehicle.job = job_grades.job and job_grades.id = players.job_grade and players.discord = @discord and job_vehicle.vehicle_mod = vehicle_mod.id UNION SELECT vehicle_mod.gameId FROM `vehicle_mod`, player_vehicle, players where vehicle_mod.gameId = @gameId and player_vehicle.player = players.id and players.discord = @discord and player_vehicle.vehicle_mod = vehicle_mod.id', {

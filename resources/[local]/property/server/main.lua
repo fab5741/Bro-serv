@@ -8,7 +8,7 @@ function GetProperty(name)
 end
 
 function SetPropertyOwned(name, price, rented, source)
-    local discord = exports.bf:GetDiscordFromSource(source)
+    local discord = exports.bro_core:GetDiscordFromSource(source)
 	local property = GetProperty(propertyName)
 	MySQL.ready(function()
 		MySQL.Async.fetchScalar("select id from players where discord = @discord", {
@@ -166,7 +166,7 @@ end)
 RegisterNetEvent('property:rentProperty')
 AddEventHandler('property:rentProperty', function(propertyName)
 	local sourceValue = source
-    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local property = GetProperty(propertyName)
 	local rent     = property.price / Config.RentModifier
 
@@ -176,7 +176,7 @@ end)
 RegisterNetEvent('property:buyProperty')
 AddEventHandler('property:buyProperty', function(propertyName)
 	local sourceValue = source
-    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local property = GetProperty(propertyName)
 
 	MySQL.ready(function ()
@@ -213,7 +213,7 @@ end)
 RegisterNetEvent('property:saveLastProperty')
 AddEventHandler('property:saveLastProperty', function(property)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.Async.execute('UPDATE players SET last_property = @last_property WHERE discord = @discord', {
 		['@last_property'] = property,
 		['@discord']    = discord
@@ -223,7 +223,7 @@ end)
 RegisterNetEvent('property:deleteLastProperty')
 AddEventHandler('property:deleteLastProperty', function()
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.Async.execute('UPDATE players SET last_property = NULL WHERE discord = @discord', {
 		['@discord']    = discord
 	})

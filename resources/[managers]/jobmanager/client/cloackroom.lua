@@ -4,14 +4,14 @@ local lockChanging = false
 function clockIn(job)
 	TriggerServerEvent("job:get:player", "job:add:uniform")
 	TriggerServerEvent("job:clock", true, job)
-	exports.bf:CloseMenu("lockers")
+	exports.bro_core:CloseMenu("lockers")
 end
-clockIn("lspd")
+clockIn("taxi")
 
 function clockOut(job)
 	TriggerServerEvent("player:get", "job:remove:uniform")
 	TriggerServerEvent("job:clock", false, job)
-	exports.bf:CloseMenu("lockers")
+	exports.bro_core:CloseMenu("lockers")
 end
 
 
@@ -55,7 +55,7 @@ AddEventHandler('job:add:uniform', function(job)
 			TriggerEvent('skinchanger:loadClothes', skin, clothes)
 		end)
 	else 
-		exports.bf:Notification("~r~Changement en cours")
+		exports.bro_core:Notification("~r~Changement en cours")
 	end
 
 end)
@@ -98,6 +98,6 @@ AddEventHandler('job:remove:uniform', function(skin)
 			TriggerServerEvent("job:breakService")
 		end)
 	else 
-		exports.bf:Notification("~r~Changement en cours")
+		exports.bro_core:Notification("~r~Changement en cours")
 	end
 end)

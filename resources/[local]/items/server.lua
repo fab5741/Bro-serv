@@ -5,7 +5,7 @@ RegisterNetEvent("items:add")
 -- source is global here, don't add to function
 AddEventHandler("items:add", function (type, amount, message)
 	local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue)
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('select id from players where discord = @discord',
     {['@discord'] =  discord},
@@ -54,7 +54,7 @@ end)
 
 function sub(source, type, amount)   
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
   MySQL.ready(function ()
     MySQL.Async.fetchAll('select id from players where discord = @discord',
     {['discord'] =  discord},
@@ -102,7 +102,7 @@ RegisterNetEvent("items:process")
 -- source is global here, don't add to function
 AddEventHandler("items:process", function (type, amount, typeTo, amountTo, message)
     local sourceValue = source
-    local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
     MySQL.ready(function ()
       MySQL.Async.fetchAll('select id, amount from players, player_item where discord = @discord and player_item.item = @type and player_item.player = players.id',
       {['discord'] =  discord,
@@ -136,7 +136,7 @@ RegisterNetEvent("items:get")
 -- source is global here, don't add to function
 AddEventHandler("items:get", function (cb)
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
   MySQL.ready(function ()
     MySQL.Async.fetchAll('SELECT items.id, item, amount, label, weight FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and discord = @discord and player_item.amount > 0',
     {['discord'] =  discord},
@@ -152,7 +152,7 @@ RegisterNetEvent("items:vehicle:get")
 -- source is global here, don't add to function
 AddEventHandler("items:vehicle:get", function (cb, vehicle)
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue)
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
   MySQL.ready(function ()
     MySQL.Async.fetchAll('SELECT items.id, item, amount, label, weight, vehicle_mod FROM `vehicle_item`, items, vehicle_mod where vehicle_mod.gameId = @vehicle and vehicle_mod.id = vehicle_item.vehicle_mod and items.id = vehicle_item.item and vehicle_item.amount > 0',
     {
@@ -169,7 +169,7 @@ RegisterNetEvent("item:get")
 -- source is global here, don't add to function
 AddEventHandler("item:get", function (cb, type)
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
   print(type)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('SELECT amount FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and discord = @discord and item = @item',
@@ -188,8 +188,8 @@ RegisterNetEvent("items:give")
 AddEventHandler("items:give", function (type, amount, to)
   local source = source
   local to = to
-  local discord = exports.bf:GetDiscordFromSource(source) 
-  local discordTo = exports.bf:GetDiscordFromSource(to) 
+  local discord = exports.bro_core:GetDiscordFromSource(source) 
+  local discordTo = exports.bro_core:GetDiscordFromSource(to) 
   
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('select id from players where discord = @discord',
@@ -239,7 +239,7 @@ RegisterNetEvent("item:vehicle:get")
 -- source is global here, don't add to function
 AddEventHandler("item:vehicle:get", function (vehicle, item, amount)
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
 
   MySQL.ready(function ()
     MySQL.Async.fetchScalar("SELECT amount FROM `vehicle_item`, players WHERE vehicle_mod = @vehicle and item = @item",
@@ -301,7 +301,7 @@ RegisterNetEvent("item:vehicle:store")
 -- source is global here, don't add to function
 AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
   MySQL.ready(function ()
     MySQL.Async.fetchScalar("SELECT amount FROM `player_item`, players WHERE item = @item and players.discord = @discord and players.id = player_item.player",
     {

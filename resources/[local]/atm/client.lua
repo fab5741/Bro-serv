@@ -1,46 +1,25 @@
-config = {}
 liquid = 0
 account = 0
 
 -- main loop
 Citizen.CreateThread(function()
-	exports.bf:AddMenu("atm", {
-		title = "ATM ",
-		position = 1,
-		buttons = {
-			{
-				text = "Retirer",
-				exec = {
-					callback = function()
-						TriggerServerEvent('atm:withdraw',  exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
-						exports.bf:CloseMenu("atm")
-					end
-				},
-			},
-			{
-				text = "Déposer",
-				exec = {
-					callback = function()
-						TriggerServerEvent('atm:deposit',  exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
-						exports.bf:CloseMenu("atm")
-					end
-				},
-			},
-		},
-	})
-	exports.bf:AddArea("atm", {
+	exports.bro_core:AddArea("ATM", {
 		trigger = {
 			weight = 2,
 			enter = {
-				callback = function()
-					exports.bf:HelpPromt("ATM : ~INPUT_PICKUP~")
-					zoneType = "atm"
+                callback = function()
+                    exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
+                        TriggerServerEvent("atm:get", "atm:get")
+                    end)
+					exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
 				end
 			},
 			exit = {
-				callback = function()
-					zoneType = nil
-				end
+                callback = function()
+                    exports.bro_core:RemoveMenu("ATM")
+                    exports.bro_core:Key("E", "E", "Interaction", function()
+                    end)
+            	end
 			},
 		},
 		blip = {
@@ -66,10 +45,4 @@ Citizen.CreateThread(function()
 			{ x = 1153.75,  y = -326.8,  z = 69.21},
 		}
 	})
-	while true do
-		Citizen.Wait(0)
-		if zoneType == "atm" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("atm:get", "atm:get")
-		end
-	end
 end) 

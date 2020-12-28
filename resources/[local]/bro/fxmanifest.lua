@@ -5,9 +5,10 @@ description '- Bro -'
 
 version '0.0.1'
 
-dependency "bf"
+dependency "bro_core"
 
 client_scripts {
+    'client/functions.lua',
     'client/client.lua',
     "lifetraffic.net.dll"
 } 
@@ -39,10 +40,3 @@ files {
 }
 
 loadscreen 'loading/loading.html'
-
-
-data_file 'HANDLING_FILE' 'handling.meta'
-
-files {
-	'handling.meta'
-}

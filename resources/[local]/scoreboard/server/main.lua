@@ -46,7 +46,7 @@ function AddPlayerToScoreboard(player, update)
 end
 
 function AddPlayersToScoreboard()
-	exports.bf:GetPlayersId()
+	exports.bro_core:GetPlayersId()
 
 	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
 end

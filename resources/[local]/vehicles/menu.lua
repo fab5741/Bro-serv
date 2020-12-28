@@ -1,11 +1,11 @@
 function createMenus()
     	--shops
-	exports.bf:AddMenu("shops", {
+	exports.bro_core:AddMenu("shops", {
 		title = "Concessionnaire",
 		position = 1,
 	})
 
-	exports.bf:AddArea("shops", {
+	exports.bro_core:AddArea("shops", {
 		marker = {
 			type = 1,
 			weight = 1,
@@ -18,14 +18,14 @@ function createMenus()
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bf:HelpPromt("Concessionnaire : ~INPUT_PICKUP~")
+					exports.bro_core:HelpPromt("Concessionnaire : ~INPUT_PICKUP~")
 					zoneType = "shops"
 					zone = "global"
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bf:CloseMenu(zoneType..zone)
+					exports.bro_core:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end
@@ -47,12 +47,12 @@ function createMenus()
 
 	--- shop for job
 
-	exports.bf:AddMenu("shops-job", {
+	exports.bro_core:AddMenu("shops-job", {
 		title = "Concessionnaire",
 		position = 1,
 	})
 
-	exports.bf:AddArea("shops-job", {
+	exports.bro_core:AddArea("shops-job", {
 		marker = {
 			type = 1,
 			weight = 1,
@@ -65,14 +65,14 @@ function createMenus()
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bf:HelpPromt("Concessionnaire entreprise : ~INPUT_PICKUP~")
+					exports.bro_core:HelpPromt("Concessionnaire entreprise : ~INPUT_PICKUP~")
 					zoneType = "shops-job"
 					zone = "global"
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bf:CloseMenu(zoneType..zone)
+					exports.bro_core:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end
@@ -92,18 +92,18 @@ function createMenus()
 		},
 	})
 	-- parkings
-	exports.bf:AddMenu("parking-veh", {
+	exports.bro_core:AddMenu("parking-veh", {
 		title = "Parking",
 		position = 1,
 	})
-	exports.bf:AddMenu("parking-foot", {
+	exports.bro_core:AddMenu("parking-foot", {
 		title = "Parking",
 		menuTitle = "Retirer",
 		position = 1,
 	})
 
 	for k,v in pairs(config.parkings) do
-		exports.bf:AddArea("parkings"..k, {
+		exports.bro_core:AddArea("parkings"..k, {
 			marker = {
 				type = 1,
 				weight = 1,
@@ -116,14 +116,14 @@ function createMenus()
 				weight = 2,
 				enter = {
 					callback = function()
-						exports.bf:HelpPromt("Parking : ~INPUT_PICKUP~")
+						exports.bro_core:HelpPromt("Parking : ~INPUT_PICKUP~")
 						zoneType = "parking"
 						zone = v.zone
 					end
 				},
 				exit = {
 					callback = function()
-						exports.bf:CloseMenu(zoneType..zone)
+						exports.bro_core:CloseMenu(zoneType..zone)
 						zoneType = nil
 						zone = nil
 					end
@@ -139,11 +139,11 @@ function createMenus()
 	end
 
 	--depots
-	exports.bf:AddMenu("depots", {
+	exports.bro_core:AddMenu("depots", {
 		title = "Fourrière",
 		position = 1,
 	})
-	exports.bf:AddArea("depots", {
+	exports.bro_core:AddArea("depots", {
 		marker = {
 			type = 1,
 			weight = 1,
@@ -162,7 +162,7 @@ function createMenus()
 			},
 			exit = {
 				callback = function()
-					exports.bf:CloseMenu("depots")
+					exports.bro_core:CloseMenu("depots")
 					zoneType = nil
 					zone = nil
 				end
@@ -182,7 +182,7 @@ function createMenus()
 		},
 	})
 	--Permis de conduire
-	exports.bf:AddArea("ds", {
+	exports.bro_core:AddArea("ds", {
 		marker = {
 			type = 1,
 			weight = 1,
@@ -200,7 +200,7 @@ function createMenus()
 			},
 			exit = {
 				callback = function()
-					exports.bf:CloseMenu(zoneType..zone)
+					exports.bro_core:CloseMenu(zoneType..zone)
 					zoneType = nil
 					zone = nil
 				end
@@ -220,7 +220,7 @@ function createMenus()
 		},
 	})
 
-	exports.bf:AddArea("checkpoints-1", {
+	exports.bro_core:AddArea("checkpoints-1", {
 		marker = {
 			type = 1,
 			weight = 8,
@@ -235,8 +235,8 @@ function createMenus()
 			active = {
 				callback = function()
 					TriggerEvent('vehicle:belt', "ds:belt")
-					exports.bf:DisableArea("checkpoints-1")
-					exports.bf:EnableArea("checkpoints-2")
+					exports.bro_core:DisableArea("checkpoints-1")
+					exports.bro_core:EnableArea("checkpoints-2")
 				end
 			},
 		},
@@ -253,7 +253,7 @@ function createMenus()
 			}
 		},
 	})
-	exports.bf:AddArea("checkpoints-2", {
+	exports.bro_core:AddArea("checkpoints-2", {
 		marker = {
 			type = 1,
 			weight = 8,
@@ -268,8 +268,8 @@ function createMenus()
 			active = {
 				callback = function()
 					TriggerEvent('vehicle:belt', "ds:belt")
-					exports.bf:DisableArea("checkpoints-2")
-					exports.bf:EnableArea("checkpoints-3")
+					exports.bro_core:DisableArea("checkpoints-2")
+					exports.bro_core:EnableArea("checkpoints-3")
 				end
 			},
 		},
@@ -286,7 +286,7 @@ function createMenus()
 			}
 		},
 	})
-	exports.bf:AddArea("checkpoints-3", {
+	exports.bro_core:AddArea("checkpoints-3", {
 		marker = {
 			type = 1,
 			weight = 8,
@@ -300,14 +300,14 @@ function createMenus()
 			weight = 4,
 			active = {
 				callback = function()
-					exports.bf:DisableArea("checkpoints-3")
+					exports.bro_core:DisableArea("checkpoints-3")
 
 					if 	IsVehicleDamaged(dsVehicle --[[ Vehicle ]]) then
 						-- TODO: donner le permis
-						exports.bf:Notification("Vous avez endommagé le véhicule !")
+						exports.bro_core:Notification("Vous avez endommagé le véhicule !")
 					else
 						TriggerServerEvent("vehicle:permis:give")
-						exports.bf:Notification("Vous avez le permis de conduire !")
+						exports.bro_core:Notification("Vous avez le permis de conduire !")
 					end
 					ds = false
 
@@ -337,11 +337,11 @@ function createMenus()
 			}
 		},
 	})
-	exports.bf:DisableArea("checkpoints-1")
-	exports.bf:DisableArea("checkpoints-2")
-	exports.bf:DisableArea("checkpoints-3")
+	exports.bro_core:DisableArea("checkpoints-1")
+	exports.bro_core:DisableArea("checkpoints-2")
+	exports.bro_core:DisableArea("checkpoints-3")
 	local price = 100
-	exports.bf:AddMenu("ds", {
+	exports.bro_core:AddMenu("ds", {
 		title = "Auto-école",
 		position = 1,
 		buttons = {
@@ -359,31 +359,31 @@ end
 
 function removeMenus()
         --shops
-    exports.bf:RemoveMenu("shops")
-    exports.bf:RemoveArea("shops")
+    exports.bro_core:RemoveMenu("shops")
+    exports.bro_core:RemoveArea("shops")
     --- shop for job
 
-    exports.bf:RemoveMenu("shops-job")
+    exports.bro_core:RemoveMenu("shops-job")
 
-    exports.bf:RemoveArea("shops-job")
+    exports.bro_core:RemoveArea("shops-job")
     -- parkings
-    exports.bf:RemoveMenu("parking-veh")
-    exports.bf:RemoveMenu("parking-foot")
+    exports.bro_core:RemoveMenu("parking-veh")
+    exports.bro_core:RemoveMenu("parking-foot")
 
     for k,v in pairs(config.parkings) do
-        exports.bf:RemoveArea("parkings"..k)
+        exports.bro_core:RemoveArea("parkings"..k)
     end
 
 
     --depots
-    exports.bf:RemoveMenu("depots")
-	exports.bf:RemoveArea("depots")
-	exports.bf:RemoveMenu("depots")
-    exports.bf:RemoveArea("depots")
+    exports.bro_core:RemoveMenu("depots")
+	exports.bro_core:RemoveArea("depots")
+	exports.bro_core:RemoveMenu("depots")
+    exports.bro_core:RemoveArea("depots")
     --Permis de conduire
-    exports.bf:RemoveArea("ds")
-    exports.bf:RemoveArea("checkpoints-1")
-    exports.bf:RemoveArea("checkpoints-2")
-    exports.bf:RemoveArea("checkpoints-3")
-    exports.bf:RemoveMenu("ds")
+    exports.bro_core:RemoveArea("ds")
+    exports.bro_core:RemoveArea("checkpoints-1")
+    exports.bro_core:RemoveArea("checkpoints-2")
+    exports.bro_core:RemoveArea("checkpoints-3")
+    exports.bro_core:RemoveMenu("ds")
 end

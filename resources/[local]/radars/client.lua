@@ -35,7 +35,7 @@ end
   local kmhspeed = math.ceil(speed*3.6)
     if kmhspeed > maxspeed and driver == pP then
       if GetVehicleClass(vehicle) == 18 then
-        exports.bf:Notification("Vous avez été flashé. ~g~Véhicle authorisé")
+        exports.bro_core:Notification("Vous avez été flashé. ~g~Véhicle authorisé")
       else
         fine = kmhspeed - maxspeed
         nbPoints = (fine/40)+1
@@ -44,7 +44,7 @@ end
         Citizen.Wait(math.random(1000,10000))
         TriggerServerEvent("vehicle:permis:withdraw", "", nbPoints)
         TriggerServerEvent("account:player:add", "", -fine)
-        exports.bf:Notification("Vous avez été flashé ~r~".. kmhspeed.. " km/h~s~. Perte de ~r~"..nbPoints.."points ~s~. Amende de ~r~"..fine.."$")
+        exports.bro_core:Notification("Vous avez été flashé ~r~".. kmhspeed.. " km/h~s~. Perte de ~r~"..nbPoints.."points ~s~. Amende de ~r~"..fine.."$")
         TriggerServerEvent("job:avert:all", "lspd", "Flash radars : "..location, true)
       end
 	end

@@ -33,7 +33,7 @@ function CreateTaxi(x, y, z)
             -- GetClosestVehicleNodeWithHeading(x, y, z, outPosition, outHeading, nodeType, p6, p7)
             local sX, sY, sZ = table.unpack(vector)
 
-            exports.bf:Notification("Le chauffeur arrive")
+            exports.bro_core:Notification("Le chauffeur arrive")
             PlaySoundFrontend(-1, "Text_Arrive_Tone", "Phone_SoundSet_Default", 1)
             Wait(2000)
 
@@ -54,7 +54,7 @@ function CreateTaxi(x, y, z)
 
             return taxiVeh
         else
-            exports.bf:Notification("Le chauffeur est occupé")
+            exports.bro_core:Notification("Le chauffeur est occupé")
         end
 	end	
 end

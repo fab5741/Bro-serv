@@ -2,26 +2,26 @@ local OwnedProperties, Blips, CurrentActionData = {}, {}, {}
 local CurrentProperty, CurrentPropertyOwner, LastProperty, LastPart, CurrentAction, CurrentActionMsg
 local firstSpawn, hasChest, hasAlreadyEnteredMarker = true, false, false
 
-exports.bf:AddMenu("property-owned", {
+exports.bro_core:AddMenu("property-owned", {
     title = "Propriété",
 })
 
-exports.bf:AddMenu("property", {
+exports.bro_core:AddMenu("property", {
     title = "Propriété",
 })
 
 
 
-exports.bf:AddMenu("property-gateway-bought", {
+exports.bro_core:AddMenu("property-gateway-bought", {
     title = "Propriétés achetés",
 })
 
-exports.bf:AddMenu("property-gateway-avaiable", {
+exports.bro_core:AddMenu("property-gateway-avaiable", {
     title = "Propriétés libres",
 })
 
 
-exports.bf:AddMenu("property-gateway", {
+exports.bro_core:AddMenu("property-gateway", {
     title = "Propriété Portail",
     buttons = {
         {
@@ -39,10 +39,10 @@ exports.bf:AddMenu("property-gateway", {
 							}
 						end
 					end
-					exports.bf:SetMenuValue({
+					exports.bro_core:SetMenuValue({
 						buttons = buttons
 					})
-					exports.bf:NextMenu("property-gateway-bought")
+					exports.bro_core:NextMenu("property-gateway-bought")
 				end
 			},
 		},
@@ -62,10 +62,10 @@ exports.bf:AddMenu("property-gateway", {
 							}
 						end
 					end
-					exports.bf:SetMenuValue({
+					exports.bro_core:SetMenuValue({
 						buttons = buttons
 					})
-					exports.bf:NextMenu("property-gateway-avaiable")
+					exports.bro_core:NextMenu("property-gateway-avaiable")
 				end
 			},
         },
@@ -181,7 +181,7 @@ function EnterProperty(name, owner)
 		DoScreenFadeIn(800)
 		DrawSub(property.label, 5000)
 	end)
-	exports.bf:CloseMenu("property")
+	exports.bro_core:CloseMenu("property")
 end
 
 function ExitProperty(name)
@@ -280,7 +280,7 @@ end
 
 function OpenPropertyMenu(property)
 	if PropertyIsOwned(property) then
-		exports.bf:SetMenuValue("property-owned", {
+		exports.bro_core:SetMenuValue("property-owned", {
 			buttons = {
 				{
 					text = "Entrer : "..property.name,
@@ -300,29 +300,29 @@ function OpenPropertyMenu(property)
 				},
 			}
 		})
-		exports.bf:OpenMenu("property-owned")
+		exports.bro_core:OpenMenu("property-owned")
 	else
-		exports.bf:SetMenuValue("property", {
+		exports.bro_core:SetMenuValue("property", {
 				buttons = {
 					{
 						text = "Acheter ~g~"..property.price.."$",
 						exec=  {
 							callback = function ()
 								TriggerServerEvent('property:buyProperty', LastProperty)
-								exports.bf:CloseMenu("property")
+								exports.bro_core:CloseMenu("property")
 							end
 						},
 					}
 				},
 			}
 		)
-		exports.bf:OpenMenu("property")
+		exports.bro_core:OpenMenu("property")
 	end
 end
 
 function OpenGatewayMenu(property)
 	LastProperty = property
-	exports.bf:OpenMenu("property-gateway")
+	exports.bro_core:OpenMenu("property-gateway")
 end
 
 function OpenGatewayOwnedPropertiesMenu(property)
@@ -873,7 +873,7 @@ Citizen.CreateThread(function()
 		Citizen.Wait(0)
 
 		if CurrentAction then
-			exports.bf:Notification(CurrentActionMsg)
+			exports.bro_core:Notification(CurrentActionMsg)
 
 			if IsControlJustReleased(0, 38) then
 				print(CurrentAction)

@@ -43,11 +43,11 @@ zone = 0
 
 -- Create blips
 Citizen.CreateThread(function()   
-	exports.bf:AddMenu("CurrentShop", {
+	exports.bro_core:AddMenu("CurrentShop", {
 		title = "Magasin",
 		position = 1,
 	})
-	exports.bf:AddArea("shopssss", {
+	exports.bro_core:AddArea("shopssss", {
 		marker = {
 			weight = 0.5,
 			height = 0.3,
@@ -56,7 +56,7 @@ Citizen.CreateThread(function()
 			weight = 1,
 			enter = {
 				callback = function()
-					exports.bf:HelpPromt("Acheter : ~INPUT_PICKUP~")
+					exports.bro_core:HelpPromt("Acheter : ~INPUT_PICKUP~")
 					zoneType = "shops"
 				end
 			},
@@ -134,15 +134,15 @@ Citizen.CreateThread(function()
 					text = "Quitter",
 					exec = {
 						callback = function()
-							exports.bf:CloseMenu("CurrentShop")
-							exports.bf:RemoveMenu("CurrentShop")
+							exports.bro_core:CloseMenu("CurrentShop")
+							exports.bro_core:RemoveMenu("CurrentShop")
 						end
 					},
 				}
-				exports.bf:SetMenuValue("CurrentShop", {
+				exports.bro_core:SetMenuValue("CurrentShop", {
 					buttons = buttons
 				})
-				exports.bf:OpenMenu("CurrentShop")
+				exports.bro_core:OpenMenu("CurrentShop")
 			end
 		end
 	end
@@ -151,7 +151,7 @@ end)
 -- close the menu when script is stopping to avoid being stuck in NUI focus
 AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
-		exports.bf:RemoveMenu('CurrentShop')
+		exports.bro_core:RemoveMenu('CurrentShop')
 	end
 end)
 
@@ -169,7 +169,7 @@ function robNpc(targetPed)
         TaskStandStill(targetPed, config.robLength * 1000)
         FreezeEntityPosition(targetPed, true)
 		TaskPlayAnim(targetPed, dict, 'handsup_standing_base', 8.0, -8, .01, 49, 0, 0, 0, 0)
-		exports.bf:Notification('Braquage en cours')
+		exports.bro_core:Notification('Braquage en cours')
 
 		-- If no luck, cops get averted
 		if math.random(1,2) == 1 then
@@ -187,9 +187,9 @@ function robNpc(targetPed)
 			if(GetDistanceBetweenCoords(GetEntityCoords(targetPed), GetEntityCoords(GetPlayerPed(-1))) < config.robMaxDistance) then
 				-- add valise
 				TriggerServerEvent("items:add", 8, nb)
-				exports.bf:Notification('Valises d\'argent : +~g~'..nb)
+				exports.bro_core:Notification('Valises d\'argent : +~g~'..nb)
 			else
-				exports.bf:Notification('~r~Vous vous êtes trop éloigné')
+				exports.bro_core:Notification('~r~Vous vous êtes trop éloigné')
 				robbedRecently = false
 				TriggerEvent("bf:progressBar:delete")
 			end
@@ -210,15 +210,15 @@ Citizen.CreateThread(function()
 				if IsPedArmed(playerPed, 1) or IsPedArmed(playerPed, 4) then
 					if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
 						if robbedRecently then
-							exports.bf:Notification('~r~Trop rapide !')
+							exports.bro_core:Notification('~r~Trop rapide !')
 						elseif IsPedDeadOrDying(targetPed, true) then
-							exports.bf:Notification("~r~L'épicier est mort")
+							exports.bro_core:Notification("~r~L'épicier est mort")
 						else
 							robNpc(targetPed)
 						end
 					end
 				else
-					exports.bf:Notification("~r~Vous devez être armé")
+					exports.bro_core:Notification("~r~Vous devez être armé")
 				end
 			end
         end

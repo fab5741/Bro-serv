@@ -23,7 +23,7 @@ RegisterNetEvent("job:get")
 
 AddEventHandler('job:get', function (cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchAll('SELECT jobs.id as job, jobs.name, jobs.label as label, job_grades.label as grade from players, job_grades, jobs where players.job_grade = job_grades.id and jobs.id = job_grades.job and discord = @discord',
         {['discord'] =  discord},
@@ -41,7 +41,7 @@ RegisterNetEvent("job:isChef")
 
 AddEventHandler('job:isChef', function (cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar('SELECT grade FROM job_grades, players, jobs where jobs.id = job_grades.job and players.job_grade = job_grades.id and discord = @discord',
         {['discord'] =  discord},
@@ -56,7 +56,7 @@ RegisterNetEvent("job:set:me")
 AddEventHandler('job:set:me', function (grade, notif)
     local sourceValue = source
     local source = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local notif = notif
     local gradee = grade
     if notif == nil then
@@ -95,7 +95,7 @@ RegisterNetEvent("job:items:get")
 AddEventHandler('job:items:get', function (cb, job)
     local sourceValue = source
     local source = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchAll('select items.label, job_item.amount, job_item.item from job_item, items where job = @job and items.id = job_item.item',
         {['@job'] = job},
@@ -111,7 +111,7 @@ RegisterNetEvent("job:items:withdraw")
 AddEventHandler('job:items:withdraw', function (item, amount)
     local sourceValue = source
     local source = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar('select job_grades.job from players, job_grades where job_grades.id = players.job_grade and discord = @discord',
         {['@discord'] = discord},
@@ -144,7 +144,7 @@ RegisterNetEvent("job:items:store")
 AddEventHandler('job:items:store', function (item, amount)
     local sourceValue = source
     local source = source
-    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local amount = amount
     local item = item
     MySQL.ready(function ()
@@ -248,7 +248,7 @@ AddEventHandler('job:safe:deposit', function (withdraw, amount, job)
     local sourceValue = source
     local withdraw = withdraw
     local amount = tonumber(amount)
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
     MySQL.ready(function ()
         if withdraw then
@@ -300,7 +300,7 @@ RegisterNetEvent("job:parking:get")
 
 AddEventHandler('job:parking:get', function (cb, id, job)
     local source = source
-	local discord = exports.bf:GetDiscordFromSource(source)
+	local discord = exports.bro_core:GetDiscordFromSource(source)
 
     MySQL.ready(function ()
         MySQL.Async.execute('Update job_vehicle SET parking="" where id = @id',{['id'] = id},
@@ -325,17 +325,14 @@ end)
 
 RegisterNetEvent("job:lsms:distress")
 
-AddEventHandler('job:lsms:distress', function(player)
+AddEventHandler('job:lsms:distress', function(coords, message)
     local sourceValue = source
-    --check le nombre d'ambulanciers présent
-    --TODO disable or true, when phone woirking
     if #inService["lsms"] == 0 then
+        TriggerClientEvent('bro_core:Notification', sourceValue, "~r~Pas de médecins en ville.~g~ Ce n'était qu'un petit bobo au final.")
         TriggerClientEvent('job:lsms:revive', sourceValue)
     else
-        TriggerClientEvent('bf:Notification', sourceValue, "Appel en cours")
-        for k,v in pairs(inService["lsms"])do
-            TriggerClientEvent('bf:Notification', v, "Appel en cours, venant de ")
-        end
+        TriggerClientEvent('bro_core:Notification', sourceValue, "~g~Votre appel a été transmis.")
+        TriggerEvent("job:alert:all", "lsms", "~b~Coma :", true, coords)
     end
 end)
 
@@ -402,7 +399,7 @@ RegisterNetEvent("job:clock")
 
 AddEventHandler("job:clock", function (isIn, job)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
     local isIn = isIn
     local job = job
@@ -430,7 +427,7 @@ RegisterNetEvent("job:service:recruit")
 
 AddEventHandler("job:service:recruit", function (job, player)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(player)
+	local discord = exports.bro_core:GetDiscordFromSource(player)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar("SELECT min(grade), id FROM `job_grades` where job = @job",
         {
@@ -452,7 +449,7 @@ RegisterNetEvent("job:service:promote")
 
 AddEventHandler("job:service:promote", function (player)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(player)
+	local discord = exports.bro_core:GetDiscordFromSource(player)
     MySQL.ready(function ()
         MySQL.Async.execute('Update players SET job_grade = @job_grade+1 where discord = @discord',
         {
@@ -468,7 +465,7 @@ RegisterNetEvent("job:service:demote")
 
 AddEventHandler("job:service:demote", function (player)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(player)
+	local discord = exports.bro_core:GetDiscordFromSource(player)
     MySQL.ready(function ()
         MySQL.Async.execute('Update players SET job_grade = @job_grade-1 where discord = @discord',
         {
@@ -486,7 +483,7 @@ RegisterNetEvent("job:get:player")
 -- source is global here, don't add to function
 AddEventHandler('job:get:player', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local cbe = cb
     MySQL.ready(function ()
         MySQL.Async.fetchAll('SELECT jobs.name, players.skin, job_grades.grade FROM players, job_grades, jobs WHERE job_grades.id = players.job_grade and job_grades.job = jobs.id and discord = @discord', {
@@ -507,7 +504,7 @@ RegisterNetEvent("weapon:store")
 -- source is global here, don't add to function
 AddEventHandler('weapon:store', function(weapon)
     local sourceValue = source
-    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.insert('update job_armory,players, job_grades, jobs set amount = amount+1 where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
             ['@weapon'] =  weapon,
@@ -522,7 +519,7 @@ RegisterNetEvent("weapon:get:all")
 -- source is global here, don't add to function
 AddEventHandler('weapon:get:all', function(cb)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchAll('select * from job_armory,players,job_grades,jobs  where jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job', {
             ['@discord'] =  discord
@@ -537,7 +534,7 @@ RegisterNetEvent("weapon:get")
 -- source is global here, don't add to function
 AddEventHandler('weapon:get', function(cb, weapon)
     local sourceValue = source
-    local discord = exports.bf:GetDiscordFromSource(sourceValue)
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar("select amount from job_armory,players, job_grades, jobs where weapon = @weapon and jobs.id = job_armory.job and players.discord = @discord and job_grades.id = players.job_grade and jobs.id = job_grades.job",
     {
@@ -562,7 +559,7 @@ end)
 RegisterNetEvent("job:weapon:licence")
 
 AddEventHandler('job:weapon:licence', function (t,  bool)
-    local discord = exports.bf:GetDiscordFromSource(t)
+    local discord = exports.bro_core:GetDiscordFromSource(t)
     MySQL.ready(function ()
         MySQL.Async.insert('update players set gun_permis= @bool where discord = @discord', {
             ['@discord'] =  discord,
@@ -675,7 +672,7 @@ RegisterNetEvent("job:sell")
 -- source is global here, don't add to function
 AddEventHandler("job:sell", function (type, job, price, message)
   local sourceValue = source
-  local discord = exports.bf:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
   MySQL.ready(function ()
     MySQL.Async.fetchScalar('SELECT amount FROM `player_item`, players where players.id = player_item.player and discord = @discord and item = @item',
     {
@@ -741,7 +738,7 @@ end)
 
 AddEventHandler('playerDropped', function (reason)
     local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
     local isIn = isIn
     local job = job

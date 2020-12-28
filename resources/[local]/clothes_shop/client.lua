@@ -54,7 +54,7 @@ function addMenu(max, part, variante, maxVariant, isSkin)
         }
 	end
 
-    exports.bf:AddMenu("clothes-shop-"..part, {
+    exports.bro_core:AddMenu("clothes-shop-"..part, {
 		title = "Magasin Vêtements ",
 		position = 1,
 		buttons = buttons
@@ -88,7 +88,7 @@ function addMenu(max, part, variante, maxVariant, isSkin)
             }
         end
 
-        exports.bf:AddMenu("clothes-shop-"..part.."2", {
+        exports.bro_core:AddMenu("clothes-shop-"..part.."2", {
             title = "Magasin Vêtements ",
             position = 1,
             buttons = buttons
@@ -99,7 +99,7 @@ end
 
 -- open menu loop
 Citizen.CreateThread(function()
-    exports.bf:AddMenu("clothes-shop", {
+    exports.bro_core:AddMenu("clothes-shop", {
         title = "Magasin Vêtements ",
         position = 1,
         buttons = {
@@ -230,7 +230,7 @@ Citizen.CreateThread(function()
                                 skin[k] = v
                             end
                             TriggerServerEvent("account:player:liquid:add", "", price * -1)
-                            exports.bf:Notification('Vous avez modifié vos vétements. ~g~'..price..'$')
+                            exports.bro_core:Notification('Vous avez modifié vos vétements. ~g~'..price..'$')
                             TriggerServerEvent('skin:save', skin)
                             TriggerServerEvent('skin:clothes:save', clothesSkin)
                         end)
@@ -251,7 +251,7 @@ Citizen.CreateThread(function()
     addMenu(31, "watches", true, 10)
     addMenu(9, "bracelets", true, 10)
 
-    exports.bf:AddArea("clothes-shops", {
+    exports.bro_core:AddArea("clothes-shops", {
         marker = {
             type = 1,
             weight = 1,
@@ -264,7 +264,7 @@ Citizen.CreateThread(function()
             weight = 1,
             enter = {
                 callback = function()
-                    exports.bf:HelpPromt("Magasin : ~INPUT_PICKUP~")
+                    exports.bro_core:HelpPromt("Magasin : ~INPUT_PICKUP~")
                     zoneType = "clothes-shop"
                 end
             },
@@ -294,7 +294,7 @@ Citizen.CreateThread(function()
 		Citizen.Wait(0)	
 		if zoneType ~= nil and IsControlJustPressed(1,config.bindings.interact_position) then
 			if zoneType == "clothes-shop" then
-				exports.bf:OpenMenu("clothes-shop")
+				exports.bro_core:OpenMenu("clothes-shop")
 			end
 		end
 	end

@@ -1,7 +1,5 @@
 
 function StartDeathTimer()
-	local canPayFine = false
-
 	local bleedoutTimer = config.BleedoutTimer / 1000
 
 	Citizen.CreateThread(function()
@@ -21,9 +19,8 @@ function StartDeathTimer()
 end
 
 function SendDistressSignal()
-	local playerPed = PlayerPedId()
 	local coords = GetEntityCoords(playerPed)
-	TriggerServerEvent('job:lsms:distress', playerPed)
+	TriggerServerEvent('job:lsms:distress', coords, exports.bro_core:OpenTextInput({title= "Raison du Coma", customTitle = true}))
 end
 
 
@@ -45,6 +42,7 @@ function StartDistressSignal()
 			AddTextComponentSubstringPlayerName('G pour appeler')
 			EndTextCommandDisplayText(0.175, 0.805)
 
+			-- G control
 			if IsControlJustReleased(0, 47) then
 				SendDistressSignal()
 				break

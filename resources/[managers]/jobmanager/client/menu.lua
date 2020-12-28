@@ -1,5 +1,5 @@
 function menus() 
-	exports.bf:AddMenu("lspd", {
+	exports.bro_core:AddMenu("lspd", {
 		title = "Menu LSPD",
 		menuTitle = "Job",
 		position = 1,
@@ -24,16 +24,16 @@ function menus()
 				text = "Facturer",
 				exec = {
 					callback = function()
-						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer, dist = GetClosestPlayer()
 
 						if closestPlayer and dist <=1 then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
 						else
-							exports.bf:Notification("Pas de joueur à proximité")
+							exports.bro_core:Notification("Pas de joueur à proximité")
 						end
-						exports.bf:CloseMenu("lspd")
+						exports.bro_core:CloseMenu("lspd")
 					end
 				},
 			},
@@ -47,7 +47,7 @@ function menus()
 			},
 		},	
 	})
-	exports.bf:AddMenu("lspd-animations", {
+	exports.bro_core:AddMenu("lspd-animations", {
 		title = "LSPD",
 		menuTitle = "Animations",
 		position = 1,
@@ -94,7 +94,7 @@ function menus()
 			},
 		},
 	})
-	exports.bf:AddMenu("lspd-citizens", {
+	exports.bro_core:AddMenu("lspd-citizens", {
 		title = "LSPD",
 		menuTitle = "Animations",
 		position = 1,
@@ -130,7 +130,7 @@ function menus()
 		},
 	})
 
-	exports.bf:AddMenu("lspd-citizens-fines", {
+	exports.bro_core:AddMenu("lspd-citizens-fines", {
 		title = "LSPD",
 		menuTitle = "Amendes",
 		position = 1,
@@ -162,7 +162,7 @@ function menus()
 		},
 	})
 
-	exports.bf:AddMenu("lspd-veh", {
+	exports.bro_core:AddMenu("lspd-veh", {
 		title = "LSPD",
 		menuTitle = "Vehicules",
 		position = 1,
@@ -187,7 +187,7 @@ function menus()
 	})
 
 
-	exports.bf:AddMenu("lspd-props", {
+	exports.bro_core:AddMenu("lspd-props", {
 		title = "LSPD",
 		menuTitle = "Amendes",
 		position = 1,
@@ -267,7 +267,7 @@ function menus()
 		},
 	})
 
-	exports.bf:AddMenu("lsms", {
+	exports.bro_core:AddMenu("lsms", {
 		title = "Menu LSMS",
 		menuTitle = "Job",
 		position = 1,
@@ -292,16 +292,16 @@ function menus()
 				text = "Facturer",
 				exec = {
 					callback = function()
-						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer, dist = GetClosestPlayer()
 
 						if closestPlayer and dist <=1 then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 3)
 						else
-							exports.bf:Notification("Pas de joueur à proximité")
+							exports.bro_core:Notification("Pas de joueur à proximité")
 						end
-						exports.bf:CloseMenu("lspd")
+						exports.bro_core:CloseMenu("lspd")
 					end
 				},
 			},
@@ -326,13 +326,13 @@ function menus()
 					TriggerServerEvent("job:set:me", 34, "Livreur de journaux")
 					Wait(100)
 					TriggerServerEvent("job:get", "jobs:refresh")
-					exports.bf:CloseMenu("center")
+					exports.bro_core:CloseMenu("center")
                 end
             },
         }
     end
 
-	exports.bf:AddMenu("farm", {
+	exports.bro_core:AddMenu("farm", {
 		title = "Menu Fermier",
 		menuTitle = "Job",
 		position = 1,
@@ -341,16 +341,16 @@ function menus()
 				text = "Facturer",
 				exec = {
 					callback = function()
-						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer, dist = GetClosestPlayer()
 
 						if closestPlayer and dist <=1 then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 4)
 						else
-							exports.bf:Notification("Pas de joueur à proximité")
+							exports.bro_core:Notification("Pas de joueur à proximité")
 						end
-						exports.bf:CloseMenu("ferm")
+						exports.bro_core:CloseMenu("ferm")
 					end
 				},
 			},
@@ -381,12 +381,12 @@ function menus()
 		}
 	})
 	
-	exports.bf:AddMenu("sell", {
+	exports.bro_core:AddMenu("sell", {
 		title = "Revente ",
 		position = 2,
 	})
 
-	exports.bf:AddMenu("wine", {
+	exports.bro_core:AddMenu("wine", {
 		title = "Menu Vigneron",
 		menuTitle = "Job",
 		position = 1,
@@ -395,16 +395,16 @@ function menus()
 				text = "Facturer",
 				exec = {
 					callback = function()
-						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer, dist = GetClosestPlayer()
 
 						if closestPlayer and dist <=1 then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 5)
 						else
-							exports.bf:Notification("Pas de joueur à proximité")
+							exports.bro_core:Notification("Pas de joueur à proximité")
 						end
-						exports.bf:CloseMenu("wine")
+						exports.bro_core:CloseMenu("wine")
 					end
 				},
 			},
@@ -435,7 +435,7 @@ function menus()
 		}
 	})
 
-	exports.bf:AddMenu("taxi", {
+	exports.bro_core:AddMenu("taxi", {
 		title = "Menu Taxi",
 		menuTitle = "Job",
 		position = 1,
@@ -444,16 +444,16 @@ function menus()
 				text = "Facturer",
 				exec = {
 					callback = function()
-						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer, dist = GetClosestPlayer()
 
 						if closestPlayer and dist <=1 then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 6)
 						else
-							exports.bf:Notification("Pas de joueur à proximité")
+							exports.bro_core:Notification("Pas de joueur à proximité")
 						end
-						exports.bf:CloseMenu("taxi")
+						exports.bro_core:CloseMenu("taxi")
 					end
 				},
 			},
@@ -462,8 +462,8 @@ function menus()
 				exec = {
 					callback = function()
 						TriggerEvent("taxi:fares:start")
-						exports.bf:Notification("Les courses commencent")
-						exports.bf:CloseMenu("taxi")
+						exports.bro_core:Notification("Les courses commencent")
+						exports.bro_core:CloseMenu("taxi")
 					end
 				},
 			},
@@ -472,8 +472,8 @@ function menus()
 				exec = {
 					callback = function()
 						TriggerEvent("taxi:fares:stop")
-						exports.bf:Notification("Fin des courses")
-						exports.bf:CloseMenu("taxi")
+						exports.bro_core:Notification("Fin des courses")
+						exports.bro_core:CloseMenu("taxi")
 					end
 				},
 			},
@@ -488,7 +488,7 @@ function menus()
 		}
 	})
 
-	exports.bf:AddMenu("bennys", {
+	exports.bro_core:AddMenu("bennys", {
 		title = "Menu Benny's",
 		menuTitle = "Job",
 		position = 1,
@@ -510,7 +510,7 @@ function menus()
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-									exports.bf:CloseMenu("repair")
+									exports.bro_core:CloseMenu("repair")
 									lockRepare = true 
 									Citizen.CreateThread(function ()
 										FreezeEntityPosition(playerPed)
@@ -541,18 +541,18 @@ function menus()
 										FixVehicleWindow(vehicle, 7)
 										FixVehicleWindow(vehicle, 8)
 										TriggerServerEvent("job:repair:price", "window", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-										exports.bf:Notification("Véhicle réparé")
+										exports.bro_core:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
 									end)
 								else
-									exports.bf:Notification("~r~Sortez du véhicle")
+									exports.bro_core:Notification("~r~Sortez du véhicle")
 								end
 							else
-								exports.bf:Notification("~r~Pas de véhicule à portée")
+								exports.bro_core:Notification("~r~Pas de véhicule à portée")
 							end
 						else 
-							exports.bf:Notification("~r~Répération en cours")
+							exports.bro_core:Notification("~r~Répération en cours")
 						end
 					end
 				},
@@ -574,7 +574,7 @@ function menus()
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-									exports.bf:CloseMenu("repair")
+									exports.bro_core:CloseMenu("repair")
 									lockRepare = true 
 									Citizen.CreateThread(function ()
 										FreezeEntityPosition(playerPed)
@@ -603,18 +603,18 @@ function menus()
 										SetVehicleTyreFixed(vehicle, 5)
 										SetVehicleTyreFixed(vehicle, 6)
 										TriggerServerEvent("job:repair:price", "tyres", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-										exports.bf:Notification("Véhicle réparé")
+										exports.bro_core:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
 									end)
 								else
-									exports.bf:Notification("~r~Sortez du véhicle")
+									exports.bro_core:Notification("~r~Sortez du véhicle")
 								end
 							else
-								exports.bf:Notification("~r~Pas de véhicule à portée")
+								exports.bro_core:Notification("~r~Pas de véhicule à portée")
 							end
 						else 
-							exports.bf:Notification("~r~Répération en cours")
+							exports.bro_core:Notification("~r~Répération en cours")
 						end
 					end
 				},
@@ -636,7 +636,7 @@ function menus()
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-									exports.bf:CloseMenu("repair")
+									exports.bro_core:CloseMenu("repair")
 									lockRepare = true 
 									Citizen.CreateThread(function ()
 										FreezeEntityPosition(playerPed)
@@ -658,18 +658,18 @@ function menus()
 										Wait(time)
 										lockRepare = false
 										SetVehicleDirtLevel(vehicle, 0.0)
-										exports.bf:Notification("Véhicle réparé")
+										exports.bro_core:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
 									end)
 								else
-									exports.bf:Notification("~r~Sortez du véhicle")
+									exports.bro_core:Notification("~r~Sortez du véhicle")
 								end
 							else
-								exports.bf:Notification("~r~Pas de véhicule à portée")
+								exports.bro_core:Notification("~r~Pas de véhicule à portée")
 							end
 						else 
-							exports.bf:Notification("~r~Répération en cours")
+							exports.bro_core:Notification("~r~Répération en cours")
 						end
 					end
 				},
@@ -691,7 +691,7 @@ function menus()
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-									exports.bf:CloseMenu("repair")
+									exports.bro_core:CloseMenu("repair")
 									lockRepare = true 
 									Citizen.CreateThread(function ()
 										FreezeEntityPosition(playerPed)
@@ -712,18 +712,18 @@ function menus()
 										SetVehiclePetrolTankHealth(vehicle, 1000.0)
 										SetVehicleDeformationFixed(vehicle)
 										TriggerServerEvent("job:repair:price", "carroserie", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-										exports.bf:Notification("Véhicle réparé")
+										exports.bro_core:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
 									end)
 								else
-									exports.bf:Notification("~r~Sortez du véhicle")
+									exports.bro_core:Notification("~r~Sortez du véhicle")
 								end
 							else
-								exports.bf:Notification("~r~Pas de véhicule à portée")
+								exports.bro_core:Notification("~r~Pas de véhicule à portée")
 							end
 						else 
-							exports.bf:Notification("~r~Répération en cours")
+							exports.bro_core:Notification("~r~Répération en cours")
 						end
 					end
 				},
@@ -746,7 +746,7 @@ function menus()
 								if not IsPedInAnyVehicle(playerPed, false) then
 									local time = 4000
 									TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-									exports.bf:CloseMenu("repair")
+									exports.bro_core:CloseMenu("repair")
 									lockRepare = true 
 									Citizen.CreateThread(function ()
 										FreezeEntityPosition(playerPed)
@@ -771,18 +771,18 @@ function menus()
 										SetVehicleUndriveable(vehicle, false)
 										ClearPedTasksImmediately(playerPed)
 										TriggerServerEvent("job:repair:price", "motor", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-										exports.bf:Notification("Véhicle réparé")
+										exports.bro_core:Notification("Véhicle réparé")
 										ClearPedSecondaryTask(playerPed)
 										DeleteObject(prop)
 									end)
 								else
-									exports.bf:Notification("~r~Sortez du véhicle")
+									exports.bro_core:Notification("~r~Sortez du véhicle")
 								end
 							else
-								exports.bf:Notification("~r~Pas de véhicule à portée")
+								exports.bro_core:Notification("~r~Pas de véhicule à portée")
 							end
 						else 
-							exports.bf:Notification("~r~Répération en cours")
+							exports.bro_core:Notification("~r~Répération en cours")
 						end
 					end
 				},
@@ -791,16 +791,16 @@ function menus()
 				text = "Facturer",
 				exec = {
 					callback = function()
-						local motif = exports.bf:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-						local price = exports.bf:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer, dist = GetClosestPlayer()
 
 						if closestPlayer and dist <=1 then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 7)
 						else
-							exports.bf:Notification("Pas de joueur à proximité")
+							exports.bro_core:Notification("Pas de joueur à proximité")
 						end
-						exports.bf:CloseMenu("bennys")
+						exports.bro_core:CloseMenu("bennys")
 					end
 				},
 			},
@@ -815,7 +815,7 @@ function menus()
 		},
 	})
 
-	exports.bf:AddMenu("newspapers", {
+	exports.bro_core:AddMenu("newspapers", {
 		title = "Menu Livreurs de journaux",
 		menuTitle = "Job",
 		position = 1,
@@ -826,7 +826,7 @@ function menus()
 					callback = function()
 						beginInProgress = false
 						-- on nettoie la merde
-						exports.bf:RemoveArea("begin-current")
+						exports.bro_core:RemoveArea("begin-current")
 						vehicleLivraison = 0
 						ClearAllBlipRoutes()
 					end
@@ -836,7 +836,7 @@ function menus()
 	})
 
 
-	exports.bf:AddMenu("service", {
+	exports.bro_core:AddMenu("service", {
 		title = "Menu Service",
 		menuTitle = "Job",
 		position = 1,
@@ -877,7 +877,7 @@ function menus()
 	})
 
 
-	exports.bf:AddMenu("center", {
+	exports.bro_core:AddMenu("center", {
         title = "LSJC",
         menuTitle = "Prendre un emploi",
         position = 1,
@@ -885,7 +885,7 @@ function menus()
 	})
 
 
-	exports.bf:AddMenu("repair", {
+	exports.bro_core:AddMenu("repair", {
         title = "Réparation",
 		position = 1,
 		buttons = {
@@ -900,8 +900,8 @@ function menus()
 						SetVehicleUndriveable(vehicle, false)
 						ClearPedTasksImmediately(playerPed)
 						TriggerServerEvent("account:player:liquid:add", "", -10.0)
-						exports.bf:Notification("Véhicle réparé")
-						exports.bf:CloseMenu("repair")
+						exports.bro_core:Notification("Véhicle réparé")
+						exports.bro_core:CloseMenu("repair")
 					end
 				},
 			},
@@ -912,17 +912,17 @@ end
 
 
 function removeMenuPaint(max, type, nb) 
-	exports.bf:RemoveMenu("custom-paint"..nb.."-"..type)
+	exports.bro_core:RemoveMenu("custom-paint"..nb.."-"..type)
 end
 
 function removeMenuMod(type) 
-	exports.bf:RemoveMenu("custom-mod-"..type)
+	exports.bro_core:RemoveMenu("custom-mod-"..type)
 end
 
 function customMenuRemove()
-	exports.bf:RemoveMenu("custom")
-	exports.bf:RemoveMenu("custom-paint1")
-	exports.bf:RemoveMenu("custom-paint2")
+	exports.bro_core:RemoveMenu("custom")
+	exports.bro_core:RemoveMenu("custom-paint1")
+	exports.bro_core:RemoveMenu("custom-paint2")
 
 	for i = 1,2 do
 		removeMenuPaint(75, 0, i)	
@@ -972,7 +972,7 @@ function addMenuPaint(max, type, nb)
 			},
 		}
 	end
-	exports.bf:AddMenu("custom-paint"..nb.."-"..type, {
+	exports.bro_core:AddMenu("custom-paint"..nb.."-"..type, {
 		title = "Peinture type"..type,
 		position = 1,
 		buttons = buttons
@@ -1003,7 +1003,7 @@ function addMenuMod(type)
 			},
 		}
 	end
-	exports.bf:AddMenu("custom-mod-"..type, {
+	exports.bro_core:AddMenu("custom-mod-"..type, {
 		title = "Mod "..type,
 		position = 1,
 		buttons = buttons
@@ -1011,7 +1011,7 @@ function addMenuMod(type)
 end
 
 function customMenu()
-	exports.bf:AddMenu("custom", {
+	exports.bro_core:AddMenu("custom", {
         title = "Customisation",
 		position = 1,
 		buttons = {
@@ -1127,7 +1127,7 @@ function customMenu()
 		}
 	})
 	
-	exports.bf:AddMenu("custom-paint1", {
+	exports.bro_core:AddMenu("custom-paint1", {
         title = "Customisation",
 		position = 1,
 		buttons = {
@@ -1158,7 +1158,7 @@ function customMenu()
 		}
 	})
 
-	exports.bf:AddMenu("custom-paint2", {
+	exports.bro_core:AddMenu("custom-paint2", {
         title = "Customisation",
 		position = 1,
 		buttons = {

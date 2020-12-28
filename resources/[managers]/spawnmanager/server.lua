@@ -5,7 +5,7 @@ RegisterNetEvent("player:create")
 -- source is global here, don't add to function
 AddEventHandler('player:saveCoordsServer', function(pos, weapons, health)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local weapons = weapons
     local health = health
     MySQL.ready(function ()
@@ -19,7 +19,7 @@ end)
 -- source is global here, don't add to function
 AddEventHandler('player:get', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local cbe = cb
     MySQL.ready(function ()
         MySQL.Async.fetchAll('SELECT * FROM players WHERE discord = @discord', {
@@ -39,7 +39,7 @@ end)
 -- source is global here, don't add to function
 AddEventHandler('player:create', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local cbe = cb
     MySQL.ready(function ()
         MySQL.Async.insert("INSERT INTO `players` (`id`, `discord`, `x`, `y`, `z`, `job_grade`, `onDuty`, `skin`, `liquid`, `firstname`, `lastname`, `birth`, `permis`, `gun_permis`, `gameId`, `phone_number`) VALUES (NULL, @discord, '0', '0', '0', NULL, '0', NULL, '100', 'John', 'Smith', '00/01/1901', '0', '1', '-1', '')", {

@@ -17,7 +17,7 @@ RegisterNetEvent("atm:get")
 -- Player #1
 AddEventHandler('account:player:get', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, player_account, players where players.discord = @discord and players.id = player_account.player and accounts.id = player_account.account', {
 			['@discord'] = discord
@@ -29,7 +29,7 @@ end)
 
 AddEventHandler('account:player:add', function(cb, amount)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.execute('UPDATE accounts, player_account, players SET accounts.amount = accounts.amount + @amount WHERE player_account.player = players.id and players.discord = @discord and player_account.account= accounts.id ', 
 			{
@@ -45,7 +45,7 @@ end)
 -- Player liquid #2
 AddEventHandler('account:player:liquid:get', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
@@ -59,7 +59,7 @@ end)
 
 AddEventHandler('account:player:liquid:get:facture', function(cb, amount, sender, job)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
@@ -73,7 +73,7 @@ end)
 
 AddEventHandler('account:player:liquid:add', function(cb, amount)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local amount=amount
 	MySQL.ready(function ()
 		MySQL.Async.insert(
@@ -83,7 +83,7 @@ AddEventHandler('account:player:liquid:add', function(cb, amount)
 				['@amount'] = amount,
 			}, function(id)
 				MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
-					if liquid > 100000 then
+					if liquid > 50000 then
 						TriggerClientEvent("account:suitcase:on", sourceValue)
 					elseif liquid < 100000 then
 						TriggerClientEvent("account:suitcase:off", sourceValue)
@@ -97,7 +97,7 @@ end)
 -- Jobs #3
 AddEventHandler('account:job:get', function(cb, job)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account  where job_account.job = @job and accounts.id = job_account.account', {
 			['@job'] = job
@@ -109,7 +109,7 @@ end)
 
 AddEventHandler('account:job:add', function(cb, job, amount, silent)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local job = job
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {
@@ -127,13 +127,13 @@ AddEventHandler('account:job:add', function(cb, job, amount, silent)
 					}, function(result)
 						TriggerClientEvent(cb, sourceValue, result)
 						if not silent then
-							TriggerClientEvent('bf:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
+							TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
 						end
 					end)
 				end)
 			else
 				if not silent then
-					TriggerClientEvent('bf:Notification', sourceValue,  "Vous n'avez pas cet argent !")
+					TriggerClientEvent('bro_core:Notification', sourceValue,  "Vous n'avez pas cet argent !")
 				end
 			end
 		end)
@@ -142,7 +142,7 @@ end)
 
 AddEventHandler('account:job:withdraw', function(cb, job, amount)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local job = job
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where job_account.job = @job and accounts.id = job_account.account', {
@@ -159,11 +159,11 @@ AddEventHandler('account:job:withdraw', function(cb, job, amount)
 						['@amount'] = amount
 					}, function(result)
 						TriggerClientEvent(cb, sourceValue, result)
-						TriggerClientEvent('bf:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
+						TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
 					end)
 				end)
 			else
-				TriggerClientEvent('bf:Notification', sourceValue,  "L'entreprise n'a pas assez d'argent")
+				TriggerClientEvent('bro_core:Notification', sourceValue,  "L'entreprise n'a pas assez d'argent")
 			end
 		end)
 	end)
@@ -172,7 +172,7 @@ end)
 -- ATM
 AddEventHandler('atm:get', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local data = {
 
 	}

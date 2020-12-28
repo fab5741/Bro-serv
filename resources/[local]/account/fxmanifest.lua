@@ -3,7 +3,7 @@ game 'gta5'
 
 description '- Bro - Accounting'
 
-dependency "bf"
+dependency "bro_core"
 
 version '0.1'
 

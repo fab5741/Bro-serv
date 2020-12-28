@@ -6,12 +6,12 @@ description '- Bro -'
 version '0.0.1'
 
 dependencies {
-    'bf',
-    'account',
-    'items',
-    'vehicles',
-    'jobManager',
-    'crime'
+    'bro_core',
+   -- 'account',
+ --   'items',
+   -- 'vehicles',
+    ---'jobManager',
+   -- 'crime'
 }
 
 client_script  {

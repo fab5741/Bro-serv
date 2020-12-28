@@ -4,18 +4,18 @@ account = 0
 
 -- main loop
 Citizen.CreateThread(function()
-	exports.bf:AddMenu("gunshop", {
+	exports.bro_core:AddMenu("gunshop", {
 		title = "Ammunation",
 		position = 1,
 		buttons = {
 		},
 	})
-	exports.bf:AddArea("gunshop", {
+	exports.bro_core:AddArea("gunshop", {
 		trigger = {
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bf:HelpPromt("Magasin : ~INPUT_PICKUP~")
+					exports.bro_core:HelpPromt("Magasin : ~INPUT_PICKUP~")
 					zoneType = "gunshop"
 				end
 			},
@@ -49,9 +49,9 @@ RegisterNetEvent("gun:buy:ok")
 AddEventHandler("gun:buy:ok", function (bool, weapon)
 	if bool then
 		GiveWeaponToPed(GetPlayerPed(-1), weapon, 1000, false, false)
-		exports.bf:Notification("~g~Et voilà, faites pas le con avec.")
+		exports.bro_core:Notification("~g~Et voilà, faites pas le con avec.")
 	else
-		exports.bf:Notification("~r~Vous ne pouvez pas acheter cette arme")
+		exports.bro_core:Notification("~r~Vous ne pouvez pas acheter cette arme")
 	end
 end)
 
@@ -83,8 +83,8 @@ AddEventHandler("gun:shop2", function (job)
 			}
 		end
 	end
-	exports.bf:SetMenuButtons("gunshop", buttons)
-	exports.bf:OpenMenu("gunshop")
+	exports.bro_core:SetMenuButtons("gunshop", buttons)
+	exports.bro_core:OpenMenu("gunshop")
 end)
 
 RegisterNetEvent("gun:shop")
@@ -94,7 +94,7 @@ AddEventHandler("gun:shop", function (permis)
 	if permis then
 		TriggerServerEvent("job:get", "gun:shop2")
 	else
-		exports.bf:Notification("Vous n'avez pas le ~r~permis de port d'armes.~s~ Renseignez vous au LSPD.")
+		exports.bro_core:Notification("Vous n'avez pas le ~r~permis de port d'armes.~s~ Renseignez vous au LSPD.")
 	end
 end)
 
@@ -102,6 +102,6 @@ AddEventHandler('onResourceStop', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
 	  return
 	end
-	exports.bf:RemoveMenu("gunshop")
-	exports.bf:RemoveArea("gunshop")
+	exports.bro_core:RemoveMenu("gunshop")
+	exports.bro_core:RemoveArea("gunshop")
 end)

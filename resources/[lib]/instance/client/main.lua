@@ -28,7 +28,7 @@ end
 function LeaveInstance()
 	if instance.host then
 		if #instance.players > 1 then
-			exports.bf:Notification("Instance quitté")
+			exports.bro_core:Notification("Instance quitté")
 		end
 
 		if registeredInstanceTypes[instance.type].exit then

@@ -1,9 +1,9 @@
 -- Ping kicker
 -- Ping Limit
-pingLimit = 1000
+local pingLimit = 1000
 
-RegisterServerEvent("checkMyPingBro")
-AddEventHandler("checkMyPingBro", function()
+RegisterServerEvent("bro:ping:check")
+AddEventHandler("bro:ping:check", function()
 	ping = GetPlayerPing(source)
 	if ping >= pingLimit then
 		DropPlayer(source, "Votre ping est trop haut : (Limit: " .. pingLimit .. " Votre ping : " .. ping .. ")")
@@ -16,7 +16,7 @@ price = 10 -- you may edit this to your liking. if "enableprice = false" ignore 
 RegisterServerEvent('carwash:checkmoney')
 AddEventHandler('carwash:checkmoney', function ()
 local sourceValue = source
-local discord = exports.bf:GetDiscordFromSource(sourceValue)
+local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 MySQL.ready(function ()
   MySQL.Async.fetchAll('select liquid from players where discord = @discord',
       {['discord'] =  discord},

@@ -1,8 +1,6 @@
 AddEventHandler('player:dead', function(data)
     if(not isDead) then
         isDead = true
-        --TriggerServerEvent('lsms:setDeathStatus', true)
-
         StartDeathTimer()
         StartDistressSignal()
 

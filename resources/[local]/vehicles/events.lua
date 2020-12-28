@@ -19,10 +19,10 @@ RegisterNetEvent("vehicle:mods:refresh")
 
 AddEventHandler("ds:belt", function(belt)
 	if not belt then
-		exports.bf:Notification('Pas de ceinture ! Permis annulé')
-		exports.bf:DisableArea("checkpoints-1")
-		exports.bf:DisableArea("checkpoints-2")
-		exports.bf:DisableArea("checkpoints-3")
+		exports.bro_core:Notification('Pas de ceinture ! Permis annulé')
+		exports.bro_core:DisableArea("checkpoints-1")
+		exports.bro_core:DisableArea("checkpoints-2")
+		exports.bro_core:DisableArea("checkpoints-3")
 		ds = false
 	end
 end)
@@ -31,20 +31,20 @@ end)
 
 AddEventHandler("vehicle:permis:get:ds", function(permis)
 	if permis < 1 then
-		exports.bf:HelpPromt("Auto-école : ~INPUT_PICKUP~")
+		exports.bro_core:HelpPromt("Auto-école : ~INPUT_PICKUP~")
 		zoneType = "ds"
 	else
-		exports.bf:Notification("Vous avez déjà le permis")
+		exports.bro_core:Notification("Vous avez déjà le permis")
 	end
 end)
 
 
 AddEventHandler("vehicle:permis:get:depot", function(permis)
 	if permis > 0 then
-		exports.bf:HelpPromt("Fourrière : ~INPUT_PICKUP~")
+		exports.bro_core:HelpPromt("Fourrière : ~INPUT_PICKUP~")
 		zoneType = "depots"
 	else
-		exports.bf:Notification("Vous n'avez pas le permis")
+		exports.bro_core:Notification("Vous n'avez pas le permis")
 	end
 end)
 
@@ -77,10 +77,10 @@ AddEventHandler("vehicle:ds", function()
 	dsVehicle = vehicle
 	SetEntityAsNoLongerNeeded(vehicle)
 
-	exports.bf:Notification("~g~ L'épreuve commence. N'oubliez pas votre ceinture !")
-	exports.bf:EnableArea("checkpoints-1")
+	exports.bro_core:Notification("~g~ L'épreuve commence. N'oubliez pas votre ceinture !")
+	exports.bro_core:EnableArea("checkpoints-1")
 	ds = true
-	exports.bf:CloseMenu("ds")
+	exports.bro_core:CloseMenu("ds")
 end)
 
 
@@ -90,7 +90,7 @@ AddEventHandler("vehicle:job:buy:ok", function(name, id)
 	data.gameId = 0
 	data.name = name
 	spawnACar(data, false)
-	exports.bf:CloseMenu("shops-job")
+	exports.bro_core:CloseMenu("shops-job")
 end)
 
 
@@ -102,7 +102,7 @@ AddEventHandler("vehicle:buy:ok", function(name, id)
 	data.gameId = 0
 	data.name = name
 	spawnACar(data, false, true)
-	exports.bf:CloseMenu("shops")
+	exports.bro_core:CloseMenu("shops")
 end)
 
 
@@ -122,8 +122,8 @@ AddEventHandler("vehicle:job:shop", function(vehicles)
 			},
 		}
 	end
-	exports.bf:SetMenuButtons("shops", buttons)
-	exports.bf:OpenMenu("shops")
+	exports.bro_core:SetMenuButtons("shops", buttons)
+	exports.bro_core:OpenMenu("shops")
 end)
 
 
@@ -171,8 +171,8 @@ AddEventHandler("vehicle:shop", function(vehicles)
 	}
 	end
 	
-	exports.bf:SetMenuButtons("shops", buttons)
-	exports.bf:OpenMenu("shops")
+	exports.bro_core:SetMenuButtons("shops", buttons)
+	exports.bro_core:OpenMenu("shops")
 end)
 
 
@@ -232,8 +232,8 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 		}
 	end
 	end
-	exports.bf:SetMenuButtons("depots", buttons)
-	exports.bf:OpenMenu("depots")
+	exports.bro_core:SetMenuButtons("depots", buttons)
+	exports.bro_core:OpenMenu("depots")
 end)
 
 
@@ -254,7 +254,7 @@ AddEventHandler("vehicle:foot", function(vehicles)
 						Wait(time)
 
 						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
-						exports.bf:CloseMenu("parking-veh")
+						exports.bro_core:CloseMenu("parking-veh")
 						FreezeEntityPosition(playerPed, false)
 						lockParking = false
 					end
@@ -262,13 +262,13 @@ AddEventHandler("vehicle:foot", function(vehicles)
 		}
 	}
 	end
-	exports.bf:SetMenuButtons("parking-foot", buttons)
-	exports.bf:OpenMenu("parking-foot")
+	exports.bro_core:SetMenuButtons("parking-foot", buttons)
+	exports.bro_core:OpenMenu("parking-foot")
 end)
 
 
 AddEventHandler("vehicle:get", function(data)
-	exports.bf:CloseMenu("parking-foot")
+	exports.bro_core:CloseMenu("parking-foot")
 	TriggerServerEvent("vehicle:parking:get", data.id, "")
 	data.x = nil
 	data.y = nil
@@ -292,8 +292,8 @@ AddEventHandler("vehicle:depots:get", function(data)
 	end
 	TriggerServerEvent("account:player:add", "", -price)
 	TriggerServerEvent("account:job:add", "", 1, price, true)
-	exports.bf:Notification("Vous avez payé ~g~".. price.."$")
-	exports.bf:CloseMenu("depots")
+	exports.bro_core:Notification("Vous avez payé ~g~".. price.."$")
+	exports.bro_core:CloseMenu("depots")
 end)
 
 AddEventHandler("vehicle:depots:job:get", function(data, job)
@@ -311,8 +311,8 @@ AddEventHandler("vehicle:depots:job:get", function(data, job)
 	end
 	TriggerServerEvent("account:job:add", "", job, -price, true)
 	TriggerServerEvent("account:job:add", "", 1, price, true)
-	exports.bf:Notification("Vous avez payé ~g~".. price.."$")
-	exports.bf:CloseMenu("depots")
+	exports.bro_core:Notification("Vous avez payé ~g~".. price.."$")
+	exports.bro_core:CloseMenu("depots")
 end)
 
 function spawnACar(v, new, tpIn)
@@ -321,12 +321,12 @@ function spawnACar(v, new, tpIn)
 
 	--spawn
 	if v.x == nil or v.y == nil or v.z == nil then
-		vehicle = exports.bf:spawnCar(v.name, true, nil, true, true)
+		vehicle = exports.bro_core:spawnCar(v.name, true, nil, true, true)
 	else
 		if tpIn then
-			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), true, false, v.heading)
+			vehicle = exports.bro_core:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), true, false, v.heading)
 		else
-			vehicle = exports.bf:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), false, true, v.heading)
+			vehicle = exports.bro_core:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), false, true, v.heading)
 		end
 	end
 	TriggerServerEvent("vehicle:saveId", vehicle, v.gameId)
@@ -460,9 +460,9 @@ AddEventHandler('vehicle:lock', function(vehicle)
     -- test if its my vehicle
     if (islocked == 1)then
         SetVehicleDoorsLocked(vehicle, 2)
-        exports.bf:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+        exports.bro_core:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
     else
         SetVehicleDoorsLocked(vehicle,1)
-        exports.bf:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+        exports.bro_core:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
     end
 end)

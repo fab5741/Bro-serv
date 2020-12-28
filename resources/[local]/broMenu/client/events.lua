@@ -9,37 +9,135 @@ AddEventHandler("bf:open", function(job)
 	else
 		job = job[1]
 	end
-	exports.bf:SetMenuValue("bro", {
-		menuTitle = job.grade.." "..job.label
+--	exports.bro_core:SetMenuValue("bro", {
+--		menuTitle = job.grade.." "..job.label
+--	})
+--	exports.bro_core:OpenMenu("bro")
+
+	exports.bro_core:AddMenu("bromenu", {
+		Title = "Bromenu",
+		Subtitle = job.grade.." "..job.label,
+		buttons = { 
+			{
+				type = "button",
+				label = "Portefeuille",
+				style = { 
+					RightLabel = "",
+					LeftBadge = { 
+						BadgeTexture  = "mp_medal_bronze" 
+					}
+				},
+			---	actions = {
+				--	onSelected = function()
+				--		TriggerServerEvent("account:player:liquid:get", "bro_core:liquid")
+			--		end
+			--	},
+				subMenu = "bromenu-wallet"
+			},
+			{
+				type = "button",
+				label = "Inventaire",
+				actions = {
+					onSelected = function()
+						TriggerServerEvent("items:get", "bro_core:items")
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Vehicule",
+				openMenu = "bro-vehicle"
+			},
+			{
+				type = "button",
+				label = "Vetements",
+				style = {
+					LeftBadge = "Clothes"
+				},
+				openMenu = "bro-clothes"
+			},
+			{
+				type = "button",
+				label = "Quitter son travail",
+				actions = {
+					onSelected = function()
+						if  exports.bro_core:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
+							-- on quitte le job
+							TriggerServerEvent("job:set:me", nil, "Chomeur")
+							Wait(1000)
+							TriggerServerEvent("job:get", "jobs:refresh")
+						end
+					end
+				},
+			},
+		}
 	})
-	exports.bf:OpenMenu("bro")
+
+	local liquid = 150
+	exports.bro_core:AddSubMenu("bromenu-wallet", {
+		Title = "Portefeuille",
+		parent = "bromenu",
+		buttons = {
+			{
+				type = "button",
+				label = "Liquide",
+				style = {
+					RightLabel = exports.bro_core:Money(liquid)
+				},
+				actions = {
+					onSelected = function()
+						local amount = exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})
+						exports.bro_core:actionPlayer(2000, "Vous tendez les billets", "amb@prop_human_atm@female@base", "base",
+						function()
+							TriggerServerEvent("account:liquid:player:give", amount)
+						end)
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Identité",
+			},
+			{
+				type = "button",
+				label = "Montrer ma carte d'identité",
+				actions = {
+					onSelected = function()
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							TriggerServerEvent("bro:get", "bro:show")
+						end)
+					end
+				},
+			},
+		}
+	})
 end)
 
+RegisterNetEvent('bro_core:liquid')
 
-RegisterNetEvent('bf:liquid')
-
-AddEventHandler("bf:liquid", function(liquid) 
+AddEventHandler("bro_core:liquid", function(liquid) 
   local buttons = {}
 	buttons[1] =     {
-		text = "Liquide : " .. liquid.. " $",
+		label = "Liquide : " .. liquid.. " $",
 	}
 	buttons[2] =     {
-		text = "Identité",
-		exec = {
-			callback = function()
+		label = "Identité",
+		actions = {
+			onSelected = function()
 				TriggerServerEvent("bro:get", "bro:get")
 			end
 		}
 	}
 	buttons[3] =     {
-		text = "Montrer carte d'identité",
-		exec = {
-			callback = function()
+		label = "Montrer carte d'identité",
+		actions = {
+			onSelected = function()
 				local playerPed = GetPlayerPed(-1)
 				if lockChanging == false then
 					if not  IsPedInAnyVehicle(playerPed, false) then
 						local time = 4000
-						TriggerEvent("bf:progressBar:create", time, "Vous sortez votre carte")
+						TriggerEvent("bro_core:progressBar:create", time, "Vous sortez votre carte")
 						lockChanging = true 
 						Citizen.CreateThread(function ()
 							FreezeEntityPosition(playerPed, true)
@@ -59,23 +157,23 @@ AddEventHandler("bf:liquid", function(liquid)
 							FreezeEntityPosition(playerPed, false)
 						end)
 					else
-						exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+						exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
 					end
 				else 
-					exports.bf:Notification("~r~Vous sortez votre carte")
+					exports.bro_core:Notification("~r~Vous sortez votre carte")
 				end
 			end
 		}
 	}
 	buttons[4] =     {
-		text = "Montrer permis",
-		exec = {
-			callback = function()
+		label = "Montrer permis",
+		actions = {
+			onSelected = function()
 				local playerPed = GetPlayerPed(-1)
 				if lockChanging == false then
 					if not  IsPedInAnyVehicle(playerPed, false) then
 						local time = 4000
-						TriggerEvent("bf:progressBar:create", time, "Vous sortez votre carte")
+						TriggerEvent("bro_core:progressBar:create", time, "Vous sortez votre carte")
 						lockChanging = true 
 						Citizen.CreateThread(function ()
 							FreezeEntityPosition(playerPed, true)
@@ -95,16 +193,14 @@ AddEventHandler("bf:liquid", function(liquid)
 							FreezeEntityPosition(playerPed, false)
 						end)
 					else
-						exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+						exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
 					end
 				else 
-					exports.bf:Notification("~r~Vous sortez votre carte")
+					exports.bro_core:Notification("~r~Vous sortez votre carte")
 				end
 			end
 		}
 	}
-	exports.bf:SetMenuButtons("bro-wallet", buttons)
-	exports.bf:NextMenu("bro-wallet")
 end)
 
 RegisterNetEvent('bro:permis')
@@ -131,11 +227,11 @@ AddEventHandler("bro:get", function(data)
 	firstname = data.firstname
 	lastname = data.lastname
 	birth = data.birth
-	exports.bf:SetMenuValue("bro-wallet-character",
+	exports.bro_core:SetMenuValue("bro-wallet-character",
 	{
 		menuTitle = firstname.." ".. lastname.. " ("..birth.. ")",
 	})
-	exports.bf:NextMenu("bro-wallet-character")
+	exports.bro_core:NextMenu("bro-wallet-character")
 end)
 
 
@@ -144,15 +240,15 @@ end)
 RegisterNetEvent('bro:set')
 
 AddEventHandler("bro:set", function() 
-	exports.bf:SetMenuValue("bro-wallet-character",
+	exports.bro_core:SetMenuValue("bro-wallet-character",
 	{
 		menuTitle = firstname.." ".. lastname.. " ("..birth.. ")",
 	})
 end)
 
-RegisterNetEvent('bf:account:get')
+RegisterNetEvent('bro_core:account:get')
 
-AddEventHandler("bf:account:get", function(account) 
+AddEventHandler("bro_core:account:get", function(account) 
 	account = account
 end)
 
@@ -161,7 +257,7 @@ function giveToPlayer()
 	if closestPlayerPed and dist <=1 then
 		TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(closestPlayerPed))
 	else 
-		exports.bf:Notification("Pas de joueur à portée")
+		exports.bro_core:Notification("Pas de joueur à portée")
 	end
 end
 
@@ -175,30 +271,30 @@ AddEventHandler("bf:items", function(inventory)
 
 	for k, v in ipairs (inventory) do
 		buttons[k] =     {
-			text = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
-			exec = {
-				callback = function() 
+			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			actions = {
+				onSelected = function() 
 					local buttons = {}
 					buttons[1] =     {
-						text = "Utiliser",
-						exec = {
-							callback = function() 
+						label = "Utiliser",
+						actions = {
+							onSelected = function() 
 								TriggerServerEvent("items:use", v.item, 1)
 							end
 						},
 					}
 					buttons[2] =     {
-						text = "Donner",
-						exec = {
-							callback = function() 
+						label = "Donner",
+						actions = {
+							onSelected = function() 
 								giveToPlayer()
 							end
 						},
 					}
 				buttons[3] =     {
-						text = "Stocker vehicle",
-						exec = {
-							callback = function() 
+						label = "Stocker vehicle",
+						actions = {
+							onSelected = function() 
 								coords = GetEntityCoords(GetPlayerPed(-1), true)
 								local pos = GetEntityCoords(PlayerPedId())
 								local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
@@ -211,10 +307,10 @@ AddEventHandler("bf:items", function(inventory)
 										local playerPed = GetPlayerPed(-1)
 										if lockGetCar == false then
 											if not  IsPedInAnyVehicle(playerPed, false) then
-												nb = tonumber(exports.bf:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+												nb = tonumber(exports.bro_core:OpenlabelInput({customTitle = true, title = "Nombre", maxInputLength=10}))
 											
 												local time = 4000
-												TriggerEvent("bf:progressBar:create", time, "Stockage en cours")
+												TriggerEvent("bro_core:progressBar:create", time, "Stockage en cours")
 												lockGetCar = true 
 												Citizen.CreateThread(function ()
 													FreezeEntityPosition(playerPed)
@@ -234,58 +330,55 @@ AddEventHandler("bf:items", function(inventory)
 
 												end)
 											else
-												exports.bf:Notification("~r~Vous ne pouvez stocker en véhicule")
+												exports.bro_core:Notification("~r~Vous ne pouvez stocker en véhicule")
 											end
 										else 
-											exports.bf:Notification("~r~Stockage en cours")
+											exports.bro_core:Notification("~r~Stockage en cours")
 										end
 									else
-										exports.bf:Notification("~r~Ce véhicule est fermé")
+										exports.bro_core:Notification("~r~Ce véhicule est fermé")
 									end
 								else 
-									exports.bf:Notification("~r~Pas de véhicule à portée")
+									exports.bro_core:Notification("~r~Pas de véhicule à portée")
 								end
 							end
 						},
 					}
 					if v.item == 7 then
 						buttons[4] =     {
-							text = "Commencer la revente",
-							exec = {
-								callback = function() 
+							label = "Commencer la revente",
+							actions = {
+								onSelected = function() 
 									TriggerEvent("crime:drug:sell:start")
-									exports.bf:CloseMenu("bromenu")
+									exports.bro_core:CloseMenu("bromenu")
 								end
 							},
 						}
 						buttons[5] =     {
-							text = "Finir la revente",
-							exec = {
-								callback = function() 
+							label = "Finir la revente",
+							actions = {
+								onSelected = function() 
 									TriggerEvent("crime:drug:sell:stop")
-									exports.bf:CloseMenu("bromenu")
+									exports.bro_core:CloseMenu("bromenu")
 								end
 							},
 						}
 					end
-					exports.bf:SetMenuButtons("bro-items-item", buttons)
-					exports.bf:NextMenu("bro-items-item")
 				end
 			},
 		}
 		weight = weight + (v.amount*v.weight)
 	end
-	exports.bf:SetMenuButtons("bro-items", buttons)
 	if weight > (3/4*maxWeight) then
-		exports.bf:SetMenuValue("bro-items", {
+		exports.bro_core:SetMenuValue("bro-items", {
 			menuTitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg",
 		})
 	else
-		exports.bf:SetMenuValue("bro-items", {
+		exports.bro_core:SetMenuValue("bro-items", {
 			menuTitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg",
 		})
 	end
-	exports.bf:NextMenu("bro-items")
+	exports.bro_core:NextMenu("bro-items")
 end)
 
 
@@ -299,20 +392,20 @@ AddEventHandler("vehicle:items:open", function(inventory)
 
 	for k, v in ipairs (inventory) do
 		buttons[k] =     {
-			text = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
-			exec = {
-				callback = function() 
+			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			actions = {
+				onSelected = function() 
 					local buttons = {}
 					buttons[1] =     {
-						text = "Récupérer",
-						exec = {
-							callback = function() 
+						label = "Récupérer",
+						actions = {
+							onSelected = function() 
 								local playerPed = GetPlayerPed(-1)
 								if lockGetCar == false then
 									if not  IsPedInAnyVehicle(playerPed, false) then
-										nb = tonumber(exports.bf:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+										nb = tonumber(exports.bro_core:OpenlabelInput({customTitle = true, title = "Nombre", maxInputLength=10}))
 										local time = 4000
-										TriggerEvent("bf:progressBar:create", time, "Stockage en cours")
+										TriggerEvent("bro_core:progressBar:create", time, "Stockage en cours")
 										lockGetCar = true 
 										Citizen.CreateThread(function ()
 											FreezeEntityPosition(playerPed)
@@ -331,33 +424,30 @@ AddEventHandler("vehicle:items:open", function(inventory)
 											TriggerServerEvent("item:vehicle:get", v.vehicle_mod, v.id, nb)
 										end)
 									else
-										exports.bf:Notification("~r~Vous ne pouvez stocker en véhicule")
+										exports.bro_core:Notification("~r~Vous ne pouvez stocker en véhicule")
 									end
 								else 
-									exports.bf:Notification("~r~Stockage en cours")
+									exports.bro_core:Notification("~r~Stockage en cours")
 								end
 							end
 						},
 					}
-					exports.bf:SetMenuButtons("bro-items-item", buttons)
-					exports.bf:NextMenu("bro-items-item")
 				end
 			},
 		}
 		weight = weight + (v.amount*v.weight)
 	end
 
-	exports.bf:SetMenuButtons("bro-items", buttons)
 	if weight > (3/4*maxWeight) then
-		exports.bf:SetMenuValue("bro-items", {
+		exports.bro_core:SetMenuValue("bro-items", {
 			menuTitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg",
 		})
 	else
-		exports.bf:SetMenuValue("bro-items", {
+		exports.bro_core:SetMenuValue("bro-items", {
 			menuTitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg",
 		})
 	end
-	exports.bf:NextMenu("bro-items")
+	exports.bro_core:NextMenu("bro-items")
 end)
 
 
@@ -391,7 +481,7 @@ AddEventHandler('bromenu:mask', function()
 	if not lockChanging then
 		local time = 2000
 		local playerPed = GetPlayerPed(-1)
-		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		TriggerEvent("bro_core:progressBar:create", time, "Changement en cours")
 		lockChanging = true 
 		Citizen.CreateThread(function ()
 			FreezeEntityPosition(playerPed, true)
@@ -416,7 +506,7 @@ AddEventHandler('bromenu:mask', function()
 			FreezeEntityPosition(playerPed, false)
 		end)
 	else
-		exports.bf:Notification("~r~Vous êtes occupé")
+		exports.bro_core:Notification("~r~Vous êtes occupé")
 	end
 end)
 
@@ -425,7 +515,7 @@ AddEventHandler('bromenu:koszulka', function()
 	if not lockChanging then
 		local time = 2000
 		local playerPed = GetPlayerPed(-1)
-		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		TriggerEvent("bro_core:progressBar:create", time, "Changement en cours")
 		lockChanging = true 
 		Citizen.CreateThread(function ()
 			FreezeEntityPosition(playerPed, true)
@@ -452,7 +542,7 @@ AddEventHandler('bromenu:koszulka', function()
 			FreezeEntityPosition(playerPed, false)
 		end)
 	else
-		exports.bf:Notification("~r~Vous êtes occupé")
+		exports.bro_core:Notification("~r~Vous êtes occupé")
 	end
 end)
 RegisterNetEvent('bromenu:spodnie')
@@ -460,7 +550,7 @@ AddEventHandler('bromenu:spodnie', function()
 	if not lockChanging then
 		local time = 2000
 		local playerPed = GetPlayerPed(-1)
-		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		TriggerEvent("bro_core:progressBar:create", time, "Changement en cours")
 		lockChanging = true 
 		Citizen.CreateThread(function ()
 			FreezeEntityPosition(playerPed, true)
@@ -485,7 +575,7 @@ AddEventHandler('bromenu:spodnie', function()
 			FreezeEntityPosition(playerPed, false)
 		end)
 	else
-		exports.bf:Notification("~r~Vous êtes occupé")
+		exports.bro_core:Notification("~r~Vous êtes occupé")
 	end
 end)
 
@@ -494,7 +584,7 @@ AddEventHandler('bromenu:buty', function()
 	if not lockChanging then
 		local time = 2000
 		local playerPed = GetPlayerPed(-1)
-		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		TriggerEvent("bro_core:progressBar:create", time, "Changement en cours")
 		lockChanging = true 
 		Citizen.CreateThread(function ()
 			FreezeEntityPosition(playerPed, true)
@@ -519,7 +609,7 @@ AddEventHandler('bromenu:buty', function()
 			FreezeEntityPosition(playerPed, false)
 		end)
 	else
-		exports.bf:Notification("~r~Vous êtes occupé")
+		exports.bro_core:Notification("~r~Vous êtes occupé")
 	end
 end)
 
@@ -528,7 +618,7 @@ AddEventHandler('bromenu:skin:reset', function(skin)
 	if not lockChanging then
 		local time = 2000
 		local playerPed = GetPlayerPed(-1)
-		TriggerEvent("bf:progressBar:create", time, "Changement en cours")
+		TriggerEvent("bro_core:progressBar:create", time, "Changement en cours")
 		lockChanging = true 
 		Citizen.CreateThread(function ()
 			FreezeEntityPosition(playerPed, true)
@@ -548,7 +638,7 @@ AddEventHandler('bromenu:skin:reset', function(skin)
 			FreezeEntityPosition(playerPed, false)
 		end)
 	else
-		exports.bf:Notification("~r~Vous êtes occupé")
+		exports.bro_core:Notification("~r~Vous êtes occupé")
 	end
 end)
 
@@ -558,12 +648,7 @@ AddEventHandler('onResourceStop', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
 	  return
 	end
-	exports.bf:RemoveMenu("bro")
-	exports.bf:RemoveMenu("bro-wallet")
-	exports.bf:RemoveMenu("bro-items")
-	exports.bf:RemoveMenu("bro-items-item")
-	exports.bf:RemoveMenu("bro-wallet-character")
-	exports.bf:RemoveMenu("bro-vehicles")
-	exports.bf:RemoveMenu("bro-clothes")
+	exports.bro_core:RemoveMenu("bromenu-wallet")
+	exports.bro_core:RemoveMenu("bromenu")
 end)
 

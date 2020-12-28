@@ -122,8 +122,8 @@ Citizen.CreateThread(function()
 		elseif zoneType == "shops-job" and IsControlJustPressed(1, 51) then
 				TriggerServerEvent("vehicle:shop:job:get:all", "vehicle:job:shop")		
 		elseif zoneType == "parking" and IsControlJustPressed(1, 51) then
-			if exports.bf:isPedDrivingAVehicle() then
-				exports.bf:SetMenuValue("parking-veh", {
+			if exports.bro_core:isPedDrivingAVehicle() then
+				exports.bro_core:SetMenuValue("parking-veh", {
 					buttons = {
 						{
 							text = "Stocker : " .. zone,
@@ -140,7 +140,7 @@ Citizen.CreateThread(function()
 										TriggerServerEvent("vehicle:store", currentVehicle, zone)
 										currentVehicle = 0
 										DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-										exports.bf:CloseMenu("parking-veh")
+										exports.bro_core:CloseMenu("parking-veh")
 										FreezeEntityPosition(playerPed, false)
 										lockParking = false
 									end
@@ -150,21 +150,21 @@ Citizen.CreateThread(function()
 					}
 				})
 
-				exports.bf:OpenMenu("parking-veh")
+				exports.bro_core:OpenMenu("parking-veh")
 			else
 				TriggerServerEvent("vehicle:parking:get:all", zone, "vehicle:foot")
 			end
 		elseif zoneType == "depots" and IsControlJustPressed(1, 51) then
-			if exports.bf:isPedDrivingAVehicle() then
-				exports.bf:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
+			if exports.bro_core:isPedDrivingAVehicle() then
+				exports.bro_core:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
 			else
 				TriggerServerEvent("vehicle:depots:get:all", "vehicle:depots")
 			end
 		elseif zoneType == "ds" and IsControlJustPressed(1, 51) then
-			if exports.bf:isPedDrivingAVehicle() then
-				exports.bf:Notification('~r~Tu ne peux pas passer le permis de voiture en conduisant.')
+			if exports.bro_core:isPedDrivingAVehicle() then
+				exports.bro_core:Notification('~r~Tu ne peux pas passer le permis de voiture en conduisant.')
 			else
-				exports.bf:OpenMenu("ds")
+				exports.bro_core:OpenMenu("ds")
 			end
 		end
 
@@ -172,10 +172,10 @@ Citizen.CreateThread(function()
 			local ped = GetPlayerPed(-1)
 			vehicle = GetVehiclePedIsIn(ped, false)
 			if vehicle ~= dsVehicle then
-				exports.bf:Notification('Vous êtes descendu de la voiture. Permis annulé')
-				exports.bf:DisableArea("checkpoints-1")
-				exports.bf:DisableArea("checkpoints-2")
-				exports.bf:DisableArea("checkpoints-3")
+				exports.bro_core:Notification('Vous êtes descendu de la voiture. Permis annulé')
+				exports.bro_core:DisableArea("checkpoints-1")
+				exports.bro_core:DisableArea("checkpoints-2")
+				exports.bro_core:DisableArea("checkpoints-3")
 				ds = false
 			end
 		end

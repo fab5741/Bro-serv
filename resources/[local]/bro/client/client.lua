@@ -1,154 +1,118 @@
--- rag doll on leg dammage
-local BONES = {
-	--[[Pelvis]][11816] = true,
-	--[[SKEL_L_Thigh]][58271] = true,
-	--[[SKEL_L_Calf]][63931] = true,
-	--[[SKEL_L_Foot]][14201] = true,
-	--[[SKEL_L_Toe0]][2108] = true,
-	--[[IK_L_Foot]][65245] = true,
-	--[[PH_L_Foot]][57717] = true,
-	--[[MH_L_Knee]][46078] = true,
-	--[[SKEL_R_Thigh]][51826] = true,
-	--[[SKEL_R_Calf]][36864] = true,
-	--[[SKEL_R_Foot]][52301] = true,
-	--[[SKEL_R_Toe0]][20781] = true,
-	--[[IK_R_Foot]][35502] = true,
-	--[[PH_R_Foot]][24806] = true,
-	--[[MH_R_Knee]][16335] = true,
-	--[[RB_L_ThighRoll]][23639] = true,
-	--[[RB_R_ThighRoll]][6442] = true,
+--
+-- Config
+--
+
+config = {
+    keys = {
+        pointing = 29,
+        interact = 38,
+    }   
 }
 
-
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(0)
-		local ped = GetPlayerPed(-1)
-			--if IsShockingEventInSphere(102, 235.497,2894.511,43.339,999999.0) then
-			if HasEntityBeenDamagedByAnyPed(ped) then
-			--if GetPedLastDamageBone(ped) = 
-					Disarm(ped)
-			end
-			ClearEntityLastDamageEntity(ped)
-	 end
-end)
+--
+-- \ Config
+--
 
 
+--
+-- Variables
+--
 
-function Bool (num) return num == 1 or num == true end
-
--- WEAPON DROP OFFSETS
-local function GetDisarmOffsetsForPed (ped)
-	local v
-
-	if IsPedWalking(ped) then v = { 0.6, 4.7, -0.1 }
-	elseif IsPedSprinting(ped) then v = { 0.6, 5.7, -0.1 }
-	elseif IsPedRunning(ped) then v = { 0.6, 4.7, -0.1 }
-	else v = { 0.4, 4.7, -0.1 } end
-
-	return v
-end
-
-function Disarm (ped)
-	if IsEntityDead(ped) then return false end
-
-	local boneCoords
-	local hit, bone = GetPedLastDamageBone(ped)
-
-	hit = Bool(hit)
-
-	if hit then
-		if BONES[bone] then
-			
-
-			boneCoords = GetWorldPositionOfEntityBone(ped, GetPedBoneIndex(ped, bone))
-			SetPedToRagdoll(GetPlayerPed(-1), 5000, 5000, 0, 0, 0, 0)
-			
-
-			return true
-		end
-	end
-
-	return false 
-end
-
-	
-
--- Ping kick
-checkRate = 1000
-
-Citizen.CreateThread(function()
-	while true do
-		Wait(checkRate)
-	--	TriggerServerEvent("checkMyPingBro")
-	end
-end)
-
---pausemenu change text
-function AddTextEntry(key, value)
-	Citizen.InvokeNative(GetHashKey("ADD_TEXT_ENTRY"), key, value)
-end
-
-Citizen.CreateThread(function()
-  AddTextEntry('FE_THDR_GTAO', 'Le serveur des bros')
-end)
-
+--global
+ped = GetPlayerPed(-1)
 
 -- point finger
 local mp_pointing = false
 local keyPressed = false
-
-local function startPointing()
-    local ped = GetPlayerPed(-1)
-    RequestAnimDict("anim@mp_point")
-    while not HasAnimDictLoaded("anim@mp_point") do
-        Wait(0)
-    end
-    SetPedCurrentWeaponVisible(ped, 0, 1, 1, 1)
-    SetPedConfigFlag(ped, 36, 1)
-    Citizen.InvokeNative(0x2D537BA194896636, ped, "task_mp_pointing", 0.5, 0, "anim@mp_point", 24)
-    RemoveAnimDict("anim@mp_point")
-end
-
-local function stopPointing()
-    local ped = GetPlayerPed(-1)
-    Citizen.InvokeNative(0xD01015C7316AE176, ped, "Stop")
-    if not IsPedInjured(ped) then
-        ClearPedSecondaryTask(ped)
-    end
-    if not IsPedInAnyVehicle(ped, 1) then
-        SetPedCurrentWeaponVisible(ped, 1, 1, 1, 1)
-    end
-    SetPedConfigFlag(ped, 36, 0)
-    ClearPedSecondaryTask(PlayerPedId())
-end
-
 local once = true
-local oldval = false
-local oldvalped = false
 
+-- weapon on back
+local SETTINGS = {
+    back_bone = 24816,
+    x = 0.075,
+    y = -0.15,
+    z = -0.02,
+    x_rotation = 0.0,
+    y_rotation = 165.0,
+    z_rotation = 0.0,
+    compatable_weapon_hashes = {
+      ["w_me_bat"] = -1786099057,
+      -- assault rifles:
+      ["w_ar_carbinerifle"] = -2084633992,
+      ["w_ar_carbineriflemk2"] = GetHashKey("WEAPON_CARBINERIFLE_MK2"),
+      ["w_ar_assaultrifle"] = -1074790547,
+      ["w_ar_specialcarbine"] = -1063057011,
+      ["w_ar_bullpuprifle"] = 2132975508,
+      ["w_ar_advancedrifle"] = -1357824103,
+      -- sub machine guns:
+      ["w_sb_microsmg"] = 324215364,
+      ["w_sb_assaultsmg"] = -270015777,
+      ["w_sb_smg"] = 736523883,
+      ["w_sb_smgmk2"] = GetHashKey("WEAPON_SMG_MK2"),
+      ["w_sb_gusenberg"] = 1627465347,
+      -- sniper rifles:
+      ["w_sr_sniperrifle"] = 100416529,
+      -- shotguns:
+      ["w_sg_assaultshotgun"] = -494615257,
+      ["w_sg_bullpupshotgun"] = -1654528753,
+      ["w_sg_pumpshotgun"] = 487013001,
+      ["w_ar_musket"] = -1466123874,
+      ["w_sg_heavyshotgun"] = GetHashKey("WEAPON_HEAVYSHOTGUN"),
+    }
+}
+
+local attached_weapons = {}
+
+
+--
+-- \ Variables
+--
+
+
+-- Main loop
 Citizen.CreateThread(function()
-    while true do
-        Wait(0)
+    -- change menu texts
+    Citizen.InvokeNative(GetHashKey("ADD_TEXT_ENTRY"), "FE_THDR_GTAO", "Le serveur des bros")
+	while true do
+        Citizen.Wait(0)
+        
+        --
+        -- Disarm when leg shot
+        --
 
+        --if IsShockingEventInSphere(102, 235.497,2894.511,43.339,999999.0) then
+        if HasEntityBeenDamagedByAnyPed(ped) then
+        --if GetPedLastDamageBone(ped) = 
+                Disarm(ped)
+        end
+        ClearEntityLastDamageEntity(ped)
+            
+
+        --
+        -- \ Leg Shot
+        --
+
+        --
+        -- Pointing finger
+        --
         if once then
             once = false
         end
 
         if not keyPressed then
-            if IsControlPressed(0, 29) and not mp_pointing and IsPedOnFoot(PlayerPedId()) then
+            if IsControlPressed(0, config.keys.pointing) and not mp_pointing and IsPedOnFoot(PlayerPedId()) then
                 Wait(200)
-                if not IsControlPressed(0, 29) then
+                if not IsControlPressed(0, config.keys.pointing) then
                     keyPressed = true
                     startPointing()
                     mp_pointing = true
                 else
                     keyPressed = true
-                    while IsControlPressed(0, 29) do
+                    while IsControlPressed(0, config.keys.pointing) do
                         Wait(50)
                     end
                 end
-            elseif (IsControlPressed(0, 29) and mp_pointing) or (not IsPedOnFoot(PlayerPedId()) and mp_pointing) then
+            elseif (IsControlPressed(0, config.keys.pointing) and mp_pointing) or (not IsPedOnFoot(PlayerPedId()) and mp_pointing) then
                 keyPressed = true
                 mp_pointing = false
                 stopPointing()
@@ -156,7 +120,7 @@ Citizen.CreateThread(function()
         end
 
         if keyPressed then
-            if not IsControlPressed(0, 29) then
+            if not IsControlPressed(0, config.keys.pointing) then
                 keyPressed = false
             end
         end
@@ -167,7 +131,6 @@ Citizen.CreateThread(function()
             if not IsPedOnFoot(PlayerPedId()) then
                 stopPointing()
             else
-                local ped = GetPlayerPed(-1)
                 local camPitch = GetGameplayCamRelativePitch()
                 if camPitch < -70.0 then
                     camPitch = -70.0
@@ -200,137 +163,78 @@ Citizen.CreateThread(function()
 
             end
         end
-    end
-end)
+        --
+        -- \ Pointing finger
+        --
 
--- Weapons on back
+        --
+        -- Weapons on Back
+        --
+        -- this script puts certain large weapons on a player's back when it is not currently selected but still in there weapon wheel
+        -- by: minipunch
+        -- originally made for USA Realism RP (https://usarrp.net)
 
--- this script puts certain large weapons on a player's back when it is not currently selected but still in there weapon wheel
--- by: minipunch
--- originally made for USA Realism RP (https://usarrp.net)
-
--- Add weapons to the 'compatable_weapon_hashes' table below to make them show up on a player's back (can use GetHashKey(...) if you don't know the hash) --
-local SETTINGS = {
-    back_bone = 24816,
-    x = 0.075,
-    y = -0.15,
-    z = -0.02,
-    x_rotation = 0.0,
-    y_rotation = 165.0,
-    z_rotation = 0.0,
-    compatable_weapon_hashes = {
-      -- melee:
-      --["prop_golf_iron_01"] = 1141786504, -- positioning still needs work
-      ["w_me_bat"] = -1786099057,
-      ["prop_ld_jerrycan_01"] = 883325847,
-      -- assault rifles:
-      ["w_ar_carbinerifle"] = -2084633992,
-      ["w_ar_carbineriflemk2"] = GetHashKey("WEAPON_CARBINERIFLE_MK2"),
-      ["w_ar_assaultrifle"] = -1074790547,
-      ["w_ar_specialcarbine"] = -1063057011,
-      ["w_ar_bullpuprifle"] = 2132975508,
-      ["w_ar_advancedrifle"] = -1357824103,
-      -- sub machine guns:
-      ["w_sb_microsmg"] = 324215364,
-      ["w_sb_assaultsmg"] = -270015777,
-      ["w_sb_smg"] = 736523883,
-      ["w_sb_smgmk2"] = GetHashKey("WEAPON_SMG_MK2"),
-      ["w_sb_gusenberg"] = 1627465347,
-      -- sniper rifles:
-      ["w_sr_sniperrifle"] = 100416529,
-      -- shotguns:
-      ["w_sg_assaultshotgun"] = -494615257,
-      ["w_sg_bullpupshotgun"] = -1654528753,
-      ["w_sg_pumpshotgun"] = 487013001,
-      ["w_ar_musket"] = -1466123874,
-      ["w_sg_heavyshotgun"] = GetHashKey("WEAPON_HEAVYSHOTGUN"),
-      -- ["w_sg_sawnoff"] = 2017895192 don't show, maybe too small?
-      -- launchers:
-      ["w_lr_firework"] = 2138347493
-    }
-}
-
-local attached_weapons = {}
-
-Citizen.CreateThread(function()
-  while true do
-      local me = GetPlayerPed(-1)
-      ---------------------------------------
-      -- attach if player has large weapon --
-      ---------------------------------------
-      for wep_name, wep_hash in pairs(SETTINGS.compatable_weapon_hashes) do
-          if HasPedGotWeapon(me, wep_hash, false) then
-              if not attached_weapons[wep_name] then
-                  AttachWeapon(wep_name, wep_hash, SETTINGS.back_bone, SETTINGS.x, SETTINGS.y, SETTINGS.z, SETTINGS.x_rotation, SETTINGS.y_rotation, SETTINGS.z_rotation, isMeleeWeapon(wep_name))
-              end
-          end
-      end
-      --------------------------------------------
-      -- remove from back if equipped / dropped --
-      --------------------------------------------
-      for name, attached_object in pairs(attached_weapons) do
-          -- equipped? delete it from back:
-          if GetSelectedPedWeapon(me) ==  attached_object.hash or not HasPedGotWeapon(me, attached_object.hash, false) then -- equipped or not in weapon wheel
+        -- Add weapons to the 'compatable_weapon_hashes' table below to make them show up on a player's back (can use GetHashKey(...) if you don't know the hash) --
+        ---------------------------------------
+        -- attach if player has large weapon --
+        ---------------------------------------
+        for wep_name, wep_hash in pairs(SETTINGS.compatable_weapon_hashes) do
+            if HasPedGotWeapon(ped, wep_hash, false) then
+                if not attached_weapons[wep_name] then
+                    AttachWeapon(wep_name, wep_hash, SETTINGS.back_bone, SETTINGS.x, SETTINGS.y, SETTINGS.z, SETTINGS.x_rotation, SETTINGS.y_rotation, SETTINGS.z_rotation, isMeleeWeapon(wep_name))
+                end
+            end
+        end
+        --------------------------------------------
+        -- remove from back if equipped / dropped --
+        --------------------------------------------
+        for name, attached_object in pairs(attached_weapons) do
+            -- equipped? delete it from back:
+            if GetSelectedPedWeapon(ped) ==  attached_object.hash or not HasPedGotWeapon(ped, attached_object.hash, false) then -- equipped or not in weapon wheel
             DeleteObject(attached_object.handle)
             attached_weapons[name] = nil
-          end
-      end
-  Wait(0)
-  end
-end)
+            end
+        end
+        --
+        -- \ Weapons on Back
+        --
+	 end
+end)	
 
-function AttachWeapon(attachModel,modelHash,boneNumber,x,y,z,xR,yR,zR, isMelee)
-	local bone = GetPedBoneIndex(GetPlayerPed(-1), boneNumber)
-	RequestModel(attachModel)
-	while not HasModelLoaded(attachModel) do
-		Wait(100)
+
+--
+-- Check ping
+--
+Citizen.CreateThread(function()
+    -- Check ping
+	while true do
+		Wait(10000)
+		TriggerServerEvent("bro:ping:check")
 	end
-
-  attached_weapons[attachModel] = {
-    hash = modelHash,
-    handle = CreateObject(GetHashKey(attachModel), 1.0, 1.0, 1.0, true, true, false)
-  }
-
-  if isMelee then x = 0.11 y = -0.14 z = 0.0 xR = -75.0 yR = 185.0 zR = 92.0 end -- reposition for melee items
-  if attachModel == "prop_ld_jerrycan_01" then x = x + 0.3 end
-	AttachEntityToEntity(attached_weapons[attachModel].handle, GetPlayerPed(-1), bone, x, y, z, xR, yR, zR, 1, 1, 0, 0, 2, 1)
-end
-
-function isMeleeWeapon(wep_name)
-    if wep_name == "prop_golf_iron_01" then
-        return true
-    elseif wep_name == "w_me_bat" then
-        return true
-    elseif wep_name == "prop_ld_jerrycan_01" then
-      return true
-    else
-        return false
-    end
-end
+end)
+--
+-- \ Check ping
+--
 
 
--- wheelchair
-RegisterCommand('wheelchair', function()
-	LoadModel('prop_wheelchair_01')
-
-	local wheelchair = CreateObject(GetHashKey('prop_wheelchair_01'), GetEntityCoords(PlayerPedId()), true)
-end, false)
-
-RegisterCommand('removewheelchair', function()
-	local wheelchair = GetClosestObjectOfType(GetEntityCoords(PlayerPedId()), 10.0, GetHashKey('prop_wheelchair_01'))
+--
+-- Wheel chair
+--
+RegisterCommand('chaise', function()
+    local wheelchair = GetClosestObjectOfType(GetEntityCoords(PlayerPedId()), 10.0, GetHashKey('prop_wheelchair_01'))
 
 	if DoesEntityExist(wheelchair) then
-		DeleteEntity(wheelchair)
+        DeleteEntity(wheelchair)
+    else
+        exports.bro_core:LoadModel('prop_wheelchair_01')
+        local wheelchair = CreateObject(GetHashKey('prop_wheelchair_01'), GetEntityCoords(PlayerPedId()), true)    
 	end
 end, false)
 
 Citizen.CreateThread(function()
 	while true do
 		local sleep = 500
-
-		local ped = PlayerPedId()
 		local pedCoords = GetEntityCoords(ped)
-
 		local closestObject = GetClosestObjectOfType(pedCoords, 3.0, GetHashKey("prop_wheelchair_01"), false)
 
 		if DoesEntityExist(closestObject) then
@@ -342,18 +246,29 @@ Citizen.CreateThread(function()
 			local sitCoords = (wheelChairCoords + wheelChairForward * - 0.5)
 			local pickupCoords = (wheelChairCoords + wheelChairForward * 0.3)
 
-			if GetDistanceBetweenCoords(pedCoords, sitCoords, true) <= 1.0 then
-				DrawText3Ds(sitCoords, "[E] Sit", 0.4)
-
-				if IsControlJustPressed(0, 38) then
+            if GetDistanceBetweenCoords(pedCoords, sitCoords, true) <= 1.0 then
+                exports.bro_core:Show3DText({
+                    text = "[E] S'assoir",
+                    scale = 0.4,
+                    x= sitCoords.x,
+                    y= sitCoords.y,
+                    z= sitCoords.z
+                })
+				if IsControlJustPressed(0, config.keys.interact) then
 					Sit(closestObject)
 				end
 			end
 
-			if GetDistanceBetweenCoords(pedCoords, pickupCoords, true) <= 1.0 then
-				DrawText3Ds(pickupCoords, "[E] Pick up", 0.4)
+            if GetDistanceBetweenCoords(pedCoords, pickupCoords, true) <= 1.0 then
+                exports.bro_core:Show3DText({
+                    text = "[E] Prendre",
+                    scale = 0.4,
+                    x= sitCoords.x,
+                    y= sitCoords.y,
+                    z= sitCoords.z
+                })
 
-				if IsControlJustPressed(0, 38) then
+				if IsControlJustPressed(0, config.keys.interact) then
 					PickUp(closestObject)
 				end
 			end
@@ -363,177 +278,20 @@ Citizen.CreateThread(function()
 	end
 end)
 
-Sit = function(wheelchairObject)
-	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer and closestPlayerDist <= 1.5 then
-		if IsEntityPlayingAnim(GetPlayerPed(closestPlayer), 'missfinale_c2leadinoutfin_c_int', '_leadin_loop2_lester', 3) then
-			ShowNotification("Somebody is already using the wheelchair!")
-			return
-		end
-	end
 
-	LoadAnim("missfinale_c2leadinoutfin_c_int")
 
-	AttachEntityToEntity(PlayerPedId(), wheelchairObject, 0, 0, 0.0, 0.4, 0.0, 0.0, 180.0, 0.0, false, false, false, false, 2, true)
-
-	local heading = GetEntityHeading(wheelchairObject)
-
-	while IsEntityAttachedToEntity(PlayerPedId(), wheelchairObject) do
-		Citizen.Wait(5)
-
-		if IsPedDeadOrDying(PlayerPedId()) then
-			DetachEntity(PlayerPedId(), true, true)
-		end
-
-		if not IsEntityPlayingAnim(PlayerPedId(), 'missfinale_c2leadinoutfin_c_int', '_leadin_loop2_lester', 3) then
-			TaskPlayAnim(PlayerPedId(), 'missfinale_c2leadinoutfin_c_int', '_leadin_loop2_lester', 8.0, 8.0, -1, 69, 1, false, false, false)
-		end
-
-		if IsControlPressed(0, 32) then
-			local x, y, z  = table.unpack(GetEntityCoords(wheelchairObject) + GetEntityForwardVector(wheelchairObject) * -0.02)
-			SetEntityCoords(wheelchairObject, x,y,z)
-			PlaceObjectOnGroundProperly(wheelchairObject)
-		end
-
-		if IsControlPressed(1,  34) then
-			heading = heading + 0.4
-
-			if heading > 360 then
-				heading = 0
-			end
-
-			SetEntityHeading(wheelchairObject,  heading)
-		end
-
-		if IsControlPressed(1,  9) then
-			heading = heading - 0.4
-
-			if heading < 0 then
-				heading = 360
-			end
-
-			SetEntityHeading(wheelchairObject,  heading)
-		end
-
-		if IsControlJustPressed(0, 73) then
-			DetachEntity(PlayerPedId(), true, true)
-
-			local x, y, z = table.unpack(GetEntityCoords(wheelchairObject) + GetEntityForwardVector(wheelchairObject) * - 0.7)
-
-			SetEntityCoords(PlayerPedId(), x,y,z)
-		end
-	end
-end
-
-PickUp = function(wheelchairObject)
-	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
-
-	if closestPlayer and closestPlayerDist <= 1.5 then
-		if IsEntityPlayingAnim(GetPlayerPed(closestPlayer), 'anim@heists@box_carry@', 'idle', 3) then
-			ShowNotification("Somebody is already driving the wheelchair!")
-			return
-		end
-	end
-
-	NetworkRequestControlOfEntity(wheelchairObject)
-
-	LoadAnim("anim@heists@box_carry@")
-
-	AttachEntityToEntity(wheelchairObject, PlayerPedId(), GetPedBoneIndex(PlayerPedId(),  28422), -0.00, -0.3, -0.73, 195.0, 180.0, 180.0, 0.0, false, false, true, false, 2, true)
-
-	while IsEntityAttachedToEntity(wheelchairObject, PlayerPedId()) do
-		Citizen.Wait(5)
-
-		if not IsEntityPlayingAnim(PlayerPedId(), 'anim@heists@box_carry@', 'idle', 3) then
-			TaskPlayAnim(PlayerPedId(), 'anim@heists@box_carry@', 'idle', 8.0, 8.0, -1, 50, 0, false, false, false)
-		end
-
-		if IsPedDeadOrDying(PlayerPedId()) then
-			DetachEntity(wheelchairObject, true, true)
-		end
-
-		if IsControlJustPressed(0, 73) then
-			DetachEntity(wheelchairObject, true, true)
-		end
-	end
-end
-
-DrawText3Ds = function(coords, text, scale)
-	local x,y,z = coords.x, coords.y, coords.z
-	local onScreen, _x, _y = World3dToScreen2d(x, y, z)
-	local pX, pY, pZ = table.unpack(GetGameplayCamCoords())
-
-	SetTextScale(scale, scale)
-	SetTextFont(4)
-	SetTextProportional(1)
-	SetTextEntry("STRING")
-	SetTextCentre(1)
-	SetTextColour(255, 255, 255, 215)
-
-	AddTextComponentString(text)
-	DrawText(_x, _y)
-
-	local factor = (string.len(text)) / 370
-
-	DrawRect(_x, _y + 0.0150, 0.030 + factor, 0.025, 41, 11, 41, 100)
-end
-
-GetPlayers = function()
-    local players = {}
-
-    for i = 0, 31 do
-        if NetworkIsPlayerActive(i) then
-            table.insert(players, i)
-        end
-    end
-
-    return players
-end
-
-GetClosestPlayer = function()
-	local players = GetPlayers()
-	local closestDistance = -1
-	local closestPlayer = -1
-	local ply = GetPlayerPed(-1)
-	local plyCoords = GetEntityCoords(ply, 0)
-	
-	for index,value in ipairs(players) do
-		local target = GetPlayerPed(value)
-		if(target ~= ply) then
-			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
-			if(closestDistance == -1 or closestDistance > distance) then
-				closestPlayer = value
-				closestDistance = distance
-			end
-		end
-	end
-	
-	return closestPlayer, closestDistance
-end
-
-LoadAnim = function(dict)
-	while not HasAnimDictLoaded(dict) do
-		RequestAnimDict(dict)
-		
-		Citizen.Wait(1)
-	end
-end
-
-LoadModel = function(model)
-	while not HasModelLoaded(model) do
-		RequestModel(model)
-		
-		Citizen.Wait(1)
-	end
-end
 
 ShowNotification = function(msg)
 	SetNotificationTextEntry('STRING')
 	AddTextComponentSubstringWebsite(msg)
 	DrawNotification(false, true)
 end
+
+
+--
+-- \ Wheel chair
+--
 
 --carhud
 -- SCREEN POSITION PARAMETERS
@@ -800,7 +558,7 @@ Citizen.CreateThread(function ()
 				end
                 if GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)),  garageCoords2[1], garageCoords2[2], garageCoords2[3], true ) < 5 then
                    if not shown then
-                       exports.bf:Notification("[~g~ENTER~s~] pour nettoyé votre véhicle")
+                       exports.bro_core:Notification("[~g~ENTER~s~] pour nettoyé votre véhicle")
                         show = true
                     end
                     if IsControlJustPressed(1, Key) then
@@ -819,12 +577,12 @@ RegisterNetEvent('carwash:success')
 AddEventHandler('carwash:success', function (price)
 	WashDecalsFromVehicle(GetVehiclePedIsUsing(GetPlayerPed(-1)), 1.0)
     SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(-1)))
-    exports.bf:Notification("Votre véhicule à été nettoyer. pour ~g~ "..price .. " $")
+    exports.bro_core:Notification("Votre véhicule à été nettoyer. pour ~g~ "..price .. " $")
 end)
 
 RegisterNetEvent('carwash:notenoughmoney')
 AddEventHandler('carwash:notenoughmoney', function ()
-    exports.bf:Notification("Vous n'avez pas assez d'argent")
+    exports.bro_core:Notification("Vous n'avez pas assez d'argent")
 end)
 
 --minimap changer street names
@@ -1272,3 +1030,26 @@ Citizen.CreateThread(function()
     TriggerEvent('chat:addSuggestion', '/night', 'Set the time to 23:00')
     TriggerEvent('chat:addSuggestion', '/blackout', 'Toggle blackout mode.')
 end)
+
+Citizen.CreateThread(function()
+	Citizen.Wait(100)
+
+	while true do
+		local sleepThread = 500
+
+		local radarEnabled = IsRadarEnabled()
+
+		if not IsPedInAnyVehicle(PlayerPedId()) and radarEnabled then
+			DisplayRadar(false)
+		elseif IsPedInAnyVehicle(PlayerPedId()) and not radarEnabled then
+			DisplayRadar(true)
+		end
+
+		Citizen.Wait(sleepThread)
+	end
+end)
+
+--
+-- Register keys
+--
+--Keys.Register('E', 'E', 'Interaction')

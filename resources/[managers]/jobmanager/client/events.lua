@@ -7,7 +7,7 @@ end)
 
 RegisterNetEvent("job:getCar")
 AddEventHandler('job:getCar', function(car, carId)
-	exports.bf:spawnCar(car, true, nil, true)
+	exports.bro_core:spawnCar(car, true, nil, true)
     TriggerServerEvent("vehicle:set:id", carId, vehicle)
 end)
 
@@ -46,17 +46,17 @@ AddEventHandler("job:process:open", function(job)
 								FreezeEntityPosition(playerPed, false)
 							end)
 						else
-							exports.bf:Notification("~r~Vous ne pouvez pas transformer en véhicule")
+							exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
 						end
 					else 
-						exports.bf:Notification("~r~Tranformation en cours")
+						exports.bro_core:Notification("~r~Tranformation en cours")
 					end
 				end
 			},
 		}
 	end
-	exports.bf:SetMenuButtons(zoneType..zone, buttons)
-	exports.bf:OpenMenu(zoneType..zone)
+	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
+	exports.bro_core:OpenMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:sell:open')
@@ -93,19 +93,19 @@ AddEventHandler("job:sell:open", function(job)
 									nbSold = 0
 									removeSell(job.name)
 									beginSell(job.name)
-									exports.bf:Notification("J'en ai trop, va vendre ailleurs.")
+									exports.bro_core:Notification("J'en ai trop, va vendre ailleurs.")
 								end
 								TriggerServerEvent("job:sell", v.type, job.job, v.price, 'Vous avez vendu : '..v.label.. " X "..v.amount.." pour ~g~".. v.price.." $")
 							end)
 					else 
-						exports.bf:Notification("~r~Vente en cours")
+						exports.bro_core:Notification("~r~Vente en cours")
 					end
 				end
 			},
 		}
 	end
-	exports.bf:SetMenuButtons("sell", buttons)
-	exports.bf:OpenMenu("sell")
+	exports.bro_core:SetMenuButtons("sell", buttons)
+	exports.bro_core:OpenMenu("sell")
 end)
 
 
@@ -143,17 +143,17 @@ AddEventHandler("job:collect:open", function(job)
 								TriggerServerEvent('items:add', v.type,  v.amount, 'Vous avez collecté : '..v.label.. " X "..v.amount) 
 							end)
 						else
-							exports.bf:Notification("~r~Vous ne pouvez pas récolter en véhicule")
+							exports.bro_core:Notification("~r~Vous ne pouvez pas récolter en véhicule")
 						end
 					else 
-						exports.bf:Notification("~r~Collecte en cours")
+						exports.bro_core:Notification("~r~Collecte en cours")
 					end
 				end
 			},
 		}
 	end
-	exports.bf:SetMenuButtons(zoneType..zone, buttons)
-	exports.bf:OpenMenu(zoneType..zone)
+	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
+	exports.bro_core:OpenMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:parking:open')
@@ -167,7 +167,7 @@ RegisterNetEvent('job:safe:open2')
 
 AddEventHandler("job:safe:open2", function(amount) 
 	-- todo: test if chef de service
-	exports.bf:SetMenuValue("safes-account"..zone, {
+	exports.bro_core:SetMenuValue("safes-account"..zone, {
 		menuTitle = "Compte ~r~"..amount.. " $"
 	})
 	TriggerServerEvent("job:isChef", "job:safe:open3")
@@ -177,9 +177,9 @@ RegisterNetEvent('job:safe:open3')
 
 AddEventHandler("job:safe:open3", function(isChef) 
 	if isChef then
-		exports.bf:NextMenu("safes-account"..zone)
+		exports.bro_core:NextMenu("safes-account"..zone)
 	else 
-		exports.bf:Notification("~r~Vous n'etes pas abilité")
+		exports.bro_core:Notification("~r~Vous n'etes pas abilité")
 	end
 end)
 
@@ -205,8 +205,8 @@ AddEventHandler("job:item:open:store", function(items)
 			},
 		}
 	end
-	exports.bf:SetMenuButtons("safes-items-store", buttons)
-	exports.bf:NextMenu("safes-items-store")
+	exports.bro_core:SetMenuButtons("safes-items-store", buttons)
+	exports.bro_core:NextMenu("safes-items-store")
 end)
 
 RegisterNetEvent('job:item:open2')
@@ -235,14 +235,14 @@ AddEventHandler("job:item:open2", function(items)
 							end
 						},
 					}
-					exports.bf:SetMenuButtons("safes-items-item", buttons)
-					exports.bf:NextMenu("safes-items-item")
+					exports.bro_core:SetMenuButtons("safes-items-item", buttons)
+					exports.bro_core:NextMenu("safes-items-item")
 				end
 			},
 		}
 	end
-	exports.bf:SetMenuButtons("safes-items", buttons)
-	exports.bf:NextMenu("safes-items")
+	exports.bro_core:SetMenuButtons("safes-items", buttons)
+	exports.bro_core:NextMenu("safes-items")
 end)
 
 RegisterNetEvent('job:safe:open')
@@ -258,7 +258,7 @@ RegisterNetEvent('job:open:menu')
 AddEventHandler("job:open:menu", function(job)  
 	job = job[1] 
 	if job.name == "lspd" or job.name == "lsms" or job.name == "farm" or job.name == "wine"  or job.name == "taxi"  or job.name=="bennys" or job.name=="newspapers" then
-		exports.bf:OpenMenu(job.name)
+		exports.bro_core:OpenMenu(job.name)
 	end
 end)
 
@@ -279,8 +279,8 @@ AddEventHandler("job:parking", function(vehicles)
 			},
 	}
 	end
-	exports.bf:SetMenuButtons(zoneType..zone, buttons)
-	exports.bf:OpenMenu(zoneType..zone)
+	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
+	exports.bro_core:OpenMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:parking:get')
@@ -290,8 +290,8 @@ AddEventHandler("job:parking:get", function(name, id)
 	local playerPed = PlayerPedId() -- get the local player ped
 
 	if not IsPedInAnyVehicle(playerPed) then
-		exports.bf:spawnCar(name, true, nil, true)
-		exports.bf:CloseMenu(zoneType..zone)
+		exports.bro_core:spawnCar(name, true, nil, true)
+		exports.bro_core:CloseMenu(zoneType..zone)
 	end
 end)
 
@@ -342,7 +342,7 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 		SetEntityCoords(PlayerPed, vector3(304.0592956543,-573.39636230469,29.836771011353))
 		Wait(20)
 		TaskPlayAnim(PlayerPed, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
-		exports.bf:Notification("~g~F1~w~ pour vous relever")		
+		exports.bro_core:Notification("~g~F1~w~ pour vous relever")		
 		FreezeEntityPosition(PlayerPedId(), false)
 	end
 	
@@ -376,29 +376,29 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 
 						if not IsPedInAnyVehicle(playerPed) then
 							currentVehicle = v.id
-							exports.bf:spawnCar(v.name, true, nil, true)
+							exports.bro_core:spawnCar(v.name, true, nil, true)
 							TriggerServerEvent("account:money:sub", 10)
-							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
-							exports.bf:CloseMenu("bro-vehicles")
+							exports.bro_core:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
+							exports.bro_core:CloseMenu("bro-vehicles")
 						else
-							exports.bf:Notification("Vous êtes déjà dans un véhicle")
+							exports.bro_core:Notification("Vous êtes déjà dans un véhicle")
 						end
 					end
 				end
 			},
 		}
 	end
-	exports.bf:SetMenuButtons("jobs-vehicles", buttons)
-	exports.bf:NextMenu("jobs-vehicles")
+	exports.bro_core:SetMenuButtons("jobs-vehicles", buttons)
+	exports.bro_core:NextMenu("jobs-vehicles")
 end)
 
 RegisterNetEvent('jobs:service:manage')
 
 AddEventHandler("jobs:service:manage", function(grade)
 	if grade >= 4 then
-		exports.bf:NextMenu("service")
+		exports.bro_core:NextMenu("service")
 	else
-		exports.bf:Notification("~r~Vous n'êtes pas chef de service !")
+		exports.bro_core:Notification("~r~Vous n'êtes pas chef de service !")
 	end
 end)
 
@@ -443,8 +443,8 @@ AddEventHandler("weapon:store", function(weapons)
 			},
 		}
 	end
-	exports.bf:SetMenuButtons("weapon-store", buttons)
-	exports.bf:NextMenu("weapon-store")
+	exports.bro_core:SetMenuButtons("weapon-store", buttons)
+	exports.bro_core:NextMenu("weapon-store")
 end)
 
 RegisterNetEvent('weapon:store:store')
@@ -472,7 +472,7 @@ AddEventHandler("weapon:store:store", function(isOk, weapon)
 			true --[[ boolean ]]
 		)
 	else
-		exports.bf:Notification("~r~ L'armurerie est vide")
+		exports.bro_core:Notification("~r~ L'armurerie est vide")
 	end
 end)
 
@@ -487,13 +487,13 @@ RegisterNetEvent('job:handcuff')
 AddEventHandler('job:handcuff', function()
 	handCuffed = not handCuffed
 	if(handCuffed) then
-		exports.bf:AdvancedNotification({
+		exports.bro_core:AdvancedNotification({
 			text = "Menotté",
 			title = "LSPD",
 			icon = "CHAR_AGENT14",
 		})
 	else
-		exports.bf:AdvancedNotification({
+		exports.bro_core:AdvancedNotification({
 			text = "Démenotté",
 			title = "LSPD",
 			icon = "CHAR_AGENT14",
@@ -512,20 +512,20 @@ AddEventHandler('job:payFines', function(amount, sender)
 		if(lockAskingFine ~= true) then
 			lockAskingFine = true
 			local notifReceivedAt = GetGameTimer()
-			exports.bf:Notification("Amende de " .. amount .. "$. Y pour accepter")
+			exports.bro_core:Notification("Amende de " .. amount .. "$. Y pour accepter")
 			while(true) do
 				Wait(0)
 				
 				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
 					TriggerServerEvent('job:finesETA', sender, 2)
-					exports.bf:Notification("Amende expirée")
+					exports.bro_core:Notification("Amende expirée")
 					lockAskingFine = false
 					break
 				end
 				
 				if IsControlPressed(1, config.bindings.accept_fine) then
 					TriggerServerEvent("account:player:add", "", -amount)
-					exports.bf:Notification("Amende de " .. amount .. "$ payée")
+					exports.bro_core:Notification("Amende de " .. amount .. "$ payée")
 					TriggerServerEvent('job:finesETA', sender, 0)
 					lockAskingFine = false
 					break
@@ -551,7 +551,7 @@ AddEventHandler('job:facture', function(amount, motif, job, sender)
 		if(lockAskingFacture ~= true) then
 			lockAskingFacture = true
 			local notifReceivedAt = GetGameTimer()
-			exports.bf:AdvancedNotification({
+			exports.bro_core:AdvancedNotification({
 				text = "Facture de " .. amount .. "$. Y pour accepter, N pour refuser",
 				title = job,
 				icon = "char_AGENT14"
@@ -561,7 +561,7 @@ AddEventHandler('job:facture', function(amount, motif, job, sender)
 				
 				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
 					TriggerServerEvent('job:facture2', sender, 2)
-					exports.bf:Notification("Facture expirée")
+					exports.bro_core:Notification("Facture expirée")
 					lockAskingFacture = false
 					break
 				end
@@ -591,10 +591,10 @@ AddEventHandler("job:facture:accept", function(liquid, amount, sender, job)
 		TriggerServerEvent("account:player:liquid:add", "", amount*(-1))
 		TriggerServerEvent("account:job:add", "", job, amount*(1-tva), true)
 		TriggerServerEvent("account:job:add", "", 1, amount*tva, true)
-		exports.bf:Notification("Facture de " .. amount .. "$ payée")
+		exports.bro_core:Notification("Facture de " .. amount .. "$ payée")
 		TriggerServerEvent('job:facture2', sender, 0)
 	else
-		exports.bf:Notification("Vous n'avez pas assez d'argent")
+		exports.bro_core:Notification("Vous n'avez pas assez d'argent")
 		TriggerServerEvent('job:facture2', sender, 3)
 	end
 	lockAskingFacture = false

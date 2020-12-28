@@ -46,6 +46,14 @@ function LoadAnimSet(AnimDict)
 	end
 end
 
+function LoadModel(model)
+	while not HasModelLoaded(model) do
+		RequestModel(model)
+		
+		Citizen.Wait(1)
+	end
+end
+
 local lockAction = false
 
 function actionPlayer(time, message, dict, anim, cb)

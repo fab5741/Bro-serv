@@ -1,4 +1,4 @@
-exports.bf:AddMenu("bro", {
+exports.bro_core:AddMenu("bro", {
     title = "Bro Menu",
     menuTitle = "Job",
     position = 1,
@@ -31,7 +31,7 @@ exports.bf:AddMenu("bro", {
             text = "Quitter son travail",
             exec = {
                 callback = function()
-                    if  exports.bf:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
+                    if  exports.bro_core:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
                         -- on quitte le job
                         TriggerServerEvent("job:set:me", nil, "Chomeur")
                         Wait(1000)
@@ -42,19 +42,19 @@ exports.bf:AddMenu("bro", {
         },
     },
 })
-exports.bf:AddMenu("bro-wallet", {
+exports.bro_core:AddMenu("bro-wallet", {
     title = "Portefeuille",
     position = 1,
 })
-exports.bf:AddMenu("bro-items", {
+exports.bro_core:AddMenu("bro-items", {
     title = "Inventaire",
     position = 1,
 })
-exports.bf:AddMenu("bro-items-item", {
+exports.bro_core:AddMenu("bro-items-item", {
     title = "Item",
     position = 1,
 })
-exports.bf:AddMenu("bro-wallet-character", {
+exports.bro_core:AddMenu("bro-wallet-character", {
     title = "Personnage",
     menuTitle = "Léon Paquin (17/05/1992)",
     position = 1,
@@ -63,7 +63,7 @@ exports.bf:AddMenu("bro-wallet-character", {
             text = "Nom",
             exec = {
                 callback = function()
-                    lastname = exports.bf:OpenTextInput({ title="Nom", maxInputLength=25, customTitle=true})
+                    lastname = exports.bro_core:OpenTextInput({ title="Nom", maxInputLength=25, customTitle=true})
                     TriggerServerEvent("bro:set", "lastname", lastname, "bro:set")
                 end
             }
@@ -72,7 +72,7 @@ exports.bf:AddMenu("bro-wallet-character", {
             text = "Prénom",
             exec = {
                 callback = function()
-                    firstname = exports.bf:OpenTextInput({ title="Prénom", maxInputLength=25, customTitle=true})
+                    firstname = exports.bro_core:OpenTextInput({ title="Prénom", maxInputLength=25, customTitle=true})
                     TriggerServerEvent("bro:set", "firstname", firstname, "bro:set")
                 end
             }
@@ -81,7 +81,7 @@ exports.bf:AddMenu("bro-wallet-character", {
             text = "Date de naissance",
             exec = {
                 callback = function()
-                    birth = exports.bf:OpenTextInput({ title="Date de naissance (01/01/1999)", maxInputLength=10, customTitle=true})
+                    birth = exports.bro_core:OpenTextInput({ title="Date de naissance (01/01/1999)", maxInputLength=10, customTitle=true})
                     TriggerServerEvent("bro:set", "birth", birth, "bro:set")
                 end
             }
@@ -92,7 +92,7 @@ exports.bf:AddMenu("bro-wallet-character", {
 
 
 
-exports.bf:AddMenu("bro-vehicle", {
+exports.bro_core:AddMenu("bro-vehicle", {
     title = "Véhicule",
     position = 1,
     buttons = {
@@ -113,10 +113,10 @@ exports.bf:AddMenu("bro-vehicle", {
                             if GetPedInVehicleSeat(vehicle2, -1) == player then
                                 TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle2)
                             else
-                                exports.bf:Notification("~r~Vous ne conduisez pas") 
+                                exports.bro_core:Notification("~r~Vous ne conduisez pas") 
                             end
                         else
-                            exports.bf:Notification("~r~Pas de voiture à portée")
+                            exports.bro_core:Notification("~r~Pas de voiture à portée")
                         end
                 end
             }
@@ -139,7 +139,7 @@ exports.bf:AddMenu("bro-vehicle", {
                         TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
                     end
                 else
-                    exports.bf:Notification("~r~Pas de voiture")
+                    exports.bro_core:Notification("~r~Pas de voiture")
                 end
         end
             }
@@ -187,7 +187,7 @@ exports.bf:AddMenu("bro-vehicle", {
                         SetVehicleDoorShut(vehicle,5,0)
                         end
                     else
-                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                        exports.bro_core:Notification("~r~vous devez être dans un véhicule")
                     end
                 end
             }
@@ -210,7 +210,7 @@ exports.bf:AddMenu("bro-vehicle", {
                         SetVehicleDoorShut(vehicle,1,0)
                         end
                     else
-                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                        exports.bro_core:Notification("~r~vous devez être dans un véhicule")
                     end
                 end
             }
@@ -233,7 +233,7 @@ exports.bf:AddMenu("bro-vehicle", {
                         SetVehicleDoorShut(vehicle,3,0)
                         end
                     else
-                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                        exports.bro_core:Notification("~r~vous devez être dans un véhicule")
                     end
                 end
             }
@@ -255,18 +255,18 @@ exports.bf:AddMenu("bro-vehicle", {
                             SetVehicleDoorShut(vehicle,4,0)
                             end
                         else
-                        exports.bf:Notification("~r~vous devez être dans un véhicule")
+                        exports.bro_core:Notification("~r~vous devez être dans un véhicule")
                     end
                 end
             }
         },
     }
 })
-exports.bf:AddMenu("bro-vehicles", {
+exports.bro_core:AddMenu("bro-vehicles", {
     title = "Vehicules",
     position = 1,
 })
-exports.bf:AddMenu("bro-clothes", {
+exports.bro_core:AddMenu("bro-clothes", {
     title = "Vetements",
     position = 1,
     buttons = {

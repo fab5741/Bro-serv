@@ -1,27 +1,9 @@
-local config = {
-    hospitals = {	
-		vector3(340.73, -584.6, 28.79),
-	}
+config = {
+	
 }
 config.BleedoutTimer = 900000 -- time til the player bleeds out 15 min
 local isDead = false
 local PlayerPed = PlayerPedId()
-
--- Create blips
-Citizen.CreateThread(function()	
-	for k,v in pairs(config.hospitals) do
-		exports.bro_core:AddBlip("hospitals"..k, {
-			x = v.x,
-			y = v.y,
-			z = v.z,
-			imageId	=61,
-			scale =1.2,
-			colorId=8,
-			text = "Hopital",
-		})
-	end
-end)
-
 
 --beds 
 local Beds, CurrentBed, OnBed = {'v_med_bed2', 'v_med_bed1', 'v_med_emptybed'}, nil, false
@@ -76,14 +58,3 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-
--- remove my blips on script stop
-AddEventHandler('onResourceStop', function(resourceName)
-	if (GetCurrentResourceName() ~= resourceName) then
-	  return
-	end
-	for k,v in pairs(config.hospitals) do
-		exports.bro_core:RemoveBlip("hospitals"..k)
-	end
-end)
-

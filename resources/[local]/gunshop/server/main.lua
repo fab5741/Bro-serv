@@ -2,7 +2,7 @@ RegisterNetEvent("gun:permis")
 
 AddEventHandler('gun:permis', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select gun_permis from players where discord = @discord',
 		{['@discord'] =  discord},
@@ -17,7 +17,7 @@ RegisterNetEvent("gun:buy")
 
 AddEventHandler('gun:buy', function(cb, price, weapon)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local tva = 0.2
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select liquid from players where discord = @discord',

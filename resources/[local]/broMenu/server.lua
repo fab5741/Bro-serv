@@ -1,7 +1,7 @@
 RegisterNetEvent('bro:get')
 AddEventHandler('bro:get', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select * from players where discord = @discord',
         {['discord'] =  discord},
@@ -16,7 +16,7 @@ end)
 RegisterNetEvent('bro:set')
 AddEventHandler('bro:set', function(field, value, cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	-- TODO generic field
 	if field == "firstname" then
 		MySQL.ready(function ()
@@ -58,7 +58,7 @@ end)
 RegisterNetEvent('bro:skin:get')
 AddEventHandler('bro:skin:get', function(cb)
 	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select skin from players where discord = @discord',

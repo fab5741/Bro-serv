@@ -59,7 +59,7 @@ end
 
 function GetRandomWalkingNPC()
 	local search = {}
-	local peds   = exports.bf:GetPedsInAround({
+	local peds   = exports.bro_core:GetPedsInAround({
     range = 100
  })
 	for i=1, #peds, 1 do
@@ -160,13 +160,13 @@ if enableTaxiGui then
                   local standTime = GetRandomIntInRange(60000, 180000)
                   TaskStandStill(CurrentCustomer, standTime)
                   
-                  exports.bf:Notification('Client trouvé')
+                  exports.bro_core:Notification('Client trouvé')
                 end
               end
             end
           else
             if IsPedFatallyInjured(CurrentCustomer) then
-              exports.bf:Notification('Client inconscient')
+              exports.bro_core:Notification('Client inconscient')
     
               if DoesBlipExist(CurrentCustomerBlip) then
                 RemoveBlip(CurrentCustomerBlip)
@@ -198,7 +198,7 @@ if enableTaxiGui then
                   if targetDistance <= 10.0 then
                     TaskLeaveVehicle(CurrentCustomer, vehicle, 0)
     
-                    exports.bf:Notification('Arrivé à destination. Vous gagnez ~g~'..string.format("%.2f", farecost)..'$')
+                    exports.bro_core:Notification('Arrivé à destination. Vous gagnez ~g~'..string.format("%.2f", farecost)..'$')
                     TaskGoStraightToCoord(CurrentCustomer, targetCoords.x, targetCoords.y, targetCoords.z, 1.0, -1, 0.0, 0.0)
                     SetEntityAsMissionEntity(CurrentCustomer, false, true)
                     TriggerServerEvent("account:job:add", "", 6, farecost, true)
@@ -236,7 +236,7 @@ if enableTaxiGui then
                     msg = string.format('Amenez moi à', GetStreetNameFromHashKey(street[1]))
                   end
     
-                  exports.bf:Notification(msg)
+                  exports.bro_core:Notification(msg)
     
                   DestinationBlip = AddBlipForCoord(targetCoords.x, targetCoords.y, targetCoords.z)
     
@@ -254,7 +254,7 @@ if enableTaxiGui then
                   if customerDistance <= 40.0 then
     
                     if not IsNearCustomer then
-                      exports.bf:Notification("Proche du client")
+                      exports.bro_core:Notification("Proche du client")
                       IsNearCustomer = true
                     end
     
@@ -282,7 +282,7 @@ if enableTaxiGui then
                 end
               end
             else
-              exports.bf:Notification("Retournez à votre vehicule")
+              exports.bro_core:Notification("Retournez à votre vehicule")
             end
         end
       end
@@ -426,7 +426,7 @@ AddEventHandler('taxi:call', function(number)
       SetPedKeepTask(taxiPed, true)
     end
   else
-    exports.bf:Notification("Passez un appel aux taxis via le téléphone ou une borne taxi")
+    exports.bro_core:Notification("Passez un appel aux taxis via le téléphone ou une borne taxi")
   end
 end)
 
@@ -437,7 +437,7 @@ end)
 
 
 RegisterCommand('taxi_reset', function()
-  exports.bf:Notification('Reset taxi')
+  exports.bro_core:Notification('Reset taxi')
     
   if DoesBlipExist(CurrentCustomerBlip) then
     RemoveBlip(CurrentCustomerBlip)
@@ -512,7 +512,7 @@ Citizen.CreateThread(function()
 								end
 
 								if GetGameTimer() > TaxiInfoTimer + 1000 and GetGameTimer() < TaxiInfoTimer + 10000 then
-                  exports.bf:Notification("info_waypoint_message")
+                  exports.bro_core:Notification("info_waypoint_message")
 								end
 							elseif DoesBlipExist(GetFirstBlipInfoId(8)) then
 								dx, dy, dz = table.unpack(Citizen.InvokeNative(0xFA7C7F0AADF25D09, GetFirstBlipInfoId(8), Citizen.ResultAsVector()))
@@ -540,7 +540,7 @@ Citizen.CreateThread(function()
                   local _fare = DecorGetFloat(veh, "fares")
 
                   TriggerServerEvent("account:player:liquid:add", "", -string.format("%.2f", _fare))
-                  exports.bf:Notification('Arrivé à destination. Vous payez ~g~'..string.format("%.2f", _fare)..'$')
+                  exports.bro_core:Notification('Arrivé à destination. Vous payez ~g~'..string.format("%.2f", _fare)..'$')
     
                   local _miles = DecorGetFloat(veh, "miles")
                   DecorSetFloat(veh, "initialFare", initialFare)

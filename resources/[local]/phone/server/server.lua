@@ -62,7 +62,7 @@ RegisterServerEvent('phone:addContact')
 AddEventHandler('phone:addContact', function(display, phoneNumber)
     local _source = source
     local sourcePlayer = tonumber(_source)
-    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+    local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
         MySQL.Async.insert("INSERT INTO phone_players_contacts (`discord`, `number`,`display`) VALUES (@discord, @number, @display)", {
             ['@discord'] = discord,
@@ -78,7 +78,7 @@ RegisterServerEvent('phone:updateContact')
 AddEventHandler('phone:updateContact', function(id, display, phoneNumber)
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
         MySQL.Async.insert("UPDATE phone_players_contacts SET number = @number, display = @display WHERE id = @id", { 
             ['@number'] = number,
@@ -94,7 +94,7 @@ RegisterServerEvent('phone:deleteContact')
 AddEventHandler('phone:deleteContact', function(id)
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
         MySQL.Async.execute("DELETE FROM phone_players_contacts WHERE `discord` = @discord AND `id` = @id", {
             ['@discord'] = discord,
@@ -116,7 +116,7 @@ end)
 
 function addMessage(source, discord, phone_number, message)
     local sourcePlayer = source
-    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+    local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     if message ~= nil then
         if phone_number == "taxi" or phone_number == "lspd" or phone_number == "lsms" then
             TriggerEvent("job:avert:all", phone_number, "Appel reçu", true)
@@ -213,7 +213,7 @@ RegisterServerEvent('phone:sendMessage')
 AddEventHandler('phone:sendMessage', function(phoneNumber, message)
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     addMessage(sourcePlayer, discord, phoneNumber, message)
 end)
 
@@ -226,7 +226,7 @@ RegisterServerEvent('phone:deleteMessageNumber')
 AddEventHandler('phone:deleteMessageNumber', function(number)
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     deleteAllMessageFromPhoneNumber(sourcePlayer,discord, number)
     -- TriggerClientEvent("phone:allMessage", sourcePlayer, getMessages(discord))
 end)
@@ -235,7 +235,7 @@ RegisterServerEvent('phone:deleteAllMessage')
 AddEventHandler('phone:deleteAllMessage', function()
     local _source = source
     local sourcePlayer = tonumber(_source)
-    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+    local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function() 
         MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
@@ -251,7 +251,7 @@ RegisterServerEvent('phone:setReadMessageNumber')
 AddEventHandler('phone:setReadMessageNumber', function(num)
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
@@ -268,7 +268,7 @@ RegisterServerEvent('phone:deleteALL')
 AddEventHandler('phone:deleteALL', function()
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
 
     MySQL.ready(function()
         MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
@@ -346,7 +346,7 @@ end
 RegisterServerEvent('phone:getHistoriqueCall')
 AddEventHandler('phone:getHistoriqueCall', function()
     local _source = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
@@ -490,7 +490,7 @@ RegisterServerEvent('phone:appelsDeleteHistorique')
 AddEventHandler('phone:appelsDeleteHistorique', function (numero)
     local _source = source
     local sourcePlayer = tonumber(_source)
-    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+    local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
@@ -520,7 +520,7 @@ RegisterServerEvent('phone:appelsDeleteAllHistorique')
 AddEventHandler('phone:appelsDeleteAllHistorique', function ()
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     appelsDeleteAllHistorique(discord)
 end)
 
@@ -530,7 +530,7 @@ end)
 RegisterNetEvent('phone:playerLoaded')
 AddEventHandler('phone:playerLoaded',function()
     local sourcePlayer = source
-    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+    local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
@@ -560,7 +560,7 @@ AddEventHandler('phone:allUpdate', function()
     local _source = source
     local sourcePlayer = tonumber(_source)
 
-    local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+    local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},
@@ -592,7 +592,7 @@ function onCallFixePhone (source, phone_number, rtcOffer, extraData)
         phone_number = string.sub(phone_number, 2)
     end
     local sourcePlayer = tonumber(source)
-	local discord = exports.bf:GetDiscordFromSource(sourcePlayer)
+	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
         {['@discord'] =  discord},

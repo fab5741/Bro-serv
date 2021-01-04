@@ -1,15 +1,685 @@
+-- Refresh areas and menus
+function refresh(job)
+	deleteMenuAndArea()
+	createMenuAndArea(job)
+end
 
+
+function deleteMenuAndArea()
+	exports.bro_core:RemoveArea("center")
+	exports.bro_core:RemoveMenu("armory")
+	exports.bro_core:RemoveMenu("safe")
+	exports.bro_core:RemoveMenu("lockers")
+	exports.bro_core:RemoveMenu("actions")
+	exports.bro_core:RemoveMenu("fines")
+	exports.bro_core:RemoveMenu("props")
+	exports.bro_core:RemoveMenu("animations")
+	exports.bro_core:RemoveMenu("job")
+	for kk, vv in pairs(config.jobs) do
+		if vv.homes then
+			for k, v in pairs(vv.homes) do
+				exports.bro_core:RemoveArea("homes"..kk..k)
+			end
+		end
+		if vv.repair then
+			for k, v in pairs(vv.repair) do
+				exports.bro_core:RemoveArea("repair"..kk..k)
+			end
+		end
+		if vv.lockers then
+			for k, v in pairs(vv.lockers) do
+				exports.bro_core:RemoveArea("lockers"..k)
+				exports.bro_core:RemoveMenu("lockers"..k)
+			end
+		end
+		if vv.collect then
+			for k, v in pairs(vv.collect) do
+				exports.bro_core:RemoveArea("collect"..k)
+				exports.bro_core:RemoveMenu("collect"..k)
+			end
+		end
+		if vv.process then
+			for k, v in pairs(vv.process) do
+				exports.bro_core:RemoveArea("process"..k)
+				exports.bro_core:RemoveMenu("process"..k)
+			end
+		end
+		if vv.safes then
+			for k, v in pairs(vv.safes) do
+				exports.bro_core:RemoveArea("safes"..k)
+				exports.bro_core:RemoveMenu("safes"..k)
+			end
+		end
+		if vv.armories then
+			for k, v in pairs(vv.armories) do
+				exports.bro_core:RemoveArea("armories"..k)
+				exports.bro_core:RemoveMenu("armories"..k)
+			end
+		end
+		if vv.begin then
+			for k, v in pairs(vv.begin) do
+			exports.bro_core:RemoveArea("begin"..k)
+			end
+		end
+	end
+end
+
+function createMenuAndArea(job)
+	ClearAllBlipRoutes()
+	
+	exports.bro_core:AddArea("center", {
+		marker = {
+			weight = 1,
+			height = 1,
+		},
+		trigger = {
+			weight = 1,
+			enter = {
+				callback = function()
+					exports.bro_core:HelpPromt("Job Center Key : ~INPUT_PICKUP~")
+					zoneType = "center"
+					zone = "global"
+				end
+			},
+			exit = {
+				callback = function()
+					zoneType = nil
+				end
+			},
+		},
+		blip = {
+			text = "Job Center",
+			imageId	= config.center.sprite,
+			colorId = config.center.color,
+		},
+		locations = {
+			{
+				x = config.center.pos.x,
+				y = config.center.pos.y,
+				z = config.center.pos.z,
+			},
+		},
+	})
+
+	-- global to everyone
+	for kk, vv in pairs(config.jobs) do
+		print(kk)
+		if vv.homes then
+			for k, v in pairs(vv.homes) do
+				print(k)
+				exports.bro_core:AddArea("homes"..kk..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Accueil ("..job.name..")", function()
+									TriggerServerEvent("job:avert:all", avert, "On vous demande à l'acceuil ~b~(".. avert.. ")")
+								end)
+								exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+							end
+						},
+						exit = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Interaction", function()
+								end)
+							end
+						},
+					},
+					blip = {
+						text = vv.label,
+						imageId	= v.sprite,
+						colorId = vv.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+			end
+		end
+		if vv.repair then
+			for k, v in pairs(vv.repair) do
+				exports.bro_core:AddArea("repair"..kk..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Accueil ("..job.name..")", function()
+									if isPedDrivingAVehicle() then
+										exports.bro_core:OpenMenu("repair")
+									else
+										exports.bro_core:Notification("Montez dans un véhicule")
+									end
+								end)
+								exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+							end
+						},
+						exit = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Interaction", function()
+								end)
+							end
+						},
+					},
+					blip = {
+						text = vv.label,
+						imageId	= v.sprite,
+						colorId = vv.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+			end
+		end
+	end
+	
+	-- Draw areas 
+	if job ~= nil and job.name ~= nil then
+		myjob = config.jobs[job.name]
+		if myjob then
+			if myjob.lockers then
+				for k, v in pairs(myjob.lockers) do
+					exports.bro_core:AddArea("lockers"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Vestiaire", function()
+										exports.bro_core:AddMenu("lockers", {
+											Title = "Vestiaire",
+											Subtitle = job.name,
+											buttons = {
+												{
+													type  = "button",
+													label = "Prendre le service",
+													actions = {
+														onSelected = function()
+															clockIn(job.name)
+														end
+													},
+												},
+												{
+													type  = "button",
+													label = "Quitter le service",
+													actions = {
+														onSelected = function()
+															clockOut(job.name)
+														end
+													},
+												},
+											}
+										})
+									end)
+									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								end
+							},
+							exit = {
+								callback = function()
+									exports.bro_core:RemoveMenu("lockers")
+									exports.bro_core:Key("E", "E", "Interaction", function()
+									end)
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Vestiaire "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+				end
+			end
+			if myjob.collect then
+				for k, v in pairs(myjob.collect) do
+					exports.bro_core:AddArea("collect"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Vestiaire", function()
+										TriggerServerEvent("job:get", "job:collect:open")	
+									end)
+									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								end
+							},
+							exit = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Interaction", function()
+									end)
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Récolte "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+				end
+			end
+			if myjob.process then
+				for k, v in pairs(myjob.process) do
+					exports.bro_core:AddArea("process"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 2,
+							enter = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Vestiaire", function()
+										TriggerServerEvent("job:get", "job:process:open")	
+									end)
+									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								end
+							},
+							exit = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Interaction", function()
+									end)
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Traitement "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+					exports.bro_core:AddMenu("process"..k, {
+						title = "Traitement "..k,
+						position = 0,
+					})
+				end
+			end
+			if myjob.safes then
+				for k, v in pairs(myjob.safes) do
+					exports.bro_core:AddArea("safes"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Vestiaire", function()
+										exports.bro_core:AddMenu("safe", {
+											Title = "Vestiaire",
+											Subtitle = job.name,
+											buttons = {
+												{
+													type = "separator",
+													label = "Compte",
+												},
+												{
+													type  = "button",
+													label = "Retirer",
+													actions = {
+														onSelected = function()
+															TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+															TriggerServerEvent("job:get", "job:safe:open")		
+														end
+													},
+												},
+												{
+													type  = "button",
+													label = "Déposer",
+													actions = {
+														onSelected = function()
+															TriggerServerEvent('account:job:add', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+															TriggerServerEvent("job:get", "job:safe:open")		
+														end
+													},
+												},
+												{
+													type = "separator",
+													label = "Stock",
+												},
+											}
+										})
+									end)
+									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								end
+							},
+							exit = {
+								callback = function()
+									exports.bro_core:RemoveMenu("safe")
+									exports.bro_core:Key("E", "E", "Interaction", function()
+									end)
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Coffre "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+				end
+			end
+			if myjob.armories then
+				for k, v in pairs(myjob.armories) do
+					exports.bro_core:AddArea("armories"..k, {
+						marker = {
+							weight = 1,
+							height = 2,
+						},
+						trigger = {
+							weight = 1,
+							enter = {
+								callback = function()
+									exports.bro_core:Key("E", "E", "Vestiaire", function()
+										exports.bro_core:AddMenu("armory", {
+											Title = "Vestiaire",
+											Subtitle = job.name,
+											buttons = {
+												{
+													type = "separator",
+													label = "gillet",
+												},
+												{
+													type  = "button",
+													label = "Mettre",
+													actions = {
+														onSelected = function()
+															addBulletproofVest()	
+														end
+													},
+												},
+												{
+													type  = "button",
+													label = "Enlever",
+													actions = {
+														onSelected = function()
+															removeBulletproofVest()
+														end
+													},
+												},
+												{
+													type = "separator",
+													label = "Armes",
+												},
+												{
+													type  = "button",
+													label = "Stocker (arme équipée)",
+													actions = {
+														onSelected = function()
+															local found, weapon  = GetCurrentPedWeapon(
+																GetPlayerPed(-1),
+																1
+															)
+															if found then
+																RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
+					
+																weapon = tostring(weapon)
+																if weapon == "453432689" then
+																	weapon = "0x1B06D571"
+																elseif weapon == "-1951375401" then
+																	weapon = "0x8BB05FD7"
+																elseif weapon == "911657153" then
+																	weapon = "0x3656C8C1"
+																elseif weapon == "1737195953" then
+																	weapon = "0x678B81B1"
+																elseif weapon == "911657153" then
+																	weapon = "0x1D073A89"
+																elseif weapon == "736523883" then
+																	weapon = "0x2BE6766B"
+																end
+																TriggerServerEvent("weapon:store", weapon)
+																exports.bro_core:Notification("Arme stocké")
+															else
+																exports.bro_core:Notification("Pas d'arme sur vous")
+															end
+														end
+													},
+												},
+												{
+													type  = "button",
+													label = "Retirer arme",
+													actions = {
+														onSelected = function()
+															TriggerServerEvent("weapon:get:all", "weapon:store")
+														end
+													},
+												},
+											}
+										})
+									end)
+									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								end
+							},
+							exit = {
+								callback = function()
+									exports.bro_core:RemoveMenu("armory")
+									exports.bro_core:Key("E", "E", "Interaction", function()
+									end)
+								end
+							},
+						},
+						blip = {
+							text = job.label.. " Armurerie "..k,
+							imageId	= v.sprite,
+							colorId = myjob.color,
+						},
+						locations = {
+							{
+								x = v.coords.x,
+								y = v.coords.y,
+								z = v.coords.z,
+							},
+						},
+					})
+				end
+			end
+			if myjob.begin then
+				for k, v in pairs(myjob.begin) do
+				exports.bro_core:AddArea("begin"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Commencer les courses", function()
+									if not beginInProgress then
+										vehicleLivraison = exports.bro_core:spawnCar(vehicle, true, nil, true)
+										addBeginArea() 
+									else
+										exports.bro_core:Notification("~r~Vous avez déjà une course en cours !")
+									end
+								end)
+								exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
+							end
+						},
+						exit = {
+							callback = function()
+								exports.bro_core:RemoveMenu("ATM")
+								exports.bro_core:Key("E", "E", "Interaction", function()
+								end)
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Livraisons "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
+			if myjob.custom then
+				for k, v in pairs(myjob.custom) do
+				exports.bro_core:AddArea("custom"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Commencer les courses", function()
+									if isPedDrivingAVehicle() then
+										customMenu()
+									else
+										exports.bro_core:Notification("Montez dans un véhicule")
+									end
+								end)
+								exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
+							end
+						},
+						exit = {
+							callback = function()
+								exports.bro_core:RemoveMenu("ATM")
+								exports.bro_core:Key("E", "E", "Interaction", function()
+								end)
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Customisation "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
+			if myjob.fourriere then
+				for k, v in pairs(myjob.fourriere) do
+				exports.bro_core:AddArea("fourriere"..k, {
+					marker = {
+						weight = 1,
+						height = 2,
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Fourrière", function()
+									-- Mise en fourriére
+									vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+									if vehicle ~= nil then
+										TriggerServerEvent("vehicle:parking:store", vehicle, "depot", "")
+										exports.bro_core:Notification("Vous avez mis le véhicle en fourriére")
+										DeleteEntity(vehicle)
+									else
+										exports.bro_core:Notification("Vous n'êtes pas dans un véhicule")
+									end
+								end)
+								exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
+							end
+						},
+						exit = {
+							callback = function()
+								exports.bro_core:RemoveMenu("ATM")
+								exports.bro_core:Key("E", "E", "Interaction", function()
+								end)
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Fourriére "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
+		end
+	end
+end
 
 -- LSMS Revive people
 function reviveClosestPlayer()
-	exports.bro_core:CloseMenu("lsms")
-	local playerPed = GetPlayerPed(-1)
+	print(GetPlayerServerId(GetPlayerPed(ped)))
+	print(GetPlayerServerId(ped))
+	print(ped)
+	TriggerServerEvent('job:lsms:revive', GetPlayerServerId(ped))
+
+	exports.bro_core:RemoveMenu("lsms")
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
    -- if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
-			if not  IsPedInAnyVehicle(playerPed, false) then
+			if not IsPedInAnyVehicle(ped, false) then
 				exports.bro_core:actionPlayer(15000, "Réanimation en cours", "mini@cpr@char_a@cpr_str", "cpr_pumpchest",
 				function()
-					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(playerPed))
+					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(ped))
 				end)
 			else
 				exports.bro_core:Notification("~r~Vous ne pouvez pas réanimer en véhicule")
@@ -20,40 +690,15 @@ function reviveClosestPlayer()
 end
 
 function healClosestPlayer()
-	exports.bro_core:CloseMenu("lsms")
+	exports.bro_core:RemoveMenu("lsms")
 	local playerPed = GetPlayerPed(-1)
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
-    if closestPlayerPed  and dist <=1 then
-		if lockHeal == false then
-			if not  IsPedInAnyVehicle(playerPed, false) then
-				local time = 5000
-				TriggerEvent("bf:progressBar:create", time, "Soin en cours")
-				lockHeal = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed, true)
-					
-					local dict = "mini@cpr@char_a@cpr_str"
-					local anim = "cpr_pumpchest"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockHeal = false
-					print("heal")
-					print(closestPlayerPed)
-					SetEntityHealth(closestPlayerPed, GetPedMaxHealth(closestPlayerPed))
-					FreezeEntityPosition(playerPed, false)
-				end)
-			else
-				exports.bro_core:Notification("~r~Vous ne pouvez pas soigner en véhicule")
-			end
-		else 
-			exports.bro_core:Notification("~r~Soin en cours")
-		end
+	if closestPlayerPed  and dist <=1 then
+		exports.bro_core:actionPlayer(2000, "Vêtements","mini@cpr@char_a@cpr_str", "cpr_pumpchest",
+			function()
+				SetEntityHealth(closestPlayerPed, GetPedMaxHealth(closestPlayerPed))
+				FreezeEntityPosition(playerPed, false)
+		end)
     else
         exports.bro_core:Notification("Pas de joueur à portée")
     end
@@ -130,7 +775,7 @@ function RemoveWeapons()
     if closestPlayer and dist <=1 then
         TriggerServerEvent("job:removeWeapons", GetPlayerServerId(closestPlayer))
     else
-        exports.bro_core:Notification("Pas de joueur à proximité")
+        exports.bro_core:Notification("~r~Pas de joueur à proximité")
     end
 end
 
@@ -140,7 +785,7 @@ function ToggleCuff()
     if closestPlayer  and dist <=1 then
 		TriggerServerEvent("job:cuffGranted", GetPlayerServerId(closestPlayer))
 	else
-		exports.bro_core:Notification("Pas de joueur à proximité")
+		exports.bro_core:Notification("~r~Pas de joueur à proximité")
 	end
 end
 
@@ -169,7 +814,7 @@ function Fines(amount)
 			TriggerServerEvent("job:finesGranted", GetPlayerServerId(closestPlayer), tonumber(amount))
 		end
 	else
-		exports.bro_core:Notification("Pas de joueur à proximité")
+		exports.bro_core:Notification("~r~Pas de joueur à proximité")
 	end
 end
 
@@ -180,7 +825,7 @@ function giveWeaponLicence()
     if closestPlayer  and dist <=1 then
 		TriggerServerEvent("job:weapon:licence", closestPlayer, true)
 	else
-		exports.bro_core:Notification("Pas de joueur à proximité")
+		exports.bro_core:Notification("~r~Pas de joueur à proximité")
 	end
 end
 
@@ -421,678 +1066,7 @@ function addBeginArea()
 	})
 end
 
-function refresh(job)
-	deleteMenuAndArea()
-	createMenuAndArea(job)
-end
 
-
-function deleteMenuAndArea()
-	exports.bro_core:RemoveArea("center")
-	exports.bro_core:RemoveMenu("lsms")
-	exports.bro_core:RemoveMenu("lspd")
-	exports.bro_core:RemoveMenu("lspd-service")
-	exports.bro_core:RemoveMenu("bennys")
-	exports.bro_core:RemoveMenu("service")
-	exports.bro_core:RemoveMenu("taxi")
-	for kk, vv in pairs(config.jobs) do
-		if vv.homes then
-			for k, v in pairs(vv.homes) do
-				exports.bro_core:RemoveArea("homes"..kk..k)
-			end
-		end
-		if vv.repair then
-			for k, v in pairs(vv.repair) do
-				exports.bro_core:RemoveArea("repair"..kk..k)
-			end
-		end
-		if vv.lockers then
-			for k, v in pairs(vv.lockers) do
-				exports.bro_core:RemoveArea("lockers"..k)
-				exports.bro_core:RemoveMenu("lockers"..k)
-			end
-		end
-		if vv.collect then
-			for k, v in pairs(vv.collect) do
-				exports.bro_core:RemoveArea("collect"..k)
-				exports.bro_core:RemoveMenu("collect"..k)
-			end
-		end
-		if vv.process then
-			for k, v in pairs(vv.process) do
-				exports.bro_core:RemoveArea("process"..k)
-				exports.bro_core:RemoveMenu("process"..k)
-			end
-		end
-		if vv.safes then
-			for k, v in pairs(vv.safes) do
-				exports.bro_core:RemoveArea("safes"..k)
-				exports.bro_core:RemoveMenu("safes"..k)
-			end
-		end
-		if vv.armories then
-			for k, v in pairs(vv.armories) do
-				exports.bro_core:RemoveArea("armories"..k)
-				exports.bro_core:RemoveMenu("armories"..k)
-			end
-		end
-		if vv.begin then
-			for k, v in pairs(vv.begin) do
-			exports.bro_core:RemoveArea("begin"..k)
-			end
-		end
-	end
-end
-
-function createMenuAndArea(job)
-	ClearAllBlipRoutes()
-
-	-- create menus
-	menus()
-	
-	exports.bro_core:AddArea("center", {
-		marker = {
-			weight = 1,
-			height = 1,
-		},
-		trigger = {
-			weight = 1,
-			enter = {
-				callback = function()
-					exports.bro_core:HelpPromt("Job Center Key : ~INPUT_PICKUP~")
-					zoneType = "center"
-					zone = "global"
-				end
-			},
-			exit = {
-				callback = function()
-					zoneType = nil
-				end
-			},
-		},
-		blip = {
-			text = "Job Center",
-			imageId	= config.center.sprite,
-			colorId = config.center.color,
-		},
-		locations = {
-			{
-				x = config.center.pos.x,
-				y = config.center.pos.y,
-				z = config.center.pos.z,
-			},
-		},
-	})
-
-	-- global to everyone
-	for kk, vv in pairs(config.jobs) do
-		if vv.homes then
-			for k, v in pairs(vv.homes) do
-				exports.bro_core:AddArea("homes"..kk..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
-					trigger = {
-						weight = 1,
-						enter = {
-							callback = function()
-								exports.bro_core:HelpPromt("Accueil Key : ~INPUT_PICKUP~")
-								zone = k
-								zoneType = "homes"
-								avert = kk
-							end
-						},
-						exit = {
-							callback = function()
-								zone = nil
-								zoneType = nil
-							end
-						},
-					},
-					blip = {
-						text = vv.label,
-						imageId	= v.sprite,
-						colorId = vv.color,
-					},
-					locations = {
-						{
-							x = v.coords.x,
-							y = v.coords.y,
-							z = v.coords.z,
-						},
-					},
-				})
-			end
-		end
-		if vv.repair then
-			for k, v in pairs(vv.repair) do
-				exports.bro_core:AddArea("repair"..kk..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
-					trigger = {
-						weight = 1,
-						enter = {
-							callback = function()
-								exports.bro_core:HelpPromt("Réparation Key : ~INPUT_PICKUP~")
-								zone = k
-								zoneType = "repair"
-							end
-						},
-						exit = {
-							callback = function()
-								zone = nil
-								zoneType = nil
-							end
-						},
-					},
-					blip = {
-						text = vv.label,
-						imageId	= v.sprite,
-						colorId = vv.color,
-					},
-					locations = {
-						{
-							x = v.coords.x,
-							y = v.coords.y,
-							z = v.coords.z,
-						},
-					},
-				})
-			end
-		end
-	end
-	
-	-- Draw areas 
-	if job ~= nil and job.name ~= nil then
-		myjob = config.jobs[job.name]
-		if myjob then
-			if myjob.lockers then
-				for k, v in pairs(myjob.lockers) do
-					exports.bro_core:AddArea("lockers"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
-						trigger = {
-							weight = 1,
-							enter = {
-								callback = function()
-									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
-									zone = k
-									zoneType = "lockers"
-								end
-							},
-							exit = {
-								callback = function()
-									exports.bro_core:CloseMenu(zoneType..zone)
-									zone = nil
-									zoneType = nil
-								end
-							},
-						},
-						blip = {
-							text = job.label.. " Vestiaire "..k,
-							imageId	= v.sprite,
-							colorId = myjob.color,
-						},
-						locations = {
-							{
-								x = v.coords.x,
-								y = v.coords.y,
-								z = v.coords.z,
-							},
-						},
-					})
-					exports.bro_core:AddMenu("lockers"..k, {
-						title = "Vestiaire "..k,
-						position = 1,
-						buttons = {
-							{
-								text = "Prendre le service",
-								exec = {
-									callback = function()
-										clockIn(job.name)
-									end
-								},
-							},
-							{
-								text = "Quitter le service",
-								exec = {
-									callback = function()
-										clockOut(job.name)
-									end
-								},
-							},
-						},
-					})
-				end
-			end
-			if myjob.collect then
-				for k, v in pairs(myjob.collect) do
-					exports.bro_core:AddArea("collect"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
-						trigger = {
-							weight = 2,
-							enter = {
-								callback = function()
-									exports.bro_core:HelpPromt("Récolte Key : ~INPUT_PICKUP~")
-									zone = k
-									zoneType = "collect"
-								end
-							},
-							exit = {
-								callback = function()
-					exports.bro_core:CloseMenu(zoneType..zone)
-
-									zone = nil
-									zoneType = nil
-								end
-							},
-						},
-						blip = {
-							text = job.label.. " Récolte "..k,
-							imageId	= v.sprite,
-							colorId = myjob.color,
-						},
-						locations = {
-							{
-								x = v.coords.x,
-								y = v.coords.y,
-								z = v.coords.z,
-							},
-						},
-					})
-					exports.bro_core:AddMenu("collect"..k, {
-						title = "Récolte "..k,
-						position = 0,
-					})
-				end
-			end
-			if myjob.process then
-				for k, v in pairs(myjob.process) do
-					exports.bro_core:AddArea("process"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
-						trigger = {
-							weight = 2,
-							enter = {
-								callback = function()
-									exports.bro_core:HelpPromt("Traitement Key : ~INPUT_PICKUP~")
-									zone = k
-									zoneType = "process"
-								end
-							},
-							exit = {
-								callback = function()
-								exports.bro_core:CloseMenu(zoneType..zone)
-									zone = nil
-									zoneType = nil
-								end
-							},
-						},
-						blip = {
-							text = job.label.. " Traitement "..k,
-							imageId	= v.sprite,
-							colorId = myjob.color,
-						},
-						locations = {
-							{
-								x = v.coords.x,
-								y = v.coords.y,
-								z = v.coords.z,
-							},
-						},
-					})
-					exports.bro_core:AddMenu("process"..k, {
-						title = "Traitement "..k,
-						position = 0,
-					})
-				end
-			end
-			if myjob.safes then
-				for k, v in pairs(myjob.safes) do
-					exports.bro_core:AddArea("safes"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
-						trigger = {
-							weight = 1,
-							enter = {
-								callback = function()
-									exports.bro_core:HelpPromt("Coffre Key : ~INPUT_PICKUP~")
-									zone = k
-									zoneType = "safes"
-								end
-							},
-							exit = {
-								callback = function()
-									exports.bro_core:CloseMenu(zoneType..zone)
-									zone = nil
-									zoneType = nil
-								end
-							},
-						},
-						blip = {
-							text = job.label.. " Coffre "..k,
-							imageId	= v.sprite,
-							colorId = myjob.color,
-						},
-						locations = {
-							{
-								x = v.coords.x,
-								y = v.coords.y,
-								z = v.coords.z,
-							},
-						},
-					})
-					exports.bro_core:AddMenu("safes"..k, {
-						title = job.label.." Coffre "..k,
-						position = 1,
-						
-					buttons = {
-						{
-							text = "Compte",
-							exec = {
-								callback = function()
-									TriggerServerEvent("job:get", "job:safe:open")			
-								end
-							},
-						},
-						{
-							text = "Inventaire",
-							exec = {
-								callback = function()	
-									TriggerServerEvent("job:get", "job:item:open")			
-								end
-							},
-						},
-					}
-					})
-					exports.bro_core:AddMenu("safes-account"..k, {
-						title = job.label.." Coffre "..k,
-						position = 1,
-						
-					buttons = {
-						{
-							text = "Retirer",
-							exec = {
-								callback = function()
-									TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
-									TriggerServerEvent("job:get", "job:safe:open")		
-								end
-							},
-						},
-						{
-							text = "Déposer",
-							exec = {
-								callback = function()
-									TriggerServerEvent('account:job:add', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
-									TriggerServerEvent("job:get", "job:safe:open")		
-								end
-							},
-						},
-					}
-					})
-
-					exports.bro_core:AddMenu("safes-items", {
-						title = job.label.." Coffre ",
-						position = 1,
-					})
-					exports.bro_core:AddMenu("safes-items-item", {
-						title = job.label.." Coffre ",
-						position = 1,
-					})
-					exports.bro_core:AddMenu("safes-items-store", {
-						title = job.label.." Coffre ",
-						position = 1,
-					})
-				end
-			end
-			if myjob.armories then
-				for k, v in pairs(myjob.armories) do
-					exports.bro_core:AddArea("armories"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
-						trigger = {
-							weight = 1,
-							enter = {
-								callback = function()
-									exports.bro_core:HelpPromt("Armurerie Key : ~INPUT_PICKUP~")
-									zone = k
-									zoneType = "armories"
-								end
-							},
-							exit = {
-								callback = function()
-								exports.bro_core:CloseMenu(zoneType..zone)
-									zone = nil
-									zoneType = nil
-								end
-							},
-						},
-						blip = {
-							text = job.label.. " Armurerie "..k,
-							imageId	= v.sprite,
-							colorId = myjob.color,
-						},
-						locations = {
-							{
-								x = v.coords.x,
-								y = v.coords.y,
-								z = v.coords.z,
-							},
-						},
-					})
-					exports.bro_core:AddMenu("armories"..k, {
-						title = job.label.." Armurerie "..k,
-						position = 1,
-						closable = false,
-						buttons= {
-							{
-								text = "Mettre Gillet",
-								exec = {
-									callback = function()
-										addBulletproofVest()
-									end
-								},
-							},
-							{
-								text = "Enlever Gillet",
-								exec = {
-									callback = function()
-										removeBulletproofVest()
-									end
-								},
-							},
-							{
-								text = "Stocker armes",
-								exec = {
-									callback = function()
-										local found, weapon  = GetCurrentPedWeapon(
-											GetPlayerPed(-1),
-											1
-										)
-										if found then
-											RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
-
-											weapon = tostring(weapon)
-											if weapon == "453432689" then
-												weapon = "0x1B06D571"
-											elseif weapon == "-1951375401" then
-												weapon = "0x8BB05FD7"
-											elseif weapon == "911657153" then
-												weapon = "0x3656C8C1"
-											elseif weapon == "1737195953" then
-												weapon = "0x678B81B1"
-											elseif weapon == "911657153" then
-												weapon = "0x1D073A89"
-											elseif weapon == "736523883" then
-												weapon = "0x2BE6766B"
-											end
-											TriggerServerEvent("weapon:store", weapon)
-											exports.bro_core:Notification("Arme stocké")
-										else
-											exports.bro_core:Notification("Pas d'arme sur vous")
-										end
-									end
-								},
-							},
-							{
-								text = "Retirer arme",
-								exec = {
-									callback = function()
-										TriggerServerEvent("weapon:get:all", "weapon:store")
-									end
-								},
-							},
-							{
-								text = "Quitter",
-								exec = {
-									callback = function()
-										exports.bro_core:CloseMenu("armories"..k)
-									end
-								},
-							}
-						}
-					})
-					exports.bro_core:AddMenu("weapon-store", {
-						title = "weapon",
-						position = 1,
-					})
-				end
-			end
-			if myjob.begin then
-				for k, v in pairs(myjob.begin) do
-				exports.bro_core:AddArea("begin"..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
-					trigger = {
-						weight = 1,
-						enter = {
-							callback = function()
-								exports.bro_core:HelpPromt("Commencer la tournée Key : ~INPUT_PICKUP~")
-								zone = k
-								zoneType = "begin"
-								vehicle = v.vehicle
-								coords = v.coords
-								points = v.points
-							end
-						},
-						exit = {
-							callback = function()
-								zone = nil
-								zoneType = nil
-							end
-						},
-					},
-					blip = {
-						text = job.label.. " Livraisons "..k,
-						imageId	= v.sprite,
-						colorId = myjob.color,
-					},
-					locations = {
-						{
-							x = v.coords.x,
-							y = v.coords.y,
-							z = v.coords.z,
-						},
-					},
-				})
-				end
-			end
-			if myjob.custom then
-				for k, v in pairs(myjob.custom) do
-				exports.bro_core:AddArea("custom"..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
-					trigger = {
-						weight = 1,
-						enter = {
-							callback = function()
-								exports.bro_core:HelpPromt("Customisation Key : ~INPUT_PICKUP~")
-								zone = k
-								zoneType = "custom"
-							end
-						},
-						exit = {
-							callback = function()
-								zone = nil
-								zoneType = nil
-							end
-						},
-					},
-					blip = {
-						text = job.label.. " Customisation "..k,
-						imageId	= v.sprite,
-						colorId = myjob.color,
-					},
-					locations = {
-						{
-							x = v.coords.x,
-							y = v.coords.y,
-							z = v.coords.z,
-						},
-					},
-				})
-				end
-			end
-			if myjob.fourriere then
-				for k, v in pairs(myjob.fourriere) do
-				exports.bro_core:AddArea("fourriere"..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
-					trigger = {
-						weight = 1,
-						enter = {
-							callback = function()
-								exports.bro_core:HelpPromt("Mise en fourriére Key : ~INPUT_PICKUP~")
-								zone = k
-								zoneType = "fourriere"
-							end
-						},
-						exit = {
-							callback = function()
-								exports.bro_core:CloseMenu(zoneType..zone)
-								zoneType = nil
-								zone = nil
-							end
-						}
-					},
-					blip = {
-						text = job.label.. " Fourriére "..k,
-						imageId	= v.sprite,
-						colorId = myjob.color,
-					},
-					locations = {
-						{
-							x = v.coords.x,
-							y = v.coords.y,
-							z = v.coords.z,
-						},
-					},
-				})
-				end
-			end
-		end
-	end
-end
 
 -- service management
 function recruitClosestPlayer(job)
@@ -1114,7 +1088,6 @@ function promoteClosestPlayer()
         exports.bro_core:Notification("Pas de joueur à portée")
     end
 end
-
 
 
 function demmoteClosestPlayer()
@@ -1159,7 +1132,7 @@ function beginSell(job)
 			},
 			exit = {
 				callback = function()
-					exports.bro_core:CloseMenu("sell")
+					exports.bro_core:RemoveMenu("sell")
 					zone = nil
 					zoneType = nil
 				end
@@ -1179,13 +1152,289 @@ function beginSell(job)
 			},
 		},
 	})
-	exports.bro_core:CloseMenu(job)
-	exports.bro_core:CloseMenu("sell")
+	exports.bro_core:RemoveMenu(job)
+	exports.bro_core:RemoveMenu("sell")
 end
 
 
 function removeSell(job)
 	exports.bro_core:RemoveArea("sell")
-	exports.bro_core:CloseMenu(job)
-	exports.bro_core:CloseMenu("sell")
+	exports.bro_core:RemoveMenu(job)
+	exports.bro_core:RemoveMenu("sell")
+end
+
+-- réparations
+function fixVitres() 
+	local playerPed = GetPlayerPed(-1)
+	coords = GetEntityCoords(GetPlayerPed(-1), true)
+	local pos = GetEntityCoords(PlayerPedId())
+	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+
+	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+	local prop_name = 'prop_cs_wrench'
+	if lockRepare == false then
+		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+			if not IsPedInAnyVehicle(playerPed, false) then
+				local time = 4000
+				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+				exports.bro_core:RemoveMenu("repair")
+				lockRepare = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed)
+					FreezeEntityPosition(vehicle)
+					local x,y,z = table.unpack(GetEntityCoords(playerPed))
+					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+					local boneIndex = GetPedBoneIndex(playerPed, 18905)
+					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+				
+					local dict = "amb@world_human_vehicle_mechanic@male@exit"
+					local anim = "exit"
+					RequestAnimDict(dict)
+
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockRepare = false
+					FixVehicleWindow(vehicle, 0)
+					FixVehicleWindow(vehicle, 1)
+					FixVehicleWindow(vehicle, 2)
+					FixVehicleWindow(vehicle, 3)
+					FixVehicleWindow(vehicle, 4)
+					FixVehicleWindow(vehicle, 5)
+					FixVehicleWindow(vehicle, 6)
+					FixVehicleWindow(vehicle, 7)
+					FixVehicleWindow(vehicle, 8)
+					TriggerServerEvent("job:repair:price", "window", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+					exports.bro_core:Notification("Véhicle réparé")
+					ClearPedSecondaryTask(playerPed)
+					DeleteObject(prop)
+				end)
+			else
+				exports.bro_core:Notification("~r~Sortez du véhicle")
+			end
+		else
+			exports.bro_core:Notification("~r~Pas de véhicule à portée")
+		end
+	else 
+		exports.bro_core:Notification("~r~Répération en cours")
+	end
+end
+
+function fixCarroserie()
+	local playerPed = GetPlayerPed(-1)
+	coords = GetEntityCoords(GetPlayerPed(-1), true)
+	local pos = GetEntityCoords(PlayerPedId())
+	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+
+	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+	local prop_name = 'prop_cs_wrench'
+	if lockRepare == false then
+		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+			if not IsPedInAnyVehicle(playerPed, false) then
+				local time = 4000
+				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+				exports.bro_core:RemoveMenu("repair")
+				lockRepare = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed)
+					FreezeEntityPosition(vehicle)
+					
+					local dict = "amb@world_human_vehicle_mechanic@male@exit"
+					local anim = "exit"
+					RequestAnimDict(dict)
+
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockRepare = false
+					SetVehicleBodyHealth(vehicle, 1000.0)
+					SetVehiclePetrolTankHealth(vehicle, 1000.0)
+					SetVehicleDeformationFixed(vehicle)
+					TriggerServerEvent("job:repair:price", "carroserie", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+					exports.bro_core:Notification("Véhicle réparé")
+					ClearPedSecondaryTask(playerPed)
+					DeleteObject(prop)
+				end)
+			else
+				exports.bro_core:Notification("~r~Sortez du véhicle")
+			end
+		else
+			exports.bro_core:Notification("~r~Pas de véhicule à portée")
+		end
+	else 
+		exports.bro_core:Notification("~r~Répération en cours")
+	end
+end
+
+function fixPneus()
+	local playerPed = GetPlayerPed(-1)
+	coords = GetEntityCoords(GetPlayerPed(-1), true)
+	local pos = GetEntityCoords(PlayerPedId())
+	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+
+	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+	local prop_name = 'prop_cs_wrench'
+	if lockRepare == false then
+		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+			if not IsPedInAnyVehicle(playerPed, false) then
+				local time = 4000
+				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+				exports.bro_core:RemoveMenu("repair")
+				lockRepare = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed)
+					FreezeEntityPosition(vehicle)
+					local x,y,z = table.unpack(GetEntityCoords(playerPed))
+					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+					local boneIndex = GetPedBoneIndex(playerPed, 18905)
+					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+				
+					local dict = "amb@world_human_vehicle_mechanic@male@exit"
+					local anim = "exit"
+					RequestAnimDict(dict)
+
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockRepare = false
+					SetVehicleTyreFixed(vehicle, 0)
+					SetVehicleTyreFixed(vehicle, 1)
+					SetVehicleTyreFixed(vehicle, 2)
+					SetVehicleTyreFixed(vehicle, 3)
+					SetVehicleTyreFixed(vehicle, 4)
+					SetVehicleTyreFixed(vehicle, 5)
+					SetVehicleTyreFixed(vehicle, 6)
+					TriggerServerEvent("job:repair:price", "tyres", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+					exports.bro_core:Notification("Véhicle réparé")
+					ClearPedSecondaryTask(playerPed)
+					DeleteObject(prop)
+				end)
+			else
+				exports.bro_core:Notification("~r~Sortez du véhicle")
+			end
+		else
+			exports.bro_core:Notification("~r~Pas de véhicule à portée")
+		end
+	else 
+		exports.bro_core:Notification("~r~Répération en cours")
+	end
+end
+
+function fixEngine()
+	local playerPed = GetPlayerPed(-1)
+	coords = GetEntityCoords(GetPlayerPed(-1), true)
+	local pos = GetEntityCoords(PlayerPedId())
+	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+
+	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+	local prop_name = 'prop_cs_wrench'
+
+	if lockRepare == false then
+		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+			if not IsPedInAnyVehicle(playerPed, false) then
+				local time = 4000
+				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+				exports.bro_core:RemoveMenu("repair")
+				lockRepare = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed)
+					FreezeEntityPosition(vehicle)
+					local x,y,z = table.unpack(GetEntityCoords(playerPed))
+					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+					local boneIndex = GetPedBoneIndex(playerPed, 18905)
+					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+			   
+					local dict = "amb@world_human_vehicle_mechanic@male@exit"
+					local anim = "exit"
+					RequestAnimDict(dict)
+
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockRepare = false
+					SetVehicleEngineHealth(vehicle, 1000.0)
+					SetVehicleUndriveable(vehicle, false)
+					ClearPedTasksImmediately(playerPed)
+					TriggerServerEvent("job:repair:price", "motor", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+					exports.bro_core:Notification("Véhicle réparé")
+					ClearPedSecondaryTask(playerPed)
+					DeleteObject(prop)
+				end)
+			else
+				exports.bro_core:Notification("~r~Sortez du véhicle")
+			end
+		else
+			exports.bro_core:Notification("~r~Pas de véhicule à portée")
+		end
+	else 
+		exports.bro_core:Notification("~r~Répération en cours")
+	end
+end
+
+-- Nettoyages
+function cleanCarroserie()
+	local playerPed = GetPlayerPed(-1)
+	coords = GetEntityCoords(GetPlayerPed(-1), true)
+	local pos = GetEntityCoords(PlayerPedId())
+	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
+
+	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
+	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+	local prop_name = 'prop_rag_01'
+	if lockRepare == false then
+		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+			if not IsPedInAnyVehicle(playerPed, false) then
+				local time = 4000
+				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
+				exports.bro_core:RemoveMenu("repair")
+				lockRepare = true 
+				Citizen.CreateThread(function ()
+					FreezeEntityPosition(playerPed)
+					FreezeEntityPosition(vehicle)
+					local x,y,z = table.unpack(GetEntityCoords(playerPed))
+					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
+					local boneIndex = GetPedBoneIndex(playerPed, 0xDEAD)
+					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+				
+					local dict = "timetable@maid@cleaning_window@base"
+					local anim = "base"
+					RequestAnimDict(dict)
+
+					while not HasAnimDictLoaded(dict) do
+						Citizen.Wait(150)
+					end
+					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
+
+					Wait(time)
+					lockRepare = false
+					SetVehicleDirtLevel(vehicle, 0.0)
+					exports.bro_core:Notification("Véhicle réparé")
+					ClearPedSecondaryTask(playerPed)
+					DeleteObject(prop)
+				end)
+			else
+				exports.bro_core:Notification("~r~Sortez du véhicle")
+			end
+		else
+			exports.bro_core:Notification("~r~Pas de véhicule à portée")
+		end
+	else 
+		exports.bro_core:Notification("~r~Répération en cours")
+	end
 end

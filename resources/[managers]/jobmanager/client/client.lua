@@ -1,10 +1,3 @@
-job = {
-	job = "Chomeur",
-	grade = "Chomeur"
-}
-spawn = vector3(0,0,0)
-heading = 0
-avert = "LSPD"
 vehicleLivraison = 0
 beginInProgress = false
 tva = 0.20
@@ -14,17 +7,13 @@ nbSold = 0
 lockHeal = false
 -- police vars
 handCuffed = false
+ped = GetPlayerPed(-1)
 
 RegisterNetEvent('job:get')
 
 AddEventHandler("job:get", function(job)
 	job = job[1]
-	RegisterNUICallback('amount', function(data)
-		TriggerServerEvent("job:safe:deposit", data.withdraw, data.amount, job.job)
-		amount = tonumber(data.amount)
-		SetNuiFocus(false, false)
-	end)
-	refresh(job)
+	--refresh(job)
 end)
 
 -- open menu loop
@@ -38,68 +27,14 @@ Citizen.CreateThread(function()
 	TriggerServerEvent("job:get", "job:get")
 
 	-- create all menus
-	menus()
+	--menus()
 
 	-- main loop
     while true do
 		Citizen.Wait(0)	
-		if zone ~= nil and zoneType ~= nil and IsControlJustPressed(1,config.bindings.interact_position) then
-			if zoneType == "homes" then
-				TriggerServerEvent("job:avert:all", avert, "On vous demande à l'acceuil ~b~(".. avert.. ")")
-			elseif zoneType == "repair" then
-				if isPedDrivingAVehicle() then
-					exports.bro_core:OpenMenu("repair")
-				else
-					exports.bro_core:Notification("Montez dans un véhicule")
-				end
-			elseif zoneType == "custom" then
-				if isPedDrivingAVehicle() then
-					customMenu()
-					exports.bro_core:OpenMenu("custom")
-				else
-					exports.bro_core:Notification("Montez dans un véhicule")
-				end
-			elseif zoneType == "center" then
-				exports.bro_core:OpenMenu("center")
-			elseif zoneType == "begin" then
-				if not beginInProgress then
-					vehicleLivraison = exports.bro_core:spawnCar(vehicle, true, nil, true)
-					addBeginArea() 
-				else
-					exports.bro_core:Notification("Vous avez déjà une course en cours !")
-				end
-			elseif zoneType == "safes" then
-				exports.bro_core:OpenMenu(zoneType..zone)
-			elseif zoneType == "collect" then
-				TriggerServerEvent("job:get", "job:collect:open")	
-			elseif zoneType == "process" then
-				TriggerServerEvent("job:get", "job:process:open")		
-			elseif zoneType == "sell" then
-				TriggerServerEvent("job:get", "job:sell:open")		
-			elseif zoneType == "armories" then
-				exports.bro_core:OpenMenu("armories1")
-			elseif zoneType == "fourriere" then
-				-- Mise en fourriére
-				vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-				if vehicle ~= nil then
-					TriggerServerEvent("vehicle:parking:store", vehicle, "depot", "")
-					exports.bro_core:Notification("Vous avez mis le véhicle en fourriére")
-					DeleteEntity(vehicle)
-				else
-					exports.bro_core:Notification("Vous n'êtes pas dans un véhicule")
-				end
-			else
-				exports.bro_core:OpenMenu(zoneType..zone)
-			end
-		end
-
-		if zone ~= "custom" then
-			customMenuRemove()
-		end
 		if IsControlJustPressed(1,config.bindings.use_job_menu) then
 			TriggerServerEvent("job:get", "job:open:menu")
 		end
-
 
 		if (handCuffed == true) then
 			local myPed = PlayerPedId()

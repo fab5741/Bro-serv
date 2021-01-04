@@ -1,7 +1,3 @@
--- Bf version
-liquid = 0
-account = 0
-
 -- main loop
 Citizen.CreateThread(function()
 	exports.bro_core:AddMenu("gunshop", {

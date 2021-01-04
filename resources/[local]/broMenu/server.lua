@@ -64,6 +64,7 @@ AddEventHandler('bro:skin:get', function(cb)
 		MySQL.Async.fetchScalar('select skin from players where discord = @discord',
 		{['@discord'] =  discord},
 		function(res)
+			print(res)
 				TriggerClientEvent(cb, sourceValue, res)
 		end)
 	end)

@@ -6,6 +6,7 @@ RegisterNetEvent("account:player:add")
 RegisterNetEvent("account:player:liquid:get")
 RegisterNetEvent("account:player:liquid:get:facture")
 RegisterNetEvent("account:player:liquid:add")
+RegisterNetEvent("account:player:liquid:give")
 -- Jobs #3
 RegisterNetEvent("account:job:get")
 RegisterNetEvent("account:job:add")
@@ -91,6 +92,57 @@ AddEventHandler('account:player:liquid:add', function(cb, amount)
 					TriggerClientEvent(cb, sourceValue, id ~= nil)
 				end)
 		end)
+	end)
+end)
+
+
+AddEventHandler('account:player:liquid:give', function(cb, player, amount)
+	local sourceValue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	local discordTo = exports.bro_core:GetDiscordFromSource(player)
+	local amount=amount
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+		{
+			['@discord'] = discord
+		}, function(liquid)
+			if liquid >= amount then
+				MySQL.Async.insert(
+					'update players set liquid=liquid-@amount where discord = @discord',
+					{
+						['@discord'] = discord,
+						['@amount'] = amount,
+					}, function(id)
+						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
+							if liquid > 50000 then
+								TriggerClientEvent("account:suitcase:on", sourceValue)
+							elseif liquid < 100000 then
+								TriggerClientEvent("account:suitcase:off", sourceValue)
+							end
+							TriggerClientEvent(cb, sourceValue, id ~= nil)
+						end)
+				end)
+				MySQL.Async.insert(
+					'update players set liquid=liquid+@amount where discord = @discord',
+					{
+						['@discord'] = discordTo,
+						['@amount'] = amount,
+					}, function(id)
+						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discordTo}, function(liquid)
+							if liquid > 50000 then
+								TriggerClientEvent("account:suitcase:on", player)
+							elseif liquid < 100000 then
+								TriggerClientEvent("account:suitcase:off", player)
+							end
+							TriggerClientEvent(cb, sourceValue, id ~= nil)
+						end)
+				end)
+			else
+				TriggerClientEvent('bro_core:Notification', sourceValue, "~r~Vous n'avez pas assé de liquide")
+			end
+			TriggerClientEvent(cb, sourceValue, liquid)
+		end)
+
 	end)
 end)
 

@@ -29,12 +29,12 @@ AddEventHandler('shops:buy', function(type, amount, price)
 						MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
 						{['@discord'] =  discord, ['@price'] = pricee * tva},
 						function(numRows)
-							TriggerClientEvent("bf:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
 						end)
 					end)
 				end)
 			else
-				TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez pas assez d'argent. ~r~"..pricee.." $")
+				TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez pas assez d'argent. ~r~"..pricee.." $")
 			end
         end)
       end)
@@ -101,23 +101,23 @@ AddEventHandler('shops:sell', function(shop, type, amount)
 														['@money'] = pricee,
 													},
 													function(res)
-														TriggerClientEvent("bf:Notification", sourceValue, "~g~Vente effectuée pour ~r~"..pricee.." $")
+														TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Vente effectuée pour ~r~"..pricee.." $")
 													end)
 												end)
 											end)
 										end)
 									end)
 								else
-									TriggerClientEvent("bf:Notification", sourceValue, "Le magazsin à déjà trop de stock. ~r~Max : "..maxInShop)
+									TriggerClientEvent("bro_core:Notification", sourceValue, "Le magazsin à déjà trop de stock. ~r~Max : "..maxInShop)
 								end
 							end)
 						else
-							TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez rien à vendre")
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez rien à vendre")
 						end
 				end)
 			else
 				--TODO ; gouv money help
-				TriggerClientEvent("bf:Notification", sourceValue, "~r~Le magasin n'a pas assez d'argent. ~r~"..pricee.." $")
+				TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Le magasin n'a pas assez d'argent. ~r~"..pricee.." $")
 			end
         end)
       end)
@@ -137,7 +137,7 @@ AddEventHandler('shops:stock', function(shop, type)
 			['@shop'] = shop,
 			['@type'] = type
 		},function(amount_Shop)
-			TriggerClientEvent("bf:Notification", sourceValue, "Stock : ".. amount_Shop)
+			TriggerClientEvent("bro_core:Notification", sourceValue, "Stock : ".. amount_Shop)
 		end)
 	end)
 end)

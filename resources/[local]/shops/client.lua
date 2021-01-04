@@ -1,7 +1,4 @@
 config = {}
-config.bindings = {
-    interact_position = 51, -- E
-}
 config.Zones = {
 	{
 		pnj = {model = "mp_m_shopkeep_01", x=372.77, y=327.64, z=103.57, a=242.89},
@@ -43,11 +40,7 @@ zone = 0
 
 -- Create blips
 Citizen.CreateThread(function()   
-	exports.bro_core:AddMenu("CurrentShop", {
-		title = "Magasin",
-		position = 1,
-	})
-	exports.bro_core:AddArea("shopssss", {
+	exports.bro_core:AddArea("shop", {
 		marker = {
 			weight = 0.5,
 			height = 0.3,
@@ -56,19 +49,38 @@ Citizen.CreateThread(function()
 			weight = 1,
 			enter = {
 				callback = function()
+					exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
+						buttons = {}
+						for k, v in pairs(config.items) do
+							buttons[#buttons+1] = {
+								type = "button",
+								label = v.label.. " ~g~"..v.price.." $",
+								actions = {
+									onSelected = function()
+										TriggerServerEvent("shops:buy", v.type, 1, v.price)
+									end
+								},
+							}
+						end
+						exports.bro_core:AddMenu("shop", {
+							Title = "Epicerie",
+							Subtitle = "Epicerie",
+							buttons = buttons
+						})
+                    end)
 					exports.bro_core:HelpPromt("Acheter : ~INPUT_PICKUP~")
-					zoneType = "shops"
 				end
 			},
 			exit = {
-				callback = function()
-					zoneType = nil
-					zone = 0
-				end
+                callback = function()
+                    exports.bro_core:RemoveMenu("shop")
+                    exports.bro_core:Key("E", "E", "Interaction", function()
+                    end)
+            	end
 			},
 		},
 		blip = {
-			text = "Supérette",
+			text = "Superette",
 			colorId = 2,
 			imageId = 52,
 		},
@@ -112,41 +124,6 @@ Citizen.CreateThread(function()
 	end
 end)
 
--- open menu loop
-Citizen.CreateThread(function()
-	-- main loop
-    while true do
-		Citizen.Wait(0)	
-		if zone ~= nil and zoneType ~= nil and IsControlJustPressed(1,config.bindings.interact_position) then
-			if zoneType == "shops" then
-				buttons = {}
-				for k, v in pairs(config.items) do
-					buttons[#buttons+1] = {
-						text = v.label.. " ~g~"..v.price.." $",
-						exec = {
-							callback = function()
-								TriggerServerEvent("shops:buy", v.type, 1, v.price)
-							end
-						},
-					}
-				end
-				buttons[#buttons+1] = {
-					text = "Quitter",
-					exec = {
-						callback = function()
-							exports.bro_core:CloseMenu("CurrentShop")
-							exports.bro_core:RemoveMenu("CurrentShop")
-						end
-					},
-				}
-				exports.bro_core:SetMenuValue("CurrentShop", {
-					buttons = buttons
-				})
-				exports.bro_core:OpenMenu("CurrentShop")
-			end
-		end
-	end
-end)
 
 -- close the menu when script is stopping to avoid being stuck in NUI focus
 AddEventHandler('onResourceStop', function(resource)
@@ -224,3 +201,13 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+-- On nettoie le caca
+AddEventHandler('onResourceStop', function(resourceName)
+    if (GetCurrentResourceName() ~= resourceName) then
+        return
+    end
+	exports.bro_core:RemoveArea("shop")
+	exports.bro_core:RemoveMenu("shop")
+end)
+  

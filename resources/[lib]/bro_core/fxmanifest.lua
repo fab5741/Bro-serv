@@ -117,6 +117,8 @@ exports {
     "AddMenu",
     "AddSubMenu",
     "RemoveMenu",
+    "MenuIsOpen",
+    "MenuClose",
     "Key",
 
     -- Blip
@@ -155,6 +157,13 @@ exports {
     "GetEntityObjectInDirection",
     "GetEntitiesInAround",
     "CastRayPlayerPedToPoint",
+
+    
+    -- Vehicules
+    "GetPickups",
+    "GetPickupsInArea",
+    "GetPickupsInAround",
+    "spawnCar",
 
     -- Player
     "GetPlayerPed",

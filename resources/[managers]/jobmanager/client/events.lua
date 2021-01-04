@@ -20,8 +20,8 @@ AddEventHandler("job:process:open", function(job)
 
 		buttons[#buttons+1] = {
 			text = "Traitement "..v.label,
-			exec = {
-				callback = function()
+			actions = {
+				onSelected = function()
 					local playerPed = GetPlayerPed(-1)
 					if lockCollect == false then
 						if not  IsPedInAnyVehicle(playerPed, false) then
@@ -56,7 +56,7 @@ AddEventHandler("job:process:open", function(job)
 		}
 	end
 	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
-	exports.bro_core:OpenMenu(zoneType..zone)
+	exports.bro_core:AddMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:sell:open')
@@ -67,8 +67,8 @@ AddEventHandler("job:sell:open", function(job)
 	for k, v in pairs(config.jobs[job.name].sell.items) do
 		buttons[#buttons+1] = {
 			text = "Vente de " ..v.label,
-			exec = {
-				callback = function()
+			actions = {
+				onSelected = function()
 					local playerPed = GetPlayerPed(-1)
 					if lockCollect == false then
 							local time = 4000
@@ -105,7 +105,7 @@ AddEventHandler("job:sell:open", function(job)
 		}
 	end
 	exports.bro_core:SetMenuButtons("sell", buttons)
-	exports.bro_core:OpenMenu("sell")
+	exports.bro_core:AddMenu("sell")
 end)
 
 
@@ -118,8 +118,8 @@ AddEventHandler("job:collect:open", function(job)
 	for k, v in pairs(config.jobs[job.name].collect[zone].items) do
 		buttons[#buttons+1] = {
 			text = "Collecter "..v.label,
-			exec = {
-				callback = function()
+			actions = {
+				onSelected = function()
 					local playerPed = GetPlayerPed(-1)
 					if lockCollect == false then
 						if not  IsPedInAnyVehicle(playerPed, false) then
@@ -153,7 +153,7 @@ AddEventHandler("job:collect:open", function(job)
 		}
 	end
 	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
-	exports.bro_core:OpenMenu(zoneType..zone)
+	exports.bro_core:AddMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:parking:open')
@@ -198,8 +198,8 @@ AddEventHandler("job:item:open:store", function(items)
 	for k, v in pairs(items) do
 		buttons[#buttons+1] = {
 			text = v.label .. " X " ..v.amount,
-			exec = {
-				callback = function() 
+			actions = {
+				onSelected = function() 
 					TriggerServerEvent("job:items:store", v.item, 1)
 				end
 			},
@@ -215,8 +215,8 @@ AddEventHandler("job:item:open2", function(items)
 	buttons = {}
 	buttons[#buttons+1] = {
 		text = "Stocker item",
-		exec = {
-			callback = function() 
+		actions = {
+			onSelected = function() 
 				TriggerServerEvent("items:get", "job:item:open:store")
 			end
 		},
@@ -224,13 +224,13 @@ AddEventHandler("job:item:open2", function(items)
 	for k, v in pairs(items) do
 		buttons[#buttons+1] = {
 			text = v.label .. " X " ..v.amount,
-			exec = {
-				callback = function() 
+			actions = {
+				onSelected = function() 
 					local buttons = {}
 					buttons[1] =     {
 						text = "Retirer",
-						exec = {
-							callback = function() 
+						actions = {
+							onSelected = function() 
 								TriggerServerEvent("job:items:withdraw", v.item, 1)
 							end
 						},
@@ -255,10 +255,482 @@ end)
 
 RegisterNetEvent('job:open:menu')
 
-AddEventHandler("job:open:menu", function(job)  
+AddEventHandler("job:open:menu", function(job)
 	job = job[1] 
 	if job.name == "lspd" or job.name == "lsms" or job.name == "farm" or job.name == "wine"  or job.name == "taxi"  or job.name=="bennys" or job.name=="newspapers" then
-		exports.bro_core:OpenMenu(job.name)
+		buttons = {
+
+		}
+		if job.name == "lspd" then
+			buttons = {
+				{
+					type = "button",
+					label = "Actions",
+					subMenu = "actions"
+				},
+				{
+					type = "button",
+					label = "Amendes",
+					subMenu = "fines"
+				},
+				{
+					type = "button",
+					label = "Animations",
+					subMenu = "animations"
+				},
+				{
+					type = "button",
+					label = "Objets",
+					subMenu = "props"
+				},
+			}	
+		else 
+			buttons = {
+				{
+					type = "button",
+					label = "Actions",
+					subMenu = "actions"
+				},
+				{
+					type = "button",
+					label = "Animations",
+					subMenu = "animations"
+				},
+			}	
+		end
+		-- TODO: only display when is chief
+		if true then
+			buttons[#buttons+1] = {
+				type = "button",
+				label = "Gestion service",
+				actions = {
+					onSelected = function()
+						TriggerServerEvent("job:isChef", "jobs:service:manage")
+					end
+				},
+			}
+		end
+		exports.bro_core:AddMenu("job", {
+			Title = "Menu "..job.label,
+			Subtitle = "Job",
+			buttons = buttons
+		})
+
+		if job.name == "lspd" then
+			exports.bro_core:AddSubMenu("fines", {
+				parent= "job",
+				Title = "fines",
+				Subtitle = job.label,
+				buttons = {
+					{
+						type = "button",
+						label = "Infraction minorée (250 $)",
+						actions = {
+							onSelected = function()
+								Fines(250)
+							end
+						},
+					},
+					{
+						type = "button",
+						label = "Infraction (500 $)",
+						actions = {
+							onSelected = function()
+								Fines(500)
+							end
+						},
+					},
+					{
+						type = "button",
+						label = "Infraction majorée (1000 $)",
+						actions = {
+							onSelected = function()
+								Fines(1000)
+							end
+						},
+					},
+				}
+			})
+		end
+
+		-- Actions
+		buttons = {
+
+		}
+		if job.name == "lspd" then
+			buttons = {
+				{
+					type = "separator",
+					label = "Citoyen",
+				},
+				{
+					type = "button",
+					label = "Retirer armes",
+					actions = {
+						onSelected = function()
+							RemoveWeapons()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Menotter",
+					actions = {
+						onSelected = function()
+							ToggleCuff()
+						end
+					},
+				},
+				{
+					type = "separator",
+					label = "Permis",
+				},
+				{
+					type = "button",
+					label = "Donner Permis de Port d' Armes (PPA)",
+					actions = {
+						onSelected = function()
+							giveWeaponLicence()
+						end
+					},
+				},
+				{
+					type = "separator",
+					label = "Véhicules",
+				},
+				{
+					type = "button",
+					label = "Supprimer",
+					actions = {
+						onSelected = function()
+							DropVehicle()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Herses",
+					actions = {
+						onSelected = function()
+							SpawnSpikesStripe()
+						end
+					},
+				},
+			}
+		elseif job.name == "lsms" then
+			buttons = {
+				{
+					type = "separator",
+					label = "Soins",
+				},
+				{
+					type = "button",
+					label = "Soigner",
+					actions = {
+						onSelected = function()
+							healClosestPlayer()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Réanimer",
+					actions = {
+						onSelected = function()
+							reviveClosestPlayer()
+						end
+					},
+				},
+			}
+		elseif job.name == "farm" or job.name == "wine" then
+			buttons = {
+				{
+					type = "separator",
+					label = "Revente",
+				},
+				{
+					type = "button",
+					label = "Commencer la revente",
+					actions = {
+						onSelected = function()
+							beginSell(job.name)
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Finir la revente",
+					actions = {
+						onSelected = function()
+							removeSell(job.name)
+						end
+					},
+				},
+			}
+		elseif job.name == "taxi" then
+			buttons = {
+				{
+					type = "separator",
+					label = "Courses",
+				},
+				{
+					type = "button",
+					label = "Commencer les courses",
+					actions = {
+						onSelected = function()
+							TriggerEvent("taxi:fares:start")
+							exports.bro_core:Notification("Les courses commencent")
+							exports.bro_core:RemoveMenu("taxi")
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Stopper les courses",
+					actions = {
+						onSelected = function()
+							TriggerEvent("taxi:fares:stop")
+							exports.bro_core:Notification("Fin des courses")
+							exports.bro_core:RemoveMenu("taxi")
+						end
+					},
+				},
+			}
+		elseif job.name == "bennys" then
+			buttons = {
+				{
+					type = "separator",
+					label = "Réparations",
+				},
+				{
+					type = "button",
+					label = "Vitres",
+					actions = {
+						onSelected = function()
+							fixVitres()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Pneus",
+					actions = {
+						onSelected = function()
+							fixPneus()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Carroserie",
+					actions = {
+						onSelected = function()
+							fixCarroserie()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Moteur",
+					actions = {
+						onSelected = function()
+							fixEngine()
+						end
+					},
+				},
+				{
+					type = "separator",
+					label = "Nettoyage",
+				},
+				{
+					type = "button",
+					label = "Carroserie",
+					actions = {
+						onSelected = function()
+							cleanCarroserie()
+						end
+					},
+				},
+			}
+		end
+		buttons[#buttons+1] = {
+			type = "separator",
+			label = "Factures",
+		}
+		buttons[#buttons+1] = {
+			type = "button",
+			label = "Facturer",
+			actions = {
+				onSelected = function()
+					local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+					local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+					local closestPlayer, dist = GetClosestPlayer()
+
+					if closestPlayer and dist <=1 then
+						TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
+					else
+						exports.bro_core:Notification("Pas de joueur à proximité")
+					end
+					exports.bro_core:RemoveMenu("lspd")
+				end
+			},
+		}
+		exports.bro_core:AddSubMenu("actions", {
+			parent= "job",
+			Title = "Actions",
+			Subtitle = job.label,
+			buttons = buttons
+		})
+
+		-- Animations
+		buttons = {
+			{
+				type = "button",
+				label = "Noter",
+				actions = {
+					onSelected = function()
+						Note()
+					end
+				},
+			}
+			, {
+				type = "button",
+				label = "Annuler l'Animation",
+				actions = {
+					onSelected = function()
+						CancelEmote()
+					end
+				},
+			}
+		}
+		if job.name == "lspd" then
+			buttons[#buttons+1] = {
+					type = "button",
+					label = "Traffic",
+					actions = {
+						onSelected = function()
+							DoTraffic()
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "StandBy",
+					actions = {
+						onSelected = function()
+							StandBy()
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "StandBy5",
+					actions = {
+						onSelected = function()
+							StandBy2()
+						end
+					},
+				}
+			
+		end
+		exports.bro_core:AddSubMenu("animations", {
+			parent= "job",
+			Title = "Animations",
+			Subtitle = job.label,
+			buttons = buttons
+		})
+		-- Props
+		buttons = {
+		}
+		if job.name == "lspd" then
+			buttons[#buttons+1] = {
+					type = "button",
+					label = "Barrière",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_mp_barrier_01b")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Barrière 2",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_barrier_work05")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Cone lumineux",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_air_conelight")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Barrière 3",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_barrier_work06a")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Cabine",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_tollbooth_1")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Cone 1",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_mp_cone_01")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Cone 2",
+					actions = {
+						onSelected = function()
+							SpawnProps("prop_mp_cone_04")
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Enlever dernier",
+					actions = {
+						onSelected = function()
+							RemoveLastProps()
+						end
+					},
+				}
+				buttons[#buttons+1] = {
+					type = "button",
+					label = "Enlever tout",
+					actions = {
+						onSelected = function()
+							RemoveAllProps()
+						end
+					},
+				}
+		end
+		exports.bro_core:AddSubMenu("props", {
+			parent= "job",
+			Title = "Objets",
+			Subtitle = job.label,
+			buttons = buttons
+		})
 	end
 end)
 
@@ -272,15 +744,15 @@ AddEventHandler("job:parking", function(vehicles)
 	for k, v in ipairs (vehicles) do
 		buttons[k] =     {
 			text = v.label,
-			exec = {
-				callback = function() 
+			actions = {
+				onSelected = function() 
 					TriggerServerEvent("job:parking:get", "job:parking:get", v.id)
 				end
 			},
 	}
 	end
 	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
-	exports.bro_core:OpenMenu(zoneType..zone)
+	exports.bro_core:AddMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:parking:get')
@@ -291,7 +763,7 @@ AddEventHandler("job:parking:get", function(name, id)
 
 	if not IsPedInAnyVehicle(playerPed) then
 		exports.bro_core:spawnCar(name, true, nil, true)
-		exports.bro_core:CloseMenu(zoneType..zone)
+		exports.bro_core:RemoveMenu(zoneType..zone)
 	end
 end)
 
@@ -306,8 +778,7 @@ end
 RegisterNetEvent('job:lsms:revive')
 
 AddEventHandler("job:lsms:revive", function(isBleedout)  
-	local playerPed = PlayerPedId()
-	local coords = GetEntityCoords(playerPed)
+	local coords = GetEntityCoords(ped)
 
 	DoScreenFadeOut(800)
 
@@ -315,7 +786,7 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 		Citizen.Wait(50)
 	end
 
-	RespawnPed(playerPed, coords, 0.0)
+	RespawnPed(ped, coords, 0.0)
 
 	TriggerEvent("player:alive")
 	if isBleedout then
@@ -330,8 +801,7 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 			}
 			TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
 		end)
-		local PlayerPed = PlayerPedId()
-		FreezeEntityPosition(PlayerPedId(), true)
+		FreezeEntityPosition(ped, true)
 		if not HasAnimDictLoaded("missfbi1") then
 			RequestAnimDict("missfbi1")
 	
@@ -339,11 +809,11 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 				Citizen.Wait(1)
 			end
 		end
-		SetEntityCoords(PlayerPed, vector3(304.0592956543,-573.39636230469,29.836771011353))
+		SetEntityCoords(ped, vector3(304.0592956543,-573.39636230469,29.836771011353))
 		Wait(20)
-		TaskPlayAnim(PlayerPed, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
+		TaskPlayAnim(ped, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
 		exports.bro_core:Notification("~g~F1~w~ pour vous relever")		
-		FreezeEntityPosition(PlayerPedId(), false)
+		FreezeEntityPosition(ped, false)
 	end
 	
 	StopScreenEffect('DeathFailOut')
@@ -369,8 +839,8 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 		end
 		buttons[k] =     {
 			text =  v.label.. " ("..parking..")",
-			exec = {
-				callback = function() 
+			actions = {
+				onSelected = function() 
 					if v.parking == "" then
 						local playerPed = PlayerPedId() -- get the local player ped
 
@@ -379,7 +849,7 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 							exports.bro_core:spawnCar(v.name, true, nil, true)
 							TriggerServerEvent("account:money:sub", 10)
 							exports.bro_core:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
-							exports.bro_core:CloseMenu("bro-vehicles")
+							exports.bro_core:RemoveMenu("bro-vehicles")
 						else
 							exports.bro_core:Notification("Vous êtes déjà dans un véhicle")
 						end
@@ -436,8 +906,8 @@ AddEventHandler("weapon:store", function(weapons)
 		end
 		buttons[#buttons+1] = {
 			text = v.label..' x '..v.amount,
-			exec = {
-				callback = function()
+			actions = {
+				onSelected = function()
 					TriggerServerEvent("weapon:get", "weapon:store:store", v.weapon)
 				end
 			},
@@ -599,3 +1069,13 @@ AddEventHandler("job:facture:accept", function(liquid, amount, sender, job)
 	end
 	lockAskingFacture = false
 end)
+
+
+-- On nettoie le caca
+AddEventHandler('onResourceStop', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	deleteMenuAndArea()
+end)
+

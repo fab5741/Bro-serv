@@ -2,6 +2,7 @@ zoneType =0
 zone = "global"
 dsVehicle = 0
 currentVehicle = 0
+ped = GetPlayerPed(-1)
 
 config = {}
 config.parkings = {
@@ -185,12 +186,12 @@ end)
 
 -- update vehicles states
 Citizen.CreateThread(function()
-	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
-	while true do
-		Wait(10000)
-		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
-		TriggerServerEvent("vehicle:job:get", "vehicle:refresh")
-	end
+--	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
+--	while true do
+--		Wait(10000)
+--		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
+--		TriggerServerEvent("vehicle:job:get", "vehicle:refresh")
+--	end
 end)
 
 
@@ -229,3 +230,125 @@ end)
 RegisterCommand("seat", function(source, args, raw) --change command here
     TriggerEvent("SeatShuffle")
 end, false) --False, allow everyone to run it
+
+-- grip offroad
+local GripAmount = 5.8000001907349 -- Max amount = 9.8000001907349 | Default = 5.8000001907349 (Grip amount when on drift)
+
+
+Citizen.CreateThread(function()
+	while true do
+		local veh = GetVehiclePedIsIn(PlayerPedId())
+
+		if veh == 0 then -- Player isnt in a vehicle
+			Citizen.Wait(500)
+
+		else -- Player is in a vehicle
+
+			local material_id = GetVehicleWheelSurfaceMaterial(veh, 1)
+			local wheel_type = GetVehicleWheelType(veh)
+
+			if wheel_type == 3 or wheel_type == 4 or wheel_type == 6 then -- If have Off-road/Suv's/Motorcycles wheel grip its equal
+			else
+				if material_id == 4 or material_id == 1 or material_id == 3 then -- All road (sandy/los santos/paleto bay)
+					-- On road
+					SetVehicleGravityAmount(veh, 9.8000001907349)
+				else
+					-- Off road
+					if GripAmount >= 9.8000001907349 then
+						GripAmount = 5.8000001907349
+					end
+
+					SetVehicleGravityAmount(veh, GripAmount)
+				end
+			end
+
+			Citizen.Wait(200)
+		end
+	end
+end)
+
+local blacklistedModels = {
+}
+
+local turnEngineOn = false
+
+-- [[ THREAD ]] --
+	-- Todo: Make sure the vehicle is not a boat, bike, plane, heli or blacklisted
+
+	Citizen.CreateThread(function()
+		while true do
+			Citizen.Wait(0)
+	
+			local veh = GetVehiclePedIsIn(ped)
+			if DoesEntityExist(veh) then
+				disableAirControl(ped, veh)
+				disableVehicleRoll(ped, veh)
+			end
+	
+	
+		end
+	end)
+	
+	
+	-- [[ FUNCTIONS ] --
+	function resetVehicle(veh)
+		FreezeEntityPosition(veh,false)
+		SetVehicleOnGroundProperly(veh)
+		SetVehicleEngineOn(veh,turnEngineOn)
+	end
+	
+	function disableAirControl(ped, veh)
+		if not IsThisModelBlacklisted(veh) then
+			if IsPedSittingInAnyVehicle(ped) then
+				if GetPedInVehicleSeat(veh, -1) == ped then
+					if IsEntityInAir(veh) then
+						print("en l'air")
+						DisableControlAction(0, 59)
+						DisableControlAction(0, 60)
+					end
+				end
+			end
+		end
+	end
+	
+	function disableVehicleRoll(ped, veh)
+		local roll = GetEntityRoll(veh)
+	
+		if not IsThisModelBlacklisted(veh) then
+			if GetPedInVehicleSeat(veh, -1) == ped then
+				if (roll > 75.0 or roll < -75.0) then
+					print("tortue")
+
+					DisableControlAction(2,59,true)
+					DisableControlAction(2,60,true)
+					if not IsEntityInAir(veh) and GetEntitySpeed(veh) < 0.15 then
+						Wait(2000)
+						destroyPedsVehicle(ped)
+					end
+				end
+			end
+		end
+	end
+	
+	function IsThisModelBlacklisted(veh)
+		local model = GetEntityModel(veh)
+	
+		for i = 1, #blacklistedModels do
+			if model == GetHashKey(blacklistedModels[i]) then
+				return true
+			end
+		end
+		return false
+	end
+	
+	function destroyPedsVehicle(ped)
+		local veh = GetVehiclePedIsIn(ped)
+		FreezeEntityPosition(veh,true)
+		SetVehicleEngineOn(veh, false)
+	end
+	
+	function drawNotification(text)
+		SetNotificationTextEntry("STRING")
+		AddTextComponentString(text)
+		DrawNotification(true, false)
+	end

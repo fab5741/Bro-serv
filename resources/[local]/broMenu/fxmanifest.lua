@@ -7,15 +7,16 @@ version '0.0.1'
 
 dependencies {
     'bro_core',
-   -- 'account',
- --   'items',
-   -- 'vehicles',
-    ---'jobManager',
-   -- 'crime'
+    'account',
+    'items',
+    'vehicles',
+    'jobManager',
+    'crime',
+    'needs'
 }
 
 client_script  {
-    'client/menu.lua',
+    'client/functions.lua',
     'client/events.lua',
     'client/client.lua'
 } 

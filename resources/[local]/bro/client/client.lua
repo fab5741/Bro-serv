@@ -6,6 +6,7 @@ config = {
     keys = {
         pointing = 29,
         interact = 38,
+        surrender = 323,
     }   
 }
 
@@ -63,7 +64,6 @@ local SETTINGS = {
 
 local attached_weapons = {}
 
-
 --
 -- \ Variables
 --
@@ -73,6 +73,9 @@ local attached_weapons = {}
 Citizen.CreateThread(function()
     -- change menu texts
     Citizen.InvokeNative(GetHashKey("ADD_TEXT_ENTRY"), "FE_THDR_GTAO", "Le serveur des bros")
+    -- Load anim
+    exports.bro_core:LoadAnimSet("missminuteman_1ig_2")
+    local handsup = false
 	while true do
         Citizen.Wait(0)
         
@@ -90,6 +93,23 @@ Citizen.CreateThread(function()
 
         --
         -- \ Leg Shot
+        --
+
+        --
+        -- Surender animation
+        --
+        if IsControlJustReleased(1, config.keys.surrender) then --Start holding X
+            print("handsup")
+            if not handsup then
+                TaskPlayAnim(ped, "missminuteman_1ig_2", "handsup_enter", 8.0, 8.0, -1, 50, 0, false, false, false)
+                handsup = true
+            else
+                handsup = false
+                ClearPedTasks(ped)
+            end
+        end
+        --
+        -- \ Surrender animation
         --
 
         --
@@ -198,7 +218,7 @@ Citizen.CreateThread(function()
         --
         -- \ Weapons on Back
         --
-	 end
+     end
 end)	
 
 

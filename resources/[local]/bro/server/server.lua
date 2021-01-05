@@ -69,7 +69,7 @@ AvailableWeatherTypes = {
   'XMAS', 
   'HALLOWEEN',
 }
-CurrentWeather = "XMAS"
+CurrentWeather = "EXTRASUNNY"
 local baseTime = 0
 local timeOffset = 0
 local freezeTime = false
@@ -358,45 +358,32 @@ Citizen.CreateThread(function()
 end)
 
 function NextWeatherStage()
- -- if CurrentWeather == "CLEAR" or CurrentWeather == "CLOUDS" or CurrentWeather == "EXTRASUNNY"  then
-   --   local new = math.random(1,2)
-     -- if new == 1 then
-     --     CurrentWeather = "CLEARING"
-    --  else
-     --     CurrentWeather = "OVERCAST"
-     -- end
- -- elseif CurrentWeather == "CLEARING" or CurrentWeather == "OVERCAST" then
- --     local new = math.random(1,6)
-    --  if new == 1 then
-   --       if CurrentWeather == "CLEARING" then CurrentWeather = "FOGGY" else CurrentWeather = "RAIN" end
-   --   elseif new == 2 then
-    --      CurrentWeather = "CLOUDS"
-    --  elseif new == 3 then
-    --      CurrentWeather = "CLEAR"
-    --  elseif new == 4 then
-    --      CurrentWeather = "EXTRASUNNY"
-    --  elseif new == 5 then
-    --      CurrentWeather = "SMOG"
-    --  else
-     --     CurrentWeather = "FOGGY"
-      --end
-  --elseif CurrentWeather == "THUNDER" or CurrentWeather == "RAIN" then
-    --  CurrentWeather = "CLEARING"
-  --elseif CurrentWeather == "SMOG" or CurrentWeather == "FOGGY" then
-    --  CurrentWeather = "CLEAR"
-  --end
-
-  -- rewriten for xmas period
-  local new = math.random(1,4)
-  if new == 1 then
-    CurrentWeather = "XMAS"
-  elseif new == 2 then
-    CurrentWeather = "BLIZZARD"
-  elseif new == 3 then
-    CurrentWeather = "SNOWLIGHT"
-  else
-    CurrentWeather = "SNOW"
+  if CurrentWeather == "CLEAR" or CurrentWeather == "CLOUDS" or CurrentWeather == "EXTRASUNNY"  then
+      local new = math.random(1,2)
+      if new == 1 then
+          CurrentWeather = "CLEARING"
+      else
+          CurrentWeather = "OVERCAST"
+      end
+  elseif CurrentWeather == "CLEARING" or CurrentWeather == "OVERCAST" then
+      local new = math.random(1,6)
+      if new == 1 then
+          if CurrentWeather == "CLEARING" then CurrentWeather = "FOGGY" else CurrentWeather = "RAIN" end
+      elseif new == 2 then
+          CurrentWeather = "CLOUDS"
+      elseif new == 3 then
+          CurrentWeather = "CLEAR"
+      elseif new == 4 then
+          CurrentWeather = "EXTRASUNNY"
+      elseif new == 5 then
+          CurrentWeather = "SMOG"
+      else
+          CurrentWeather = "FOGGY"
+      end
+  elseif CurrentWeather == "THUNDER" or CurrentWeather == "RAIN" then
+      CurrentWeather = "CLEARING"
+  elseif CurrentWeather == "SMOG" or CurrentWeather == "FOGGY" then
+      CurrentWeather = "CLEAR"
   end
-
   TriggerEvent("bro:requestSync")
 end

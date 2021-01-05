@@ -32,7 +32,28 @@ end)
 AddEventHandler("vehicle:permis:get:ds", function(permis)
 	if permis < 1 then
 		exports.bro_core:HelpPromt("Auto-école : ~INPUT_PICKUP~")
-		zoneType = "ds"
+		exports.bro_core:Key("E", "E", "Permis", function()
+			if exports.bro_core:isPedDrivingAVehicle() then
+				exports.bro_core:Notification('~r~Tu ne peux pas passer le permis de voiture en conduisant.')
+			else
+				local price = 100
+				exports.bro_core:AddMenu("ds", {
+					Title = "Auto-Ecole",
+					Subtitle = "Permis",
+					buttons = 	{
+						{
+							type = "button",
+							label = "Permis de conduire (~g~"..price.." $~s~)",
+							actions = {
+								onSelected = function()
+									TriggerServerEvent("vehicle:ds", "vehicle:ds", price)
+								end
+							},
+						}
+					}
+				})
+			end
+		end)
 	else
 		exports.bro_core:Notification("Vous avez déjà le permis")
 	end
@@ -80,7 +101,7 @@ AddEventHandler("vehicle:ds", function()
 	exports.bro_core:Notification("~g~ L'épreuve commence. N'oubliez pas votre ceinture !")
 	exports.bro_core:EnableArea("checkpoints-1")
 	ds = true
-	exports.bro_core:CloseMenu("ds")
+	exports.bro_core:RemoveMenu("ds")
 end)
 
 
@@ -89,8 +110,8 @@ AddEventHandler("vehicle:job:buy:ok", function(name, id)
 	data = {}
 	data.gameId = 0
 	data.name = name
-	spawnACar(data, false)
-	exports.bro_core:CloseMenu("shops-job")
+	spawnACar(data, false, true)
+	exports.bro_core:RemoveMenu("shops-job")
 end)
 
 
@@ -102,7 +123,7 @@ AddEventHandler("vehicle:buy:ok", function(name, id)
 	data.gameId = 0
 	data.name = name
 	spawnACar(data, false, true)
-	exports.bro_core:CloseMenu("shops")
+	exports.bro_core:RemoveMenu("shops")
 end)
 
 
@@ -113,17 +134,21 @@ AddEventHandler("vehicle:job:shop", function(vehicles)
 	
 	for k, v in ipairs (vehicles) do
 		buttons[k] =     {
-			text = v.label.. " (~g~".. v.price.." $~s~)",
-			exec = {
-				callback = function() 
+			type = "button",
+			label = v.label.. " (~g~".. v.price.." $~s~)",
+			actions = {
+				onSelected = function() 
 					-- buy the car
 					TriggerServerEvent("vehicle:job:buy", "vehicle:job:buy:ok", v.id)
 				end
 			},
 		}
 	end
-	exports.bro_core:SetMenuButtons("shops", buttons)
-	exports.bro_core:OpenMenu("shops")
+	exports.bro_core:AddMenu("concesscorpo", {
+		Title = "Concessionaire",
+		Subtitle = "Entreprise",
+		buttons = buttons
+	})
 end)
 
 
@@ -132,47 +157,21 @@ AddEventHandler("vehicle:shop", function(vehicles)
 	
 	for k, v in ipairs (vehicles) do
 		buttons[k] =     {
-			text = v.label.. " (~g~".. v.price.." $~s~)",
-			exec = {
-				callback = function() 
+			type ="button",
+			label = v.label.. " (~g~".. v.price.." $~s~)",
+			actions = {
+				onSelected = function() 
 					-- buy the car
 					TriggerServerEvent("vehicle:buy", "vehicle:buy:ok", v.id)
 				end
-			},
-			hover = {
-				callback = function()
-					local vehicleName = v.name
-					-- load the model
-					RequestModel(vehicleName)
-				
-					-- wait for the model to load
-					while not HasModelLoaded(vehicleName) do
-						Wait(500) -- often you'll also see Citizen.Wait
-					end
-				
-					ClearAreaOfVehicles(-44.44, -1098.43, 26.42, 5.0, false, false, false, false, false)
-					-- create the vehicle
-					local vehicle = CreateVehicle(vehicleName, -44.44, -1098.43, 26.42, 10.04, true, false)
-				
-					-- set the player ped into the vehicle's driver seat
-				  --  SetPedIntoVehicle(playerPed, vehicle, -1)				
-				  
-					-- release the model
-					SetModelAsNoLongerNeeded(vehicleName)
-					-- SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS
-					SetVehicleDoorsLockedForAllPlayers(
-						vehicle --[[ Vehicle ]], 
-						true --[[ boolean ]]
-					)
-					-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-					SetEntityAsNoLongerNeeded(vehicle)
-				end
 			}
-	}
+		}
+		exports.bro_core:AddMenu("concess", {
+			Title = "Concessionaire",
+			Subtitle = "Entreprise",
+			buttons = buttons
+		})
 	end
-	
-	exports.bro_core:SetMenuButtons("shops", buttons)
-	exports.bro_core:OpenMenu("shops")
 end)
 
 
@@ -183,9 +182,10 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 	if vehicles ~= nil then
 		for k, v in ipairs (vehicles) do
 			buttons[k] =     {
-				text = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
-				exec = {
-					callback = function() 
+				type="button",
+				label = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
+				actions = {
+					onSelected = function() 
 						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
 					end
 			}
@@ -196,9 +196,10 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 	if vehicles2 ~= nil then
 		for k, v in ipairs (vehicles2) do
 			buttons[k] =     {
-				text = v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
-				exec = {
-					callback = function() 
+				type="button",
+				label = v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+				actions = {
+					onSelected = function() 
 						
 						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
 					end
@@ -210,9 +211,10 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 	if vehicles3 ~= nil then
 		for k, v in ipairs (vehicles3) do
 			buttons[k] =     {
-				text = "Entreprise : "..v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
-				exec = {
-					callback = function() 
+				type="button",
+				label = "Entreprise : "..v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+				actions = {
+					onSelected = function() 
 						
 						TriggerServerEvent("vehicle:parking:job:get", v.id, "vehicle:depots:job:get")
 					end
@@ -223,53 +225,58 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 	if vehicles4 ~= nil then
 		for k, v in ipairs (vehicles4) do
 			buttons[k] =     {
-				text = "Entreprise : ".. v.label.. " ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
-				exec = {
-					callback = function() 
+				type="button",
+				label = "Entreprise : ".. v.label.. " ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
+				actions = {
+					onSelected = function() 
 						TriggerServerEvent("vehicle:parking:job:get", v.id, "vehicle:depots:job:get")
 					end
 			}
 		}
 	end
 	end
-	exports.bro_core:SetMenuButtons("depots", buttons)
-	exports.bro_core:OpenMenu("depots")
+	exports.bro_core:AddMenu("depots", {
+		Title = "Depot",
+		Subtitle = "Récupérer un véhicule",
+		buttons = buttons
+	})
 end)
 
 
 AddEventHandler("vehicle:foot", function(vehicles)
-	local buttons = {}
+	if #vehicles == 0 then
+		exports.bro_core:Notification("~r~Pas de véhicle")
+	else
+		local buttons = {}
 
-	for k, v in ipairs (vehicles) do
-		buttons[k] =     {
-			text = v.label,
-			exec = {
-				callback = function() 
-					if not lockParking then
-						local playerPed = GetPlayerPed(-1)
-						local time = 4000
-						TriggerEvent("bf:progressBar:create", time, "Vous sortez le véhicule du parking")
-						FreezeEntityPosition(playerPed, true)
-						lockParking = true
-						Wait(time)
-
-						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
-						exports.bro_core:CloseMenu("parking-veh")
-						FreezeEntityPosition(playerPed, false)
-						lockParking = false
+		for k, v in ipairs (vehicles) do
+			buttons[k] =     {
+				type = "button",
+				label = v.label,
+				actions = {
+					onSelected = function() 
+						if not lockParking then
+							exports.bro_core:actionPlayer(4000, "Véhicule", "", "",
+							function()
+								TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
+								exports.bro_core:RemoveMenu("parking-veh")
+							end)
+						end
 					end
-				end
+			}
 		}
-	}
+		end
+		exports.bro_core:AddMenu("parking-veh", {
+			Title = "Parking",
+			Subtitle = "Retirer",
+			buttons = buttons
+		})
 	end
-	exports.bro_core:SetMenuButtons("parking-foot", buttons)
-	exports.bro_core:OpenMenu("parking-foot")
 end)
 
 
 AddEventHandler("vehicle:get", function(data)
-	exports.bro_core:CloseMenu("parking-foot")
-	TriggerServerEvent("vehicle:parking:get", data.id, "")
+	exports.bro_core:RemoveMenu("parking-foot")
 	data.x = nil
 	data.y = nil
 	data.z = nil
@@ -293,7 +300,7 @@ AddEventHandler("vehicle:depots:get", function(data)
 	TriggerServerEvent("account:player:add", "", -price)
 	TriggerServerEvent("account:job:add", "", 1, price, true)
 	exports.bro_core:Notification("Vous avez payé ~g~".. price.."$")
-	exports.bro_core:CloseMenu("depots")
+	exports.bro_core:RemoveMenu("depots")
 end)
 
 AddEventHandler("vehicle:depots:job:get", function(data, job)
@@ -312,16 +319,22 @@ AddEventHandler("vehicle:depots:job:get", function(data, job)
 	TriggerServerEvent("account:job:add", "", job, -price, true)
 	TriggerServerEvent("account:job:add", "", 1, price, true)
 	exports.bro_core:Notification("Vous avez payé ~g~".. price.."$")
-	exports.bro_core:CloseMenu("depots")
+	exports.bro_core:RemoveMenu("depots")
 end)
 
 function spawnACar(v, new, tpIn)
 	-- delete old if exist
 	DeleteEntity(v.gameId)
 
+	print("tpIN")
+	print(tpIn)
 	--spawn
 	if v.x == nil or v.y == nil or v.z == nil then
-		vehicle = exports.bro_core:spawnCar(v.name, true, nil, true, true)
+		if tpIn then
+			vehicle = exports.bro_core:spawnCar(v.name, true, nil, true, false)
+		else
+			vehicle = exports.bro_core:spawnCar(v.name, true, nil, true, true)
+		end
 	else
 		if tpIn then
 			vehicle = exports.bro_core:spawnCar(v.name, true, vector3((v.x+v.x)/2, (v.y+v.y)/2, (v.z+v.z)/2), true, false, v.heading)

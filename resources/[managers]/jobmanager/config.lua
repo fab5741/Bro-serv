@@ -2,6 +2,9 @@ config = {
     jobs = {
         farm = {
             color= 24,
+            red = 10,
+            blue = 10,
+            green = 250,
             lockers = {
                 {
                     coords = vector3(2030.2646484375,4979.7456054688,42.098190307617),
@@ -10,7 +13,7 @@ config = {
             },
             collect = {
                 {
-                    coords = vector3(2572.38, 4523.48, 35.2),
+                    coords = vector3(2572.7346191406,4524.150390625,36.249584197998),
                     sprite = 496,
                     items = {
                        {name="wheat", label="Blé", amount=5, type="1"},
@@ -19,17 +22,17 @@ config = {
             },
             process = {
                 {
-                    coords = vector3(463.28,3566.37,32.2),
+                    coords = vector3(461.15081787109,3566.9060058594,33.441032409668),
                     sprite = 502,
                     items = {
-                        {name="wheat", label="Blé -> Farine", amount=5, type="1", to="2", amountTo=1},
+                        {name="wheat", label="Blé -> Farine", amount=5, type="1", to="2", amountTo=5},
                     }
                 },
                 {
-                    coords = vector3(470.25,3565.63,32.45),
+                    coords = vector3(470.29010009766,3566.115234375,33.238590240479),
                     sprite = 503,
                     items = {
-                        {name="flour", label="Farine -> Bro'Bab", amount=5, type="2", to="3", amountTo=1},
+                        {name="flour", label="Farine -> Bro'Bab", amount=5, type="2", to="3", amountTo=5},
                     }
                 }
              },
@@ -388,6 +391,9 @@ config = {
         bennys = {
             label= "Benny's",
             color = 6,
+            red = 250,
+            green = 10,
+            blue = 10,
             lockers = {
                 {
                     coords = vector3(-207.11326599121,-1338.4561767578,34.894428253174),
@@ -410,13 +416,9 @@ config = {
             },
             repair = {
                 {
-                    coords = vector3(-221.8670501709,-1324.2938232422,30.890529632568),
+                    coords = vector3(-223.45896911621,-1330.2464599609,30.890396118164),
                     sprite = 357,
                 },
-                {
-                    coords = vector3(-222.41114807129,-1329.1971435547,30.890409469604),
-                    sprite = 357,
-                },                
             },
             custom = {
                 {
@@ -427,6 +429,12 @@ config = {
             safes = {
                 {
                     coords = vector3(-204.34022521973,-1327.9340820312,34.894428253174),
+                    sprite = 568,
+                }
+            },
+            fourriere = {
+                {
+                    coords= vector3(-156.51098632812,-1296.8715820312,31.310568618774),
                     sprite = 568,
                 }
             },
@@ -529,7 +537,6 @@ config = {
                             ears_1 = -1,     ears_2 = 0
                         }
                     },
-                
                      {
                         male = {
                             tshirt_1 = -1,  tshirt_2 = -1,
@@ -555,40 +562,17 @@ config = {
                         }
                     },
                 },
-                fourriere = {
-                    {
-                        coords= vector3(-163.53660583496,-1303.9177246094,31.076028823853),
-                        sprite = 568,
-                    }
-                }
         },
         lsms = {
             label = "Hopital",
             color = 1, 
+            red = 255,
+            green  = 51,
+            blue = 51,
             lockers = {
                 {
                     coords = vector3(336.27508544922, -580.03137207031, 28.791479110718),
-                    blip = {
-                    sprite = 51,
-                    scale  = 0.4,
-                    color  = 5,
-                    string = "locker",
-                    },
-                    action = "lockers",
-                }
-            },
-            parking = {
-                {
-                    coords = vector3(339.56744384766,-562.45819091797,28.743431091309),
-                    spawn = vector3(344.1618347168, -556.84796142578, 28.743431091309),
-                    heading = -15.0,
-                    blip = {
-                        sprite = 357,
-                        scale  = 1.2,
-                        color  = 5,
-                        string = "Parking",
-                    },
-                    action = "parking",
+                    sprite = 366,
                 }
             },
             homes = {
@@ -625,7 +609,6 @@ config = {
                     }
                },
                {
-                label= "Stagiaire",
                 male = {
                     tshirt_1 = 15,  tshirt_2 = 0,
                     torso_1 = 95,   torso_2 = 0,
@@ -652,7 +635,60 @@ config = {
                 }
                 },
                 {
-                    label= "Stagiaire",
+                    male = {
+                        tshirt_1 = 15,  tshirt_2 = 0,
+                        torso_1 = 95,   torso_2 = 0,
+                        decals_1 = 60,   decals_2 = 0,
+                        arms = 92,
+                        pants_1 = 24,   pants_2 = 5,
+                        shoes_1 = 9,   shoes_2 = 0,
+                        helmet_1 = 8,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0,
+                        chain_1 = 126, chain_2 = 0,
+                    },
+                    female = {
+                        tshirt_1 = 75,  tshirt_2 = 3,
+                        torso_1 = 73,   torso_2 = 0,
+                        decals_1 = 60,   decals_2 = 0,
+                        arms = 14,
+                        pants_1 = 37,   pants_2 = 5,
+                        shoes_1 = 1,   shoes_2 = 0,
+                        helmet_1 = 57,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0,
+                        chain_1 = 126, chain_2 = 0,
+
+                    }
+                },
+                {
+                    male = {
+                        tshirt_1 = 15,  tshirt_2 = 0,
+                        torso_1 = 95,   torso_2 = 0,
+                        decals_1 = 60,   decals_2 = 0,
+                        arms = 92,
+                        pants_1 = 24,   pants_2 = 5,
+                        shoes_1 = 9,   shoes_2 = 0,
+                        helmet_1 = 8,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0,
+                        chain_1 = 126, chain_2 = 0,
+                    },
+                    female = {
+                        tshirt_1 = 75,  tshirt_2 = 3,
+                        torso_1 = 73,   torso_2 = 0,
+                        decals_1 = 60,   decals_2 = 0,
+                        arms = 14,
+                        pants_1 = 37,   pants_2 = 5,
+                        shoes_1 = 1,   shoes_2 = 0,
+                        helmet_1 = 57,  helmet_2 = 0,
+                        chain_1 = 0,    chain_2 = 0,
+                        ears_1 = 2,     ears_2 = 0,
+                        chain_1 = 126, chain_2 = 0,
+
+                    }
+                },
+                {
                     male = {
                         tshirt_1 = 15,  tshirt_2 = 0,
                         torso_1 = 95,   torso_2 = 0,
@@ -690,9 +726,12 @@ config = {
         lspd = {
             label= "LSPD",
             color = 77,
+            red = 77,
+            green = 166,
+            blue = 255,
             lockers = {
                 {
-                    coords = vector3(457.06948852539,-992.75042724609,30.689332962036),
+                    coords = vector3(456.48355102539,-992.94378662109,30.689331054688),
                     sprite = 51,
                 }
             },

@@ -62,14 +62,15 @@ function actionPlayer(time, message, dict, anim, cb)
         lockAction = true
         Citizen.CreateThread(function ()
             FreezeEntityPosition(playerPed, true)
-            
-            LoadAnimSet(dict)
+			
+			if dict and dict ~= ""  and anim and anim ~= "" then
+				LoadAnimSet(dict)
 
-            while not HasAnimDictLoaded(dict) do
-                Citizen.Wait(150)
-            end
-            TaskPlayAnim(playerPed, dict, anim, 8.0, 8.0, -1, 0, 0, false, false, false)
-
+				while not HasAnimDictLoaded(dict) do
+					Citizen.Wait(150)
+				end
+				TaskPlayAnim(playerPed, dict, anim, 8.0, 8.0, -1, 0, 0, false, false, false)
+			end
             Wait(time)
             lockAction = false
             cb()
@@ -79,3 +80,4 @@ function actionPlayer(time, message, dict, anim, cb)
         Notification("~r~"..message.. " déjà en cours")
     end
 end
+

@@ -158,12 +158,24 @@ exports {
     "GetEntitiesInAround",
     "CastRayPlayerPedToPoint",
 
-    
+    -- Peds
+    "GetPeds",
+    "GetPedsInArea",
+    "GetPedsInAround",
+    "GetPedInDirection",
+
     -- Vehicules
     "GetPickups",
     "GetPickupsInArea",
     "GetPickupsInAround",
     "spawnCar",
+
+    -- Vehicules
+    "GetVehicles",
+    "GetVehiclesInArea",
+    "GetVehiclesInAround",
+    "GetVehicleInDirection",
+    
 
     -- Player
     "GetPlayerPed",
@@ -176,6 +188,7 @@ exports {
     "actionPlayer",
     "tpPlayer",
     "isPedDrivingAVehicle",
+
 }
 
 server_scripts {
@@ -197,6 +210,8 @@ server_exports {
         "GetRandomString",
         "Copy",
         "Clone",
+        "Money",
+
 }
 
 

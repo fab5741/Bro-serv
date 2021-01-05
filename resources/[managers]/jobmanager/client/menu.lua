@@ -88,31 +88,6 @@ function menus()
         position = 1,
         buttons = buttons
 	})
-
-
-	exports.bro_core:AddMenu("repair", {
-        title = "Réparation",
-		position = 1,
-		buttons = {
-			{
-				text = "Réparer carrosserie (10$)",
-				exec = {
-					callback = function()
-						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-
-						SetVehicleFixed(vehicle)
-						SetVehicleDeformationFixed(vehicle)
-						SetVehicleUndriveable(vehicle, false)
-						ClearPedTasksImmediately(playerPed)
-						TriggerServerEvent("account:player:liquid:add", "", -10.0)
-						exports.bro_core:Notification("Véhicle réparé")
-						exports.bro_core:RemoveMenu("repair")
-					end
-				},
-			},
-		}
-	})
-
 end
 
 

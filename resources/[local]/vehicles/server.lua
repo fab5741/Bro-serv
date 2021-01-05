@@ -213,6 +213,7 @@ end)
 AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	print(id)
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod, players, player_vehicle where vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id and players.discord= @discord and player_vehicle.vehicle_mod = vehicle_mod.id UNION select vehicle_mod.id, vehicles.name, vehicles.label from players, job_grades, job_vehicle, vehicle_mod, vehicles where discord = @discord and players.job_grade = job_grades.id and job_vehicle.job = job_grades.job and job_vehicle.vehicle_mod = vehicle_mod.id and vehicles.id = vehicle_mod.vehicle and vehicle_mod.parking = @id', {
 			['discord'] =  discord,

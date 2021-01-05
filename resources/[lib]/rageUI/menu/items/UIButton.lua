@@ -115,7 +115,6 @@ function RageUI.Button(Label, Description, Style, Enabled, Callback, Submenu)
                 end
             end
             RageUI.Options = RageUI.Options + 1
-
         end
     end
 

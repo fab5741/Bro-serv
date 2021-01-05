@@ -22,38 +22,34 @@ function SetPropertyOwned(name, price, rented, source)
 			}, function(rowsChanged)
 					TriggerClientEvent('property:setPropertyOwned', source, name, true, rented)
 				if rented then
-					TriggerClientEvent("bf:Notification", source, "Loué pour  ~g~"..price.."$")
+					TriggerClientEvent("bro_core:Notification", source, "Loué pour  ~g~"..price.."$")
 				else
-					TriggerClientEvent("bf:Notification", source, "Acheté pour ~g~"..price.."$")
+					TriggerClientEvent("bro_core:Notification", source, "Acheté pour ~g~"..price.."$")
 				end
 			end)
 		end)
 	end)
 end
 
-function RemoveOwnedProperty(name, owner, noPay)
-	MySQL.Async.fetchAll('SELECT id, rented, price FROM owned_properties WHERE name = @name AND owner = @owner', {
+function RemoveOwnedProperty(name, noPay)
+	local sourcevalue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourcevalue)
+	MySQL.Async.fetchAll('SELECT owned_properties.id, rented, price FROM owned_properties, players WHERE name = @name AND owner = players.id and players.discord = @discord', {
 		['@name']  = name,
-		['@owner'] = owner
+		['@discord'] = discord
 	}, function(result)
 		if result[1] then
 			MySQL.Async.execute('DELETE FROM owned_properties WHERE id = @id', {
 				['@id'] = result[1].id
 			}, function(rowsChanged)
-				local xPlayer = ESX.GetPlayerFromIdentifier(owner)
-
-				if xPlayer then
-					xPlayer.triggerEvent('property:setPropertyOwned', name, false)
-
-					if not noPay then
-						if result[1].rented == 1 then
-							xPlayer.showNotification(_U('moved_out'))
-						else
-							local sellPrice = ESX.Math.Round(result[1].price / Config.SellModifier)
-
-							xPlayer.showNotification(_U('moved_out_sold', ESX.Math.GroupDigits(sellPrice)))
-							xPlayer.addAccountMoney('bank', sellPrice)
-						end
+				if not noPay then
+					if result[1].rented == 1 then
+						TriggerClientEvent("bro_core:Notification", sourcevalue, "Vous avez déménagé")
+					else
+						local sellPrice = result[1].price * 0.8
+						print(sellPrice)
+						TriggerClientEvent("bro_core:Notification", sourcevalue, "Vous avez déménagé. Vous recevez "..exports.bro_core:Money(sellPrice))
+						TriggerClientEvent("account:player:add", sellPrice)
 					end
 				end
 			end)
@@ -194,7 +190,7 @@ AddEventHandler('property:buyProperty', function(propertyName)
 						SetPropertyOwned(propertyName, property.price, false, sourceValue)
 					end)
 				else
-					TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assez d'argent")
+					TriggerClientEvent("bro_core:Notification", sourceValue, "Vous n'avez pas assez d'argent")
 				end
 		end)
 	end)
@@ -202,12 +198,11 @@ end)
 
 RegisterNetEvent('property:removeOwnedProperty')
 AddEventHandler('property:removeOwnedProperty', function(propertyName)
-	local xPlayer = ESX.GetPlayerFromId(source)
-	RemoveOwnedProperty(propertyName, xPlayer.identifier)
+	RemoveOwnedProperty(propertyName)
 end)
 
 AddEventHandler('property:removeOwnedPropertyIdentifier', function(propertyName, identifier)
-	RemoveOwnedProperty(propertyName, identifier)
+	RemoveOwnedProperty(propertyName)
 end)
 
 RegisterNetEvent('property:saveLastProperty')

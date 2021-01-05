@@ -4,6 +4,10 @@
 
 local radares = {
   {x=394.01586914062, y= -1051.7839355469, z=28.893375396729, speed = 80, location = "lspd"},
+  {x=-277.26965332031, y= -1309.1405029297, z=30.939800262451, speed = 80, location = "bennys"},
+  {x=-702.79852294922, y= -837.08538818359, z=23.164554595947, speed = 80, location = "Vespucci Boulevard"},
+  {x=-395.23190307617, y= -1.468491435051, z=46.537395477295, speed = 80, location = "Hawick avenue | Burton"},
+  {x=859.34936523438, y= 124.029296875, z=70.76798248291, speed = 130, location = "FreeWay"},
 }
 
 Citizen.CreateThread(function()

@@ -58,12 +58,15 @@ config.parkings = {
 	},
 	{
 		zone = "lspd",
+		red = 77,
+		green = 166,
+		blue = 255,
 		locations = {
 			{
-				x=453.52593994141,
-				y=-1020.6132202148,
-				z=28.33568572998
-			}
+				x=449.6057434082,
+				y=-1014.3215942383,
+				z=28.56
+						}
 		}
 	},
 	{
@@ -118,57 +121,6 @@ Citizen.CreateThread(function()
 	local notification = false
 	while true do
 		Citizen.Wait(0)
-		if zoneType == "shops" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("vehicle:shop:get:all", "vehicle:shop")	
-		elseif zoneType == "shops-job" and IsControlJustPressed(1, 51) then
-				TriggerServerEvent("vehicle:shop:job:get:all", "vehicle:job:shop")		
-		elseif zoneType == "parking" and IsControlJustPressed(1, 51) then
-			if exports.bro_core:isPedDrivingAVehicle() then
-				exports.bro_core:SetMenuValue("parking-veh", {
-					buttons = {
-						{
-							text = "Stocker : " .. zone,
-							exec = {
-								callback = function()
-									if not lockParking then
-										local time = 4000
-										TriggerEvent("bf:progressBar:create", time, "Stockage véhicule en cours")
-										FreezeEntityPosition(playerPed, true)
-										FreezeEntityPosition(vehicle, true)
-										lockParking = true
-										Wait(time)
-
-										TriggerServerEvent("vehicle:store", currentVehicle, zone)
-										currentVehicle = 0
-										DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-										exports.bro_core:CloseMenu("parking-veh")
-										FreezeEntityPosition(playerPed, false)
-										lockParking = false
-									end
-								end
-							},
-						}
-					}
-				})
-
-				exports.bro_core:OpenMenu("parking-veh")
-			else
-				TriggerServerEvent("vehicle:parking:get:all", zone, "vehicle:foot")
-			end
-		elseif zoneType == "depots" and IsControlJustPressed(1, 51) then
-			if exports.bro_core:isPedDrivingAVehicle() then
-				exports.bro_core:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
-			else
-				TriggerServerEvent("vehicle:depots:get:all", "vehicle:depots")
-			end
-		elseif zoneType == "ds" and IsControlJustPressed(1, 51) then
-			if exports.bro_core:isPedDrivingAVehicle() then
-				exports.bro_core:Notification('~r~Tu ne peux pas passer le permis de voiture en conduisant.')
-			else
-				exports.bro_core:OpenMenu("ds")
-			end
-		end
-
 		if ds then
 			local ped = GetPlayerPed(-1)
 			vehicle = GetVehiclePedIsIn(ped, false)
@@ -302,7 +254,6 @@ local turnEngineOn = false
 			if IsPedSittingInAnyVehicle(ped) then
 				if GetPedInVehicleSeat(veh, -1) == ped then
 					if IsEntityInAir(veh) then
-						print("en l'air")
 						DisableControlAction(0, 59)
 						DisableControlAction(0, 60)
 					end
@@ -317,8 +268,6 @@ local turnEngineOn = false
 		if not IsThisModelBlacklisted(veh) then
 			if GetPedInVehicleSeat(veh, -1) == ped then
 				if (roll > 75.0 or roll < -75.0) then
-					print("tortue")
-
 					DisableControlAction(2,59,true)
 					DisableControlAction(2,60,true)
 					if not IsEntityInAir(veh) and GetEntitySpeed(veh) < 0.15 then

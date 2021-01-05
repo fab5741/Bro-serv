@@ -894,20 +894,6 @@ function RotAnglesToVec(rot) -- input vector3
 	return vector3(-math.sin(z)*num, math.cos(z)*num, math.sin(x))
 end
 
--- WEATHER
-Citizen.CreateThread(function()
-    while true 
-    	do
-		
-	--	SetWeatherTypePersist("XMAS")
-     --   SetWeatherTypeNowPersist("XMAS")
-      --  SetWeatherTypeNow("XMAS")
-       -- SetOverrideWeather("XMAS")
-    	
-		Citizen.Wait(1)
-	end
-end)
-
 --realistic vehicles
 -- Vehicles to enable/disable air control
 local vehicleClassDisableControl = {
@@ -970,7 +956,7 @@ end)
 
 -- WEATHER
 
-CurrentWeather = 'XMAS'
+CurrentWeather = 'CLEAR'
 local lastWeather = CurrentWeather
 local baseTime = 0
 local timeOffset = 0
@@ -1016,7 +1002,7 @@ AddEventHandler('bro:updateTime', function(base, offset, freeze)
 end)
 
 Citizen.CreateThread(function()
-    local hour = 0
+    local hour = 12
     local minute = 0
     while true do
         Citizen.Wait(0)

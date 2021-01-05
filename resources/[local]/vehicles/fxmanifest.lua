@@ -13,7 +13,6 @@ dependencies {
 client_scripts {
     'menu.lua',
     'events.lua',
-    'functions.lua',
     'client.lua'
 }
 

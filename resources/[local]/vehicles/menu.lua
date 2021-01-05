@@ -1,35 +1,32 @@
 function createMenus()
     	--shops
-	exports.bro_core:AddMenu("shops", {
-		title = "Concessionnaire",
-		position = 1,
-	})
-
 	exports.bro_core:AddArea("shops", {
 		marker = {
 			type = 1,
 			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
+			height = 0.2,
+			red = 250,
+			green = 10,
+			blue = 10,
+			showDistance = 5,
 		},
 		trigger = {
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bro_core:HelpPromt("Concessionnaire : ~INPUT_PICKUP~")
-					zoneType = "shops"
-					zone = "global"
+					exports.bro_core:Key("E", "E", "Concessionaire", function()
+						TriggerServerEvent("vehicle:shop:get:all", "vehicle:shop")	
+					end)
+					exports.bro_core:HelpPromt("Concessionaire Key : ~INPUT_PICKUP~")
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bro_core:CloseMenu(zoneType..zone)
-					zoneType = nil
-					zone = nil
+					exports.bro_core:RemoveMenu("concess")
+					exports.bro_core:Key("E", "E", "Interaction", function()
+					end)
 				end
-			}
+			},
 		},
 		blip = {
 			text = "Concessionnaire",
@@ -46,37 +43,33 @@ function createMenus()
 	})
 
 	--- shop for job
-
-	exports.bro_core:AddMenu("shops-job", {
-		title = "Concessionnaire",
-		position = 1,
-	})
-
 	exports.bro_core:AddArea("shops-job", {
 		marker = {
 			type = 1,
 			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
+			height = 0.2,
+			red = 250,
+			green = 10,
+			blue = 10,
+			showDistance = 5,
 		},
 		trigger = {
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bro_core:HelpPromt("Concessionnaire entreprise : ~INPUT_PICKUP~")
-					zoneType = "shops-job"
-					zone = "global"
+					exports.bro_core:HelpPromt("Concessionaire Entreprise Key : ~INPUT_PICKUP~")
+					exports.bro_core:Key("E", "E", "Concessionaire", function()
+						TriggerServerEvent("vehicle:shop:job:get:all", "vehicle:job:shop")
+					end)
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bro_core:CloseMenu(zoneType..zone)
-					zoneType = nil
-					zone = nil
+					exports.bro_core:RemoveMenu("concesscorpo")
+					exports.bro_core:Key("E", "E", "Interaction", function()
+					end)
 				end
-			}
+			},
 		},
 		blip = {
 			text = "Concessionnaire entreprise",
@@ -92,42 +85,60 @@ function createMenus()
 		},
 	})
 	-- parkings
-	exports.bro_core:AddMenu("parking-veh", {
-		title = "Parking",
-		position = 1,
-	})
-	exports.bro_core:AddMenu("parking-foot", {
-		title = "Parking",
-		menuTitle = "Retirer",
-		position = 1,
-	})
-
 	for k,v in pairs(config.parkings) do
 		exports.bro_core:AddArea("parkings"..k, {
 			marker = {
-				type = 1,
-				weight = 1,
-				height = 1,
-				red = 255,
-				green = 255,
-				blue = 153,
+				weight = 2,
+				height = 0.15,
+				red = v.red,
+				green = v.green,
+				blue = v.blue,
+				alpha = 100,
+				showDistance = 5,
+				type = 43
 			},
 			trigger = {
 				weight = 2,
 				enter = {
 					callback = function()
 						exports.bro_core:HelpPromt("Parking : ~INPUT_PICKUP~")
-						zoneType = "parking"
-						zone = v.zone
+						exports.bro_core:Key("E", "E", "Parking ("..v.zone..")", function()
+							if exports.bro_core:isPedDrivingAVehicle() then
+								exports.bro_core:AddMenu("parking-veh", {
+									Title = "Parking",
+									Subtitle = v.zone,
+									buttons = {
+										{
+											type= "button",
+											label = "Stocker : " .. v.zone,
+											actions = {
+												onSelected = function()
+													exports.bro_core:actionPlayer(4000, "Stockage véhicule", "", "",
+													function()
+														print("store veh")
+														TriggerServerEvent("vehicle:store", currentVehicle, v.zone)
+														currentVehicle = 0
+														DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
+														exports.bro_core:RemoveMenu("parking-veh")
+													end)
+												end
+											},
+										}
+									}
+								})
+							else
+								TriggerServerEvent("vehicle:parking:get:all", v.zone, "vehicle:foot")
+							end
+						end)
 					end
 				},
 				exit = {
 					callback = function()
-						exports.bro_core:CloseMenu(zoneType..zone)
-						zoneType = nil
-						zone = nil
+						exports.bro_core:RemoveMenu("parking-veh")
+						exports.bro_core:Key("E", "E", "Interaction", function()
+						end)
 					end
-				}
+				},
 			},
 			blip = {
 				text = "Parking",
@@ -139,34 +150,37 @@ function createMenus()
 	end
 
 	--depots
-	exports.bro_core:AddMenu("depots", {
-		title = "Fourrière",
-		position = 1,
-	})
 	exports.bro_core:AddArea("depots", {
 		marker = {
-			type = 1,
-			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
+			type = 43,
+			weight = 2,
+			height = 0.2,
+			red = 250,
+			green = 10,
+			blue = 10,
+			showDistance = 5,
 		},
 		trigger = {
-			weight = 1,
+			weight = 2,
 			enter = {
 				callback = function()
-					zoneType = "depots"
-					zone = 1
+					exports.bro_core:HelpPromt("Déposer un véhicule en fourrière Key : ~INPUT_PICKUP~")
+					exports.bro_core:Key("E", "E", "Fourrière", function()
+						if exports.bro_core:isPedDrivingAVehicle() then
+							exports.bro_core:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
+						else
+							TriggerServerEvent("vehicle:depots:get:all", "vehicle:depots")
+						end
+					end)
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bro_core:CloseMenu("depots")
-					zoneType = nil
-					zone = nil
+					exports.bro_core:RemoveMenu("depots")
+					exports.bro_core:Key("E", "E", "Interaction", function()
+					end)
 				end
-			}
+			},
 		},
 		blip = {
 			text = "Fourrière",
@@ -175,9 +189,9 @@ function createMenus()
 		},
 		locations = {
 			{
-				x =-162.9992980957,
-				y=-1296.6707763672,
-				z=30.994600296021
+				x=-165.1146697998,
+				y=-1304.7633056641,
+				z=31.365314178467
 			}
 		},
 	})
@@ -186,7 +200,7 @@ function createMenus()
 		marker = {
 			type = 1,
 			weight = 1,
-			height = 1,
+			height = 0.2,
 			red = 255,
 			green = 255,
 			blue = 153,
@@ -195,14 +209,16 @@ function createMenus()
 			weight = 1,
 			enter = {
 				callback = function()
-					TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:ds")
+					exports.bro_core:Key("E", "E", "Permis", function()
+						TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:ds")
+					end)
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bro_core:CloseMenu(zoneType..zone)
-					zoneType = nil
-					zone = nil
+					exports.bro_core:RemoveMenu("ds")
+					exports.bro_core:Key("E", "E", "Interaction", function()
+					end)
 				end
 			}
 		},
@@ -358,6 +374,8 @@ function createMenus()
 end
 
 function removeMenus()
+    exports.bro_core:RemoveMenu("concesscorpo")
+    exports.bro_core:RemoveMenu("concess")
         --shops
     exports.bro_core:RemoveMenu("shops")
     exports.bro_core:RemoveArea("shops")
@@ -378,8 +396,6 @@ function removeMenus()
     --depots
     exports.bro_core:RemoveMenu("depots")
 	exports.bro_core:RemoveArea("depots")
-	exports.bro_core:RemoveMenu("depots")
-    exports.bro_core:RemoveArea("depots")
     --Permis de conduire
     exports.bro_core:RemoveArea("ds")
     exports.bro_core:RemoveArea("checkpoints-1")

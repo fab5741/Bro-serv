@@ -8,12 +8,15 @@ lockHeal = false
 -- police vars
 handCuffed = false
 ped = GetPlayerPed(-1)
-
+job = {
+	name = "chomeur",
+	label = "chomeur"
+}
 RegisterNetEvent('job:get')
 
 AddEventHandler("job:get", function(job)
 	job = job[1]
-	--refresh(job)
+	refresh(job)
 end)
 
 -- open menu loop
@@ -25,10 +28,6 @@ Citizen.CreateThread(function()
 	end	
 	
 	TriggerServerEvent("job:get", "job:get")
-
-	-- create all menus
-	--menus()
-
 	-- main loop
     while true do
 		Citizen.Wait(0)	

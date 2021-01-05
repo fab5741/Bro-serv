@@ -2,75 +2,54 @@ local OwnedProperties, Blips, CurrentActionData = {}, {}, {}
 local CurrentProperty, CurrentPropertyOwner, LastProperty, LastPart, CurrentAction, CurrentActionMsg
 local firstSpawn, hasChest, hasAlreadyEnteredMarker = true, false, false
 
-exports.bro_core:AddMenu("property-owned", {
-    title = "Propriété",
-})
-
-exports.bro_core:AddMenu("property", {
-    title = "Propriété",
-})
-
-
-
-exports.bro_core:AddMenu("property-gateway-bought", {
-    title = "Propriétés achetés",
-})
-
-exports.bro_core:AddMenu("property-gateway-avaiable", {
-    title = "Propriétés libres",
-})
-
-
-exports.bro_core:AddMenu("property-gateway", {
-    title = "Propriété Portail",
-    buttons = {
-        {
-			text = "Propriétés achetés",
-			exec = {
-				callback = function()
-					local gatewayProperties = GetGatewayProperties(LastProperty)
-					local buttons = {}
-					for i=1, #gatewayProperties, 1 do
-						if PropertyIsOwned(gatewayProperties[i]) then
-							buttons[#buttons+1] = {
-								text = gatewayProperties[i].label,
-								callback = function () 
-								end
-							}
-						end
-					end
-					exports.bro_core:SetMenuValue({
+  --  title = "Propriété Portail",
+   -- buttons = {
+   --     {
+	--		text = "Propriétés achetés",
+	--		exec = {
+--				callback = function()
+--					local gatewayProperties = GetGatewayProperties(LastProperty)
+--					local buttons = {}
+--					for i=1, #gatewayProperties, 1 do
+--						if PropertyIsOwned(gatewayProperties[i]) then
+	--						buttons[#buttons+1] = {
+--								text = gatewayProperties[i].label,
+--								callback = function () 
+--								end
+	--						}
+	--					end
+	--				end
+			--		exports.bro_core:SetMenuValue({
 						buttons = buttons
-					})
-					exports.bro_core:NextMenu("property-gateway-bought")
-				end
-			},
-		},
-		{
-			text = "Propriétés libres",
-			exec = {
-				callback = function()
-					local gatewayProperties = GetGatewayProperties(LastProperty)
-					local buttons = {}
+	--				})
+	--				exports.bro_core:NextMenu("property-gateway-bought")
+				--end
+	--		},
+	--	},
+	--	{
+	--		text = "Propriétés libres",
+	--		exec = {
+	--			callback = function()
+			--		local gatewayProperties = GetGatewayProperties(LastProperty)
+		--			local buttons = {}
 				
-					for i=1, #gatewayProperties, 1 do
-						if not PropertyIsOwned(gatewayProperties[i]) then
-							buttons[#buttons+1] = {
-								text = gatewayProperties[i].label,
-								callback = function () 
-								end
-							}
-						end
-					end
-					exports.bro_core:SetMenuValue({
-						buttons = buttons
-					})
-					exports.bro_core:NextMenu("property-gateway-avaiable")
-				end
-			},
-        },
-    },
-})
+			--		for i=1, #gatewayProperties, 1 do
+			--			if not PropertyIsOwned(gatewayProperties[i]) then
+			--				buttons[#buttons+1] = {
+			--					text = gatewayProperties[i].label,
+			--					callback = function () 
+			--					end
+			--				}
+			--			end
+			--		end
+			--		exports.bro_core:SetMenuValue({
+			--			buttons = buttons
+			--		})
+			--		exports.bro_core:NextMenu("property-gateway-avaiable")
+	--			end
+--			},
+ --       },
+  --  },
 
 
 -- only used when script is restarting mid-session
@@ -180,8 +159,8 @@ function EnterProperty(name, owner)
 		SetEntityCoords(playerPed, property.inside.x, property.inside.y, property.inside.z)
 		DoScreenFadeIn(800)
 		DrawSub(property.label, 5000)
+		exports.bro_core:RemoveMenu("property")
 	end)
-	exports.bro_core:CloseMenu("property")
 end
 
 function ExitProperty(name)
@@ -280,49 +259,55 @@ end
 
 function OpenPropertyMenu(property)
 	if PropertyIsOwned(property) then
-		exports.bro_core:SetMenuValue("property-owned", {
-			buttons = {
-				{
-					text = "Entrer : "..property.name,
-					exec=  {
-						callback = function ()
-							TriggerEvent('instance:create', 'property', {property = property.name, owner = 1})
-						end
-					},
+		buttons = {
+			{
+				type = "button",
+				label = "Entrer : "..property.name,
+				actions=  {
+					onSelected = function ()
+						EnterProperty(property.name, owner)
+						--TriggerEvent('instance:create', 'property', {property = property.name, owner = 1})
+					end
 				},
-				{
-					text = "Vendre",
-					exec=  {
-						callback = function ()
-							TriggerServerEvent('property:removeOwnedProperty', LastProperty)
-						end
-					},
+			},
+			{
+				type = "button",
+				label = "Vendre",
+				actions=  {
+					onSelected = function ()
+						TriggerServerEvent('property:removeOwnedProperty', LastProperty)
+					end
 				},
-			}
+			},
+		}
+		exports.bro_core:AddMenu("property-owned", {
+			Title = "Propriété",
+			Subtitle = "Propriété",
+			buttons = buttons
 		})
-		exports.bro_core:OpenMenu("property-owned")
 	else
-		exports.bro_core:SetMenuValue("property", {
-				buttons = {
-					{
-						text = "Acheter ~g~"..property.price.."$",
-						exec=  {
-							callback = function ()
-								TriggerServerEvent('property:buyProperty', LastProperty)
-								exports.bro_core:CloseMenu("property")
-							end
-						},
-					}
+		buttons = {
+			{
+				type = "button",
+				label = "Acheter ~g~"..exports.bro_core:Money(property.price),
+				actions=  {
+					onSelected = function ()
+						TriggerServerEvent('property:buyProperty', LastProperty)
+						exports.bro_core:RemoveMenu("property")
+					end
 				},
 			}
-		)
-		exports.bro_core:OpenMenu("property")
+		},
+		exports.bro_core:AddMenu("property", {
+			Title = "Propriété",
+			Subtitle = "Propriété",
+			buttons = buttons
+		})
 	end
 end
 
 function OpenGatewayMenu(property)
 	LastProperty = property
-	exports.bro_core:OpenMenu("property-gateway")
 end
 
 function OpenGatewayOwnedPropertiesMenu(property)
@@ -876,7 +861,6 @@ Citizen.CreateThread(function()
 			exports.bro_core:Notification(CurrentActionMsg)
 
 			if IsControlJustReleased(0, 38) then
-				print(CurrentAction)
 				if CurrentAction == 'property_menu' then
 					OpenPropertyMenu(CurrentActionData.property)
 				elseif CurrentAction == 'gateway_menu' then
@@ -898,4 +882,13 @@ Citizen.CreateThread(function()
 			Citizen.Wait(500)
 		end
 	end
+end)
+
+-- On nettoie le caca
+AddEventHandler('onResourceStop', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	exports.bro_core:RemoveArea("property")
+	exports.bro_core:RemoveMenu("property")
 end)

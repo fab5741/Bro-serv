@@ -19,7 +19,8 @@ AddEventHandler("job:process:open", function(job)
 	for k, v in pairs(config.jobs[job.name].process[zone].items) do
 
 		buttons[#buttons+1] = {
-			text = "Traitement "..v.label,
+			type = "button",
+			label = "Traitement "..v.label,
 			actions = {
 				onSelected = function()
 					local playerPed = GetPlayerPed(-1)
@@ -55,18 +56,23 @@ AddEventHandler("job:process:open", function(job)
 			},
 		}
 	end
-	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
-	exports.bro_core:AddMenu(zoneType..zone)
+	exports.bro_core:AddMenu("process", {
+		Title = job.label,
+		Subtitle = "Transformation",
+		buttons = buttons
+	})
 end)
 
 RegisterNetEvent('job:sell:open')
 
 AddEventHandler("job:sell:open", function(job)  
+	print("JOB SELL ")
 	job = job[1]	
 	buttons = {}
 	for k, v in pairs(config.jobs[job.name].sell.items) do
 		buttons[#buttons+1] = {
-			text = "Vente de " ..v.label,
+			type = "button",
+			label = "Vente de " ..v.label,
 			actions = {
 				onSelected = function()
 					local playerPed = GetPlayerPed(-1)
@@ -95,7 +101,7 @@ AddEventHandler("job:sell:open", function(job)
 									beginSell(job.name)
 									exports.bro_core:Notification("J'en ai trop, va vendre ailleurs.")
 								end
-								TriggerServerEvent("job:sell", v.type, job.job, v.price, 'Vous avez vendu : '..v.label.. " X "..v.amount.." pour ~g~".. v.price.." $")
+								TriggerServerEvent("job:sell", v.type, job.job, v.price, 'Vous avez vendu : '..v.label.. " X "..v.amount.." pour ~g~".. v.price*v.amount.." $")
 							end)
 					else 
 						exports.bro_core:Notification("~r~Vente en cours")
@@ -104,11 +110,12 @@ AddEventHandler("job:sell:open", function(job)
 			},
 		}
 	end
-	exports.bro_core:SetMenuButtons("sell", buttons)
-	exports.bro_core:AddMenu("sell")
+	exports.bro_core:AddMenu("sell", {
+		Title = job.label,
+		Subtitle = "Revente",
+		buttons = buttons
+	})
 end)
-
-
 
 RegisterNetEvent('job:collect:open')
 
@@ -117,7 +124,8 @@ AddEventHandler("job:collect:open", function(job)
 	buttons = {}
 	for k, v in pairs(config.jobs[job.name].collect[zone].items) do
 		buttons[#buttons+1] = {
-			text = "Collecter "..v.label,
+			type = "button",
+			label = "Collecter "..v.label,
 			actions = {
 				onSelected = function()
 					local playerPed = GetPlayerPed(-1)
@@ -152,8 +160,11 @@ AddEventHandler("job:collect:open", function(job)
 			},
 		}
 	end
-	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
-	exports.bro_core:AddMenu(zoneType..zone)
+	exports.bro_core:AddMenu("collect", {
+		Title = job.label,
+		Subtitle = "Collecte",
+		buttons = buttons
+	})
 end)
 
 RegisterNetEvent('job:parking:open')
@@ -163,13 +174,19 @@ AddEventHandler("job:parking:open", function(job)
 	TriggerServerEvent("vehicle:parking:get:all", "job:parking", job.name)
 end)
 
+RegisterNetEvent('job:safe:open')
+
+AddEventHandler("job:safe:open", function(job) 
+	job = job[1]
+	TriggerServerEvent("account:job:get", "job:safe:open2", job.job)		
+end)
+
+
 RegisterNetEvent('job:safe:open2')
 
 AddEventHandler("job:safe:open2", function(amount) 
 	-- todo: test if chef de service
-	exports.bro_core:SetMenuValue("safes-account"..zone, {
-		menuTitle = "Compte ~r~"..amount.. " $"
-	})
+	account_amount = amount
 	TriggerServerEvent("job:isChef", "job:safe:open3")
 end)
 
@@ -177,7 +194,40 @@ RegisterNetEvent('job:safe:open3')
 
 AddEventHandler("job:safe:open3", function(isChef) 
 	if isChef then
-		exports.bro_core:NextMenu("safes-account"..zone)
+		exports.bro_core:AddMenu("safe", {
+			Title = "Coffre",
+			Subtitle = job.label,
+			buttons = {
+				{
+					type = "separator",
+					label = "Compte " .. exports.bro_core:Money(account_amount),
+				},
+				{
+					type  = "button",
+					label = "Retirer",
+					actions = {
+						onSelected = function()
+							TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+							TriggerServerEvent("job:get", "job:safe:open")		
+						end
+					},
+				},
+				{
+					type  = "button",
+					label = "Déposer",
+					actions = {
+						onSelected = function()
+							TriggerServerEvent('account:job:add', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
+							TriggerServerEvent("job:get", "job:safe:open")		
+						end
+					},
+				},
+				{
+					type = "separator",
+					label = "Stock",
+				},
+			}
+		})
 	else 
 		exports.bro_core:Notification("~r~Vous n'etes pas abilité")
 	end
@@ -245,12 +295,6 @@ AddEventHandler("job:item:open2", function(items)
 	exports.bro_core:NextMenu("safes-items")
 end)
 
-RegisterNetEvent('job:safe:open')
-
-AddEventHandler("job:safe:open", function(job) 
-	job = job[1].job
-	TriggerServerEvent("account:job:get", "job:safe:open2", job)		
-end)
 
 
 RegisterNetEvent('job:open:menu')
@@ -479,7 +523,7 @@ AddEventHandler("job:open:menu", function(job)
 					actions = {
 						onSelected = function()
 							TriggerEvent("taxi:fares:start")
-							exports.bro_core:Notification("Les courses commencent")
+							exports.bro_core:Notification("~b~Les courses commencent")
 							exports.bro_core:RemoveMenu("taxi")
 						end
 					},
@@ -490,7 +534,7 @@ AddEventHandler("job:open:menu", function(job)
 					actions = {
 						onSelected = function()
 							TriggerEvent("taxi:fares:stop")
-							exports.bro_core:Notification("Fin des courses")
+							exports.bro_core:Notification("~r~Fin des courses")
 							exports.bro_core:RemoveMenu("taxi")
 						end
 					},
@@ -751,8 +795,6 @@ AddEventHandler("job:parking", function(vehicles)
 			},
 	}
 	end
-	exports.bro_core:SetMenuButtons(zoneType..zone, buttons)
-	exports.bro_core:AddMenu(zoneType..zone)
 end)
 
 RegisterNetEvent('job:parking:get')
@@ -905,7 +947,8 @@ AddEventHandler("weapon:store", function(weapons)
 			v.label = "SMG"
 		end
 		buttons[#buttons+1] = {
-			text = v.label..' x '..v.amount,
+			type ="button",
+			label = v.label..' x '..v.amount,
 			actions = {
 				onSelected = function()
 					TriggerServerEvent("weapon:get", "weapon:store:store", v.weapon)
@@ -913,8 +956,83 @@ AddEventHandler("weapon:store", function(weapons)
 			},
 		}
 	end
-	exports.bro_core:SetMenuButtons("weapon-store", buttons)
-	exports.bro_core:NextMenu("weapon-store")
+	exports.bro_core:AddMenu("armory", {
+		Title = "Armurerie",
+		Subtitle = job.name,
+		buttons = {
+			{
+				type = "separator",
+				label = "gillet",
+			},
+			{
+				type  = "button",
+				label = "Mettre",
+				actions = {
+					onSelected = function()
+						addBulletproofVest()	
+					end
+				},
+			},
+			{
+				type  = "button",
+				label = "Enlever",
+				actions = {
+					onSelected = function()
+						removeBulletproofVest()
+					end
+				},
+			},
+			{
+				type = "separator",
+				label = "Armes",
+			},
+			{
+				type  = "button",
+				label = "Stocker (arme équipée)",
+				actions = {
+					onSelected = function()
+						local found, weapon  = GetCurrentPedWeapon(
+							GetPlayerPed(-1),
+							1
+						)
+						if found then
+							RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
+
+							weapon = tostring(weapon)
+							if weapon == "453432689" then
+								weapon = "0x1B06D571"
+							elseif weapon == "-1951375401" then
+								weapon = "0x8BB05FD7"
+							elseif weapon == "911657153" then
+								weapon = "0x3656C8C1"
+							elseif weapon == "1737195953" then
+								weapon = "0x678B81B1"
+							elseif weapon == "911657153" then
+								weapon = "0x1D073A89"
+							elseif weapon == "736523883" then
+								weapon = "0x2BE6766B"
+							end
+							TriggerServerEvent("weapon:store", weapon)
+							exports.bro_core:Notification("~g~Arme stocké")
+						else
+							exports.bro_core:Notification("~r~Pas d'arme sur vous")
+						end
+					end
+				},
+			},
+			{
+				type  = "button",
+				label = "Retirer arme",
+				subMenu = "armoryitems"
+			},
+		}
+	})
+	exports.bro_core:AddSubMenu("armoryitems", {
+		parent = "armory",
+		Title = "Armurerie",
+		Subtitle = "Stock",
+		buttons =  buttons
+	})
 end)
 
 RegisterNetEvent('weapon:store:store')

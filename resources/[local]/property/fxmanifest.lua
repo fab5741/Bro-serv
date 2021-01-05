@@ -7,7 +7,7 @@ description 'ESX Property'
 version '1.0.4'
 
 dependency {
-	"bf",
+	"bro_core",
 	"instance"
 }
 

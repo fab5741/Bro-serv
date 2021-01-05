@@ -12,12 +12,14 @@ Citizen.CreateThread(function()
 			enter = {
 				callback = function()
 					exports.bro_core:HelpPromt("Magasin : ~INPUT_PICKUP~")
-					zoneType = "gunshop"
+					exports.bro_core:Key("E", "E", "Magasin", function()
+						TriggerServerEvent("gun:permis", "gun:shop")
+					end)
+
 				end
 			},
 			exit = {
 				callback = function()
-					zoneType = nil
 				end
 			},
 		},
@@ -30,12 +32,6 @@ Citizen.CreateThread(function()
 			{ x = 21.907299041748, y=-1107.2723388672, z=29.797023773193},
 		}
 	})
-	while true do
-		Citizen.Wait(0)
-		if zoneType == "gunshop" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("gun:permis", "gun:shop")
-		end
-	end
 end)
 
 
@@ -58,10 +54,11 @@ RegisterNetEvent("gun:shop2")
 AddEventHandler("gun:shop2", function (job)
 	local buttons = {}
 	for k,v in pairs(config.weapons) do
-		buttons[#buttons+1] =     {
-			text = v.label.." prix : ~g~" ..v.price.."$",
-			exec = {
-				callback = function()
+		buttons[#buttons+1] = {
+			type = "button",
+			label = v.label.." prix : ~g~" ..v.price.."$",
+			actions = {
+				onSelected = function()
 					TriggerServerEvent("gun:buy", "gun:buy:ok", v.price, v.name)
 				end
 			}
@@ -70,17 +67,21 @@ AddEventHandler("gun:shop2", function (job)
 	if job[1].name == "lspd" then
 		for k,v in pairs(config.weaponsLspd) do
 			buttons[#buttons+1] =     {
-				text = v.label.." prix : ~g~" ..v.price.."$",
-				exec = {
-					callback = function()
+				type = "button",
+				label = v.label.." prix : ~g~" ..v.price.."$",
+				actions = {
+					onSelected = function()
 						TriggerServerEvent("gun:buy", "gun:buy:ok", v.price, v.name)
 					end
 				}
 			}
 		end
 	end
-	exports.bro_core:SetMenuButtons("gunshop", buttons)
-	exports.bro_core:OpenMenu("gunshop")
+	exports.bro_core:AddMenu("gunshop", {
+		Title = "Magasin",
+		Subtitle = "Armes",
+		buttons = buttons
+	})
 end)
 
 RegisterNetEvent("gun:shop")

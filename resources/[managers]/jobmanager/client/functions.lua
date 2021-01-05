@@ -7,6 +7,7 @@ end
 
 function deleteMenuAndArea()
 	exports.bro_core:RemoveArea("center")
+	exports.bro_core:RemoveMenu("armoryitems")
 	exports.bro_core:RemoveMenu("armory")
 	exports.bro_core:RemoveMenu("safe")
 	exports.bro_core:RemoveMenu("lockers")
@@ -61,6 +62,11 @@ function deleteMenuAndArea()
 			exports.bro_core:RemoveArea("begin"..k)
 			end
 		end
+		if vv.fourriere then
+			for k, v in pairs(vv.fourriere) do
+				exports.bro_core:RemoveArea("fourriere"..k)
+			end
+		end
 	end
 end
 
@@ -70,7 +76,7 @@ function createMenuAndArea(job)
 	exports.bro_core:AddArea("center", {
 		marker = {
 			weight = 1,
-			height = 1,
+			height = 0.2,
 		},
 		trigger = {
 			weight = 1,
@@ -103,23 +109,27 @@ function createMenuAndArea(job)
 
 	-- global to everyone
 	for kk, vv in pairs(config.jobs) do
-		print(kk)
 		if vv.homes then
 			for k, v in pairs(vv.homes) do
-				print(k)
 				exports.bro_core:AddArea("homes"..kk..k, {
 					marker = {
 						weight = 1,
-						height = 2,
+						height = 0.1,
+						red = vv.red,
+						green = vv.green,
+						blue = vv.blue,
+						alpha = 100,
+						showDistance = 6,
+						type = 36
 					},
 					trigger = {
 						weight = 1,
 						enter = {
 							callback = function()
-								exports.bro_core:Key("E", "E", "Accueil ("..job.name..")", function()
-									TriggerServerEvent("job:avert:all", avert, "On vous demande à l'acceuil ~b~(".. avert.. ")")
+								exports.bro_core:Key("E", "E", "Accueil ("..kk..")", function()
+									TriggerServerEvent("job:avert:all", kk, "On vous demande à l'acceuil ~b~(".. job.label.. ")")
 								end)
-								exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+								exports.bro_core:HelpPromt("Accueil Key : ~INPUT_PICKUP~")
 							end
 						},
 						exit = {
@@ -149,7 +159,13 @@ function createMenuAndArea(job)
 				exports.bro_core:AddArea("repair"..kk..k, {
 					marker = {
 						weight = 1,
-						height = 2,
+						height = 0.1,
+						red = vv.red,
+						green = vv.green,
+						blue = vv.blue,
+						alpha = 100,
+						showDistance = 6,
+						type = 36
 					},
 					trigger = {
 						weight = 1,
@@ -157,7 +173,32 @@ function createMenuAndArea(job)
 							callback = function()
 								exports.bro_core:Key("E", "E", "Accueil ("..job.name..")", function()
 									if isPedDrivingAVehicle() then
-										exports.bro_core:OpenMenu("repair")
+										exports.bro_core:AddMenu("repair", {
+											Title = "Réparation",
+											Subtitle = "Garage solidaire",
+											buttons = {
+												{
+													type= "button",
+													label = "Réparer totale (1000$)",
+													actions = {
+														onSelected = function()
+															exports.bro_core:RemoveMenu("repair")
+															exports.bro_core:actionPlayer(15000, "Réparation en cours", "","",
+															function()
+																vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+									
+																SetVehicleFixed(vehicle)
+																SetVehicleDeformationFixed(vehicle)
+																SetVehicleUndriveable(vehicle, false)
+																ClearPedTasksImmediately(playerPed)
+																TriggerServerEvent("account:player:liquid:add", "", -1000.0)
+																exports.bro_core:Notification("Véhicle ~b~réparé~n~~g~1000$ ~s~Payé")
+															end)
+														end
+													},
+												},
+											}
+										})
 									else
 										exports.bro_core:Notification("Montez dans un véhicule")
 									end
@@ -193,13 +234,21 @@ function createMenuAndArea(job)
 	if job ~= nil and job.name ~= nil then
 		myjob = config.jobs[job.name]
 		if myjob then
+			local marker = {
+				weight = 1,
+				height = 0.1,
+				red = myjob.red,
+				green = myjob.green,
+				blue = myjob.blue,
+				alpha = 100,
+				showDistance = 6,
+				type = 36
+			}
 			if myjob.lockers then
 				for k, v in pairs(myjob.lockers) do
+					print("addlocker")
 					exports.bro_core:AddArea("lockers"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
+						marker = marker,
 						trigger = {
 							weight = 1,
 							enter = {
@@ -260,17 +309,21 @@ function createMenuAndArea(job)
 				for k, v in pairs(myjob.collect) do
 					exports.bro_core:AddArea("collect"..k, {
 						marker = {
-							weight = 1,
-							height = 2,
+							weight = 4,
+							height = 0.2,
+							red = myjob.red,
+							green = myjob.green,
+							blue = myjob.blue,
 						},
 						trigger = {
-							weight = 2,
+							weight = 4,
 							enter = {
 								callback = function()
-									exports.bro_core:Key("E", "E", "Vestiaire", function()
+									exports.bro_core:Key("E", "E", "Collecte", function()
+										zone = k
 										TriggerServerEvent("job:get", "job:collect:open")	
 									end)
-									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+									exports.bro_core:HelpPromt("Collecte Key : ~INPUT_PICKUP~")
 								end
 							},
 							exit = {
@@ -298,18 +351,16 @@ function createMenuAndArea(job)
 			if myjob.process then
 				for k, v in pairs(myjob.process) do
 					exports.bro_core:AddArea("process"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
+						marker =  marker,
 						trigger = {
-							weight = 2,
+							weight = 4,
 							enter = {
 								callback = function()
-									exports.bro_core:Key("E", "E", "Vestiaire", function()
+									exports.bro_core:Key("E", "E", "Traitement", function()
 										TriggerServerEvent("job:get", "job:process:open")	
+										zone = k
 									end)
-									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+									exports.bro_core:HelpPromt("Traitement Key : ~INPUT_PICKUP~")
 								end
 							},
 							exit = {
@@ -341,49 +392,13 @@ function createMenuAndArea(job)
 			if myjob.safes then
 				for k, v in pairs(myjob.safes) do
 					exports.bro_core:AddArea("safes"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
+						marker = marker,
 						trigger = {
 							weight = 1,
 							enter = {
 								callback = function()
-									exports.bro_core:Key("E", "E", "Vestiaire", function()
-										exports.bro_core:AddMenu("safe", {
-											Title = "Vestiaire",
-											Subtitle = job.name,
-											buttons = {
-												{
-													type = "separator",
-													label = "Compte",
-												},
-												{
-													type  = "button",
-													label = "Retirer",
-													actions = {
-														onSelected = function()
-															TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
-															TriggerServerEvent("job:get", "job:safe:open")		
-														end
-													},
-												},
-												{
-													type  = "button",
-													label = "Déposer",
-													actions = {
-														onSelected = function()
-															TriggerServerEvent('account:job:add', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
-															TriggerServerEvent("job:get", "job:safe:open")		
-														end
-													},
-												},
-												{
-													type = "separator",
-													label = "Stock",
-												},
-											}
-										})
+									exports.bro_core:Key("E", "E", "Coffre", function()
+										TriggerServerEvent("job:get", "job:safe:open")
 									end)
 									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
 								end
@@ -414,90 +429,13 @@ function createMenuAndArea(job)
 			if myjob.armories then
 				for k, v in pairs(myjob.armories) do
 					exports.bro_core:AddArea("armories"..k, {
-						marker = {
-							weight = 1,
-							height = 2,
-						},
+						marker = marker,
 						trigger = {
 							weight = 1,
 							enter = {
 								callback = function()
 									exports.bro_core:Key("E", "E", "Vestiaire", function()
-										exports.bro_core:AddMenu("armory", {
-											Title = "Vestiaire",
-											Subtitle = job.name,
-											buttons = {
-												{
-													type = "separator",
-													label = "gillet",
-												},
-												{
-													type  = "button",
-													label = "Mettre",
-													actions = {
-														onSelected = function()
-															addBulletproofVest()	
-														end
-													},
-												},
-												{
-													type  = "button",
-													label = "Enlever",
-													actions = {
-														onSelected = function()
-															removeBulletproofVest()
-														end
-													},
-												},
-												{
-													type = "separator",
-													label = "Armes",
-												},
-												{
-													type  = "button",
-													label = "Stocker (arme équipée)",
-													actions = {
-														onSelected = function()
-															local found, weapon  = GetCurrentPedWeapon(
-																GetPlayerPed(-1),
-																1
-															)
-															if found then
-																RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
-					
-																weapon = tostring(weapon)
-																if weapon == "453432689" then
-																	weapon = "0x1B06D571"
-																elseif weapon == "-1951375401" then
-																	weapon = "0x8BB05FD7"
-																elseif weapon == "911657153" then
-																	weapon = "0x3656C8C1"
-																elseif weapon == "1737195953" then
-																	weapon = "0x678B81B1"
-																elseif weapon == "911657153" then
-																	weapon = "0x1D073A89"
-																elseif weapon == "736523883" then
-																	weapon = "0x2BE6766B"
-																end
-																TriggerServerEvent("weapon:store", weapon)
-																exports.bro_core:Notification("Arme stocké")
-															else
-																exports.bro_core:Notification("Pas d'arme sur vous")
-															end
-														end
-													},
-												},
-												{
-													type  = "button",
-													label = "Retirer arme",
-													actions = {
-														onSelected = function()
-															TriggerServerEvent("weapon:get:all", "weapon:store")
-														end
-													},
-												},
-											}
-										})
+										TriggerServerEvent("weapon:get:all", "weapon:store")
 									end)
 									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
 								end
@@ -528,10 +466,7 @@ function createMenuAndArea(job)
 			if myjob.begin then
 				for k, v in pairs(myjob.begin) do
 				exports.bro_core:AddArea("begin"..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
+					marker = marker,
 					trigger = {
 						weight = 1,
 						enter = {
@@ -573,10 +508,7 @@ function createMenuAndArea(job)
 			if myjob.custom then
 				for k, v in pairs(myjob.custom) do
 				exports.bro_core:AddArea("custom"..k, {
-					marker = {
-						weight = 1,
-						height = 2,
-					},
+					marker = marker,
 					trigger = {
 						weight = 1,
 						enter = {
@@ -618,30 +550,36 @@ function createMenuAndArea(job)
 				for k, v in pairs(myjob.fourriere) do
 				exports.bro_core:AddArea("fourriere"..k, {
 					marker = {
-						weight = 1,
-						height = 2,
+						weight = 2,
+						height = 0.15,
+						red = myjob.red,
+						green = myjob.green,
+						blue = myjob.blue,
+						alpha = 100,
+						showDistance = 5,
+						type = 43
 					},
 					trigger = {
 						weight = 1,
 						enter = {
 							callback = function()
 								exports.bro_core:Key("E", "E", "Fourrière", function()
-									-- Mise en fourriére
-									vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-									if vehicle ~= nil then
-										TriggerServerEvent("vehicle:parking:store", vehicle, "depot", "")
-										exports.bro_core:Notification("Vous avez mis le véhicle en fourriére")
-										DeleteEntity(vehicle)
-									else
-										exports.bro_core:Notification("Vous n'êtes pas dans un véhicule")
-									end
+									exports.bro_core:actionPlayer(5000, "Fourrière", "", "", function()
+										vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+										if vehicle ~= nil then
+											TriggerServerEvent("vehicle:parking:store", vehicle, "depot", "")
+											exports.bro_core:Notification("Vous avez mis le véhicle en ~b~fourriére")
+											DeleteEntity(vehicle)
+										else
+											exports.bro_core:Notification("~r~Vous n'êtes pas dans un véhicule")
+										end
+									end)
 								end)
-								exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
+								exports.bro_core:HelpPromt("Mise en fourrièere : ~INPUT_PICKUP~")
 							end
 						},
 						exit = {
 							callback = function()
-								exports.bro_core:RemoveMenu("ATM")
 								exports.bro_core:Key("E", "E", "Interaction", function()
 								end)
 							end
@@ -675,7 +613,7 @@ function reviveClosestPlayer()
 
 	exports.bro_core:RemoveMenu("lsms")
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
-   -- if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
+    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
 			if not IsPedInAnyVehicle(ped, false) then
 				exports.bro_core:actionPlayer(15000, "Réanimation en cours", "mini@cpr@char_a@cpr_str", "cpr_pumpchest",
 				function()
@@ -684,9 +622,9 @@ function reviveClosestPlayer()
 			else
 				exports.bro_core:Notification("~r~Vous ne pouvez pas réanimer en véhicule")
 			end
---    else
-	    --exports.bro_core:Notification("Pas de joueur mourrant à portée")
- --   end
+    else
+	    exports.bro_core:Notification("Pas de joueur mourrant à portée")
+    end
 end
 
 function healClosestPlayer()
@@ -1119,22 +1057,22 @@ function beginSell(job)
 	exports.bro_core:AddArea("sell", {
 		marker = {
 			weight = 1,
-			height = 2,
+			height = 0.1,
 		},
 		trigger = {
 			weight = 1,
 			enter = {
 				callback = function()
-					exports.bro_core:HelpPromt("Vendre Key : ~INPUT_PICKUP~")
-					zone = 1
-					zoneType = "sell"
+					exports.bro_core:HelpPromt("Revente Key : ~INPUT_PICKUP~")
+					exports.bro_core:Key("E", "E", "Revente", function()
+						TriggerServerEvent("job:get", "job:sell:open")
+					end)
 				end
 			},
 			exit = {
 				callback = function()
-					exports.bro_core:RemoveMenu("sell")
-					zone = nil
-					zoneType = nil
+					exports.bro_core:Key("E", "E", "Revente", function()
+					end)
 				end
 			},
 		},

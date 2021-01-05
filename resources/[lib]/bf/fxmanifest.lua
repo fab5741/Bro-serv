@@ -100,7 +100,7 @@ exports {
     "GetPrimaryMenu",
     "FreezeMenu",
     "OpenMenu",
-    "CloseMenu",
+    "RemoveMenu",
     "NextMenu",
     "BackMenu",
     "CleanMenuButtons",

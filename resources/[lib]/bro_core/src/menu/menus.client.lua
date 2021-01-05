@@ -16,7 +16,7 @@ function AddMenu(...)
         settings.X = 80
     end
     if settings.Y == nil then
-        settings.Y = 400
+        settings.Y = 200
     end
     Menus[name] = {
             menu = RageUI.CreateMenu(
@@ -60,7 +60,7 @@ function AddSubMenu(...)
         settings.X = 80
     end
     if settings.Y == nil then
-        settings.Y = 400
+        settings.Y = 200
     end
     Menus[name] = {
             menu = RageUI.CreateSubMenu(
@@ -83,6 +83,7 @@ function AddSubMenu(...)
         RageUI.Visible(Menus[settings.parent].menu, not RageUI.Visible(Menus[settings.parent].menu))
         RageUI.Visible(Menus[name].menu, not RageUI.Visible(Menus[name].menu))
     end
+    print("sub mernu created")
 end
 
 function MenuIsOpen(name)

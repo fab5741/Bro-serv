@@ -198,7 +198,7 @@ if enableTaxiGui then
                   if targetDistance <= 10.0 then
                     TaskLeaveVehicle(CurrentCustomer, vehicle, 0)
     
-                    exports.bro_core:Notification('Arrivé à destination. Vous gagnez ~g~'..string.format("%.2f", farecost)..'$')
+                    exports.bro_core:Notification('Arrivé à destination.~n~Facture auto de ~b~'..exports.bro_core:Money(farecost))
                     TaskGoStraightToCoord(CurrentCustomer, targetCoords.x, targetCoords.y, targetCoords.z, 1.0, -1, 0.0, 0.0)
                     SetEntityAsMissionEntity(CurrentCustomer, false, true)
                     TriggerServerEvent("account:job:add", "", 6, farecost, true)

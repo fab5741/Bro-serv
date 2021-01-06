@@ -85,7 +85,7 @@ function createMenus()
 		},
 	})
 	-- parkings
-	for k,v in pairs(config.parkings) do
+	for k,v in pairs(Config.parkings) do
 		exports.bro_core:AddArea("parkings"..k, {
 			marker = {
 				weight = 2,
@@ -116,8 +116,8 @@ function createMenus()
 													exports.bro_core:actionPlayer(4000, "Stockage véhicule", "", "",
 													function()
 														print("store veh")
-														TriggerServerEvent("vehicle:store", currentVehicle, v.zone)
-														currentVehicle = 0
+														TriggerServerEvent("vehicle:store", CurrentVehicle, v.zone)
+														CurrentVehicle = 0
 														DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
 														exports.bro_core:RemoveMenu("parking-veh")
 													end)
@@ -164,7 +164,7 @@ function createMenus()
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bro_core:HelpPromt("Déposer un véhicule en fourrière Key : ~INPUT_PICKUP~")
+					exports.bro_core:HelpPromt("Fourrière Key : ~INPUT_PICKUP~")
 					exports.bro_core:Key("E", "E", "Fourrière", function()
 						if exports.bro_core:isPedDrivingAVehicle() then
 							exports.bro_core:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
@@ -318,7 +318,7 @@ function createMenus()
 				callback = function()
 					exports.bro_core:DisableArea("checkpoints-3")
 
-					if 	IsVehicleDamaged(dsVehicle --[[ Vehicle ]]) then
+					if 	IsVehicleDamaged(DsVehicle --[[ Vehicle ]]) then
 						-- TODO: donner le permis
 						exports.bro_core:Notification("Vous avez endommagé le véhicule !")
 					else
@@ -330,12 +330,12 @@ function createMenus()
 					-- TASK_LEAVE_VEHICLE
 					TaskLeaveVehicle(
 						GetPlayerPed(-1) --[[ Ped ]], 
-						dsVehicle --[[ Vehicle ]]
+						DsVehicle --[[ Vehicle ]]
 					)
 					Wait(2000)
 
 					-- delete vehicle
-					DeleteGivenVehicle( dsVehicle, 10 )
+					DeleteGivenVehicle( DsVehicle, 10 )
 
 				end
 			},
@@ -388,7 +388,7 @@ function removeMenus()
     exports.bro_core:RemoveMenu("parking-veh")
     exports.bro_core:RemoveMenu("parking-foot")
 
-    for k,v in pairs(config.parkings) do
+    for k,v in pairs(Config.parkings) do
         exports.bro_core:RemoveArea("parkings"..k)
     end
 

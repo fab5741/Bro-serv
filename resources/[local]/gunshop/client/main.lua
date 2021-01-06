@@ -1,11 +1,5 @@
 -- main loop
 Citizen.CreateThread(function()
-	exports.bro_core:AddMenu("gunshop", {
-		title = "Ammunation",
-		position = 1,
-		buttons = {
-		},
-	})
 	exports.bro_core:AddArea("gunshop", {
 		trigger = {
 			weight = 2,

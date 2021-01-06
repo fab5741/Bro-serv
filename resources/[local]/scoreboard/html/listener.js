@@ -74,19 +74,14 @@ $(function () {
 				$("#BANK2").css("color", "#e94444");
 				$("#updatetext").text("Javaheri Robbery Allowed");
 				// 2 green 2 red*/
-			if (count >= 2) {
+			if (count >= 1) {
 				$("#SHOP").css("color", "#4fca4f");
-				$("#JAVAHERI").css("color", "#e94444");
-				$("#BANK1").css("color", "#e94444");
-				$("#BANK2").css("color", "#e94444");
-				$("#updatetext").text("Braquage autorisé");
-				// 1 green 3 red
+				$("#DRUG").css("color", "#4fca4f");
+				$("#updatetext").text("Illégal autorisé");
 			} else {
 				$("#SHOP").css("color", "#c2c2c2");
-				$("#JAVAHERI").css("color", "#c2c2c2");
-				$("#BANK1").css("color", "#c2c2c2");
-				$("#BANK2").css("color", "#c2c2c2");
-				$("#updatetext").text("Braquage non autorisé");
+				$("#DRUG").css("color", "#c2c2c2");
+				$("#updatetext").text("Illégal non autorisé");
 				// 4 red
 			}
 			break;
@@ -123,7 +118,7 @@ function applyPingColor() {
 				color = 'red';
 			}
 			$(this).css('color', color);
-			$(this).html(ping + " <span style='color:white;'>ms</span>");
+			$(this).html(ping + " <span style='color:white;'></span>");
 		});
 	});
 }

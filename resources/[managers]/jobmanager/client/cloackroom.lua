@@ -1,16 +1,15 @@
-local buttons = {}
-local lockChanging = false
-
-function clockIn(job)
+function ClockIn(job)
 	TriggerServerEvent("job:get:player", "job:add:uniform")
 	TriggerServerEvent("job:clock", true, job)
 	exports.bro_core:RemoveMenu("lockers")
+	TriggerServerEvent("scoreboard:ClockIn", job)
 end
 
-function clockOut(job)
+function ClockOut(job)
 	TriggerServerEvent("player:get", "job:remove:uniform")
 	TriggerServerEvent("job:clock", false, job)
 	exports.bro_core:RemoveMenu("lockers")
+	TriggerServerEvent("scoreboard:ClockIn", nil)
 end
 
 
@@ -25,9 +24,9 @@ AddEventHandler('job:add:uniform', function(job)
 			local skin = json.decode(job.skin)
 			local clothes
 			if skin.sex == 0 then
-				clothes = config.jobs[job.name].clothes[job.grade].male
+				clothes = Config.jobs[job.name].clothes[job.grade].male
 			else
-				clothes = config.jobs[job.name].clothes[job.grade].female
+				clothes = Config.jobs[job.name].clothes[job.grade].female
 			end
 			TriggerEvent('skinchanger:loadClothes', skin, clothes)
 		end)

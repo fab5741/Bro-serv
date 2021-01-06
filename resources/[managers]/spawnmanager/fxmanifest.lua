@@ -11,7 +11,7 @@ server_script {
 }
 
 dependencies {
-    "bf",
+    "bro_core",
     "skin",
     "skinchanger"
 }

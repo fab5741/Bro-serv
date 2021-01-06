@@ -84,6 +84,8 @@ end
 
 
 -- Weapon on back
+AttachedWeapons = {
+}
 function AttachWeapon(attachModel,modelHash,boneNumber,x,y,z,xR,yR,zR, isMelee)
 	local bone = GetPedBoneIndex(GetPlayerPed(-1), boneNumber)
 	RequestModel(attachModel)
@@ -91,14 +93,14 @@ function AttachWeapon(attachModel,modelHash,boneNumber,x,y,z,xR,yR,zR, isMelee)
 		Wait(100)
 	end
 
-  attached_weapons[attachModel] = {
+	AttachedWeapons[attachModel] = {
     hash = modelHash,
     handle = CreateObject(GetHashKey(attachModel), 1.0, 1.0, 1.0, true, true, false)
   }
 
   if isMelee then x = 0.11 y = -0.14 z = 0.0 xR = -75.0 yR = 185.0 zR = 92.0 end -- reposition for melee items
   if attachModel == "prop_ld_jerrycan_01" then x = x + 0.3 end
-	AttachEntityToEntity(attached_weapons[attachModel].handle, GetPlayerPed(-1), bone, x, y, z, xR, yR, zR, 1, 1, 0, 0, 2, 1)
+	AttachEntityToEntity(AttachedWeapons[attachModel].handle, GetPlayerPed(-1), bone, x, y, z, xR, yR, zR, 1, 1, 0, 0, 2, 1)
 end
 
 function isMeleeWeapon(wep_name)

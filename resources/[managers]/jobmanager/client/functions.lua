@@ -1,22 +1,17 @@
--- Refresh areas and menus
-function refresh(job)
-	deleteMenuAndArea()
-	createMenuAndArea(job)
-end
-
-
-function deleteMenuAndArea()
+function DeleteMenuAndArea()
+	-- delete area and menus
 	exports.bro_core:RemoveArea("center")
 	exports.bro_core:RemoveMenu("armoryitems")
 	exports.bro_core:RemoveMenu("armory")
 	exports.bro_core:RemoveMenu("safe")
+	exports.bro_core:RemoveMenu("safeitems")
 	exports.bro_core:RemoveMenu("lockers")
 	exports.bro_core:RemoveMenu("actions")
 	exports.bro_core:RemoveMenu("fines")
 	exports.bro_core:RemoveMenu("props")
 	exports.bro_core:RemoveMenu("animations")
 	exports.bro_core:RemoveMenu("job")
-	for kk, vv in pairs(config.jobs) do
+	for kk, vv in pairs(Config.jobs) do
 		if vv.homes then
 			for k, v in pairs(vv.homes) do
 				exports.bro_core:RemoveArea("homes"..kk..k)
@@ -67,12 +62,18 @@ function deleteMenuAndArea()
 				exports.bro_core:RemoveArea("fourriere"..k)
 			end
 		end
+		if vv.frigo then
+			for k, v in pairs(vv.frigo) do
+				exports.bro_core:RemoveArea("frigo"..k)
+			end
+		end
 	end
 end
 
-function createMenuAndArea(job)
+-- Refresh areas and menus
+function Refresh(job)
+	-- Add menus and areas
 	ClearAllBlipRoutes()
-	
 	exports.bro_core:AddArea("center", {
 		marker = {
 			weight = 1,
@@ -82,33 +83,55 @@ function createMenuAndArea(job)
 			weight = 1,
 			enter = {
 				callback = function()
+					exports.bro_core:Key("E", "E", "Job Center", function()
+						buttons = {}
+						for k, v in pairs(Config.center.jobs) do
+							buttons[#buttons+1] = {
+								type = "button",
+								label = v.label,
+								actions = {
+									onSelected = function()
+										TriggerServerEvent("job:set:me", 34, "Livreur de journaux")
+										Wait(100)
+										TriggerServerEvent("job:get", "jobs:Refresh")
+										exports.bro_core:RemoveMenu("center")
+									end
+								},
+							}
+						end
+						exports.bro_core:AddMenu("service", {
+							Title = "Job Center",
+							Subtitle = "Job",
+							buttons = buttons
+						})
+					end)
 					exports.bro_core:HelpPromt("Job Center Key : ~INPUT_PICKUP~")
-					zoneType = "center"
-					zone = "global"
 				end
 			},
 			exit = {
 				callback = function()
-					zoneType = nil
+					exports.bro_core:RemoveMenu("center")
+					exports.bro_core:Key("E", "E", "Interaction", function()
+					end)
 				end
 			},
 		},
 		blip = {
 			text = "Job Center",
-			imageId	= config.center.sprite,
-			colorId = config.center.color,
+			imageId	= Config.center.sprite,
+			colorId = Config.center.color,
 		},
 		locations = {
 			{
-				x = config.center.pos.x,
-				y = config.center.pos.y,
-				z = config.center.pos.z,
+				x = Config.center.pos.x,
+				y = Config.center.pos.y,
+				z = Config.center.pos.z,
 			},
 		},
 	})
 
 	-- global to everyone
-	for kk, vv in pairs(config.jobs) do
+	for kk, vv in pairs(Config.jobs) do
 		if vv.homes then
 			for k, v in pairs(vv.homes) do
 				exports.bro_core:AddArea("homes"..kk..k, {
@@ -185,8 +208,7 @@ function createMenuAndArea(job)
 															exports.bro_core:RemoveMenu("repair")
 															exports.bro_core:actionPlayer(15000, "Réparation en cours", "","",
 															function()
-																vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-									
+																local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)								
 																SetVehicleFixed(vehicle)
 																SetVehicleDeformationFixed(vehicle)
 																SetVehicleUndriveable(vehicle, false)
@@ -228,11 +250,10 @@ function createMenuAndArea(job)
 				})
 			end
 		end
-	end
-	
+	end	
 	-- Draw areas 
 	if job ~= nil and job.name ~= nil then
-		myjob = config.jobs[job.name]
+		local myjob = Config.jobs[job.name]
 		if myjob then
 			local marker = {
 				weight = 1,
@@ -263,7 +284,7 @@ function createMenuAndArea(job)
 													label = "Prendre le service",
 													actions = {
 														onSelected = function()
-															clockIn(job.name)
+															ClockIn(job.name)
 														end
 													},
 												},
@@ -272,7 +293,7 @@ function createMenuAndArea(job)
 													label = "Quitter le service",
 													actions = {
 														onSelected = function()
-															clockOut(job.name)
+															ClockOut(job.name)
 														end
 													},
 												},
@@ -472,9 +493,9 @@ function createMenuAndArea(job)
 						enter = {
 							callback = function()
 								exports.bro_core:Key("E", "E", "Commencer les courses", function()
-									if not beginInProgress then
-										vehicleLivraison = exports.bro_core:spawnCar(vehicle, true, nil, true)
-										addBeginArea() 
+									if not BeginInProgress then
+										vehicleLivraison = exports.bro_core:spawnCar("faggio2", true, nil, true)
+										AddBeginArea() 
 									else
 										exports.bro_core:Notification("~r~Vous avez déjà une course en cours !")
 									end
@@ -515,7 +536,7 @@ function createMenuAndArea(job)
 							callback = function()
 								exports.bro_core:Key("E", "E", "Commencer les courses", function()
 									if isPedDrivingAVehicle() then
-										customMenu()
+										CustomMenu()
 									else
 										exports.bro_core:Notification("Montez dans un véhicule")
 									end
@@ -551,12 +572,12 @@ function createMenuAndArea(job)
 				exports.bro_core:AddArea("fourriere"..k, {
 					marker = {
 						weight = 2,
-						height = 0.15,
+						height = 1,
 						red = myjob.red,
 						green = myjob.green,
 						blue = myjob.blue,
 						alpha = 100,
-						showDistance = 5,
+					--	showDistance = 5,
 						type = 43
 					},
 					trigger = {
@@ -600,24 +621,68 @@ function createMenuAndArea(job)
 				})
 				end
 			end
+			if myjob.frigo then
+				for k, v in pairs(myjob.frigo) do
+				exports.bro_core:AddArea("frigo"..k, {
+					marker = {
+						weight = 2,
+						height = 1,
+						red = myjob.red,
+						green = myjob.green,
+						blue = myjob.blue,
+						alpha = 100,
+					--	showDistance = 5,
+						type = 43
+					},
+					trigger = {
+						weight = 1,
+						enter = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Frigo", function()
+									exports.bro_core:actionPlayer(5000, "Frigo", "", "", function()
+									end)
+								end)
+								exports.bro_core:HelpPromt("Mise en fourrièere : ~INPUT_PICKUP~")
+							end
+						},
+						exit = {
+							callback = function()
+								exports.bro_core:Key("E", "E", "Interaction", function()
+								end)
+							end
+						},
+					},
+					blip = {
+						text = job.label.. " Fourriére "..k,
+						imageId	= v.sprite,
+						colorId = myjob.color,
+					},
+					locations = {
+						{
+							x = v.coords.x,
+							y = v.coords.y,
+							z = v.coords.z,
+						},
+					},
+				})
+				end
+			end
 		end
+		
 	end
 end
 
 -- LSMS Revive people
-function reviveClosestPlayer()
-	print(GetPlayerServerId(GetPlayerPed(ped)))
-	print(GetPlayerServerId(ped))
-	print(ped)
-	TriggerServerEvent('job:lsms:revive', GetPlayerServerId(ped))
+function ReviveClosestPlayer()
+	TriggerServerEvent('job:lsms:revive', GetPlayerServerId(Ped))
 
 	exports.bro_core:RemoveMenu("lsms")
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
     if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
-			if not IsPedInAnyVehicle(ped, false) then
+			if not IsPedInAnyVehicle(Ped, false) then
 				exports.bro_core:actionPlayer(15000, "Réanimation en cours", "mini@cpr@char_a@cpr_str", "cpr_pumpchest",
 				function()
-					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(ped))
+					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(Ped))
 				end)
 			else
 				exports.bro_core:Notification("~r~Vous ne pouvez pas réanimer en véhicule")
@@ -627,7 +692,7 @@ function reviveClosestPlayer()
     end
 end
 
-function healClosestPlayer()
+function HealClosestPlayer()
 	exports.bro_core:RemoveMenu("lsms")
 	local playerPed = GetPlayerPed(-1)
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
@@ -642,11 +707,11 @@ function healClosestPlayer()
     end
 end
 
-function RespawnPed(ped, coords, heading)
-	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
+function RespawnPed(Ped, coords, heading)
+	SetEntityCoordsNoOffset(Ped, coords.x, coords.y, coords.z, false, false, false, true)
 	NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
-	SetPlayerInvincible(ped, false)
-    ClearPedBloodDamage(ped)
+	SetPlayerInvincible(Ped, false)
+    ClearPedBloodDamage(Ped)
 	--TriggerEvent('spawn:spawn')
 end
 
@@ -744,7 +809,6 @@ function Fines(amount)
 					amount = tonumber(res)
 				end
 			end
-			
 			if(tonumber(amount) ~= -1) then
 				TriggerServerEvent("job:finesGranted", GetPlayerServerId(closestPlayer), tonumber(amount))
 			end
@@ -757,11 +821,11 @@ function Fines(amount)
 end
 
 
-function giveWeaponLicence()
+function GiveWeaponLicence()
 	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
     if closestPlayer  and dist <=1 then
-		TriggerServerEvent("job:weapon:licence", closestPlayer, true)
+		TriggerServerEvent("job:weapon:licence", GetPlayerServerId(closestPlayer), true)
 	else
 		exports.bro_core:Notification("~r~Pas de joueur à proximité")
 	end
@@ -869,57 +933,7 @@ function RemoveAllProps()
 
 end
 
-
---armory
-function createArmoryPed()
-	if not DoesEntityExist(armoryPed) then
-		local model = GetHashKey("s_m_y_cop_01")
-
-		RequestModel(model)
-		while not HasModelLoaded(model) do
-			Wait(0)
-		end
-
-		local armoryPed = CreatePed(26, model, 454.165, -979.999, 30.690, 92.298, false, false)
-		SetEntityInvincible(armoryPed, true)
-		TaskTurnPedToFaceEntity(armoryPed, PlayerId(), -1)		
-
-		return armoryPed
-	end
-end
-
-basic_kit = {
-	"WEAPON_STUNGUN",
-	"WEAPON_NIGHTSTICK",
-	"WEAPON_FLASHLIGHT",
-	"WEAPON_PISTOL"
-}
-
-function giveBasicKit()
-	for k,v in pairs(basic_kit) do
-		GiveWeaponToPed(PlayerPedId(), GetHashKey(v), -1, true, false)
-		-- ADD_AMMO_TO_PED
-		AddAmmoToPed(
-			PlayerPedId() --[[ Ped ]], 
-			GetHashKey(v) --[[ Hash ]], 
-			50 --[[ integer ]]
-		)
-	end
-
-	SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"), true)
-	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-end
-
-function giveBasicPrisonKit()
-	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_PISTOL50"), -1, true, true)
-	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_STUNGUN"), -1, true, true)
-	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_NIGHTSTICK"), 200, true, true)
-	GiveWeaponToPed(PlayerPedId(), GetHashKey("WEAPON_FLASHLIGHT"), 200, true, true)
-
-	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-end
-
-function addBulletproofVest()
+function AddBulletproofVest()
 	if(GetEntityModel(PlayerPedId()) == hashSkin) then
 		SetPedComponentVariation(PlayerPedId(), 9, 4, 1, 2)
 	else
@@ -930,7 +944,7 @@ function addBulletproofVest()
 	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
 end
 
-function removeBulletproofVest()
+function RemoveBulletproofVest()
 	SetPedComponentVariation(PlayerPedId(), 9, 0, 1, 2)
 
 	SetPedArmour(PlayerPedId(), 0)
@@ -943,28 +957,11 @@ function GiveCustomWeapon(weaponData)
 	PlaySoundFrontend(-1, "PICK_UP", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
 end
 
---redirect callbacks
-function isPedDrivingAVehicle()
-	local ped = GetPlayerPed(-1)
-	vehicle = GetVehiclePedIsIn(ped, false)
-	if IsPedInAnyVehicle(ped, false) then
-		-- Check if ped is in driver seat
-		if GetPedInVehicleSeat(vehicle, -1) == ped then
-			local class = GetVehicleClass(vehicle)
-			-- We don't want planes, helicopters, bicycles and trains
-			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
-				return true
-			end
-		end
-	end
-	return false
-end
-
-
-function addBeginArea() 
-	beginInProgress = true
+function AddBeginArea() 
+	BeginInProgress = true
+	local points = Config.jobs.newspapers.points
 	exports.bro_core:RemoveArea("begin-current")
-	points_coords = points[math.random(1,#points)]
+	local points_coords = points[math.random(1,#points)]
 	exports.bro_core:AddArea("begin-current", {
 		marker = {
 			type = 1,
@@ -984,7 +981,7 @@ function addBeginArea()
 					else
 						exports.bro_core:Notification("Ou est passé votre vehicule de livraison ? non payé")
 					end
-					addBeginArea()
+					AddBeginArea()
 				end
 			},
 		},
@@ -1007,7 +1004,7 @@ end
 
 
 -- service management
-function recruitClosestPlayer(job)
+function RecruitClosestPlayer(job)
 	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
     if closestPlayer and dist <=1 then
@@ -1017,7 +1014,7 @@ function recruitClosestPlayer(job)
     end
 end
 
-function promoteClosestPlayer()
+function PromoteClosestPlayer()
 	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
     if closestPlayer  and dist <=1 then
@@ -1039,7 +1036,7 @@ function demmoteClosestPlayer()
 end
 
 
-function fireClosestPlayer()
+function FireClosestPlayer()
 	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
 
 	if closestPlayer and dist <=1 then
@@ -1051,9 +1048,9 @@ function fireClosestPlayer()
 end
 
 
-function beginSell(job)
-	local nb = math.random(1,#config.jobs[job].sell.pos)
-	local currentSell = config.jobs[job].sell.pos[nb]
+function BeginSell(job)
+	local nb = math.random(1,#Config.jobs[job].sell.pos)
+	local currentSell = Config.jobs[job].sell.pos[nb]
 	exports.bro_core:AddArea("sell", {
 		marker = {
 			weight = 1,
@@ -1078,8 +1075,8 @@ function beginSell(job)
 		},
 		blip = {
 			text = "Revente",
-			imageId	= config.jobs[job].sell.sprite,
-			colorId = config.jobs[job].color,
+			imageId	= Config.jobs[job].sell.sprite,
+			colorId = Config.jobs[job].color,
 			route = true,
 		},
 		locations = {
@@ -1095,284 +1092,117 @@ function beginSell(job)
 end
 
 
-function removeSell(job)
+function RemoveSell(job)
 	exports.bro_core:RemoveArea("sell")
 	exports.bro_core:RemoveMenu(job)
 	exports.bro_core:RemoveMenu("sell")
 end
 
 -- réparations
-function fixVitres() 
-	local playerPed = GetPlayerPed(-1)
-	coords = GetEntityCoords(GetPlayerPed(-1), true)
+function FixVitres() 
+	exports.bro_core:RemoveMenu("repair")
 	local pos = GetEntityCoords(PlayerPedId())
 	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
 
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-	local prop_name = 'prop_cs_wrench'
-	if lockRepare == false then
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if not IsPedInAnyVehicle(playerPed, false) then
-				local time = 4000
-				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-				exports.bro_core:RemoveMenu("repair")
-				lockRepare = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed)
-					FreezeEntityPosition(vehicle)
-					local x,y,z = table.unpack(GetEntityCoords(playerPed))
-					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
-					local boneIndex = GetPedBoneIndex(playerPed, 18905)
-					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
-				
-					local dict = "amb@world_human_vehicle_mechanic@male@exit"
-					local anim = "exit"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockRepare = false
-					FixVehicleWindow(vehicle, 0)
-					FixVehicleWindow(vehicle, 1)
-					FixVehicleWindow(vehicle, 2)
-					FixVehicleWindow(vehicle, 3)
-					FixVehicleWindow(vehicle, 4)
-					FixVehicleWindow(vehicle, 5)
-					FixVehicleWindow(vehicle, 6)
-					FixVehicleWindow(vehicle, 7)
-					FixVehicleWindow(vehicle, 8)
-					TriggerServerEvent("job:repair:price", "window", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-					exports.bro_core:Notification("Véhicle réparé")
-					ClearPedSecondaryTask(playerPed)
-					DeleteObject(prop)
-				end)
-			else
-				exports.bro_core:Notification("~r~Sortez du véhicle")
-			end
-		else
-			exports.bro_core:Notification("~r~Pas de véhicule à portée")
-		end
-	else 
-		exports.bro_core:Notification("~r~Répération en cours")
+	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+			FixVehicleWindow(vehicle, 0)
+			FixVehicleWindow(vehicle, 1)
+			FixVehicleWindow(vehicle, 2)
+			FixVehicleWindow(vehicle, 3)
+			FixVehicleWindow(vehicle, 4)
+			FixVehicleWindow(vehicle, 5)
+			FixVehicleWindow(vehicle, 6)
+			FixVehicleWindow(vehicle, 7)
+			FixVehicleWindow(vehicle, 8)
+			TriggerServerEvent("job:repair:price", "window", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+			exports.bro_core:Notification("Véhicle réparé")
+		end)
+	else
+		exports.bro_core:Notification("~r~Pas de véhicule à portée")
 	end
 end
 
-function fixCarroserie()
-	local playerPed = GetPlayerPed(-1)
-	coords = GetEntityCoords(GetPlayerPed(-1), true)
+function FixCarroserie()
+	exports.bro_core:RemoveMenu("repair")
 	local pos = GetEntityCoords(PlayerPedId())
 	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
 
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-	local prop_name = 'prop_cs_wrench'
-	if lockRepare == false then
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if not IsPedInAnyVehicle(playerPed, false) then
-				local time = 4000
-				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-				exports.bro_core:RemoveMenu("repair")
-				lockRepare = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed)
-					FreezeEntityPosition(vehicle)
-					
-					local dict = "amb@world_human_vehicle_mechanic@male@exit"
-					local anim = "exit"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockRepare = false
-					SetVehicleBodyHealth(vehicle, 1000.0)
-					SetVehiclePetrolTankHealth(vehicle, 1000.0)
-					SetVehicleDeformationFixed(vehicle)
-					TriggerServerEvent("job:repair:price", "carroserie", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-					exports.bro_core:Notification("Véhicle réparé")
-					ClearPedSecondaryTask(playerPed)
-					DeleteObject(prop)
-				end)
-			else
-				exports.bro_core:Notification("~r~Sortez du véhicle")
-			end
-		else
-			exports.bro_core:Notification("~r~Pas de véhicule à portée")
-		end
-	else 
-		exports.bro_core:Notification("~r~Répération en cours")
+	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+			SetVehicleBodyHealth(vehicle, 1000.0)
+			SetVehiclePetrolTankHealth(vehicle, 1000.0)
+			SetVehicleDeformationFixed(vehicle)
+			TriggerServerEvent("job:repair:price", "carroserie", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+			exports.bro_core:Notification("Véhicle réparé")
+		end)
+	else
+		exports.bro_core:Notification("~r~Pas de véhicule à portée")
 	end
 end
 
-function fixPneus()
-	local playerPed = GetPlayerPed(-1)
-	coords = GetEntityCoords(GetPlayerPed(-1), true)
+function FixPneus()
+	exports.bro_core:RemoveMenu("repair")
 	local pos = GetEntityCoords(PlayerPedId())
 	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
 
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-	local prop_name = 'prop_cs_wrench'
-	if lockRepare == false then
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if not IsPedInAnyVehicle(playerPed, false) then
-				local time = 4000
-				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-				exports.bro_core:RemoveMenu("repair")
-				lockRepare = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed)
-					FreezeEntityPosition(vehicle)
-					local x,y,z = table.unpack(GetEntityCoords(playerPed))
-					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
-					local boneIndex = GetPedBoneIndex(playerPed, 18905)
-					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
-				
-					local dict = "amb@world_human_vehicle_mechanic@male@exit"
-					local anim = "exit"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockRepare = false
-					SetVehicleTyreFixed(vehicle, 0)
-					SetVehicleTyreFixed(vehicle, 1)
-					SetVehicleTyreFixed(vehicle, 2)
-					SetVehicleTyreFixed(vehicle, 3)
-					SetVehicleTyreFixed(vehicle, 4)
-					SetVehicleTyreFixed(vehicle, 5)
-					SetVehicleTyreFixed(vehicle, 6)
-					TriggerServerEvent("job:repair:price", "tyres", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-					exports.bro_core:Notification("Véhicle réparé")
-					ClearPedSecondaryTask(playerPed)
-					DeleteObject(prop)
-				end)
-			else
-				exports.bro_core:Notification("~r~Sortez du véhicle")
-			end
-		else
-			exports.bro_core:Notification("~r~Pas de véhicule à portée")
-		end
-	else 
-		exports.bro_core:Notification("~r~Répération en cours")
+	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+			SetVehicleTyreFixed(vehicle, 0)
+			SetVehicleTyreFixed(vehicle, 1)
+			SetVehicleTyreFixed(vehicle, 2)
+			SetVehicleTyreFixed(vehicle, 3)
+			SetVehicleTyreFixed(vehicle, 4)
+			SetVehicleTyreFixed(vehicle, 5)
+			SetVehicleTyreFixed(vehicle, 6)
+			TriggerServerEvent("job:repair:price", "tyres", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+			exports.bro_core:Notification("Véhicle réparé")
+		end)
+	else
+		exports.bro_core:Notification("~r~Pas de véhicule à portée")
 	end
 end
 
-function fixEngine()
-	local playerPed = GetPlayerPed(-1)
-	coords = GetEntityCoords(GetPlayerPed(-1), true)
+function FixEngine()
+	exports.bro_core:RemoveMenu("repair")
 	local pos = GetEntityCoords(PlayerPedId())
 	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
 
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-	local prop_name = 'prop_cs_wrench'
-
-	if lockRepare == false then
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if not IsPedInAnyVehicle(playerPed, false) then
-				local time = 4000
-				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-				exports.bro_core:RemoveMenu("repair")
-				lockRepare = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed)
-					FreezeEntityPosition(vehicle)
-					local x,y,z = table.unpack(GetEntityCoords(playerPed))
-					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
-					local boneIndex = GetPedBoneIndex(playerPed, 18905)
-					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
-			   
-					local dict = "amb@world_human_vehicle_mechanic@male@exit"
-					local anim = "exit"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockRepare = false
-					SetVehicleEngineHealth(vehicle, 1000.0)
-					SetVehicleUndriveable(vehicle, false)
-					ClearPedTasksImmediately(playerPed)
-					TriggerServerEvent("job:repair:price", "motor", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
-					exports.bro_core:Notification("Véhicle réparé")
-					ClearPedSecondaryTask(playerPed)
-					DeleteObject(prop)
-				end)
-			else
-				exports.bro_core:Notification("~r~Sortez du véhicle")
-			end
-		else
-			exports.bro_core:Notification("~r~Pas de véhicule à portée")
-		end
-	else 
-		exports.bro_core:Notification("~r~Répération en cours")
+	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+			SetVehicleEngineHealth(vehicle, 1000.0)
+			SetVehicleUndriveable(vehicle, false)
+			ClearPedTasksImmediately(playerPed)
+			TriggerServerEvent("job:repair:price", "motor", string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))))
+			exports.bro_core:Notification("Véhicle réparé")
+		end)
+	else
+		exports.bro_core:Notification("~r~Pas de véhicule à portée")
 	end
 end
 
 -- Nettoyages
-function cleanCarroserie()
-	local playerPed = GetPlayerPed(-1)
-	coords = GetEntityCoords(GetPlayerPed(-1), true)
+function CleanCarroserie()
+	exports.bro_core:RemoveMenu("repair")
 	local pos = GetEntityCoords(PlayerPedId())
 	local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
 
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-	local prop_name = 'prop_rag_01'
-	if lockRepare == false then
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if not IsPedInAnyVehicle(playerPed, false) then
-				local time = 4000
-				TriggerEvent("bf:progressBar:create", time, "Réparation en cours")
-				exports.bro_core:RemoveMenu("repair")
-				lockRepare = true 
-				Citizen.CreateThread(function ()
-					FreezeEntityPosition(playerPed)
-					FreezeEntityPosition(vehicle)
-					local x,y,z = table.unpack(GetEntityCoords(playerPed))
-					local prop = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, true, true, true)
-					local boneIndex = GetPedBoneIndex(playerPed, 0xDEAD)
-					AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
-				
-					local dict = "timetable@maid@cleaning_window@base"
-					local anim = "base"
-					RequestAnimDict(dict)
-
-					while not HasAnimDictLoaded(dict) do
-						Citizen.Wait(150)
-					end
-					TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-					Wait(time)
-					lockRepare = false
-					SetVehicleDirtLevel(vehicle, 0.0)
-					exports.bro_core:Notification("Véhicle réparé")
-					ClearPedSecondaryTask(playerPed)
-					DeleteObject(prop)
-				end)
-			else
-				exports.bro_core:Notification("~r~Sortez du véhicle")
-			end
-		else
-			exports.bro_core:Notification("~r~Pas de véhicule à portée")
-		end
-	else 
-		exports.bro_core:Notification("~r~Répération en cours")
+	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+			SetVehicleDirtLevel(vehicle, 0.0)
+			exports.bro_core:Notification("Véhicle réparé")
+		end)
+	else
+		exports.bro_core:Notification("~r~Pas de véhicule à portée")
 	end
 end

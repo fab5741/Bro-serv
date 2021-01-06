@@ -1,150 +1,57 @@
-function menus() 
-    -- job center
-    buttons = {}
-    for k, v in pairs(config.center.jobs) do
-        buttons[#buttons+1] = {
-            text = v.label,
-            exec = {
-                callback = function()
-					TriggerServerEvent("job:set:me", 34, "Livreur de journaux")
-					Wait(100)
-					TriggerServerEvent("job:get", "jobs:refresh")
-					exports.bro_core:RemoveMenu("center")
-                end
-            },
-        }
-    end
-	
-	exports.bro_core:AddMenu("sell", {
-		title = "Revente ",
-		position = 2,
-	})
-
-	exports.bro_core:AddMenu("newspapers", {
-		title = "Menu Livreurs de journaux",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "Stopper les livraisons",
-				exec = {
-					callback = function()
-						beginInProgress = false
-						-- on nettoie la merde
-						exports.bro_core:RemoveArea("begin-current")
-						vehicleLivraison = 0
-						ClearAllBlipRoutes()
-					end
-				},
-			},
-		},
-	})
-
-
-	exports.bro_core:AddMenu("service", {
-		title = "Menu Service",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "Recruter",
-				exec = {
-					callback = function()
-						TriggerServerEvent("job:get", "job:recruit")
-					end
-				},
-			},
-			{
-				text = "Promouvoir",
-				exec = {
-					callback = function()
-						promoteClosestPlayer()
-					end
-				},
-			},
-			{
-				text = "Rétrograder",
-				exec = {
-					callback = function()
-						demoteClosestPlayer()
-					end
-				},
-			},
-			{
-				text = "Virer",
-				exec = {
-					callback = function()
-						fireClosestPlayer()
-					end
-				},
-			},
-		}
-	})
-
-
-	exports.bro_core:AddMenu("center", {
-        title = "LSJC",
-        menuTitle = "Prendre un emploi",
-        position = 1,
-        buttons = buttons
-	})
-end
-
-
-function removeMenuPaint(max, type, nb) 
+function RemoveMenuPaint(max, type, nb) 
 	exports.bro_core:RemoveMenu("custom-paint"..nb.."-"..type)
 end
 
-function removeMenuMod(type) 
+function RemoveMenuMod(type) 
 	exports.bro_core:RemoveMenu("custom-mod-"..type)
 end
 
-function customMenuRemove()
+function CustomMenuRemove()
 	exports.bro_core:RemoveMenu("custom")
 	exports.bro_core:RemoveMenu("custom-paint1")
 	exports.bro_core:RemoveMenu("custom-paint2")
 
 	for i = 1,2 do
-		removeMenuPaint(75, 0, i)	
-		removeMenuPaint(75, 1, i)	
-		removeMenuPaint(75, 2, i)		
-		removeMenuPaint(20, 3, i)		
-		removeMenuPaint(5, 4, i)		
-		removeMenuPaint(0, 5, i)	
+		RemoveMenuPaint(75, 0, i)	
+		RemoveMenuPaint(75, 1, i)	
+		RemoveMenuPaint(75, 2, i)		
+		RemoveMenuPaint(20, 3, i)		
+		RemoveMenuPaint(5, 4, i)		
+		RemoveMenuPaint(0, 5, i)	
 	end
 
 
 
 	for i = 0,19 do
-		removeMenuMod(i)
+		RemoveMenuMod(i)
 	end
-	removeMenuMod(23)
-	removeMenuMod(50)
+	RemoveMenuMod(23)
+	RemoveMenuMod(50)
 end
 
-function addMenuPaint(max, type, nb) 
-	buttons = {}
+function AddMenuPaint(max, type, nb)
+	local buttons = {}
 	for i = 0,max do
 		buttons[#buttons+1] = {
 			text = i,
 			hover = {
 				callback = function()
-					vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+					local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 					SetVehicleModKit(
 						vehicle, 
 						0
 					)
 					if nb == 1 then
 						SetVehicleModColor_1(
-							vehicle, 
-							type, 
-							i, 
+							vehicle,
+							type,
+							i,
 							0 -- always 0
 						)
 					elseif nb == 2 then
 						SetVehicleModColor_2(
-							vehicle, 
-							type, 
+							vehicle,
+							type,
 							i
 						)
 					end
@@ -156,12 +63,12 @@ function addMenuPaint(max, type, nb)
 		title = "Peinture type"..type,
 		position = 1,
 		buttons = buttons
-	})	
+	})
 end
 
-function addMenuMod(type) 
-	buttons = {}
-	vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+function AddMenuMod(type) 
+	local buttons = {}
+	local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 
 	SetVehicleModKit(
 		vehicle --[[ Vehicle ]], 
@@ -170,13 +77,13 @@ function addMenuMod(type)
 	local max = GetNumVehicleMods(vehicle, type)
 	for i = 0,max do
 		buttons[#buttons+1] = {
-			text = i,
-			hover = {
-				callback = function()
+			label = i,
+			actions = {
+				onSelected = function()
 					SetVehicleMod(
-						vehicle, 
-						type, 
-						i, 
+						vehicle,
+						type,
+						i,
 						false -- always 0
 					)
 				end
@@ -187,10 +94,10 @@ function addMenuMod(type)
 		title = "Mod "..type,
 		position = 1,
 		buttons = buttons
-	})	
+	})
 end
 
-function customMenu()
+function CustomMenu()
 	exports.bro_core:AddMenu("custom", {
         title = "Customisation",
 		position = 1,
@@ -306,7 +213,6 @@ function customMenu()
 			}
 		}
 	})
-	
 	exports.bro_core:AddMenu("custom-paint1", {
         title = "Customisation",
 		position = 1,
@@ -337,7 +243,6 @@ function customMenu()
 			},
 		}
 	})
-
 	exports.bro_core:AddMenu("custom-paint2", {
         title = "Customisation",
 		position = 1,
@@ -368,22 +273,17 @@ function customMenu()
 			},
 		}
 	})
-
-
 	for i = 1,2 do
-		addMenuPaint(75, 0, i)	
-		addMenuPaint(75, 1, i)	
-		addMenuPaint(75, 2, i)		
-		addMenuPaint(20, 3, i)		
-		addMenuPaint(5, 4, i)		
-		addMenuPaint(0, 5, i)	
+		AddMenuPaint(75, 0, i)	
+		AddMenuPaint(75, 1, i)	
+		AddMenuPaint(75, 2, i)		
+		AddMenuPaint(20, 3, i)		
+		AddMenuPaint(5, 4, i)		
+		AddMenuPaint(0, 5, i)	
 	end
-
-
-
 	for i = 0,19 do
-		addMenuMod(i)
+		AddMenuMod(i)
 	end
-	addMenuMod(23)
-	addMenuMod(50)
+	AddMenuMod(23)
+	AddMenuMod(50)
 end

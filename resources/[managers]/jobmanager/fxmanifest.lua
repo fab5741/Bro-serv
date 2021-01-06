@@ -15,7 +15,6 @@ client_script {
     'client/cloackroom.lua',
     'client/functions.lua',
     'client/events.lua',
-    'client/menu.lua',
     'client/jobs.lua',
     'client/client.lua',
 }

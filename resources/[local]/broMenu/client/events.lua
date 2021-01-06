@@ -18,7 +18,6 @@ RegisterNetEvent('bromenu:clothes:reset')
 
 
 AddEventHandler("bromenu:open", function(job) 
-	print("open menu")
 	if job[1] == nil then 
 		job = {
 			grade = "Chomeur",
@@ -27,11 +26,6 @@ AddEventHandler("bromenu:open", function(job)
 	else
 		job = job[1]
 	end
-	--	exports.bro_core:SetMenuValue("bro", {
-	--		menuTitle = job.grade.." "..job.label
-	--	})
-	--	exports.bro_core:OpenMenu("bro")
-
 	buttons = {}
 
 	buttons[#buttons+1] = 	{
@@ -109,10 +103,12 @@ AddEventHandler("bromenu:open", function(job)
 						end
 					else
 						local pos = GetEntityCoords(ped)
+						print(ped)
 						local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
 				
 						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, ped, 0)
 						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+						print(vehicle)
 						if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 							TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
 						else
@@ -464,50 +460,32 @@ AddEventHandler("vehicle:items:open", function(inventory)
 
 	for k, v in ipairs (inventory) do
 		buttons[k] =     {
+			type="button",
 			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
 			actions = {
-				onSelected = function() 
-					local buttons = {}
-					buttons[1] =     {
-						label = "Récupérer",
-						actions = {
-							onSelected = function() 
-								if lockGetCar == false then
-									if not  IsPedInAnyVehicle(pedPed, false) then
-										nb = tonumber(exports.bro_core:OpenlabelInput({customTitle = true, title = "Nombre", maxInputLength=10}))
-										local time = 4000
-										TriggerEvent("bro_core:progressBar:create", time, "Stockage en cours")
-										lockGetCar = true 
-										Citizen.CreateThread(function ()
-											FreezeEntityPosition(pedPed)
-											
-											local dict = "amb@world_human_gardener_plant@male@enter"
-											local anim = "enter"
-											RequestAnimDict(dict)
-			
-											while not HasAnimDictLoaded(dict) do
-												Citizen.Wait(150)
-											end
-											TaskPlayAnim(pedPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-			
-											Wait(time)
-											lockGetCar = false
-											TriggerServerEvent("item:vehicle:get", v.vehicle_mod, v.id, nb)
-										end)
-									else
-										exports.bro_core:Notification("~r~Vous ne pouvez stocker en véhicule")
-									end
-								else 
-									exports.bro_core:Notification("~r~Stockage en cours")
-								end
-							end
-						},
-					}
+				onSelected = function()
+					if lockGetCar == false then
+						if not  IsPedInAnyVehicle(pedPed, false) then
+							local nb = tonumber(exports.bro_core:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+							exports.bro_core:actionPlayer(4000, "Stockage", "amb@world_human_gardener_plant@male@enter", "enter", function()
+								TriggerServerEvent("item:vehicle:get", v.vehicle_mod, v.id, nb)
+							end)
+						else
+							exports.bro_core:Notification("~r~Vous ne pouvez stocker en véhicule")
+						end
+					else
+						exports.bro_core:Notification("~r~Stockage en cours")
+					end
 				end
 			},
 		}
 		weight = weight + (v.amount*v.weight)
 	end
+	exports.bro_core:AddMenu("items", {
+		Title = "Inventaire",
+		Subtitle = "Cofre",
+		buttons = buttons
+	})
 end)
 
 

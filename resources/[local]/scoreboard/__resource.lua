@@ -4,7 +4,7 @@ description 'ESX Scoreboard'
 
 version '1.0.0'
 
-dependency "bf"
+dependency "bro_core"
 
 server_script 'server/main.lua'
 

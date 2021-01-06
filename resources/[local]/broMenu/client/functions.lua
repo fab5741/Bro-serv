@@ -16,6 +16,7 @@ function openMenuItem(item)
 		actions = {
 			onSelected = function() 
 				TriggerServerEvent("items:use", item, 1)
+				exports.bro_core:RemoveMenu("inventory")
 			end
 		},
 	}
@@ -41,38 +42,11 @@ function openMenuItem(item)
 				local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 					if GetVehicleDoorLockStatus(vehicle) == 1 then
-						
-						local playerPed = GetPlayerPed(-1)
-						if lockGetCar == false then
-							if not  IsPedInAnyVehicle(playerPed, false) then
-								nb = tonumber(exports.bro_core:OpenlabelInput({customTitle = true, title = "Nombre", maxInputLength=10}))
-							
-								local time = 4000
-								TriggerEvent("bro_core:progressBar:create", time, "Stockage en cours")
-								lockGetCar = true 
-								Citizen.CreateThread(function ()
-									FreezeEntityPosition(playerPed)
-									
-									local dict = "amb@world_human_gardener_plant@male@enter"
-									local anim = "enter"
-									RequestAnimDict(dict)
-	
-									while not HasAnimDictLoaded(dict) do
-										Citizen.Wait(150)
-									end
-									TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-	
-									Wait(time)
-									lockGetCar = false
-									TriggerServerEvent("item:vehicle:store", vehicle, v.id, nb)
-
-								end)
-							else
-								exports.bro_core:Notification("~r~Vous ne pouvez stocker en véhicule")
-							end
-						else 
-							exports.bro_core:Notification("~r~Stockage en cours")
-						end
+						exports.bro_core:RemoveMenu("item")
+						local nb = tonumber(exports.bro_core:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+						exports.bro_core:actionPlayer(4000, "Stockage", "amb@world_human_gardener_plant@male@enter", "enter", function()
+							TriggerServerEvent("item:vehicle:store", vehicle, item, nb)
+						end)
 					else
 						exports.bro_core:Notification("~r~Ce véhicule est fermé")
 					end

@@ -15,11 +15,41 @@ inService = {
 
     },
     bennys = {
-        
+
     }
 }
 
 RegisterNetEvent("job:get")
+RegisterNetEvent("job:isChef")
+RegisterNetEvent("job:set:me")
+RegisterNetEvent("job:set")
+RegisterNetEvent("job:items:get")
+RegisterNetEvent("job:items:withdraw")
+RegisterNetEvent("job:items:store")
+RegisterNetEvent("job:safe:deposit")
+RegisterNetEvent("job:parking:get")
+RegisterNetEvent("job:lsms:distress")
+RegisterNetEvent("job:lsms:revive")
+RegisterNetEvent("job:avert:all")
+RegisterNetEvent("job:inService:number")
+RegisterNetEvent("job:clock:set")
+RegisterNetEvent("job:clock")
+RegisterNetEvent("job:service:recruit")
+RegisterNetEvent("job:service:promote")
+RegisterNetEvent("job:service:demote")
+RegisterNetEvent("job:get:player")
+RegisterNetEvent("weapon:store")
+RegisterNetEvent("weapon:get:all")
+RegisterNetEvent("weapon:get")
+RegisterNetEvent("job:weapon:licence")
+RegisterServerEvent('job:removeWeapons')
+RegisterServerEvent('job:cuffGranted')
+RegisterServerEvent('job:finesGranted')
+RegisterServerEvent('job:finesETA')
+RegisterNetEvent("job:facture")
+RegisterServerEvent('job:facture2')
+RegisterNetEvent("job:sell")
+RegisterNetEvent("job:repair:price")
 
 AddEventHandler('job:get', function (cb)
 	local sourceValue = source
@@ -37,7 +67,6 @@ AddEventHandler('job:get', function (cb)
       end)
 end)
 
-RegisterNetEvent("job:isChef")
 
 AddEventHandler('job:isChef', function (cb)
 	local sourceValue = source
@@ -51,7 +80,6 @@ AddEventHandler('job:isChef', function (cb)
       end)
 end)
 
-RegisterNetEvent("job:set:me")
 
 AddEventHandler('job:set:me', function (grade, notif)
     local sourceValue = source
@@ -75,7 +103,6 @@ AddEventHandler('job:set:me', function (grade, notif)
 end)
 
 
-RegisterNetEvent("job:set")
 
 AddEventHandler('job:set', function (player, grade, notif, notif2)
     MySQL.ready(function ()
@@ -90,7 +117,6 @@ AddEventHandler('job:set', function (player, grade, notif, notif2)
 end)
 
 
-RegisterNetEvent("job:items:get")
 
 AddEventHandler('job:items:get', function (cb, job)
     local sourceValue = source
@@ -106,7 +132,6 @@ AddEventHandler('job:items:get', function (cb, job)
 end)
 
 
-RegisterNetEvent("job:items:withdraw")
 
 AddEventHandler('job:items:withdraw', function (item, amount)
     local sourceValue = source
@@ -139,11 +164,9 @@ AddEventHandler('job:items:withdraw', function (item, amount)
     end)
 end)
 
-RegisterNetEvent("job:items:store")
 
 AddEventHandler('job:items:store', function (item, amount)
     local sourceValue = source
-    local source = source
     local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local amount = amount
     local item = item
@@ -185,64 +208,42 @@ Citizen.CreateThread(function()
         -- Check if people are working
         MySQL.ready(function()
             MySQL.Async.fetchAll('select players.gameId, jobs.id as job, job_grades.salary, players.id as player from players, jobs, job_grades where jobs.id = job_grades.job and onDuty = 1 and players.job_grade= job_grades.id',{},
-                function(res)
-                    for k,v in pairs(res) do
-                        MySQL.Async.fetchScalar('select amount from job_account, accounts where job_account.job = @job and accounts.id = job_account.account ',
-                            {['@job'] = v.job},
-                        function(amount)
-                            v.salary = v.salary/6
-                            if amount > v.salary then
-                               MySQL.Async.execute('update job_account, accounts set amount = amount - @salary where job_account.job = @job and accounts.id = job_account.account',{
-                                   ['@salary'] = v.salary,
-                                   ['@job'] = v.job
-                               },
-                               function(affectedRows)
-                                    MySQL.Async.execute('update accounts, player_account set amount = amount + @salary where player_account.player = @player and player_account.account = accounts.id',{
-                                        ['@salary'] = v.salary,
-                                        ['@player'] = v.player
-                                    },
-                                    function(affectedRows)
-                                        if affectedRows == 1 then
-                                           -- TriggerClientEvent("phone:account:get", sourceValue)
-                                            TriggerClientEvent('bf:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
-                                        else
-                                            TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
-                                        end
-                                    end)
-                               end)
-                            else
-                                TriggerClientEvent('bf:Notification', v.gameId, "~r~Vous n'avez pas reçu votre paie, la société, n'a pas assez de fond pour vous payer !")
-                            end
-                        end)
-                    end
-                end)
+            function(res)
+                for k,v in pairs(res) do
+                    MySQL.Async.fetchScalar('select amount from job_account, accounts where job_account.job = @job and accounts.id = job_account.account ',
+                        {['@job'] = v.job},
+                    function(amount)
+                        v.salary = v.salary/6
+                        if amount > v.salary then
+                            MySQL.Async.execute('update job_account, accounts set amount = amount - @salary where job_account.job = @job and accounts.id = job_account.account',{
+                                ['@salary'] = v.salary,
+                                ['@job'] = v.job
+                            },
+                            function(affectedRows)
+                                MySQL.Async.execute('update accounts, player_account set amount = amount + @salary where player_account.player = @player and player_account.account = accounts.id',{
+                                    ['@salary'] = v.salary,
+                                    ['@player'] = v.player
+                                },
+                                function(affectedRows)
+                                    if affectedRows == 1 then
+                                        -- TriggerClientEvent("phone:account:get", sourceValue)
+                                        TriggerClientEvent('bf:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
+                                    else
+                                        TriggerClientEvent('bf:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
+                                    end
+                                end)
+                            end)
+                        else
+                            TriggerClientEvent('bf:Notification', v.gameId, "~r~Vous n'avez pas reçu votre paie, la société, n'a pas assez de fond pour vous payer !")
+                        end
+                    end)
+                end
             end)
-       -- MySQL.ready(function ()
-         --   MySQL.Async.execute('Update accounts, players, job_grades SET accounts.amount = accounts.amount + job_grades.salary/2 where players.onDuty = 1 and accounts.player = players.id and players.job_grade = job_grades.id',{},
-           -- function(affectedRows)
-             --   MySQL.Async.fetchAll('select id from jobs',{},
-              --  function(res)
-                  --  for k,v in pairs(res) do
-                     --   MySQL.Async.fetchScalar('select SUM(salary/2) from job_grades, players where players.job_grade = job_grades.id and job = @job and onDuty=1',
-                     --   {['@job'] = job},
-                      --  function(sum)
-                      --      if sum ~= nil then
-                    --            MySQL.Async.execute('Update jobs set money = money-@money',
-                  --              {['@money'] = sum},
-                --                function(numRows)
-              --                      TriggerClientEvent('bf:Notification', -1, "Vous avez reçu votre paie")
-            --                    end)
-                --            end
-              --          end)
-           ---         end
-          --      end)
-        --    end)
-      --  end)
+        end)
     end
 end)
 
 --- safe
-RegisterNetEvent("job:safe:deposit")
 
 AddEventHandler('job:safe:deposit', function (withdraw, amount, job)
     local sourceValue = source
@@ -296,12 +297,9 @@ end)
 
 
 --- Parkings
-RegisterNetEvent("job:parking:get")
 
 AddEventHandler('job:parking:get', function (cb, id, job)
     local source = source
-	local discord = exports.bro_core:GetDiscordFromSource(source)
-
     MySQL.ready(function ()
         MySQL.Async.execute('Update job_vehicle SET parking="" where id = @id',{['id'] = id},
         function(affectedRows)
@@ -316,14 +314,12 @@ AddEventHandler('job:parking:get', function (cb, id, job)
 end)
 
 -- lsms
-RegisterNetEvent("job:lsms:revive")
 
 AddEventHandler('job:lsms:revive', function (player)
     TriggerClientEvent("job:lsms:revive", player)
 end)
 
 
-RegisterNetEvent("job:lsms:distress")
 
 AddEventHandler('job:lsms:distress', function(coords, message)
     local sourceValue = source
@@ -339,7 +335,6 @@ end)
 
 
 -- homes
-RegisterNetEvent("job:avert:all")
 
 AddEventHandler("job:avert:all", function (job, message, silent, pos)
     local sourceValue = source
@@ -374,7 +369,6 @@ AddEventHandler("job:avert:all", function (job, message, silent, pos)
     end
 end)
 
-RegisterNetEvent("job:inService:number")
 
 AddEventHandler("job:inService:number", function (cb, job)
     TriggerClientEvent(cb, source, #inService[job])
@@ -382,7 +376,6 @@ end)
 
 
 -- clock in
-RegisterNetEvent("job:clock:set")
 
 AddEventHandler("job:clock:set", function (isIn, source, job)
     if isIn then
@@ -395,7 +388,6 @@ AddEventHandler("job:clock:set", function (isIn, source, job)
         end
     end
 end)
-RegisterNetEvent("job:clock")
 
 AddEventHandler("job:clock", function (isIn, job)
     local sourceValue = source
@@ -423,10 +415,8 @@ end)
 -- job service manage
 
 
-RegisterNetEvent("job:service:recruit")
 
 AddEventHandler("job:service:recruit", function (job, player)
-    local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(player)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar("SELECT min(grade), id FROM `job_grades` where job = @job",
@@ -438,17 +428,13 @@ AddEventHandler("job:service:recruit", function (job, player)
                 ['@discord'] = discord,
                 ['@job_grade'] = job_grade
             },function(affectedRows)
-                if affectedRows > 0 then
-                end
             end)
         end)
     end)
 end)
 
-RegisterNetEvent("job:service:promote")
 
 AddEventHandler("job:service:promote", function (player)
-    local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(player)
     MySQL.ready(function ()
         MySQL.Async.execute('Update players SET job_grade = @job_grade+1 where discord = @discord',
@@ -456,15 +442,11 @@ AddEventHandler("job:service:promote", function (player)
             ['@discord'] = discord,
             ['@job_grade'] = job_grade
         },function(affectedRows)
-            if affectedRows > 0 then
-            end
         end)
     end)
 end)
-RegisterNetEvent("job:service:demote")
 
 AddEventHandler("job:service:demote", function (player)
-    local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(player)
     MySQL.ready(function ()
         MySQL.Async.execute('Update players SET job_grade = @job_grade-1 where discord = @discord',
@@ -472,13 +454,10 @@ AddEventHandler("job:service:demote", function (player)
             ['@discord'] = discord,
             ['@job_grade'] = job_grade
         },function(affectedRows)
-            if affectedRows > 0 then
-            end
         end)
     end)
 end)
 
-RegisterNetEvent("job:get:player")
 
 -- source is global here, don't add to function
 AddEventHandler('job:get:player', function(cb)
@@ -499,7 +478,6 @@ AddEventHandler('job:get:player', function(cb)
 end)
 
 
-RegisterNetEvent("weapon:store")
 
 -- source is global here, don't add to function
 AddEventHandler('weapon:store', function(weapon)
@@ -514,7 +492,6 @@ AddEventHandler('weapon:store', function(weapon)
     end)
 end)
 
-RegisterNetEvent("weapon:get:all")
 
 -- source is global here, don't add to function
 AddEventHandler('weapon:get:all', function(cb)
@@ -529,7 +506,6 @@ AddEventHandler('weapon:get:all', function(cb)
     end)
 end)
 
-RegisterNetEvent("weapon:get")
 
 -- source is global here, don't add to function
 AddEventHandler('weapon:get', function(cb, weapon)
@@ -556,7 +532,6 @@ AddEventHandler('weapon:get', function(cb, weapon)
 end)
 
 --- LSPD
-RegisterNetEvent("job:weapon:licence")
 
 AddEventHandler('job:weapon:licence', function (t,  bool)
     local discord = exports.bro_core:GetDiscordFromSource(t)
@@ -569,12 +544,10 @@ AddEventHandler('job:weapon:licence', function (t,  bool)
     end)
 end)
 
-RegisterServerEvent('job:removeWeapons')
 AddEventHandler('job:removeWeapons', function(t)
 	TriggerClientEvent("job:removeWeapons", t)
 end)
 
-RegisterServerEvent('job:cuffGranted')
 AddEventHandler('job:cuffGranted', function(t)
     local sourceValue = source
 	TriggerClientEvent("bf:AdvancedNotification", sourceValue, {
@@ -584,7 +557,6 @@ AddEventHandler('job:cuffGranted', function(t)
     })
 	TriggerClientEvent('job:handcuff', t)
 end)
-RegisterServerEvent('job:finesGranted')
 AddEventHandler('job:finesGranted', function(target, amount)
     local sourceValue = source
 
@@ -596,7 +568,6 @@ AddEventHandler('job:finesGranted', function(target, amount)
     })
 end)
 
-RegisterServerEvent('job:finesETA')
 AddEventHandler('job:finesETA', function(officer, code)
     if(code==1) then
         TriggerClientEvent("bf:AdvancedNotification", officer, {
@@ -626,7 +597,6 @@ AddEventHandler('job:finesETA', function(officer, code)
 end)
 
 
-RegisterNetEvent("job:facture")
 
 AddEventHandler("job:facture", function(t, motif, price, job)
     local sourceValue = source
@@ -638,7 +608,6 @@ AddEventHandler("job:facture", function(t, motif, price, job)
     })
 end)
 
-RegisterServerEvent('job:facture2')
 AddEventHandler('job:facture2', function(officer, code)
     if(code==1) then
         TriggerClientEvent("bf:AdvancedNotification", officer, {
@@ -667,7 +636,6 @@ AddEventHandler('job:facture2', function(officer, code)
 	end
 end)
 
-RegisterNetEvent("job:sell")
 
 -- source is global here, don't add to function
 AddEventHandler("job:sell", function (type, job, price, message)
@@ -707,7 +675,6 @@ end)
 
 
 
-RegisterNetEvent("job:repair:price")
 
 -- source is global here, don't add to function
 AddEventHandler("job:repair:price", function (type, name)

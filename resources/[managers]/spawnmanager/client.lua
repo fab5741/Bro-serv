@@ -1,5 +1,5 @@
 local spawned = false
-weaponsHashes = {
+WeaponsHashes = {
     "WEAPON_PISTOL",
     "WEAPON_STUNGUN",
     "WEAPON_MACHETE",
@@ -25,9 +25,10 @@ Citizen.CreateThread(function()
             NetworkSetFriendlyFireOption(true)
             TriggerServerEvent('player:get', "spawn:spawn")
             spawned = true
-        end 
+        end
     end
 
+    Wait(60000)
     -- le player est spawn, on check des events comme la mort
     while spawned do
         Citizen.Wait(2000)
@@ -44,7 +45,7 @@ AddEventHandler('player:saveCoords', function ()
     local weapons = {
 
     }
-    for k,v in pairs(weaponsHashes) do
+    for k,v in pairs(WeaponsHashes) do
         if HasPedGotWeapon(GetPlayerPed(-1), v, false) then 
             weapons[#weapons+1] = v
         end
@@ -52,7 +53,7 @@ AddEventHandler('player:saveCoords', function ()
     TriggerServerEvent("player:saveCoordsServer", GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons), GetEntityHealth(GetPlayerPed(-1)))
 end)
 
-function spawnPlayerBegin(player)
+function SpawnPlayerBegin(player)
     if player.skin == nil or player.skin == "" then
         TriggerEvent('nicoo_charcreator:CharCreator')
         Citizen.Wait(100)
@@ -64,17 +65,17 @@ function spawnPlayerBegin(player)
         end
         Citizen.Wait(100)
     end
-    spawnPlayer(player.x,player.y, player.z, player.weapons,  player.health)
+    SpawnPlayer(player.x,player.y, player.z, player.weapons,  player.health)
 end
 
 AddEventHandler('spawn:spawn', function (player)
     if player == nil then
         TriggerServerEvent("player:create", "spawn:spawn:2")
     else
-        spawnPlayerBegin(player)
+        SpawnPlayerBegin(player)
     end
 end)
 
 AddEventHandler('spawn:spawn:2', function (player)
-    spawnPlayerBegin(player)
+    SpawnPlayerBegin(player)
 end)

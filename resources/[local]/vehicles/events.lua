@@ -74,18 +74,18 @@ AddEventHandler("vehicle:ds", function()
 	local vehicleName = "dilettante"
 	-- load the model
 	RequestModel(vehicleName)
-    local playerPed = PlayerPedId() -- get the local player ped
+    local playerPed = PlayerPedId() -- get the local player Ped
 
 	-- wait for the model to load
 	while not HasModelLoaded(vehicleName) do
 		Wait(500) -- often you'll also see Citizen.Wait
 	end
-	
+
 	ClearAreaOfVehicles(228.3041229248, -1397.3438720703, 30.488224029541, 5.0, false, false, false, false, false)
 	-- create the vehicle
 	local vehicle = CreateVehicle(vehicleName, 228.3041229248, -1397.3438720703, 26.42, 150.0, true, false)
 
-	-- set the player ped into the vehicle's driver seat
+	-- set the player Ped into the vehicle's driver seat
 	SetPedIntoVehicle(playerPed, vehicle, -1)
 
 	-- release the model
@@ -95,12 +95,12 @@ AddEventHandler("vehicle:ds", function()
 	SetVehicleFuelLevel(vehicle, 100.0)
 
 
-	dsVehicle = vehicle
+	DsVehicle = vehicle
 	SetEntityAsNoLongerNeeded(vehicle)
 
 	exports.bro_core:Notification("~g~ L'épreuve commence. N'oubliez pas votre ceinture !")
 	exports.bro_core:EnableArea("checkpoints-1")
-	ds = true
+	Ds = true
 	exports.bro_core:RemoveMenu("ds")
 end)
 
@@ -131,13 +131,13 @@ RegisterNetEvent("vehicle:job:shop")
 
 AddEventHandler("vehicle:job:shop", function(vehicles)
 	local buttons = {}
-	
+
 	for k, v in ipairs (vehicles) do
 		buttons[k] =     {
 			type = "button",
 			label = v.label.. " (~g~".. v.price.." $~s~)",
 			actions = {
-				onSelected = function() 
+				onSelected = function()
 					-- buy the car
 					TriggerServerEvent("vehicle:job:buy", "vehicle:job:buy:ok", v.id)
 				end
@@ -154,13 +154,13 @@ end)
 
 AddEventHandler("vehicle:shop", function(vehicles)
 	local buttons = {}
-	
+
 	for k, v in ipairs (vehicles) do
 		buttons[k] =     {
 			type ="button",
 			label = v.label.. " (~g~".. v.price.." $~s~)",
 			actions = {
-				onSelected = function() 
+				onSelected = function()
 					-- buy the car
 					TriggerServerEvent("vehicle:buy", "vehicle:buy:ok", v.id)
 				end
@@ -178,14 +178,14 @@ end)
 
 AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehicles4)
 	local buttons = {}
-	
+
 	if vehicles ~= nil then
 		for k, v in ipairs (vehicles) do
 			buttons[k] =     {
 				type="button",
 				label = v.label.." ~r~(fourrière) ~g~"..tostring(v.price*0.10).."$",
 				actions = {
-					onSelected = function() 
+					onSelected = function()
 						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
 					end
 			}
@@ -199,8 +199,8 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 				type="button",
 				label = v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
 				actions = {
-					onSelected = function() 
-						
+					onSelected = function()
+
 						TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:depots:get")
 					end
 			}
@@ -214,8 +214,8 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 				type="button",
 				label = "Entreprise : "..v.label.." ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
 				actions = {
-					onSelected = function() 
-						
+					onSelected = function()
+
 						TriggerServerEvent("vehicle:parking:job:get", v.id, "vehicle:depots:job:get")
 					end
 			}
@@ -228,7 +228,7 @@ AddEventHandler("vehicle:depots", function(vehicles, vehicles2, vehicles3, vehic
 				type="button",
 				label = "Entreprise : ".. v.label.. " ~r~(volé) ~g~"..tostring(v.price*0.01).."$",
 				actions = {
-					onSelected = function() 
+					onSelected = function()
 						TriggerServerEvent("vehicle:parking:job:get", v.id, "vehicle:depots:job:get")
 					end
 			}
@@ -254,14 +254,12 @@ AddEventHandler("vehicle:foot", function(vehicles)
 				type = "button",
 				label = v.label,
 				actions = {
-					onSelected = function() 
-						if not lockParking then
-							exports.bro_core:actionPlayer(4000, "Véhicule", "", "",
-							function()
-								TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
-								exports.bro_core:RemoveMenu("parking-veh")
-							end)
-						end
+					onSelected = function()
+						exports.bro_core:actionPlayer(4000, "Véhicule", "", "",
+						function()
+							TriggerServerEvent("vehicle:parking:get", v.id, "vehicle:get")
+							exports.bro_core:RemoveMenu("parking-veh")
+						end)
 					end
 			}
 		}
@@ -291,7 +289,7 @@ AddEventHandler("vehicle:depots:get", function(data)
 	spawnACar(data, false, true)
 
 	local price = 0
-	
+
 	if data.parking == "" then
 		price = data.price*(0.01)
 	else
@@ -310,7 +308,7 @@ AddEventHandler("vehicle:depots:job:get", function(data, job)
 	spawnACar(data, true, true)
 
 	local price = 0
-	
+
 	if data.parking == "" then
 		price = data.price*(0.01)
 	else
@@ -325,9 +323,6 @@ end)
 function spawnACar(v, new, tpIn)
 	-- delete old if exist
 	DeleteEntity(v.gameId)
-
-	print("tpIN")
-	print(tpIn)
 	--spawn
 	if v.x == nil or v.y == nil or v.z == nil then
 		if tpIn then
@@ -343,7 +338,7 @@ function spawnACar(v, new, tpIn)
 		end
 	end
 	TriggerServerEvent("vehicle:saveId", vehicle, v.gameId)
-	currentVehicle = vehicle
+	CurrentVehicle = vehicle
 
 	if new == false then
 	--	Wait(2000)
@@ -353,26 +348,26 @@ function spawnACar(v, new, tpIn)
 		if v.engineHealth == "-nan" then
 			v.engineHealth = -1
 		end
-	
+
 		if v.bodyHealth == "-nan" then
 			v.bodyHealth = -1
 		end
-	
+
 		if v.fuelLevel == nil then
 			v.fuelLevel = 30
 		end
 		if v.dirtLevel == nil then
 			v.dirtLevel = 0
 		end
-	
+
 		if v.bodyHealth == nil then
 			v.bodyHealth = 0
 		end
-	
+
 		if v.heading == nil then
 			v.heading = 0
 		end
-		
+
 --	print("DEBUG")
 --	print(vehicle)
 --	print(v.x)
@@ -425,10 +420,10 @@ end)
 
 AddEventHandler("vehicle:refresh", function(vehicles)
 	for k,v in pairs(vehicles) do
-        local ped = GetPlayerPed(-1)
+        local Ped = GetPlayerPed(-1)
 		local primaryColour, secondaryColour = GetVehicleColours(v.gameId)
 		local bodyHealth = GetVehicleBodyHealth(v.gameId)
-        TriggerServerEvent("vehicle:save", "", 
+        TriggerServerEvent("vehicle:save", "",
         v.gameId,
         GetEntityCoords(v.gameId),
         GetEntityHeading(v.gameId),
@@ -451,15 +446,15 @@ end)
 
 AddEventHandler("vehicle:mods:refresh", function(vehicle, mods)
 	SetVehicleModKit(
-		vehicle, 
+		vehicle,
 		0
 	)
-	if mods then 
+	if mods then
 		for k,v in pairs(mods) do
 				SetVehicleMod(
-					vehicle, 
-					v.type, 
-					v.value, 
+					vehicle,
+					v.type,
+					v.value,
 					false -- always 0
 				)
 		end

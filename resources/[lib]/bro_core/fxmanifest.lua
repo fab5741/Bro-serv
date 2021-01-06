@@ -100,7 +100,6 @@ exports {
     "Clone",
     "getPlayerIdentifiers",
     "Money",
-    
 
     -- Ui
     "HelpPromt",
@@ -127,7 +126,6 @@ exports {
     "ShowBlip",
     "HideBlip",
 
-    
     -- Trigger
     "AddTrigger",
     "RemoveTrigger",
@@ -175,7 +173,6 @@ exports {
     "GetVehiclesInArea",
     "GetVehiclesInAround",
     "GetVehicleInDirection",
-    
 
     -- Player
     "GetPlayerPed",
@@ -188,7 +185,6 @@ exports {
     "actionPlayer",
     "tpPlayer",
     "isPedDrivingAVehicle",
-
 }
 
 server_scripts {

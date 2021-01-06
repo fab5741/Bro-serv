@@ -5,21 +5,17 @@ thirst = 100
 local thirstTickRate = 90* 1000
 local dangerTickRate = 2000
 
-AddEventHandler('onResourceStart', function(resourceName)
-    if (GetCurrentResourceName() ~= resourceName) then
-      return
-    end
-    Citizen.CreateThread(function()
-        TriggerServerEvent("needs:get", "needs:spawn2")
-        while true do
-            Citizen.Wait(dangerTickRate)
-            if(hunger <= 0 or thirst <= 0) then
-                SetPlayerHealthRechargeMultiplier(PlayerId(), 0.0)
-                SetEntityHealth(GetPlayerPed(-1), GetEntityHealth(GetPlayerPed(-1))-10)
-            end
+Citizen.CreateThread(function()
+    Wait(10000)
+    TriggerServerEvent("needs:get", "needs:spawn2")
+    while true do
+        Citizen.Wait(dangerTickRate)
+        if(hunger <= 0 or thirst <= 0) then
+            SetPlayerHealthRechargeMultiplier(PlayerId(), 0.0)
+            SetEntityHealth(GetPlayerPed(-1), GetEntityHealth(GetPlayerPed(-1))-10)
         end
-    end)
-  end)
+    end
+end)
 
 
 RegisterNetEvent("needs:spawn2")

@@ -1,22 +1,21 @@
-vehicleLivraison = 0
-beginInProgress = false
-tva = 0.20
-lockCollect = false
-lockRepare = false
-nbSold = 0
-lockHeal = false
+VehicleLivraison = 0
+BeginInProgress = false
+NbSold = 0
 -- police vars
-handCuffed = false
-ped = GetPlayerPed(-1)
+HandCuffed = false
+Ped = GetPlayerPed(-1)
 job = {
 	name = "chomeur",
 	label = "chomeur"
+}
+SafeButtons = {
+
 }
 RegisterNetEvent('job:get')
 
 AddEventHandler("job:get", function(job)
 	job = job[1]
-	refresh(job)
+	Refresh(job)
 end)
 
 -- open menu loop
@@ -31,11 +30,11 @@ Citizen.CreateThread(function()
 	-- main loop
     while true do
 		Citizen.Wait(0)	
-		if IsControlJustPressed(1,config.bindings.use_job_menu) then
+		if IsControlJustPressed(1,Config.bindings.use_job_menu) then
 			TriggerServerEvent("job:get", "job:open:menu")
 		end
 
-		if (handCuffed == true) then
+		if (HandCuffed == true) then
 			local myPed = PlayerPedId()
 			local animation = 'idle'
 			local flags = 50				
@@ -55,10 +54,10 @@ Citizen.CreateThread(function()
 			DisableControlAction(1, 16, true)
 			DisableControlAction(1, 17, true)
 
-			if not cuffing then
+			if not Cuffing then
 				SetCurrentPedWeapon(myPed, GetHashKey("WEAPON_UNARMED"), true)
 				RemoveAllPedWeapons(myPed, true)
-				cuffing = true
+				Cuffing = true
 			end
 
 			if not IsEntityPlayingAnim(myPed, "mp_arresting", animation, 3) then
@@ -81,7 +80,7 @@ Citizen.CreateThread(function()
 				ClearPedTasksImmediately(PlayerPedId())
 			end
 
-			cuffing = false		
+			Cuffing = false		
 		end
 	end
 end)

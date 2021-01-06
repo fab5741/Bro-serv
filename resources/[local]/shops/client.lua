@@ -35,9 +35,6 @@ config.items = {
 config.robLength = 120000
 config.robMaxDistance = 20
 
-zoneType = ""
-zone = 0
-
 -- Create blips
 Citizen.CreateThread(function()   
 	exports.bro_core:AddArea("shop", {
@@ -50,7 +47,7 @@ Citizen.CreateThread(function()
 			enter = {
 				callback = function()
 					exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
-						buttons = {}
+						local buttons = {}
 						for k, v in pairs(config.items) do
 							buttons[#buttons+1] = {
 								type = "button",
@@ -116,7 +113,7 @@ Citizen.CreateThread(function()
 		end
 
 	-- Spawn the bartender to the coordinates
-		bartender =  CreatePed(5, v.pnj.model, v.pnj.x, v.pnj.y, v.pnj.z, v.pnj.a, false, true)
+		local bartender =  CreatePed(5, v.pnj.model, v.pnj.x, v.pnj.y, v.pnj.z, v.pnj.a, false, true)
 		SetBlockingOfNonTemporaryEvents(bartender, true)
 		SetPedCombatAttributes(bartender, 46, true)
 		SetPedFleeAttributes(bartender, 0, 0)
@@ -134,7 +131,7 @@ end)
 
 --- roberry
 function robNpc(targetPed)
-    robbedRecently = true
+    RobbedRecently = true
 
     Citizen.CreateThread(function()
         local dict = 'random@mugging3'
@@ -155,9 +152,9 @@ function robNpc(targetPed)
 
 		TriggerEvent("bf:progressBar:create", config.robLength, "Braquage en cours")
 
-		timeElapsed = 0
-		nb = 5
-		while timeElapsed <= config.robLength and robbedRecently do
+		local timeElapsed = 0
+		local nb = 5
+		while timeElapsed <= config.robLength and RobbedRecently do
 			Citizen.Wait(10000)
 			timeElapsed = timeElapsed + 10000
 			local playerCoords = GetEntityCoords(PlayerPedId())
@@ -167,11 +164,11 @@ function robNpc(targetPed)
 				exports.bro_core:Notification('Valises d\'argent : +~g~'..nb)
 			else
 				exports.bro_core:Notification('~r~Vous vous êtes trop éloigné')
-				robbedRecently = false
+				RobbedRecently = false
 				TriggerEvent("bf:progressBar:delete")
 			end
 		end
-        robbedRecently = false
+        RobbedRecently = false
     end)
 end
 
@@ -186,7 +183,7 @@ Citizen.CreateThread(function()
                 local playerPed = GetPlayerPed(-1)
 				if IsPedArmed(playerPed, 1) or IsPedArmed(playerPed, 4) then
 					if DoesEntityExist(targetPed) and IsEntityAPed(targetPed) then
-						if robbedRecently then
+						if RobbedRecently then
 							exports.bro_core:Notification('~r~Trop rapide !')
 						elseif IsPedDeadOrDying(targetPed, true) then
 							exports.bro_core:Notification("~r~L'épicier est mort")

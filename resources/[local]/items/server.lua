@@ -302,6 +302,8 @@ RegisterNetEvent("item:vehicle:store")
 AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
   local sourceValue = source
   local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
+  print(item)
+  print(amount)
   MySQL.ready(function ()
     MySQL.Async.fetchScalar("SELECT amount FROM `player_item`, players WHERE item = @item and players.discord = @discord and players.id = player_item.player",
     {

@@ -37,11 +37,10 @@ end
 local spawnLock = false
 
 -- spawns the current player at a certain spawn point index (or a random one, for that matter)
-function spawnPlayer(x, y, z, weapons, health)     
+function SpawnPlayer(x, y, z, weapons, health)     
     if spawnLock then
         return
     end
-    
     spawnLock = true
 
     Citizen.CreateThread(function()
@@ -54,7 +53,6 @@ function spawnPlayer(x, y, z, weapons, health)
 
         -- freeze the local player
         freezePlayer(PlayerId(), true)
-       
         -- preload collisions for the spawnpoint
         RequestCollisionAtCoord(x, y, z)
 

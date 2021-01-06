@@ -1,56 +1,59 @@
 RegisterNetEvent("job:set")
+RegisterNetEvent("job:getCar")
+RegisterNetEvent('job:process:open')
+RegisterNetEvent('job:sell:open')
+RegisterNetEvent('job:collect:open')
+RegisterNetEvent('job:parking:open')
+RegisterNetEvent('job:safe:open')
+RegisterNetEvent('job:safe:open2')
+RegisterNetEvent('job:safe:open3')
+RegisterNetEvent('job:safe:open4')
+RegisterNetEvent('job:item:open')
+RegisterNetEvent('job:item:open:store')
+RegisterNetEvent('job:item:open2')
+RegisterNetEvent('job:open:menu')
+RegisterNetEvent('job:parking')
+RegisterNetEvent('job:parking:get')
+RegisterNetEvent('job:lsms:revive')
+RegisterNetEvent('jobs:assurance:vehicles')
+RegisterNetEvent('jobs:service:manage')
+RegisterNetEvent("jobs:refresh")
+RegisterNetEvent("jobs:recruit")
+RegisterNetEvent('weapon:store')
+RegisterNetEvent('weapon:store:store')
+RegisterNetEvent('job:removeWeapons')
+RegisterNetEvent('job:handcuff')
+RegisterNetEvent('job:payFines')
+RegisterNetEvent('job:facture')
+RegisterNetEvent("job:facture:accept")
 
 -- source is global here, don't add to function
 AddEventHandler('job:set', function (grade)
     TriggerServerEvent("job:set", grade)
 end)
 
-RegisterNetEvent("job:getCar")
 AddEventHandler('job:getCar', function(car, carId)
 	exports.bro_core:spawnCar(car, true, nil, true)
     TriggerServerEvent("vehicle:set:id", carId, vehicle)
 end)
 
-RegisterNetEvent('job:process:open')
 
-AddEventHandler("job:process:open", function(job)  
-	job = job[1]	
-	buttons = {}
-	for k, v in pairs(config.jobs[job.name].process[zone].items) do
+AddEventHandler("job:process:open", function(job)
+	job = job[1]
+	local buttons = {}
+	for k, v in pairs(Config.jobs[job.name].process[zone].items) do
 
 		buttons[#buttons+1] = {
 			type = "button",
 			label = "Traitement "..v.label,
 			actions = {
 				onSelected = function()
-					local playerPed = GetPlayerPed(-1)
-					if lockCollect == false then
-						if not  IsPedInAnyVehicle(playerPed, false) then
-							local time = 4000
-							TriggerEvent("bf:progressBar:create", time, "Transformation en cours")
-							lockCollect = true 
-							Citizen.CreateThread(function ()
-								FreezeEntityPosition(playerPed, true)
-								
-								local dict = "amb@world_human_gardener_plant@male@enter"
-								local anim = "enter"
-								RequestAnimDict(dict)
-
-								while not HasAnimDictLoaded(dict) do
-									Citizen.Wait(150)
-								end
-								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-								Wait(time)
-								lockCollect = false
-								TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo, 'Vous avez transformé : '..v.label.. " X "..v.amount) 
-								FreezeEntityPosition(playerPed, false)
-							end)
-						else
-							exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
-						end
-					else 
-						exports.bro_core:Notification("~r~Tranformation en cours")
+					if not IsPedInAnyVehicle(playerPed, false) then
+						exports.bro_core:actionPlayer(4000, "Transformation", "amb@world_human_gardener_plant@male@enter", "enter", function()
+							TriggerServerEvent('items:process', v.type,  v.amount, v.to,  v.amountTo, 'Vous avez transformé : '..v.label.. " X "..v.amount)
+						end)
+					else
+						exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
 					end
 				end
 			},
@@ -63,48 +66,29 @@ AddEventHandler("job:process:open", function(job)
 	})
 end)
 
-RegisterNetEvent('job:sell:open')
 
-AddEventHandler("job:sell:open", function(job)  
-	print("JOB SELL ")
-	job = job[1]	
-	buttons = {}
-	for k, v in pairs(config.jobs[job.name].sell.items) do
+AddEventHandler("job:sell:open", function(job)
+	job = job[1]
+	local buttons = {}
+	for k, v in pairs(Config.jobs[job.name].sell.items) do
 		buttons[#buttons+1] = {
 			type = "button",
 			label = "Vente de " ..v.label,
 			actions = {
 				onSelected = function()
-					local playerPed = GetPlayerPed(-1)
-					if lockCollect == false then
-							local time = 4000
-							TriggerEvent("bf:progressBar:create", time, "Revente en cours")
-							lockCollect = true 
-							Citizen.CreateThread(function ()
-								FreezeEntityPosition(playerPed)
-								
-								local dict = "amb@world_human_gardener_plant@male@enter"
-								local anim = "enter"
-								RequestAnimDict(dict)
-
-								while not HasAnimDictLoaded(dict) do
-									Citizen.Wait(150)
-								end
-								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-								Wait(time)
-								lockCollect = false
-								nbSold = nbSold +1
-								if nbSold >= config.jobs[job.name].sell.maxSold then
-									nbSold = 0
-									removeSell(job.name)
-									beginSell(job.name)
-									exports.bro_core:Notification("J'en ai trop, va vendre ailleurs.")
-								end
-								TriggerServerEvent("job:sell", v.type, job.job, v.price, 'Vous avez vendu : '..v.label.. " X "..v.amount.." pour ~g~".. v.price*v.amount.." $")
-							end)
-					else 
-						exports.bro_core:Notification("~r~Vente en cours")
+					if not IsPedInAnyVehicle(playerPed, false) then
+						exports.bro_core:actionPlayer(4000, "Transformation", "amb@world_human_gardener_plant@male@enter", "enter", function()
+							NbSold = NbSold +1
+							if NbSold >= Config.jobs[job.name].sell.maxSold then
+								NbSold = 0
+								RemoveSell(job.name)
+								BeginSell(job.name)
+								exports.bro_core:Notification("J'en ai trop, va vendre ailleurs.")
+							end
+							TriggerServerEvent("job:sell", v.type, job.job, v.price, 'Vous avez vendu : '..v.label.. " X "..v.amount.." pour ~g~".. v.price*v.amount.." $")
+						end)
+					else
+						exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
 					end
 				end
 			},
@@ -117,47 +101,25 @@ AddEventHandler("job:sell:open", function(job)
 	})
 end)
 
-RegisterNetEvent('job:collect:open')
 
-AddEventHandler("job:collect:open", function(job)  
-	job = job[1]	
-	buttons = {}
-	for k, v in pairs(config.jobs[job.name].collect[zone].items) do
+AddEventHandler("job:collect:open", function(job)
+	job = job[1]
+	local buttons = {}
+	for k, v in pairs(Config.jobs[job.name].collect[zone].items) do
 		buttons[#buttons+1] = {
 			type = "button",
 			label = "Collecter "..v.label,
 			actions = {
 				onSelected = function()
-					local playerPed = GetPlayerPed(-1)
-					if lockCollect == false then
-						if not  IsPedInAnyVehicle(playerPed, false) then
-							local time = 4000
-							TriggerEvent("bf:progressBar:create", time, "Collecte")
-							lockCollect = true 
-							Citizen.CreateThread(function ()
-								FreezeEntityPosition(playerPed)
-								
-								local dict = "amb@world_human_gardener_plant@male@enter"
-								local anim = "enter"
-								RequestAnimDict(dict)
-
-								while not HasAnimDictLoaded(dict) do
-									Citizen.Wait(150)
-								end
-								TaskPlayAnim(playerPed, dict, anim, 3.0, -1, time, flag, 0, false, false, false)
-
-								Wait(time)
-								lockCollect = false
-								TriggerServerEvent('items:add', v.type,  v.amount, 'Vous avez collecté : '..v.label.. " X "..v.amount) 
-							end)
-						else
-							exports.bro_core:Notification("~r~Vous ne pouvez pas récolter en véhicule")
-						end
-					else 
-						exports.bro_core:Notification("~r~Collecte en cours")
+					if not IsPedInAnyVehicle(playerPed, false) then
+						exports.bro_core:actionPlayer(4000, "Transformation", "amb@world_human_gardener_plant@male@enter", "enter", function()
+							TriggerServerEvent('items:add', v.type,  v.amount, 'Vous avez collecté : '..v.label.. " X "..v.amount)
+						end)
+					else
+						exports.bro_core:Notification("~r~Vous ne pouvez pas transformer en véhicule")
 					end
 				end
-			},
+			}
 		}
 	end
 	exports.bro_core:AddMenu("collect", {
@@ -167,89 +129,108 @@ AddEventHandler("job:collect:open", function(job)
 	})
 end)
 
-RegisterNetEvent('job:parking:open')
 
-AddEventHandler("job:parking:open", function(job)  
+AddEventHandler("job:parking:open", function(job)
 	job = job[1]
 	TriggerServerEvent("vehicle:parking:get:all", "job:parking", job.name)
 end)
 
-RegisterNetEvent('job:safe:open')
 
-AddEventHandler("job:safe:open", function(job) 
+AddEventHandler("job:safe:open", function(job)
 	job = job[1]
-	TriggerServerEvent("account:job:get", "job:safe:open2", job.job)		
+	TriggerServerEvent("account:job:get", "job:safe:open2", job.job)
 end)
 
-
-RegisterNetEvent('job:safe:open2')
-
-AddEventHandler("job:safe:open2", function(amount) 
+AddEventHandler("job:safe:open2", function(amount)
 	-- todo: test if chef de service
-	account_amount = amount
+	AccountAmount = amount
 	TriggerServerEvent("job:isChef", "job:safe:open3")
 end)
 
-RegisterNetEvent('job:safe:open3')
-
-AddEventHandler("job:safe:open3", function(isChef) 
+AddEventHandler("job:safe:open3", function(isChef)
+	SafeButtons = {}
 	if isChef then
-		exports.bro_core:AddMenu("safe", {
-			Title = "Coffre",
-			Subtitle = job.label,
-			buttons = {
-				{
-					type = "separator",
-					label = "Compte " .. exports.bro_core:Money(account_amount),
-				},
-				{
-					type  = "button",
-					label = "Retirer",
-					actions = {
-						onSelected = function()
-							TriggerServerEvent('account:job:withdraw', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
-							TriggerServerEvent("job:get", "job:safe:open")		
-						end
-					},
-				},
-				{
-					type  = "button",
-					label = "Déposer",
-					actions = {
-						onSelected = function()
-							TriggerServerEvent('account:job:add', "", job.job, tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})))
-							TriggerServerEvent("job:get", "job:safe:open")		
-						end
-					},
-				},
-				{
-					type = "separator",
-					label = "Stock",
-				},
+		SafeButtons[#SafeButtons+1] = {
+			type = "separator",
+			label = "Compte " .. exports.bro_core:Money(AccountAmount),
+		}
+		SafeButtons[#SafeButtons+1] = {
+			type  = "button",
+			label = "Retirer",
+			actions = {
+				onSelected = function()
+					local nb = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+					TriggerServerEvent('account:job:withdraw', "", job.job, nb)
+					TriggerServerEvent("job:get", "job:safe:open")
+				end
 			}
-		})
-	else 
-		exports.bro_core:Notification("~r~Vous n'etes pas abilité")
+		}
+		SafeButtons[#SafeButtons+1] = {
+			type  = "button",
+			label = "Déposer",
+			actions = {
+				onSelected = function()
+					local nb = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+					TriggerServerEvent('account:job:add', "", job.job, nb)
+					TriggerServerEvent("job:get", "job:safe:open")
+				end
+			}
+		}
 	end
+	TriggerServerEvent("job:items:get", "job:safe:open4")
+end)
+
+AddEventHandler("job:safe:open4", function(items)
+	SafeButtons[#SafeButtons+1] = {
+			type = "separator",
+			label = "Stock",
+		}
+	for k,v in ipairs(items) do
+		SafeButtons[#SafeButtons+1] = {
+			type="button",
+			label = v.label,
+			actions = {
+				onSelected = function()
+				end
+			},
+		}
+	end
+	SafeButtons[#SafeButtons+1] = {
+			type = "button",
+			label = "Déposer",
+			actions = {
+				onSelected = function()
+					exports.bro_core:AddSubMenu("safeitems", {
+						parent = "safe",
+						Title = "Coffre",
+						Subtitle = "Stock",
+						buttons = SafeButtons
+					})
+				end
+			}
+	}
+	exports.bro_core:PrintTable(SafeButtons)
+	exports.bro_core:AddMenu("safe", {
+		Title = "Coffre",
+		Subtitle = "Stock",
+		buttons = SafeButtons
+	})
 end)
 
 
-RegisterNetEvent('job:item:open')
-
-AddEventHandler("job:item:open", function(job) 
+AddEventHandler("job:item:open", function(job)
 	job = job[1].job
 	TriggerServerEvent("job:items:get", "job:item:open2", job)
 end)
 
-RegisterNetEvent('job:item:open:store')
 
-AddEventHandler("job:item:open:store", function(items) 
-	buttons = {}
+AddEventHandler("job:item:open:store", function(items)
+	local buttons = {}
 	for k, v in pairs(items) do
 		buttons[#buttons+1] = {
 			text = v.label .. " X " ..v.amount,
 			actions = {
-				onSelected = function() 
+				onSelected = function()
 					TriggerServerEvent("job:items:store", v.item, 1)
 				end
 			},
@@ -259,14 +240,13 @@ AddEventHandler("job:item:open:store", function(items)
 	exports.bro_core:NextMenu("safes-items-store")
 end)
 
-RegisterNetEvent('job:item:open2')
 
-AddEventHandler("job:item:open2", function(items) 
-	buttons = {}
+AddEventHandler("job:item:open2", function(items)
+	local buttons = {}
 	buttons[#buttons+1] = {
 		text = "Stocker item",
 		actions = {
-			onSelected = function() 
+			onSelected = function()
 				TriggerServerEvent("items:get", "job:item:open:store")
 			end
 		},
@@ -275,12 +255,12 @@ AddEventHandler("job:item:open2", function(items)
 		buttons[#buttons+1] = {
 			text = v.label .. " X " ..v.amount,
 			actions = {
-				onSelected = function() 
-					local buttons = {}
+				onSelected = function()
+					buttons = {}
 					buttons[1] =     {
 						text = "Retirer",
 						actions = {
-							onSelected = function() 
+							onSelected = function()
 								TriggerServerEvent("job:items:withdraw", v.item, 1)
 							end
 						},
@@ -297,12 +277,11 @@ end)
 
 
 
-RegisterNetEvent('job:open:menu')
 
 AddEventHandler("job:open:menu", function(job)
-	job = job[1] 
+	job = job[1]
 	if job.name == "lspd" or job.name == "lsms" or job.name == "farm" or job.name == "wine"  or job.name == "taxi"  or job.name=="bennys" or job.name=="newspapers" then
-		buttons = {
+		local buttons = {
 
 		}
 		if job.name == "lspd" then
@@ -327,8 +306,8 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Objets",
 					subMenu = "props"
 				},
-			}	
-		else 
+			}
+		else
 			buttons = {
 				{
 					type = "button",
@@ -340,7 +319,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Animations",
 					subMenu = "animations"
 				},
-			}	
+			}
 		end
 		-- TODO: only display when is chief
 		if true then
@@ -472,7 +451,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Soigner",
 					actions = {
 						onSelected = function()
-							healClosestPlayer()
+							HealClosestPlayer()
 						end
 					},
 				},
@@ -481,7 +460,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Réanimer",
 					actions = {
 						onSelected = function()
-							reviveClosestPlayer()
+							ReviveClosestPlayer()
 						end
 					},
 				},
@@ -497,7 +476,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Commencer la revente",
 					actions = {
 						onSelected = function()
-							beginSell(job.name)
+							BeginSell(job.name)
 						end
 					},
 				},
@@ -506,7 +485,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Finir la revente",
 					actions = {
 						onSelected = function()
-							removeSell(job.name)
+							RemoveSell(job.name)
 						end
 					},
 				},
@@ -551,7 +530,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Vitres",
 					actions = {
 						onSelected = function()
-							fixVitres()
+							FixVitres()
 						end
 					},
 				},
@@ -560,7 +539,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Pneus",
 					actions = {
 						onSelected = function()
-							fixPneus()
+							FixPneus()
 						end
 					},
 				},
@@ -569,7 +548,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Carroserie",
 					actions = {
 						onSelected = function()
-							fixCarroserie()
+							FixCarroserie()
 						end
 					},
 				},
@@ -578,7 +557,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Moteur",
 					actions = {
 						onSelected = function()
-							fixEngine()
+							FixEngine()
 						end
 					},
 				},
@@ -591,34 +570,49 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Carroserie",
 					actions = {
 						onSelected = function()
-							cleanCarroserie()
+							CleanCarroserie()
 						end
 					},
 				},
 			}
-		end
-		buttons[#buttons+1] = {
-			type = "separator",
-			label = "Factures",
-		}
-		buttons[#buttons+1] = {
-			type = "button",
-			label = "Facturer",
-			actions = {
-				onSelected = function()
-					local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
-					local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-					local closestPlayer, dist = GetClosestPlayer()
-
-					if closestPlayer and dist <=1 then
-						TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
-					else
-						exports.bro_core:Notification("Pas de joueur à proximité")
+		elseif job.name == "newspapers" then
+			buttons[#buttons+1] = {
+				text = "Stopper les livraisons",
+				exec = {
+					callback = function()
+						BeginInProgress = false
+						-- on nettoie la merde
+						exports.bro_core:RemoveArea("begin-current")
+						VehicleLivraison = 0
+						ClearAllBlipRoutes()
 					end
-					exports.bro_core:RemoveMenu("lspd")
-				end
-			},
-		}
+				},
+			}
+		end
+		if job.name == "lspd" or job.name == "lsms" or job.name == "bennys" or job.name == "farm" or job.name == "wine" or job.name == "taxi" then
+			buttons[#buttons+1] = {
+				type = "separator",
+				label = "Factures",
+			}
+			buttons[#buttons+1] = {
+				type = "button",
+				label = "Facturer",
+				actions = {
+					onSelected = function()
+						print("FACTURE")
+						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
+						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
+						local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+						if closestPlayer and dist <=1 then
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
+						else
+							exports.bro_core:Notification("~r~Pas de joueur à proximité")
+						end
+						exports.bro_core:RemoveMenu("actions")
+					end
+				},
+			}
+		end
 		exports.bro_core:AddSubMenu("actions", {
 			parent= "job",
 			Title = "Actions",
@@ -636,8 +630,8 @@ AddEventHandler("job:open:menu", function(job)
 						Note()
 					end
 				},
-			}
-			, {
+			},
+			{
 				type = "button",
 				label = "Annuler l'Animation",
 				actions = {
@@ -675,7 +669,7 @@ AddEventHandler("job:open:menu", function(job)
 						end
 					},
 				}
-			
+
 		end
 		exports.bro_core:AddSubMenu("animations", {
 			parent= "job",
@@ -779,9 +773,8 @@ AddEventHandler("job:open:menu", function(job)
 end)
 
 
-RegisterNetEvent('job:parking')
 
-AddEventHandler("job:parking", function(vehicles)  
+AddEventHandler("job:parking", function(vehicles)
 	local buttons = {
 
 	}
@@ -789,7 +782,7 @@ AddEventHandler("job:parking", function(vehicles)
 		buttons[k] =     {
 			text = v.label,
 			actions = {
-				onSelected = function() 
+				onSelected = function()
 					TriggerServerEvent("job:parking:get", "job:parking:get", v.id)
 				end
 			},
@@ -797,11 +790,9 @@ AddEventHandler("job:parking", function(vehicles)
 	end
 end)
 
-RegisterNetEvent('job:parking:get')
 
-AddEventHandler("job:parking:get", function(name, id)  
-
-	local playerPed = PlayerPedId() -- get the local player ped
+AddEventHandler("job:parking:get", function(name, id)
+	local playerPed = PlayerPedId() -- get the local player Ped
 
 	if not IsPedInAnyVehicle(playerPed) then
 		exports.bro_core:spawnCar(name, true, nil, true)
@@ -809,18 +800,17 @@ AddEventHandler("job:parking:get", function(name, id)
 	end
 end)
 
-function RespawnPed(ped, coords, heading)
-	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
+function RespawnPed(Ped, coords, heading)
+	SetEntityCoordsNoOffset(Ped, coords.x, coords.y, coords.z, false, false, false, true)
 	NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
-	SetPlayerInvincible(ped, false)
-	ClearPedBloodDamage(ped)
+	SetPlayerInvincible(Ped, false)
+	ClearPedBloodDamage(Ped)
 	TriggerEvent('playerSpawned') -- compatibility with old scripts, will be removed soon
 end
 
-RegisterNetEvent('job:lsms:revive')
 
-AddEventHandler("job:lsms:revive", function(isBleedout)  
-	local coords = GetEntityCoords(ped)
+AddEventHandler("job:lsms:revive", function(isBleedout)
+	local coords = GetEntityCoords(Ped)
 
 	DoScreenFadeOut(800)
 
@@ -828,7 +818,7 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 		Citizen.Wait(50)
 	end
 
-	RespawnPed(ped, coords, 0.0)
+	RespawnPed(Ped, coords, 0.0)
 
 	TriggerEvent("player:alive")
 	if isBleedout then
@@ -843,21 +833,21 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 			}
 			TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
 		end)
-		FreezeEntityPosition(ped, true)
+		FreezeEntityPosition(Ped, true)
 		if not HasAnimDictLoaded("missfbi1") then
 			RequestAnimDict("missfbi1")
-	
+
 			while not HasAnimDictLoaded("missfbi1") do
 				Citizen.Wait(1)
 			end
 		end
-		SetEntityCoords(ped, vector3(304.0592956543,-573.39636230469,29.836771011353))
+		SetEntityCoords(Ped, vector3(304.0592956543,-573.39636230469,29.836771011353))
 		Wait(20)
-		TaskPlayAnim(ped, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
-		exports.bro_core:Notification("~g~F1~w~ pour vous relever")		
-		FreezeEntityPosition(ped, false)
+		TaskPlayAnim(Ped, 'missfbi1', 'cpr_pumpchest_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
+		exports.bro_core:Notification("~g~F1~w~ pour vous relever")
+		FreezeEntityPosition(Ped, false)
 	end
-	
+
 	StopScreenEffect('DeathFailOut')
 	DoScreenFadeIn(800)
 	Wait(0)
@@ -865,7 +855,6 @@ end)
 
 
 
-RegisterNetEvent('jobs:assurance:vehicles')
 
 AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 	local buttons = {}
@@ -882,12 +871,12 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 		buttons[k] =     {
 			text =  v.label.. " ("..parking..")",
 			actions = {
-				onSelected = function() 
+				onSelected = function()
 					if v.parking == "" then
-						local playerPed = PlayerPedId() -- get the local player ped
+						local playerPed = PlayerPedId() -- get the local player Ped
 
 						if not IsPedInAnyVehicle(playerPed) then
-							currentVehicle = v.id
+							CurrentVehicle = v.id
 							exports.bro_core:spawnCar(v.name, true, nil, true)
 							TriggerServerEvent("account:money:sub", 10)
 							exports.bro_core:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
@@ -904,7 +893,6 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 	exports.bro_core:NextMenu("jobs-vehicles")
 end)
 
-RegisterNetEvent('jobs:service:manage')
 
 AddEventHandler("jobs:service:manage", function(grade)
 	if grade >= 4 then
@@ -915,23 +903,20 @@ AddEventHandler("jobs:service:manage", function(grade)
 end)
 
 --lifecycle
-RegisterNetEvent("jobs:refresh")
 
 AddEventHandler("jobs:refresh", function(job)
 	refresh(job[1])
 end)
 
-RegisterNetEvent("jobs:recruit")
 
-AddEventHandler("jobs:recruit", function(job) 
-	recruitClosestPlayer(job)
+AddEventHandler("jobs:recruit", function(job)
+	RecruitClosestPlayer(job)
 end)
 
 
-RegisterNetEvent('weapon:store')
 
-AddEventHandler("weapon:store", function(weapons)  
-	buttons = {}
+AddEventHandler("weapon:store", function(weapons)
+	local buttons = {}
 	for k, v in pairs(weapons) do
 		if v.weapon == "0x1B06D571" then
 			v.label = "9mm"
@@ -969,7 +954,7 @@ AddEventHandler("weapon:store", function(weapons)
 				label = "Mettre",
 				actions = {
 					onSelected = function()
-						addBulletproofVest()	
+						AddBulletproofVest()
 					end
 				},
 			},
@@ -978,7 +963,7 @@ AddEventHandler("weapon:store", function(weapons)
 				label = "Enlever",
 				actions = {
 					onSelected = function()
-						removeBulletproofVest()
+						RemoveBulletproofVest()
 					end
 				},
 			},
@@ -1035,9 +1020,8 @@ AddEventHandler("weapon:store", function(weapons)
 	})
 end)
 
-RegisterNetEvent('weapon:store:store')
 
-AddEventHandler("weapon:store:store", function(isOk, weapon)  
+AddEventHandler("weapon:store:store", function(isOk, weapon)
 	if isOk then
 		if weapon == "0x1B06D571" then
 			weapon = "WEAPON_PISTOL"
@@ -1053,10 +1037,10 @@ AddEventHandler("weapon:store:store", function(isOk, weapon)
 			weapon = "WEAPON_SMG"
 		end
 		GiveWeaponToPed(
-			GetPlayerPed(-1) --[[ Ped ]], 
-			weapon --[[ Hash ]], 
-			100 --[[ integer ]], 
-			false --[[ boolean ]], 
+			GetPlayerPed(-1) --[[ Ped ]],
+			weapon --[[ Hash ]],
+			100 --[[ integer ]],
+			false --[[ boolean ]],
 			true --[[ boolean ]]
 		)
 	else
@@ -1065,16 +1049,14 @@ AddEventHandler("weapon:store:store", function(isOk, weapon)
 end)
 
 
-RegisterNetEvent('job:removeWeapons')
 AddEventHandler('job:removeWeapons', function()
     RemoveAllPedWeapons(PlayerPedId(), true)
 end)
 
 
-RegisterNetEvent('job:handcuff')
 AddEventHandler('job:handcuff', function()
-	handCuffed = not handCuffed
-	if(handCuffed) then
+	HandCuffed = not HandCuffed
+	if(HandCuffed) then
 		exports.bro_core:AdvancedNotification({
 			text = "Menotté",
 			title = "LSPD",
@@ -1086,40 +1068,39 @@ AddEventHandler('job:handcuff', function()
 			title = "LSPD",
 			icon = "CHAR_AGENT14",
 		})
-		cuffing = false
+		Cuffing = false
 		ClearPedTasksImmediately(PlayerPedId())
 	end
 end)
 
 
 local lockAskingFine = false
-RegisterNetEvent('job:payFines')
 AddEventHandler('job:payFines', function(amount, sender)
 	Citizen.CreateThread(function()
-		
+
 		if(lockAskingFine ~= true) then
 			lockAskingFine = true
 			local notifReceivedAt = GetGameTimer()
 			exports.bro_core:Notification("Amende de " .. amount .. "$. Y pour accepter")
 			while(true) do
 				Wait(0)
-				
+
 				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
 					TriggerServerEvent('job:finesETA', sender, 2)
 					exports.bro_core:Notification("Amende expirée")
 					lockAskingFine = false
 					break
 				end
-				
-				if IsControlPressed(1, config.bindings.accept_fine) then
+
+				if IsControlPressed(1, Config.bindings.accept_fine) then
 					TriggerServerEvent("account:player:add", "", -amount)
 					exports.bro_core:Notification("Amende de " .. amount .. "$ payée")
 					TriggerServerEvent('job:finesETA', sender, 0)
 					lockAskingFine = false
 					break
 				end
-				
-				if IsControlPressed(1, config.bindings.refuse_fine) then
+
+				if IsControlPressed(1, Config.bindings.refuse_fine) then
 					TriggerServerEvent('job:finesETA', sender, 3)
 					lockAskingFine = false
 					break
@@ -1131,38 +1112,36 @@ AddEventHandler('job:payFines', function(amount, sender)
 	end)
 end)
 
-lockAskingFacture = false
-RegisterNetEvent('job:facture')
+LockAskingFacture = false
 AddEventHandler('job:facture', function(amount, motif, job, sender)
 	Citizen.CreateThread(function()
-		
-		if(lockAskingFacture ~= true) then
-			lockAskingFacture = true
+		if(LockAskingFacture ~= true) then
+			LockAskingFacture = true
 			local notifReceivedAt = GetGameTimer()
 			exports.bro_core:AdvancedNotification({
-				text = "Facture de " .. amount .. "$. Y pour accepter, N pour refuser",
+				text = "Facture de ~g~" .. exports.bro_core:Money(amount) .. "$.~n~ Motif : " .. motif.. "~n~Y pour accepter.~n~N pour refuser0",
 				title = job,
 				icon = "char_AGENT14"
 			})
 			while(true) do
 				Wait(0)
-				
+
 				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
 					TriggerServerEvent('job:facture2', sender, 2)
 					exports.bro_core:Notification("Facture expirée")
-					lockAskingFacture = false
+					LockAskingFacture = false
 					break
 				end
-				
-				if IsControlPressed(1, config.bindings.accept_fine) then
+
+				if IsControlPressed(1, Config.bindings.accept_fine) then
 					TriggerServerEvent("account:player:liquid:get:facture", "job:facture:accept", amount, sender)
-					lockAskingFacture = false
+					LockAskingFacture = false
 					break
 				end
-				
-				if IsControlPressed(1, config.bindings.refuse_fine) then
+
+				if IsControlPressed(1, Config.bindings.refuse_fine) then
 					TriggerServerEvent('job:facture2', sender, 3)
-					lockAskingFacture = false
+					LockAskingFacture = false
 					break
 				end
 			end
@@ -1172,20 +1151,19 @@ AddEventHandler('job:facture', function(amount, motif, job, sender)
 	end)
 end)
 
-RegisterNetEvent("job:facture:accept")
 AddEventHandler("job:facture:accept", function(liquid, amount, sender, job)
 	amount = tonumber(amount)
 	if liquid >= amount then
 		TriggerServerEvent("account:player:liquid:add", "", amount*(-1))
-		TriggerServerEvent("account:job:add", "", job, amount*(1-tva), true)
-		TriggerServerEvent("account:job:add", "", 1, amount*tva, true)
+		TriggerServerEvent("account:job:add", "", job, amount*(1-Config.tva), true)
+		TriggerServerEvent("account:job:add", "", 1, amount*Config.tva, true)
 		exports.bro_core:Notification("Facture de " .. amount .. "$ payée")
 		TriggerServerEvent('job:facture2', sender, 0)
 	else
 		exports.bro_core:Notification("Vous n'avez pas assez d'argent")
 		TriggerServerEvent('job:facture2', sender, 3)
 	end
-	lockAskingFacture = false
+	LockAskingFacture = false
 end)
 
 
@@ -1194,6 +1172,6 @@ AddEventHandler('onResourceStop', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
 	  return
 	end
-	deleteMenuAndArea()
+	DeleteMenuAndArea()
 end)
 

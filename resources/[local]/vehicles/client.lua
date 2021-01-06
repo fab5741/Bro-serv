@@ -1,18 +1,16 @@
-zoneType =0
-zone = "global"
-dsVehicle = 0
-currentVehicle = 0
-ped = GetPlayerPed(-1)
+DsVehicle = 0
+CurrentVehicle = 0
+Ped = GetPlayerPed(-1)
 
-config = {}
-config.parkings = {
+Config = {}
+Config.parkings = {
 	{
 		zone = "global",
 		locations = {
 			{
-				x =234.68,
-				y=-782.73,
-				z=29.9
+				x=236.14970397949,
+				y=-779.75360107422,
+				z=30.804173355103
 			},
 		}
 	},
@@ -81,10 +79,8 @@ config.parkings = {
 	},
 }
 
-lockParking = false
-
 function DeleteGivenVehicle( veh, timeoutMax )
-    local timeout = 0 
+    local timeout = 0
 
     SetEntityAsMissionEntity( veh, true, true )
     DeleteVehicle( veh )
@@ -93,22 +89,22 @@ function DeleteGivenVehicle( veh, timeoutMax )
         Notify( "~r~Failed to delete vehicle, trying again..." )
 
         -- Fallback if the vehicle doesn't get deleted
-        while ( DoesEntityExist( veh ) and timeout < timeoutMax ) do 
+        while ( DoesEntityExist( veh ) and timeout < timeoutMax ) do
             DeleteVehicle( veh )
 
             -- The vehicle has been banished from the face of the Earth!
-            if ( not DoesEntityExist( veh ) ) then 
+            if ( not DoesEntityExist( veh ) ) then
                 Notify( "~g~Vehicle deleted." )
-            end 
+            end
 
             -- Increase the timeout counter and make the system wait
-            timeout = timeout + 1 
+            timeout = timeout + 1
             Citizen.Wait( 500 )
-        end 
-    else 
+        end
+    else
         Notify( "~g~Vehicle deleted." )
-    end 
-end 
+    end
+end
 
 -- Create blips
 Citizen.CreateThread(function()
@@ -118,18 +114,17 @@ end)
 
 -- detect parking enter
 Citizen.CreateThread(function()
-	local notification = false
 	while true do
 		Citizen.Wait(0)
-		if ds then
-			local ped = GetPlayerPed(-1)
-			vehicle = GetVehiclePedIsIn(ped, false)
-			if vehicle ~= dsVehicle then
+		if Ds then
+			local Ped = GetPlayerPed(-1)
+			local vehicle = GetVehiclePedIsIn(Ped, false)
+			if vehicle ~= DsVehicle then
 				exports.bro_core:Notification('Vous êtes descendu de la voiture. Permis annulé')
 				exports.bro_core:DisableArea("checkpoints-1")
 				exports.bro_core:DisableArea("checkpoints-2")
 				exports.bro_core:DisableArea("checkpoints-3")
-				ds = false
+				Ds = false
 			end
 		end
 	end
@@ -138,12 +133,12 @@ end)
 
 -- update vehicles states
 Citizen.CreateThread(function()
---	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
---	while true do
---		Wait(10000)
---		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
---		TriggerServerEvent("vehicle:job:get", "vehicle:refresh")
---	end
+	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
+	while true do
+		Wait(10000)
+		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
+		TriggerServerEvent("vehicle:job:get", "vehicle:refresh")
+	end
 end)
 
 
@@ -230,29 +225,29 @@ local turnEngineOn = false
 	Citizen.CreateThread(function()
 		while true do
 			Citizen.Wait(0)
-	
-			local veh = GetVehiclePedIsIn(ped)
+
+			local veh = GetVehiclePedIsIn(Ped)
 			if DoesEntityExist(veh) then
-				disableAirControl(ped, veh)
-				disableVehicleRoll(ped, veh)
+				disableAirControl(Ped, veh)
+				disableVehicleRoll(Ped, veh)
 			end
-	
-	
+
+
 		end
 	end)
-	
-	
+
+
 	-- [[ FUNCTIONS ] --
 	function resetVehicle(veh)
 		FreezeEntityPosition(veh,false)
 		SetVehicleOnGroundProperly(veh)
 		SetVehicleEngineOn(veh,turnEngineOn)
 	end
-	
-	function disableAirControl(ped, veh)
+
+	function disableAirControl(Ped, veh)
 		if not IsThisModelBlacklisted(veh) then
-			if IsPedSittingInAnyVehicle(ped) then
-				if GetPedInVehicleSeat(veh, -1) == ped then
+			if IsPedSittingInAnyVehicle(Ped) then
+				if GetPedInVehicleSeat(veh, -1) == Ped then
 					if IsEntityInAir(veh) then
 						DisableControlAction(0, 59)
 						DisableControlAction(0, 60)
@@ -261,27 +256,27 @@ local turnEngineOn = false
 			end
 		end
 	end
-	
-	function disableVehicleRoll(ped, veh)
+
+	function disableVehicleRoll(Ped, veh)
 		local roll = GetEntityRoll(veh)
-	
+
 		if not IsThisModelBlacklisted(veh) then
-			if GetPedInVehicleSeat(veh, -1) == ped then
+			if GetPedInVehicleSeat(veh, -1) == Ped then
 				if (roll > 75.0 or roll < -75.0) then
 					DisableControlAction(2,59,true)
 					DisableControlAction(2,60,true)
 					if not IsEntityInAir(veh) and GetEntitySpeed(veh) < 0.15 then
 						Wait(2000)
-						destroyPedsVehicle(ped)
+						destroyPeDsVehicle(Ped)
 					end
 				end
 			end
 		end
 	end
-	
+
 	function IsThisModelBlacklisted(veh)
 		local model = GetEntityModel(veh)
-	
+
 		for i = 1, #blacklistedModels do
 			if model == GetHashKey(blacklistedModels[i]) then
 				return true
@@ -289,13 +284,13 @@ local turnEngineOn = false
 		end
 		return false
 	end
-	
-	function destroyPedsVehicle(ped)
-		local veh = GetVehiclePedIsIn(ped)
+
+	function destroyPeDsVehicle(Ped)
+		local veh = GetVehiclePedIsIn(Ped)
 		FreezeEntityPosition(veh,true)
 		SetVehicleEngineOn(veh, false)
 	end
-	
+
 	function drawNotification(text)
 		SetNotificationTextEntry("STRING")
 		AddTextComponentString(text)

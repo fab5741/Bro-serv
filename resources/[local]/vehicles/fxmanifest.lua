@@ -6,7 +6,7 @@ description '- Bro - Vehicles'
 version '0.0.1'
 
 dependencies {
-    "bf", 
+    "bro_core", 
     "account"
 }
 

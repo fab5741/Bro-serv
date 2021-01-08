@@ -22,6 +22,7 @@ RegisterNetEvent("vehicle:save")
 RegisterNetEvent("vehicle:saveId")
 RegisterNetEvent("vehicle:mods:save")
 RegisterNetEvent("vehicle:lock")
+RegisterNetEvent("vehicle:sell")
 
 local tva = 0.20
 
@@ -46,7 +47,7 @@ AddEventHandler("vehicle:buy", function(cb, id)
 							},
 							function(count2)
 								count = count +count2
-									if count <= 5 then
+									if count <= 1 then
 										MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where discord = @discord',
 										{['discord'] =  discord,
 										['price'] = res2[1].price},
@@ -313,6 +314,8 @@ end)
 
 AddEventHandler("vehicle:store", function(vehicle, parking)
 	local sourceValue = source
+	print(vehicle)
+	print(parking)
 	MySQL.ready(function ()
 		MySQL.Async.fetchAll('UPDATE `vehicle_mod` SET parking = @parking WHERE `vehicle_mod`.`gameId` = @vehicle ', {
 			['vehicle'] =  vehicle,
@@ -588,6 +591,38 @@ AddEventHandler("vehicle:lock", function(cb, vehicle)
 					TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez pas les clés")
 				end
 			end)
+		end)
+	end)
+end)
+
+
+
+AddEventHandler("vehicle:sell", function(vehicle)
+	local sourceValue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	local vehicle = vehicle
+	MySQL.ready(function ()
+		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.price from vehicle_mod, vehicles where gameId = "@gameId" and vehicle_mod.vehicle =  vehicles.id', {
+			['@gameid'] =  vehicle,
+		}, function(res)
+			if res and res[1] then
+				MySQL.Async.execute('DELETE from player_vehicle where vehicle_mod = @id', {
+					['@id'] =  res[1].id,
+				}, function()
+					MySQL.Async.execute('DELETE from vehicle_mod  where gameId = @gameId', {
+						['@gameid'] =  vehicle,
+					}, function()
+						MySQL.Async.execute('update players set liquid = liquid+@nb where discord = @discord', {
+							['@nb'] =  res[1].price/2,
+							['@discord'] =  discord,
+						}, function()
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous avez vendu votre véhicle pour ~g~".. res[1].price/2)
+						end)
+					end)
+				end)
+			else
+				TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Ce véhicule est volé !")
+			end
 		end)
 	end)
 end)

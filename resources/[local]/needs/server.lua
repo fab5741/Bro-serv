@@ -16,14 +16,14 @@ end)
 RegisterNetEvent("needs:get")
 
 -- source is global here, don't add to function
-AddEventHandler('needs:get', function(bf)
+AddEventHandler('needs:get', function(bro_core)
     local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchAll('select hunger, thirst from players where discord = @discord',
         {['@discord'] =  discord},
         function(res)
-            TriggerClientEvent(bf, sourceValue, res[1].hunger, res[1].thirst)
+            TriggerClientEvent(bro_core, sourceValue, res[1].hunger, res[1].thirst)
         end)
     end)
 end)
@@ -31,7 +31,7 @@ end)
 RegisterNetEvent("needs:get2")
 
 -- source is global here, don't add to function
-AddEventHandler('needs:get2', function(bf, isHunger, amount)
+AddEventHandler('needs:get2', function(bro_core, isHunger, amount)
     local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
@@ -51,7 +51,7 @@ AddEventHandler('needs:get2', function(bf, isHunger, amount)
             if thirst >100 then
                 thirst = 100
             end
-            TriggerClientEvent(bf, sourceValue, hunger, thirst)
+            TriggerClientEvent(bro_core, sourceValue, hunger, thirst)
         end)
     end)
 end)

@@ -27,8 +27,6 @@ AddEventHandler("ds:belt", function(belt)
 	end
 end)
 
-
-
 AddEventHandler("vehicle:permis:get:ds", function(permis)
 	if permis < 1 then
 		exports.bro_core:HelpPromt("Auto-école : ~INPUT_PICKUP~")
@@ -59,7 +57,6 @@ AddEventHandler("vehicle:permis:get:ds", function(permis)
 	end
 end)
 
-
 AddEventHandler("vehicle:permis:get:depot", function(permis)
 	if permis > 0 then
 		exports.bro_core:HelpPromt("Fourrière : ~INPUT_PICKUP~")
@@ -68,7 +65,6 @@ AddEventHandler("vehicle:permis:get:depot", function(permis)
 		exports.bro_core:Notification("Vous n'avez pas le permis")
 	end
 end)
-
 
 AddEventHandler("vehicle:ds", function()
 	local vehicleName = "dilettante"
@@ -266,7 +262,7 @@ AddEventHandler("vehicle:foot", function(vehicles)
 		end
 		exports.bro_core:AddMenu("parking-veh", {
 			Title = "Parking",
-			Subtitle = "Retirer",
+			Subtitle = "Retirer "..#vehicles.."/"..#vehicles,
 			buttons = buttons
 		})
 	end
@@ -345,8 +341,8 @@ function spawnACar(v, new, tpIn)
 		if v.livery == -1 then
 			v.livery = 0
 		end
-		if v.engineHealth == "-nan" then
-			v.engineHealth = -1
+		if not v.engineHealth or v.engineHealth == "-nan"  then
+			v.engineHealth = 1000
 		end
 
 		if v.bodyHealth == "-nan" then
@@ -373,11 +369,11 @@ function spawnACar(v, new, tpIn)
 --	print(v.x)
 --	print(v.y)
 --	print(v.z)
---	print(v.name)
+	print(v.name)
 
 --	print("Health")
 --	print(v.bodyHealth)
---	print(v.engineHealth)
+	print(v.engineHealth)
 --	print("Colours")
 --	print(v.primaryColour)
 --	print(v.secondaryColour)
@@ -473,4 +469,11 @@ AddEventHandler('vehicle:lock', function(vehicle)
         SetVehicleDoorsLocked(vehicle,1)
         exports.bro_core:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
     end
+end)
+
+RegisterNetEvent("vehicle:store:veh")
+AddEventHandler('vehicle:store:veh', function(address)
+	TriggerServerEvent("vehicle:store", CurrentVehicle, address)
+	CurrentVehicle = 0
+	DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
 end)

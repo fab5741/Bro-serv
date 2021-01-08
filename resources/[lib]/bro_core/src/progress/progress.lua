@@ -1,6 +1,7 @@
-RegisterNetEvent("bf:progress:create")
+RegisterNetEvent("bro_core:progress:create")
 
-AddEventHandler("bf:progress:create", function(name, color)
+AddEventHandler("bro_core:progress:create", function(name, color)
+    print("create progress")
     SendNUIMessage({
         name = name,
         type = "progress",
@@ -9,10 +10,10 @@ AddEventHandler("bf:progress:create", function(name, color)
     })
 end)
 
-RegisterNetEvent("bf:progress:update")
+RegisterNetEvent("bro_core:progress:update")
 
 
-AddEventHandler("bf:progress:udpate", function(name, value)
+AddEventHandler("bro_core:progress:udpate", function(name, value)
     SendNUIMessage({
         name = name,
         type = "progress",
@@ -21,9 +22,9 @@ AddEventHandler("bf:progress:udpate", function(name, value)
     })
 end)
 
-RegisterNetEvent("bf:progress:delete")
+RegisterNetEvent("bro_core:progress:delete")
 
-AddEventHandler("bf:progress:delete", function(name, color)
+AddEventHandler("bro_core:progress:delete", function(name, color)
     SendNUIMessage({
         name = name,
         type = "progress",
@@ -33,9 +34,9 @@ AddEventHandler("bf:progress:delete", function(name, color)
 end)
 
 
-RegisterNetEvent("bf:progressBar:create")
+RegisterNetEvent("bro_core:progressBar:create")
 
-AddEventHandler("bf:progressBar:create", function(time, text)
+AddEventHandler("bro_core:progressBar:create", function(time, text)
 	SendNUIMessage({
 		action = "ui",
 		display = true,
@@ -44,9 +45,9 @@ AddEventHandler("bf:progressBar:create", function(time, text)
 	})
 end)
 
-RegisterNetEvent("bf:progressBar:delete")
+RegisterNetEvent("bro_core:progressBar:delete")
 
-AddEventHandler("bf:progressBar:delete", function()
+AddEventHandler("bro_core:progressBar:delete", function()
 	SendNUIMessage({
 		action = "ui",
 		display = false

@@ -1,4 +1,5 @@
 RegisterNetEvent('shops:buy')
+MaxWeight = 100
 
 AddEventHandler('shops:buy', function(type, amount, price)
 	local sourceValue = source
@@ -13,24 +14,35 @@ AddEventHandler('shops:buy', function(type, amount, price)
 		function(player)
 			local pricee = (amount * price)
 			if player[1].liquid >= pricee then
-				MySQL.Async.execute('UPDATE players SET players.liquid=players.liquid-@price where players.id = @id',
-					{
-						['id'] = player[1].id,
-						['price'] = pricee
-					},
-					function(res)
-						MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+				MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, player_item  WHERE player_item.item= items.id and player_item.player = @player",
+				{
+					['@player'] = player[1].id,
+				}, function(weight)
+					if weight == nil then
+						weight = 0
+						end
+						MySQL.Async.fetchScalar("SELECT weight FROM `items` WHERE id = @type",
 						{
-							['id'] = player[1].id,
-							['amount'] = amount,
-							['type'] = type
-						},
-						function(res)
-						MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
-						{['@discord'] =  discord, ['@price'] = pricee * tva},
-						function(numRows)
-							TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
-						end)
+						['@type'] = type,
+						}, function(newWeight)
+						weight = (newWeight*amount)+weight
+						if weight <= MaxWeight then
+							MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+							{
+								['id'] = player[1].id,
+								['amount'] = amount,
+								['type'] = type
+							},
+							function(res)
+								MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
+								{['@discord'] =  discord, ['@price'] = pricee * tva},
+								function(numRows)
+									TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
+								end)
+							end)
+						else
+							TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+						end
 					end)
 				end)
 			else

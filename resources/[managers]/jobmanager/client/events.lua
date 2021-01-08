@@ -159,9 +159,8 @@ AddEventHandler("job:safe:open3", function(isChef)
 			label = "Retirer",
 			actions = {
 				onSelected = function()
-					local nb = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
-					TriggerServerEvent('account:job:withdraw', "", job.job, nb)
-					TriggerServerEvent("job:get", "job:safe:open")
+					local nb = exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})
+					TriggerServerEvent('job:safe:withdraw', job.job, nb)
 				end
 			}
 		}
@@ -172,7 +171,6 @@ AddEventHandler("job:safe:open3", function(isChef)
 				onSelected = function()
 					local nb = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
 					TriggerServerEvent('account:job:add', "", job.job, nb)
-					TriggerServerEvent("job:get", "job:safe:open")
 				end
 			}
 		}
@@ -200,20 +198,47 @@ AddEventHandler("job:safe:open4", function(items)
 			label = "Déposer",
 			actions = {
 				onSelected = function()
-					exports.bro_core:AddSubMenu("safeitems", {
-						parent = "safe",
-						Title = "Coffre",
-						Subtitle = "Stock",
-						buttons = SafeButtons
-					})
+					TriggerServerEvent("items:get", "job:safe:open:items")
 				end
 			}
 	}
-	exports.bro_core:PrintTable(SafeButtons)
 	exports.bro_core:AddMenu("safe", {
 		Title = "Coffre",
-		Subtitle = "Stock",
+		Subtitle = "Entreprise",
 		buttons = SafeButtons
+	})
+end)
+
+RegisterNetEvent("job:safe:open:items")
+
+AddEventHandler("job:safe:open:items", function(inventory)
+	local buttons = {}
+	local weight = 0
+	local maxWeight = 100
+
+	for k, v in ipairs (inventory) do
+		buttons[k] =     {
+			type = "button",
+			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			actions = {
+				onSelected = function() 
+					OpenMenuItem(v.item)
+				end
+			},
+		}
+		weight = weight + (v.amount*v.weight)
+	end
+	Subtitle = ""
+	if weight > (3/4*maxWeight) then
+		Subtitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg"
+	else
+		Subtitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg"
+	end
+	exports.bro_core:AddSubMenu("safeitems", {
+		parent = "safe",
+		Title = "Coffre",
+		Subtitle = Subtitle, 
+		buttons = buttons
 	})
 end)
 
@@ -918,17 +943,15 @@ end)
 AddEventHandler("weapon:store", function(weapons)
 	local buttons = {}
 	for k, v in pairs(weapons) do
-		if v.weapon == "0x1B06D571" then
+		if v.weapon == "WEAPON_PISTOL" then
 			v.label = "9mm"
-		elseif v.weapon == "0x8BB05FD7" then
+		elseif v.weapon == "WEAPON_FLASHLIGHT" then
 			v.label = "Lampe torche"
-		elseif v.weapon == "0x3656C8C1" then
+		elseif v.weapon == "WEAPON_STUNGUN" then
 			v.label = "Tazer"
-		elseif v.weapon == "0x678B81B1" then
+		elseif v.weapon == "WEAPON_NIGHTSTICK" then
 			v.label = "Matraque"
-		elseif v.weapon == "0x1D073A89" then
-			v.label = "Fusil à pompe"
-		elseif v.weapon == "0x2BE6766B" then
+		elseif v.weapon == "WEAPON_SMG" then
 			v.label = "SMG"
 		end
 		buttons[#buttons+1] = {
@@ -981,22 +1004,23 @@ AddEventHandler("weapon:store", function(weapons)
 							1
 						)
 						if found then
-							RemoveWeaponFromPed(GetPlayerPed(-1), weapon)
 
 							weapon = tostring(weapon)
+							print(weapon)
 							if weapon == "453432689" then
-								weapon = "0x1B06D571"
+								weapon = "WEAPON_PISTOL"
 							elseif weapon == "-1951375401" then
-								weapon = "0x8BB05FD7"
+								weapon = "WEAPON_FLASHLIGHT"
 							elseif weapon == "911657153" then
-								weapon = "0x3656C8C1"
+								weapon = "WEAPON_STUNGUN"
 							elseif weapon == "1737195953" then
-								weapon = "0x678B81B1"
+								weapon = "WEAPON_NIGHTSTICK"
 							elseif weapon == "911657153" then
-								weapon = "0x1D073A89"
+								weapon = "WEAPON_SMG"
 							elseif weapon == "736523883" then
-								weapon = "0x2BE6766B"
+								weapon = "WEAPON_SMG"
 							end
+							RemoveWeaponFromPed(GetPlayerPed(-1), GetHashKey(weapon))
 							TriggerServerEvent("weapon:store", weapon)
 							exports.bro_core:Notification("~g~Arme stocké")
 						else
@@ -1023,26 +1047,17 @@ end)
 
 AddEventHandler("weapon:store:store", function(isOk, weapon)
 	if isOk then
-		if weapon == "0x1B06D571" then
-			weapon = "WEAPON_PISTOL"
-		elseif weapon == "0x8BB05FD7" then
-			weapon = "WEAPON_FLASHLIGHT"
-		elseif weapon == "0x3656C8C1" then
-			weapon = "WEAPON_STUNGUN"
-		elseif weapon == "0x678B81B1" then
-			weapon = "WEAPON_NIGHTSTICK"
-		elseif weapon == "0x1D073A89" then
-			weapon = "WEAPON_PUMPSHOTGUN"
-		elseif weapon == "0x2BE6766B" then
-			weapon = "WEAPON_SMG"
+		if not HasPedGotWeapon(GetPlayerPed(-1), GetHashKey(weapon), false) then
+			GiveWeaponToPed(
+				GetPlayerPed(-1) --[[ Ped ]],
+				weapon --[[ Hash ]],
+				100 --[[ integer ]],
+				false --[[ boolean ]],
+				true --[[ boolean ]]
+			)
+		else
+			exports.bro_core:Notification("~r~ Vous avez déjà cet arme")
 		end
-		GiveWeaponToPed(
-			GetPlayerPed(-1) --[[ Ped ]],
-			weapon --[[ Hash ]],
-			100 --[[ integer ]],
-			false --[[ boolean ]],
-			true --[[ boolean ]]
-		)
 	else
 		exports.bro_core:Notification("~r~ L'armurerie est vide")
 	end

@@ -22,12 +22,12 @@ RegisterNetEvent("needs:spawn2")
 
 -- source is global here, don't add to function
 AddEventHandler('needs:spawn2', function(hunger, thirst)
-    TriggerEvent("bf:progress:create", "hunger") 
-    TriggerEvent("bf:progress:create", "thirst") 
+    TriggerEvent("bro_core:progress:create", "hunger") 
+    TriggerEvent("bro_core:progress:create", "thirst") 
     hunger = hunger
     thirst = thirst
-    TriggerEvent("bf:progress:udpate", "hunger", hunger) 
-    TriggerEvent("bf:progress:udpate", "thirst", thirst) 
+    TriggerEvent("bro_core:progress:udpate", "hunger", hunger) 
+    TriggerEvent("bro_core:progress:udpate", "thirst", thirst) 
     Citizen.CreateThread(function()
         while true do
             TriggerServerEvent("needs:get", "needs:update")
@@ -45,8 +45,8 @@ AddEventHandler('needs:update', function(hungere, thirstt)
         hunger = hunger -1
         thirst = thirst -1
     end
-    TriggerEvent("bf:progress:udpate", "hunger", hunger) 
-    TriggerEvent("bf:progress:udpate", "thirst", thirst) 
+    TriggerEvent("bro_core:progress:udpate", "hunger", hunger) 
+    TriggerEvent("bro_core:progress:udpate", "thirst", thirst) 
     TriggerServerEvent("needs:set", hunger, thirst)
 end)
 
@@ -61,12 +61,11 @@ RegisterNetEvent("needs:change2")
 
 -- source is global here, don't add to function
 AddEventHandler('needs:change2', function(hungerr, thirstt)
-    hunger = hungerr
-    thirst = thirstt
-    TriggerEvent("bf:progress:udpate", "hunger", hunger) 
-    TriggerEvent("bf:progress:udpate", "thirst", thirst) 
+    local hunger = hungerr
+    local thirst = thirstt
+    TriggerEvent("bro_core:progress:udpate", "hunger", hunger) 
+    TriggerEvent("bro_core:progress:udpate", "thirst", thirst) 
     TriggerServerEvent("needs:set", hunger, thirst)
-
 end)
 
 
@@ -75,6 +74,6 @@ AddEventHandler('onResourceStop', function(resourceName)
       return
     end
     print('The resource ' .. resourceName .. ' was stopped.')
-    TriggerEvent("bf:progress:delete", "hunger") 
-    TriggerEvent("bf:progress:delete", "thirst") 
+    TriggerEvent("bro_core:progress:delete", "hunger") 
+    TriggerEvent("bro_core:progress:delete", "thirst") 
   end)

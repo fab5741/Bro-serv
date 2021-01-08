@@ -77,9 +77,9 @@ RegisterNetEvent("items:use")
 AddEventHandler("items:use", function (type, amount)
     local source = source
     if(type == 3) then
-        -- EAT bread
-        TriggerClientEvent("items:eat", source)
-        TriggerClientEvent("needs:change", source, 1, 75)
+      -- EAT bread
+      TriggerClientEvent("items:eat", source)
+      TriggerClientEvent("needs:change", source, 1, 75)
     elseif(type == 5) then
       -- drink juice
       TriggerClientEvent("items:drink", source)
@@ -136,7 +136,7 @@ RegisterNetEvent("items:get")
 -- source is global here, don't add to function
 AddEventHandler("items:get", function (cb)
   local sourceValue = source
-  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
   MySQL.ready(function ()
     MySQL.Async.fetchAll('SELECT items.id, item, amount, label, weight FROM `player_item`, items, players where players.id = player_item.player and items.id = player_item.item and discord = @discord and player_item.amount > 0',
     {['discord'] =  discord},

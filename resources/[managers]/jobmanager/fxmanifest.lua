@@ -3,10 +3,10 @@ games { 'gta5' }
 
 dependencies {
     'bro_core',
-    'bf',
     'vehicles',
-    'lsms', 
+    'lsms',
     'account',
+    "items",
     'spawnManager'
 }
 
@@ -14,6 +14,7 @@ client_script {
     'config.lua',
     'client/cloackroom.lua',
     'client/functions.lua',
+    'client/menu.lua',
     'client/events.lua',
     'client/jobs.lua',
     'client/client.lua',

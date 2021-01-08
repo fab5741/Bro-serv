@@ -1,6 +1,8 @@
 function DeleteMenuAndArea()
 	-- delete area and menus
 	exports.bro_core:RemoveArea("center")
+	exports.bro_core:RemoveMenu("sell")
+	exports.bro_core:RemoveMenu("service")
 	exports.bro_core:RemoveMenu("armoryitems")
 	exports.bro_core:RemoveMenu("armory")
 	exports.bro_core:RemoveMenu("safe")
@@ -84,7 +86,7 @@ function Refresh(job)
 			enter = {
 				callback = function()
 					exports.bro_core:Key("E", "E", "Job Center", function()
-						buttons = {}
+						local buttons = {}
 						for k, v in pairs(Config.center.jobs) do
 							buttons[#buttons+1] = {
 								type = "button",
@@ -195,7 +197,7 @@ function Refresh(job)
 						enter = {
 							callback = function()
 								exports.bro_core:Key("E", "E", "Accueil ("..job.name..")", function()
-									if isPedDrivingAVehicle() then
+									if IsPedInAnyVehicle(PlayerPedId(), false) then
 										exports.bro_core:AddMenu("repair", {
 											Title = "Réparation",
 											Subtitle = "Garage solidaire",
@@ -267,7 +269,6 @@ function Refresh(job)
 			}
 			if myjob.lockers then
 				for k, v in pairs(myjob.lockers) do
-					print("addlocker")
 					exports.bro_core:AddArea("lockers"..k, {
 						marker = marker,
 						trigger = {
@@ -305,7 +306,7 @@ function Refresh(job)
 							},
 							exit = {
 								callback = function()
-									exports.bro_core:RemoveMenu("lockers")
+									exports.bro_core:RemoveMenu("lockers"..k)
 									exports.bro_core:Key("E", "E", "Interaction", function()
 									end)
 								end
@@ -349,6 +350,7 @@ function Refresh(job)
 							},
 							exit = {
 								callback = function()
+									exports.bro_core:RemoveMenu("collect"..k)
 									exports.bro_core:Key("E", "E", "Interaction", function()
 									end)
 								end
@@ -386,6 +388,7 @@ function Refresh(job)
 							},
 							exit = {
 								callback = function()
+									exports.bro_core:RemoveMenu("process"..k)
 									exports.bro_core:Key("E", "E", "Interaction", function()
 									end)
 								end
@@ -421,12 +424,12 @@ function Refresh(job)
 									exports.bro_core:Key("E", "E", "Coffre", function()
 										TriggerServerEvent("job:get", "job:safe:open")
 									end)
-									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+									exports.bro_core:HelpPromt("Coffre Key : ~INPUT_PICKUP~")
 								end
 							},
 							exit = {
 								callback = function()
-									exports.bro_core:RemoveMenu("safe")
+									exports.bro_core:RemoveMenu("safe"..k)
 									exports.bro_core:Key("E", "E", "Interaction", function()
 									end)
 								end
@@ -455,10 +458,10 @@ function Refresh(job)
 							weight = 1,
 							enter = {
 								callback = function()
-									exports.bro_core:Key("E", "E", "Vestiaire", function()
+									exports.bro_core:Key("E", "E", "Armurerie", function()
 										TriggerServerEvent("weapon:get:all", "weapon:store")
 									end)
-									exports.bro_core:HelpPromt("Vestiaire Key : ~INPUT_PICKUP~")
+									exports.bro_core:HelpPromt("Armurerie Key : ~INPUT_PICKUP~")
 								end
 							},
 							exit = {
@@ -535,18 +538,18 @@ function Refresh(job)
 						enter = {
 							callback = function()
 								exports.bro_core:Key("E", "E", "Commencer les courses", function()
-									if isPedDrivingAVehicle() then
+									if IsPedInAnyVehicle(PlayerPedId(), false) then
 										CustomMenu()
 									else
 										exports.bro_core:Notification("Montez dans un véhicule")
 									end
 								end)
-								exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
+								exports.bro_core:HelpPromt("Customisations : ~INPUT_PICKUP~")
 							end
 						},
 						exit = {
 							callback = function()
-								exports.bro_core:RemoveMenu("ATM")
+								exports.bro_core:RemoveMenu("Customisations")
 								exports.bro_core:Key("E", "E", "Interaction", function()
 								end)
 							end
@@ -679,7 +682,7 @@ function ReviveClosestPlayer()
 	exports.bro_core:RemoveMenu("lsms")
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
     if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
-			if not IsPedInAnyVehicle(Ped, false) then
+			if not IsPedInAnyVehicle(PlayerPedId(), false) then
 				exports.bro_core:actionPlayer(15000, "Réanimation en cours", "mini@cpr@char_a@cpr_str", "cpr_pumpchest",
 				function()
 					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(Ped))

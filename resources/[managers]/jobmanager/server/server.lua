@@ -50,6 +50,7 @@ RegisterNetEvent("job:facture")
 RegisterServerEvent('job:facture2')
 RegisterNetEvent("job:sell")
 RegisterNetEvent("job:repair:price")
+RegisterNetEvent("job:safe:withdraw")
 
 AddEventHandler('job:get', function (cb)
 	local sourceValue = source
@@ -728,3 +729,33 @@ AddEventHandler('playerDropped', function (reason)
         end)
     end)
   end)
+
+  
+AddEventHandler('job:safe:withdraw', function(job, amount)
+	local sourceValue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	print(job)
+	print(amount)
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players where job_account.job = @job and accounts.id = job_account.account', {
+			['@job'] = job
+		}, function(money)
+			if money > amount then
+				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount - @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
+				{
+					['@job'] = job,
+					['@amount'] = amount
+				}, function(result)
+					MySQL.Async.execute('UPDATE players SET liquid = liquid + @amount WHERE discord = @discord', {
+						['@discord'] = discord,
+						['@amount'] = amount
+					}, function(result)
+						TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
+					end)
+				end)
+			else
+				TriggerClientEvent('bro_core:Notification', sourceValue,  "L'entreprise n'a pas assez d'argent")
+			end
+		end)
+	end)
+end)

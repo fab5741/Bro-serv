@@ -84,6 +84,54 @@ function createMenus()
 			}
 		},
 	})
+	exports.bro_core:AddArea("shops-sell", {
+		marker = {
+			type = 1,
+			weight = 1,
+			height = 0.2,
+			red = 250,
+			green = 10,
+			blue = 10,
+			showDistance = 5,
+		},
+		trigger = {
+			weight = 2,
+			enter = {
+				callback = function()
+					exports.bro_core:HelpPromt("Concessionaire Reprise ~r~ Non disponible")
+			--		exports.bro_core:HelpPromt("Concessionaire Reprise Key : ~INPUT_PICKUP~")
+			--		exports.bro_core:Key("E", "E", "Concessionaire Reprise ", function()
+			--			local motif = exports.bro_core:OpenTextInput({defaultText = "", customTitle = true, title= "Confirmer ? (oui)"})
+			--			if motif == "oui" then
+			--				TriggerServerEvent("vehicle:sell", CurrentVehicle)
+			--				CurrentVehicle = 0
+			--				DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
+			--				exports.bro_core:RemoveMenu("shops-sell")
+			--			end
+			--		end)
+				end
+			},
+			exit = {
+				callback = function()
+					exports.bro_core:RemoveMenu("shops-sell")
+					exports.bro_core:Key("E", "E", "Concessionaire Reprise ", function()
+					end)
+				end
+			},
+		},
+		blip = {
+			text = "Concessionnaire Reprise",
+			colorId = 1,
+			imageId = 326,
+		},
+		locations = {
+			{
+				x =-37.017524719238,
+				y=-1088.1219482422,
+				z=26.422353744507
+			}
+		},
+	})
 	-- parkings
 	for k,v in pairs(Config.parkings) do
 		exports.bro_core:AddArea("parkings"..k, {
@@ -115,7 +163,6 @@ function createMenus()
 												onSelected = function()
 													exports.bro_core:actionPlayer(4000, "Stockage véhicule", "", "",
 													function()
-														print("store veh")
 														TriggerServerEvent("vehicle:store", CurrentVehicle, v.zone)
 														CurrentVehicle = 0
 														DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))

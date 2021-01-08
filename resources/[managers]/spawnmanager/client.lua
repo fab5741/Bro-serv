@@ -28,7 +28,8 @@ Citizen.CreateThread(function()
         end
     end
 
-    Wait(60000)
+    --Wait(60000)
+
     -- le player est spawn, on check des events comme la mort
     while spawned do
         Citizen.Wait(2000)
@@ -43,13 +44,13 @@ end)
 -- source is global here, don't add to function
 AddEventHandler('player:saveCoords', function ()
     local weapons = {
-
     }
     for k,v in pairs(WeaponsHashes) do
-        if HasPedGotWeapon(GetPlayerPed(-1), v, false) then 
+        if HasPedGotWeapon(GetPlayerPed(-1), GetHashKey(v), false) then
             weapons[#weapons+1] = v
         end
     end
+    print(json.encode(weapons))
     TriggerServerEvent("player:saveCoordsServer", GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons), GetEntityHealth(GetPlayerPed(-1)))
 end)
 

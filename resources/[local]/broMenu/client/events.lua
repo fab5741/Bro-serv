@@ -26,29 +26,19 @@ AddEventHandler("bromenu:open", function(job)
 	else
 		job = job[1]
 	end
-	buttons = {}
+	local buttons = {}
 
 	buttons[#buttons+1] = 	{
 		type = "button",
 		label = "Inventaire",
-		actions = {
-			onSelected = function()
-				TriggerServerEvent("items:get", "bromenu:items")
-			end
-		},
+		subMenu = "items"
 	}
 
-	if not exports.bro_core:isPedDrivingAVehicle() then
-		buttons[#buttons+1] = 	{
-			type = "button",
-			label = "Portefeuille",
-			actions = {
-				onSelected = function()
-					TriggerServerEvent("account:player:liquid:get", "bromenu:liquid")
-				end
-			}
-		}
-	end
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Portefeuille",
+		subMenu = "wallet",
+	}
 
 	buttons[#buttons+1] = 	{
 		type = "button",
@@ -60,9 +50,6 @@ AddEventHandler("bromenu:open", function(job)
 		buttons[#buttons+1] = 	{
 			type = "button",
 			label = "Vetements",
-			style = {
-				LeftBadge = "Clothes"
-			},
 			subMenu = "clothes"
 		}
 		buttons[#buttons+1] = 	{
@@ -86,178 +73,192 @@ AddEventHandler("bromenu:open", function(job)
 		Subtitle = job.grade.." "..job.label,
 		buttons = buttons
 	})
-	
+
+	exports.bro_core:AddSubMenu("items", {
+		parent = "bromenu",
+		buttons = buttons
+	})
+
+	exports.bro_core:AddSubMenu("wallet", {
+		parent = "bromenu",
+		buttons = buttons
+	})
+
+	-- trigger menu data loads
+	TriggerServerEvent("items:get", "bromenu:items")
+	TriggerServerEvent("account:player:liquid:get", "bromenu:liquid")
+
 	buttons = {}
 
 	buttons[#buttons+1] = 	{
-			type = "button",
-			label = "Verrouiller/Déverouiller",
-			actions = {
-				onSelected = function()
-					local vehicle = GetVehiclePedIsIn(ped, false)
-					if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-						if GetPedInVehicleSeat(vehicle, -1) == ped then
-							TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
-						else
-							exports.bro_core:Notification("~r~Vous ne conduisez pas") 
-						end
+		type = "button",
+		label = "Verrouiller/Déverouiller",
+		actions = {
+			onSelected = function()
+				local vehicle = GetVehiclePedIsIn(ped, false)
+				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+					if GetPedInVehicleSeat(vehicle, -1) == ped then
+						TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
 					else
-						local pos = GetEntityCoords(ped)
-						print(ped)
-						local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
-				
-						local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, ped, 0)
-						local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-						print(vehicle)
-						if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-							TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
-						else
-							exports.bro_core:Notification("~r~Pas de voiture à portée")
-						end
+						exports.bro_core:Notification("~r~Vous ne conduisez pas") 
 					end
-				end
-			}
-		}
-
-		buttons[#buttons+1] = 	{
-			type = "button",
-			label = "Inventaire coffre",
-			actions = {
-				onSelected = function()
-					local coords = GetEntityCoords(ped, true)
+				else
 					local pos = GetEntityCoords(ped)
-					local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
+					print(ped)
 					local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
 			
 					local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, ped, 0)
 					local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-					local islocked = GetVehicleDoorLockStatus(vehicle)
+					print(vehicle)
 					if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-						if (islocked == 1)then
-							TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
-						end
+						TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
 					else
-						exports.bro_core:Notification("~r~Pas de voiture")
+						exports.bro_core:Notification("~r~Pas de voiture à portée")
+					end
+				end
+			end
+		}
+	}
+
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Inventaire coffre",
+		actions = {
+			onSelected = function()
+				local coords = GetEntityCoords(ped, true)
+				local pos = GetEntityCoords(ped)
+				local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
+				local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
+		
+				local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, ped, 0)
+				local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+				local islocked = GetVehicleDoorLockStatus(vehicle)
+				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+					if (islocked == 1)then
+						TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
+					end
+				else
+					exports.bro_core:Notification("~r~Pas de voiture")
+				end
+			end
+		}
+	}
+	if exports.bro_core:isPedDrivingAVehicle() then
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Moteur",
+			actions = {
+				onSelected = function()		
+					if (IsPedSittingInAnyVehicle(ped)) then 
+						local vehicle = GetVehiclePedIsIn(ped,false)
+						
+						if GetIsVehicleEngineRunning(vehicle) then
+							SetVehicleEngineOn(vehicle,false,false,false)
+							SetVehicleUndriveable(vehicle,true)
+						else
+							SetVehicleUndriveable(vehicle,false)
+							SetVehicleEngineOn(vehicle,true,false,false)
+						end
 					end
 				end
 			}
 		}
-		if exports.bro_core:isPedDrivingAVehicle() then
-			buttons[#buttons+1] = 	{
-				type = "button",
-				label = "Moteur",
-				actions = {
-					onSelected = function()		
-						if (IsPedSittingInAnyVehicle(ped)) then 
-							local vehicle = GetVehiclePedIsIn(ped,false)
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Coffre",
+			actions = {
+				onSelected = function()
+					vehicle = GetVehiclePedIsIn(ped,true)
+					
+					local isopen = GetVehicleDoorAngleRatio(vehicle,5)
+					local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+					
+					if distanceToVeh <= interactionDistance then
+						if (isopen == 0) then
+						SetVehicleDoorOpen(vehicle,5,0,0)
+						else
+						SetVehicleDoorShut(vehicle,5,0)
+						end
+					else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Porte avant",
+			actions = {
+				onSelected = function()
+					vehicle = GetVehiclePedIsIn(ped,true)
+					local isopen = GetVehicleDoorAngleRatio(vehicle,0) and GetVehicleDoorAngleRatio(vehicle,1)
+					local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+					
+					if distanceToVeh <= interactionDistance then
+						if (isopen == 0) then
+						SetVehicleDoorOpen(vehicle,0,0,0)
+						SetVehicleDoorOpen(vehicle,1,0,0)
+						else
+						SetVehicleDoorShut(vehicle,0,0)
+						SetVehicleDoorShut(vehicle,1,0)
+						end
+					else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Porte arriéres",
+			actions = {
+				onSelected = function()
+					vehicle = GetVehiclePedIsIn(ped,true)
+					local isopen = GetVehicleDoorAngleRatio(vehicle,2) and GetVehicleDoorAngleRatio(vehicle,3)
+					local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+					
+					if distanceToVeh <= interactionDistance then
+						if (isopen == 0) then
+						SetVehicleDoorOpen(vehicle,2,0,0)
+						SetVehicleDoorOpen(vehicle,3,0,0)
+						else
+						SetVehicleDoorShut(vehicle,2,0)
+						SetVehicleDoorShut(vehicle,3,0)
+						end
+					else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Capot",
+			actions = {
+				onSelected = function()
+						vehicle = GetVehiclePedIsIn(ped,true)
 							
-							if GetIsVehicleEngineRunning(vehicle) then
-								SetVehicleEngineOn(vehicle,false,false,false)
-								SetVehicleUndriveable(vehicle,true)
-							else
-								SetVehicleUndriveable(vehicle,false)
-								SetVehicleEngineOn(vehicle,true,false,false)
-							end
-						end
-					end
-				}
-			}
-			buttons[#buttons+1] = 	{
-				type = "button",
-				label = "Coffre",
-				actions = {
-					onSelected = function()
-						vehicle = GetVehiclePedIsIn(ped,true)
-						
-						local isopen = GetVehicleDoorAngleRatio(vehicle,5)
+						local isopen = GetVehicleDoorAngleRatio(vehicle,4)
 						local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
 						
 						if distanceToVeh <= interactionDistance then
 							if (isopen == 0) then
-							SetVehicleDoorOpen(vehicle,5,0,0)
+							SetVehicleDoorOpen(vehicle,4,0,0)
 							else
-							SetVehicleDoorShut(vehicle,5,0)
+							SetVehicleDoorShut(vehicle,4,0)
 							end
 						else
-							exports.bro_core:Notification("~r~vous devez être dans un véhicule")
-						end
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
 					end
-				}
+				end
 			}
-			buttons[#buttons+1] = 	{
-				type = "button",
-				label = "Porte avant",
-				actions = {
-					onSelected = function()
-						vehicle = GetVehiclePedIsIn(ped,true)
-						local isopen = GetVehicleDoorAngleRatio(vehicle,0) and GetVehicleDoorAngleRatio(vehicle,1)
-						local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
-						
-						if distanceToVeh <= interactionDistance then
-							if (isopen == 0) then
-							SetVehicleDoorOpen(vehicle,0,0,0)
-							SetVehicleDoorOpen(vehicle,1,0,0)
-							else
-							SetVehicleDoorShut(vehicle,0,0)
-							SetVehicleDoorShut(vehicle,1,0)
-							end
-						else
-							exports.bro_core:Notification("~r~vous devez être dans un véhicule")
-						end
-					end
-				}
-			}
-			buttons[#buttons+1] = 	{
-				type = "button",
-				label = "Porte arriéres",
-				actions = {
-					onSelected = function()
-						vehicle = GetVehiclePedIsIn(ped,true)
-						local isopen = GetVehicleDoorAngleRatio(vehicle,2) and GetVehicleDoorAngleRatio(vehicle,3)
-						local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
-						
-						if distanceToVeh <= interactionDistance then
-							if (isopen == 0) then
-							SetVehicleDoorOpen(vehicle,2,0,0)
-							SetVehicleDoorOpen(vehicle,3,0,0)
-							else
-							SetVehicleDoorShut(vehicle,2,0)
-							SetVehicleDoorShut(vehicle,3,0)
-							end
-						else
-							exports.bro_core:Notification("~r~vous devez être dans un véhicule")
-						end
-					end
-				}
-			}
-			buttons[#buttons+1] = 	{
-				type = "button",
-				label = "Capot",
-				actions = {
-					onSelected = function()
-							vehicle = GetVehiclePedIsIn(ped,true)
-								
-							local isopen = GetVehicleDoorAngleRatio(vehicle,4)
-							local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
-							
-							if distanceToVeh <= interactionDistance then
-								if (isopen == 0) then
-								SetVehicleDoorOpen(vehicle,4,0,0)
-								else
-								SetVehicleDoorShut(vehicle,4,0)
-								end
-							else
-							exports.bro_core:Notification("~r~vous devez être dans un véhicule")
-						end
-					end
-				}
-			}
-		end
-	
+		}
+	end
+
 	exports.bro_core:AddSubMenu("vehicle", {
 		parent= "bromenu",
 		Title = "Vehicule",
-		Subtitle = "Gestion",
+		Subtitle = "Bromenu > Gestion véhicule",
 		buttons = buttons
 	})
 
@@ -271,7 +272,7 @@ AddEventHandler("bromenu:open", function(job)
 				label = "Se rhabiller",
 				actions = {
 					onSelected = function()
-						TriggerServerEvent("bro:skin:get", "bromenu:skin:reset")
+						TriggerServerEvent("bro:skin:get", "bromenu:clothes:reset")
 					end
 				},
 			},
@@ -317,8 +318,8 @@ end)
 
 
 AddEventHandler("bromenu:liquid", function(liquid) 
-	exports.bro_core:RemoveMenu("bromenu")
-	exports.bro_core:AddMenu("wallet", {
+	exports.bro_core:AddSubMenu("wallet", {
+			parent = "bromenu",
 			Title = "Portefeuille",
 			Subtitle = firstname.." "..lastname.. " ("..birth..")",
 			buttons = {
@@ -432,11 +433,7 @@ AddEventHandler("bromenu:items", function(inventory)
 		buttons[k] =     {
 			type = "button",
 			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
-			actions = {
-				onSelected = function() 
-					openMenuItem(v.item)
-				end
-			},
+			subMenu = "item"..v.id
 		}
 		weight = weight + (v.amount*v.weight)
 	end
@@ -446,11 +443,16 @@ AddEventHandler("bromenu:items", function(inventory)
 	else
 		Subtitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg"
 	end
-	exports.bro_core:AddMenu("items", {
+	exports.bro_core:AddSubMenu("items", {
+			parent = "bromenu",
 			Title = "Inventaire",
 			Subtitle = Subtitle,
 			buttons = buttons
 		})
+
+		for k, v in ipairs (inventory) do
+			OpenMenuItem(v)
+		end
 end)
 
 AddEventHandler("vehicle:items:open", function(inventory)

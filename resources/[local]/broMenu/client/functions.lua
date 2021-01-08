@@ -1,5 +1,5 @@
 
-function giveToPlayer()
+function GiveToPlayer()
 	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
 	if closestPlayerPed and dist <=1 then
 		TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(closestPlayerPed))
@@ -8,15 +8,15 @@ function giveToPlayer()
 	end
 end
 
-function openMenuItem(item)
+function OpenMenuItem(item)
 	local buttons = {}
 	buttons[1] =     {
 		type = "button",
 		label = "Utiliser",
 		actions = {
 			onSelected = function() 
-				TriggerServerEvent("items:use", item, 1)
-				exports.bro_core:RemoveMenu("inventory")
+				TriggerServerEvent("items:use", item.id, 1)
+				exports.bro_core:RemoveMenu("item")
 			end
 		},
 	}
@@ -25,7 +25,7 @@ function openMenuItem(item)
 		label = "Donner",
 		actions = {
 			onSelected = function() 
-				giveToPlayer()
+				GiveToPlayer()
 			end
 		},
 	}
@@ -34,18 +34,18 @@ function openMenuItem(item)
 		label = "Stocker vehicle",
 		actions = {
 			onSelected = function() 
-				coords = GetEntityCoords(GetPlayerPed(-1), true)
 				local pos = GetEntityCoords(PlayerPedId())
 				local entityWorld = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 20.0, 0.0)
 		
 				local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 				local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+					print( GetVehicleDoorLockStatus(vehicle))
 					if GetVehicleDoorLockStatus(vehicle) == 1 then
-						exports.bro_core:RemoveMenu("item")
+						exports.bro_core:RemoveMenu("bromenu")
 						local nb = tonumber(exports.bro_core:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
 						exports.bro_core:actionPlayer(4000, "Stockage", "amb@world_human_gardener_plant@male@enter", "enter", function()
-							TriggerServerEvent("item:vehicle:store", vehicle, item, nb)
+							TriggerServerEvent("item:vehicle:store", vehicle, item.id, nb)
 						end)
 					else
 						exports.bro_core:Notification("~r~Ce véhicule est fermé")
@@ -56,7 +56,7 @@ function openMenuItem(item)
 			end
 		},
 	}
-	if item == 7 then
+	if item.id == 7 then
 		buttons[4] =     {
 			type = "button",
 			label = "Commencer la revente",
@@ -78,10 +78,10 @@ function openMenuItem(item)
 			},
 		}
 	end
-	exports.bro_core:AddMenu("item", {
+	exports.bro_core:AddSubMenu("item"..item.id, {
+			parent ="items",
 			Title = "Item",
-			Subtitle = item,
+			Subtitle = item.label,
 			buttons = buttons
 		})
-
 end

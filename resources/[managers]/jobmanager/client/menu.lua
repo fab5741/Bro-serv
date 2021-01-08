@@ -33,9 +33,10 @@ function AddMenuPaint(max, type, nb)
 	local buttons = {}
 	for i = 0,max do
 		buttons[#buttons+1] = {
-			text = i,
-			hover = {
-				callback = function()
+			type = "button",
+			label = i,
+			actions = {
+				onSelected = function()
 					local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 					SetVehicleModKit(
 						vehicle, 
@@ -59,9 +60,10 @@ function AddMenuPaint(max, type, nb)
 			},
 		}
 	end
-	exports.bro_core:AddMenu("custom-paint"..nb.."-"..type, {
-		title = "Peinture type"..type,
-		position = 1,
+	exports.bro_core:AddSubMenu("custom-paint"..nb.."-"..type, {
+		parent = "paint"..nb,
+		Title = "Peinture type"..type,
+		Subtitle = "Customisations > Preintures > "..type,
 		buttons = buttons
 	})
 end
@@ -77,6 +79,7 @@ function AddMenuMod(type)
 	local max = GetNumVehicleMods(vehicle, type)
 	for i = 0,max do
 		buttons[#buttons+1] = {
+			type = "button",
 			label = i,
 			actions = {
 				onSelected = function()
@@ -90,114 +93,154 @@ function AddMenuMod(type)
 			},
 		}
 	end
-	exports.bro_core:AddMenu("custom-mod-"..type, {
-		title = "Mod "..type,
-		position = 1,
+	exports.bro_core:AddSubMenu("custom-mod-"..type, {
+		parent = "custom",
+		Title = "Mod "..type,
+		Subtitle = "Customisations > "..type,
 		buttons = buttons
 	})
 end
 
 function CustomMenu()
+
 	exports.bro_core:AddMenu("custom", {
-        title = "Customisation",
-		position = 1,
+        Title = "Bennys",
+        Subtitle = "Customisation",
 		buttons = {
 			{
-				text = "Peinture",
-				openMenu = "custom-paint1"
+				type = "separator",
+				label = "Peintures"
 			},
 			{
-				text = "Peinture 2",
-				openMenu = "custom-paint2"
+				type= "button",
+				label = "Peinture",
+				subMenu = "paint1",
 			},
 			{
-				text = "Spoilers",
-				openMenu = "custom-mod-0"
+				type= "button",
+				label = "Peinture 2",
+				subMenu = "paint2",
 			},
 			{
-				text = "Bumpers (devant)",
-				openMenu = "custom-mod-1"
+				type = "separator",
+				label = "Carroserie"
 			},
 			{
-				text = "Bumpers (arriére)",
-				openMenu = "custom-mod-2"
+				type= "button",
+				label = "Spoilers",
+				subMenu = "custom-mod-0"
 			},
 			{
-				text = "Side Skirt",
-				openMenu = "custom-mod-3"
+				type= "button",
+				label = "Bumpers (devant)",
+				subMenu = "custom-mod-1"
 			},
 			{
-				text = "Exhaust",
-				openMenu = "custom-mod-4"
+				type= "button",
+				label = "Bumpers (arriére)",
+				subMenu = "custom-mod-2"
 			},
 			{
-				text = "Frame",
-				openMenu = "custom-mod-5"
+				type= "button",
+				label = "Side Skirt",
+				subMenu = "custom-mod-3"
 			},
 			{
-				text = "Grille",
-				openMenu = "custom-mod-6"
+				type= "button",
+				label = "Exhaust",
+				subMenu = "custom-mod-4"
 			},
 			{
-				text = "Hood",
-				openMenu = "custom-mod-7"
+				type= "button",
+				label = "Frame",
+				subMenu = "custom-mod-5"
 			},
 			{
-				text = "Fender",
-				openMenu = "custom-mod-8"
+				type= "button",
+				label = "Grille",
+				subMenu = "custom-mod-6"
 			},
 			{
-				text = "Right Fender",
-				openMenu = "custom-mod-9"
+				type= "button",
+				label = "Hood",
+				subMenu = "custom-mod-7"
 			},
 			{
-				text = "Toit",
-				openMenu = "custom-mod-10"
+				type= "button",
+				label = "Fender",
+				subMenu = "custom-mod-8"
 			},
 			{
-				text = "Moteur",
-				openMenu = "custom-mod-11"
+				type= "button",
+				label = "Right Fender",
+				subMenu = "custom-mod-9"
 			},
 			{
-				text = "Freins",
-				openMenu = "custom-mod-12"
+				type= "button",
+				label = "Toit",
+				subMenu = "custom-mod-10"
 			},
 			{
-				text = "Transmission",
-				openMenu = "custom-mod-13"
+				type = "separator",
+				label = "Améliorations"
 			},
 			{
-				text = "Klaxon",
-				openMenu = "custom-mod-14"
+				type= "button",
+				label = "Moteur",
+				subMenu = "custom-mod-11"
 			},
 			{
-				text = "Suspension",
-				openMenu = "custom-mod-15"
+				type= "button",
+				label = "Freins",
+				subMenu = "custom-mod-12"
 			},
 			{
-				text = "Blindage",
-				openMenu = "custom-mod-16"
+				type= "button",
+				label = "Transmission",
+				subMenu = "custom-mod-13"
 			},
 			{
-				text = "Turbo",
-				openMenu = "custom-mod-18"
+				type= "button",
+				label = "Klaxon",
+				subMenu = "custom-mod-14"
 			},
 			{
-				text = "Roues",
-				openMenu = "custom-mod-19"
+				label = "Suspension",
+				subMenu = "custom-mod-15"
 			},
 			{
-				text = "Roues avant (moto)",
-				openMenu = "custom-mod-23"
+				type= "button",
+				label = "Blindage",
+				subMenu = "custom-mod-16"
 			},
 			{
-				text = "",
-				openMenu = "custom-mod-50"
+				type= "button",
+				label = "Turbo",
+				subMenu = "custom-mod-18"
 			},
 			{
-				text = "valider",
-				exec = {
-					callback = function()
+				type = "separator",
+				label = "Roues"
+			},
+			{
+				type= "button",
+				label = "Roues",
+				subMenu = "custom-mod-19"
+			},
+			{
+				type= "button",
+				label = "Roues avant (moto)",
+				subMenu = "custom-mod-23"
+			},
+			{
+				type= "button",
+				label = "valider",
+				actions = {
+					onSelected = function()
+						SetVehicleModKit(
+							vehicle --[[ Vehicle ]], 
+							0 --[[ integer ]]
+						)
 						local mods = {
 
 						}
@@ -207,69 +250,84 @@ function CustomMenu()
 								i --[[ integer ]]
 							)
 						end
+						exports.bro_core:PrintTable(mods)
 						TriggerServerEvent("vehicle:mods:save" , vehicle, mods)
 					end
 				}
 			}
 		}
 	})
-	exports.bro_core:AddMenu("custom-paint1", {
-        title = "Customisation",
-		position = 1,
+	exports.bro_core:AddSubMenu("paint1", {
+		parent = "custom",
+		Title = "bennys",
+		Subtitle = "Customisations > Peintures > Principale",
 		buttons = {
 			{
-				text = "Normal",
-				openMenu = "custom-paint1-0"
+				type= "button",
+				label = "Normal",
+				subMenu = "custom-paint1-0"
 			},
 			{
-				text = "Metallic",
-				openMenu = "custom-paint1-1"
+				type= "button",
+				label = "Metallic",
+				subMenu = "custom-paint1-1"
 			},
 			{
-				text = "Pearl",
-				openMenu = "custom-paint1-2"
+				type= "button",
+				label = "Pearl",
+				subMenu = "custom-paint1-2"
 			},
 			{
-				text = "Mat",
-				openMenu = "custom-paint1-3"
+				type= "button",
+				label = "Mat",
+				subMenu = "custom-paint1-3"
 			},
 			{
-				text = "Metal",
-				openMenu = "custom-paint1-4"
+				type= "button",
+				label = "Metal",
+				subMenu = "custom-paint1-4"
 			},
 			{
-				text = "Chrome",
-				openMenu = "custom-paint1-5"
+				type= "button",
+				label = "Chrome",
+				subMenu = "custom-paint1-5"
 			},
 		}
 	})
-	exports.bro_core:AddMenu("custom-paint2", {
-        title = "Customisation",
-		position = 1,
+	exports.bro_core:AddSubMenu("paint2", {
+		parent = "custom",
+		Title = "bennys",
+		Subtitle = "Customisations > Peintures > Secondaire",
 		buttons = {
 			{
-				text = "Normal",
-				openMenu = "custom-paint2-0"
+				type= "button",
+				label = "Normal",
+				subMenu = "custom-paint2-0"
 			},
 			{
-				text = "Metallic",
-				openMenu = "custom-paint2-1"
+				type= "button",
+				label = "Metallic",
+				subMenu = "custom-paint2-1"
 			},
 			{
-				text = "Pearl",
-				openMenu = "custom-paint2-2"
+				type= "button",
+				label = "Pearl",
+				subMenu = "custom-paint2-2"
 			},
 			{
-				text = "Mat",
-				openMenu = "custom-paint2-3"
+				type= "button",
+				label = "Mat",
+				subMenu = "custom-paint2-3"
 			},
 			{
-				text = "Metal",
-				openMenu = "custom-paint2-4"
+				type= "button",
+				label = "Metal",
+				subMenu = "custom-paint2-4"
 			},
 			{
-				text = "Chrome",
-				openMenu = "custom-paint2-5"
+				type= "button",
+				label = "Chrome",
+				subMenu = "custom-paint2-5"
 			},
 		}
 	})

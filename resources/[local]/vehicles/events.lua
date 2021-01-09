@@ -159,6 +159,26 @@ AddEventHandler("vehicle:shop", function(vehicles)
 				onSelected = function()
 					-- buy the car
 					TriggerServerEvent("vehicle:buy", "vehicle:buy:ok", v.id)
+				end,
+				onActive = function ()
+					if LastHover ~= v.name then
+						Frames = 0
+					end
+					if v.name ~= LastHovered then
+						LastHover = v.name
+
+						if Frames > 100 then 
+							LastHovered = v.name
+							local vehicle = exports.bro_core:spawnCar(v.name, false, vector3(-43.203769683838,-1098.0733642578,26.422355651855), false, true, 0)
+							SetVehicleDoorsLocked(
+								vehicle --[[ Vehicle ]], 
+								10
+							)
+						else
+							print(Frames)
+							Frames = Frames +1
+						end
+					end
 				end
 			}
 		}
@@ -408,6 +428,10 @@ end
 
 AddEventHandler("vehicle:spawn", function(vehicles)
 	for k,v in pairs(vehicles) do
+		print(v.gameId)
+		print(v.name)
+		print(v.x)
+		print(v.z)
 		if v.x and v.y and v.z then
 			spawnACar(v, false)
 		end
@@ -462,12 +486,12 @@ RegisterNetEvent("vehicle:lock")
 AddEventHandler('vehicle:lock', function(vehicle)
     local islocked = GetVehicleDoorLockStatus(vehicle)
     -- test if its my vehicle
-    if (islocked == 1)then
+    if islocked == 1 then
         SetVehicleDoorsLocked(vehicle, 2)
-        exports.bro_core:Notification("~r~Vous avez verrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+        exports.bro_core:Notification("Vous avez ~g~verrouilé~s~ votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
     else
-        SetVehicleDoorsLocked(vehicle,1)
-        exports.bro_core:Notification("~r~Vous avez déverrouilé votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
+        SetVehicleDoorsLocked(vehicle, 1)
+        exports.bro_core:Notification("Vous avez ~r~déverrouilé~s~ votre ~y~".. GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))) .. "~w~.")
     end
 end)
 

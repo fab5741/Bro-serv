@@ -95,8 +95,6 @@ function spawnCar(vehicleName, keep, pos, direct, notp, heading)
 	local netid = NetworkGetNetworkIdFromEntity(vehicle)
 	SetNetworkIdCanMigrate(netid, true)
 	NetworkRegisterEntityAsNetworked(VehToNet(vehicle))
-print(notp)
-print(direct)
 
     if not notp then
         if direct then

@@ -98,17 +98,18 @@ function createMenus()
 			weight = 2,
 			enter = {
 				callback = function()
-					exports.bro_core:HelpPromt("Concessionaire Reprise ~r~ Non disponible")
-			--		exports.bro_core:HelpPromt("Concessionaire Reprise Key : ~INPUT_PICKUP~")
-			--		exports.bro_core:Key("E", "E", "Concessionaire Reprise ", function()
-			--			local motif = exports.bro_core:OpenTextInput({defaultText = "", customTitle = true, title= "Confirmer ? (oui)"})
-			--			if motif == "oui" then
-			--				TriggerServerEvent("vehicle:sell", CurrentVehicle)
-			--				CurrentVehicle = 0
-			--				DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-			--				exports.bro_core:RemoveMenu("shops-sell")
-			--			end
-			--		end)
+			--		exports.bro_core:HelpPromt("Concessionaire Reprise ~r~ Non disponible")
+					exports.bro_core:HelpPromt("Concessionaire Reprise Key : ~INPUT_PICKUP~")
+					exports.bro_core:Key("E", "E", "Concessionaire Reprise ", function()
+						local motif = exports.bro_core:OpenTextInput({defaultText = "", customTitle = true, title= "Confirmer ? (oui)"})
+						if motif == "oui" then
+							TriggerServerEvent("vehicle:sell", GetVehiclePedIsIn(GetPlayerPed(-1), true))
+							print(GetVehiclePedIsIn(GetPlayerPed(-1), true))
+							CurrentVehicle = 0
+							DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), true))
+							exports.bro_core:RemoveMenu("shops-sell")
+						end
+					end)
 				end
 			},
 			exit = {
@@ -165,7 +166,7 @@ function createMenus()
 													function()
 														TriggerServerEvent("vehicle:store", CurrentVehicle, v.zone)
 														CurrentVehicle = 0
-														DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
+														DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), true))
 														exports.bro_core:RemoveMenu("parking-veh")
 													end)
 												end

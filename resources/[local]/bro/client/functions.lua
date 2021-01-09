@@ -117,10 +117,10 @@ end
 
 --wheelchair
 function Sit(wheelchairObject)
-	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
+	local closestPed = exports.bro_core:GetClosestPed()
 
-	if closestPlayer and closestPlayerDist <= 1.5 then
-		if IsEntityPlayingAnim(GetPlayerPed(closestPlayer), 'missfinale_c2leadinoutfin_c_int', '_leadin_loop2_lester', 3) then
+	if closestPed then
+		if IsEntityPlayingAnim(GetPlayerPed(closestPed), 'missfinale_c2leadinoutfin_c_int', '_leadin_loop2_lester', 3) then
             exports.bro_core:Notification("Quelqu'un utilise déjà la chaise")
 			return
 		end
@@ -180,9 +180,9 @@ function Sit(wheelchairObject)
 end
 
 function PickUp(wheelchairObject)
-	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer and closestPlayerDist <= 1.5 then
+	if closestPlayer ~= -1 then
 		if IsEntityPlayingAnim(GetPlayerPed(closestPlayer), 'anim@heists@box_carry@', 'idle', 3) then
 			exports.bro_core:Notification("Quelqu'un tient djéà la chaise")
 			return

@@ -677,15 +677,14 @@ end
 
 -- LSMS Revive people
 function ReviveClosestPlayer()
-	TriggerServerEvent('job:lsms:revive', GetPlayerServerId(Ped))
-
 	exports.bro_core:RemoveMenu("lsms")
-	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
-    if closestPlayerPed and IsPedDeadOrDying(closestPlayerPed, 1) and dist <=1 then
+	local closestPlayerPed = exports.bro_core:GetClosestPed()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+    if closestPlayerPed ~= -1 and IsPedDeadOrDying(closestPlayerPed, 1) and closestPlayer ~= -1 then
 			if not IsPedInAnyVehicle(PlayerPedId(), false) then
 				exports.bro_core:actionPlayer(15000, "Réanimation en cours", "mini@cpr@char_a@cpr_str", "cpr_pumpchest",
 				function()
-					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(Ped))
+					TriggerServerEvent('job:lsms:revive', GetPlayerServerId(closestPlayer))
 				end)
 			else
 				exports.bro_core:Notification("~r~Vous ne pouvez pas réanimer en véhicule")
@@ -698,9 +697,9 @@ end
 function HealClosestPlayer()
 	exports.bro_core:RemoveMenu("lsms")
 	local playerPed = GetPlayerPed(-1)
-	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
-	if closestPlayerPed  and dist <=1 then
-		exports.bro_core:actionPlayer(2000, "Vêtements","mini@cpr@char_a@cpr_str", "cpr_pumpchest",
+	local closestPlayerPed = exports.bro_core:GetClosestPed()
+	if closestPlayerPed ~= -1 then
+		exports.bro_core:actionPlayer(2000, "Soignage","mini@cpr@char_a@cpr_str", "cpr_pumpchest",
 			function()
 				SetEntityHealth(closestPlayerPed, GetPedMaxHealth(closestPlayerPed))
 				FreezeEntityPosition(playerPed, false)
@@ -776,9 +775,9 @@ function CancelEmote()
 end
 
 function RemoveWeapons()
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 then
         TriggerServerEvent("job:removeWeapons", GetPlayerServerId(closestPlayer))
     else
         exports.bro_core:Notification("~r~Pas de joueur à proximité")
@@ -786,9 +785,9 @@ function RemoveWeapons()
 end
 
 function ToggleCuff()
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer  and dist <=1 then
+    if closestPlayer ~= -1 then
 		TriggerServerEvent("job:cuffGranted", GetPlayerServerId(closestPlayer))
 	else
 		exports.bro_core:Notification("~r~Pas de joueur à proximité")
@@ -796,9 +795,9 @@ function ToggleCuff()
 end
 
 function Fines(amount)
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
+    if closestPlayer ~= -1 then
 		Citizen.Trace("Price : "..tonumber(amount))
 		if(tonumber(amount) == -1) then
 			DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8S", "", "", "", "", "", 20)
@@ -825,9 +824,9 @@ end
 
 
 function GiveWeaponLicence()
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer  and dist <=1 then
+    if closestPlayer ~= 1  then
 		TriggerServerEvent("job:weapon:licence", GetPlayerServerId(closestPlayer), true)
 	else
 		exports.bro_core:Notification("~r~Pas de joueur à proximité")
@@ -1008,47 +1007,49 @@ end
 
 -- service management
 function RecruitClosestPlayer(job)
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer= exports.bro_core:GetClosestPlayer()
 
-    if closestPlayer and dist <=1 then
-        TriggerServerEvent('job:service:recruit', job[1].id, GetPlayerServerId(closestPlayer))
+	if closestPlayer ~= 1 then
+		TriggerServerEvent('job:service:recruit', job, GetPlayerServerId(closestPlayer))
     else
-        exports.bro_core:Notification("Pas de joueur à portée")
-    end
-end
-
-function PromoteClosestPlayer()
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
-
-    if closestPlayer  and dist <=1 then
-        TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
-    else
-        exports.bro_core:Notification("Pas de joueur à portée")
-    end
-end
-
-
-function demmoteClosestPlayer()
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
-
-    if closestPlayer and dist <=1 then
-        TriggerServerEvent('job:service:prmote', GetPlayerServerId(closestPlayer))
-    else
-        exports.bro_core:Notification("Pas de joueur à portée")
+        exports.bro_core:Notification("~r~Pas de joueur à portée")
     end
 end
 
 
 function FireClosestPlayer()
-	local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer= exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer and dist <=1 then
+	if closestPlayer ~= -1 then
 		--todo
         TriggerServerEvent('job:set', GetPlayerServerId(closestPlayer), nil, "Vous avez été viré", "Vous avez viré un employé")
     else
         exports.bro_core:Notification("Pas de joueur à portée")
     end
 end
+
+
+function PromoteClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+
+    if closestPlayer ~= 1    then
+        TriggerServerEvent('job:service:promote', GetPlayerServerId(closestPlayer))
+    else
+        exports.bro_core:Notification("Pas de joueur à portée")
+    end
+end
+
+
+function DemmoteClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+
+    if closestPlayer ~= -1 then
+        TriggerServerEvent('job:service:demote', GetPlayerServerId(closestPlayer))
+    else
+        exports.bro_core:Notification("Pas de joueur à portée")
+    end
+end
+
 
 
 function BeginSell(job)
@@ -1110,7 +1111,7 @@ function FixVitres()
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+		exports.bro_core:actionPlayer(4000, "Réparation", "mini@repair", "fixing_a_ped", function()
 			FixVehicleWindow(vehicle, 0)
 			FixVehicleWindow(vehicle, 1)
 			FixVehicleWindow(vehicle, 2)
@@ -1136,7 +1137,7 @@ function FixCarroserie()
 	local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, PlayerPedId(), 0)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-		exports.bro_core:actionPlayer(4000, "Réparation", "amb@world_human_vehicle_mechanic@male@exit", "exit", function()
+		exports.bro_core:actionPlayer(4000, "Réparation", "scenario", "WORLD_HUMAN_CAR_PARK_ATTENDANT", function()
 			SetVehicleBodyHealth(vehicle, 1000.0)
 			SetVehiclePetrolTankHealth(vehicle, 1000.0)
 			SetVehicleDeformationFixed(vehicle)

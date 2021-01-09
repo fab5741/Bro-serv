@@ -216,7 +216,7 @@ AddEventHandler("vehicle:parking:get:all", function(id, cb)
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	print(id)
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod, players, player_vehicle where vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id and players.discord= @discord and player_vehicle.vehicle_mod = vehicle_mod.id UNION select vehicle_mod.id, vehicles.name, vehicles.label  from vehicles, players, job_grades, job_vehicle, vehicle_mod where job_grades.grade = players.job_grade and job_vehicle.job = job_grades.job and vehicle_mod.id = job_vehicle.vehicle_mod and vehicles.id = vehicle_mod.vehicle and discord = @discord and vehicle_mod.parking = @id', {
+		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.name, vehicles.label from vehicles, vehicle_mod, players, player_vehicle where player_vehicle.player = players.id and players.discord= @discord and vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id  and player_vehicle.vehicle_mod = vehicle_mod.id UNION select vehicle_mod.id, vehicles.name, vehicles.label from players, job_grades, job_vehicle, vehicle_mod, vehicles where players.discord = @discord and players.job_grade = job_grades.id and job_grades.job = job_vehicle.job and vehicle_mod.id = job_vehicle.vehicle_mod and vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = @id', {
 			['discord'] =  discord,
 			['id'] =  id,
 		}, function(result)
@@ -503,14 +503,13 @@ AddEventHandler("vehicle:player:get", function(cb)
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll("SELECT vehicle_mod.id as vehicle_mod, vehicle_mod.*, vehicles.name FROM `player_vehicle`, players, vehicles, vehicle_mod WHERE players.discord = @discord and players.id = player_vehicle.player and vehicle_mod.id = player_vehicle.vehicle_mod and vehicles.id = vehicle_mod.vehicle and vehicle_mod.parking = ''",
-		{
-			['@discord'] = discord,
-		},function(res)
+		MySQL.Async.fetchAll('select vehicle_mod.*, vehicles.name from vehicles, vehicle_mod, players, player_vehicle where player_vehicle.player = players.id and players.discord= @discord and vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = ""  and player_vehicle.vehicle_mod = vehicle_mod.id UNION select  vehicle_mod.*, vehicles.name from players, job_grades, job_vehicle, vehicle_mod, vehicles where players.discord = @discord and players.job_grade = job_grades.id and job_grades.job = job_vehicle.job and vehicle_mod.id = job_vehicle.vehicle_mod and vehicle_mod.vehicle = vehicles.id and vehicle_mod.parking = ""', {
+			['@discord'] =  discord,
+		}, function(res)
 			for k,v in pairs(res) do
 				MySQL.Async.fetchAll("SELECT vehicle_mod_type.* from vehicle_mod_type where vehicle_mod = @vehicle_mod",
 				{
-					['@vehicle_mod'] = v.vehicle_mod,
+					['@vehicle_mod'] = v.id,
 				},function(mods)
 					TriggerClientEvent("vehicle:mods:refresh", sourceValue, v.gameId, mods)
 				end)
@@ -600,23 +599,24 @@ end)
 AddEventHandler("vehicle:sell", function(vehicle)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
-	local vehicle = vehicle
+	local id = vehicle
+	print(id)
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.price from vehicle_mod, vehicles where gameId = "@gameId" and vehicle_mod.vehicle =  vehicles.id', {
-			['@gameid'] =  vehicle,
+		MySQL.Async.fetchAll('select vehicle_mod.id, vehicles.price from vehicle_mod, vehicles where gameId = @id and vehicle_mod.vehicle =  vehicles.id', {
+			['@id'] = id,
 		}, function(res)
 			if res and res[1] then
 				MySQL.Async.execute('DELETE from player_vehicle where vehicle_mod = @id', {
 					['@id'] =  res[1].id,
 				}, function()
-					MySQL.Async.execute('DELETE from vehicle_mod  where gameId = @gameId', {
-						['@gameid'] =  vehicle,
+					MySQL.Async.execute('DELETE from vehicle_mod  where gameId = @id', {
+						['@id'] =  id,
 					}, function()
 						MySQL.Async.execute('update players set liquid = liquid+@nb where discord = @discord', {
 							['@nb'] =  res[1].price/2,
 							['@discord'] =  discord,
 						}, function()
-							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous avez vendu votre véhicle pour ~g~".. res[1].price/2)
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous avez vendu votre véhicle pour ~g~".. res[1].price/2 .." $")
 						end)
 					end)
 				end)

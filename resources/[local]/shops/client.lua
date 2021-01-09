@@ -150,7 +150,7 @@ function robNpc(targetPed)
 			TriggerServerEvent("job:avert:all", "LSPD", "Un braquage est en cours", true)
 		end
 
-		TriggerEvent("bf:progressBar:create", config.robLength, "Braquage en cours")
+		TriggerEvent("bro_core:progressBar:create", config.robLength, "Braquage en cours")
 
 		local timeElapsed = 0
 		local nb = 5
@@ -165,7 +165,7 @@ function robNpc(targetPed)
 			else
 				exports.bro_core:Notification('~r~Vous vous êtes trop éloigné')
 				RobbedRecently = false
-				TriggerEvent("bf:progressBar:delete")
+				TriggerEvent("bro_core:progressBar:delete")
 			end
 		end
         RobbedRecently = false

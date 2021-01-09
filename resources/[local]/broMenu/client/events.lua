@@ -316,95 +316,142 @@ AddEventHandler("bromenu:open", function(job)
 	})
 end)
 
-
-AddEventHandler("bromenu:liquid", function(liquid) 
+RegisterNetEvent("bromenu:wallet:open")
+AddEventHandler("bromenu:wallet:open", function(player)
+	Player= player
+	local ppa = ""
+	local permis = ""
+	if player.permis > 0 then
+		permis =  "(~b~"..player.permis.." pts~s~)"
+	else
+		permis =  "(~r~"..player.permis.." pts~s~)"
+	end
+	if player.gun_permis then
+		ppa = "~b~Valide"
+	else
+		ppa = "~r~Non Valide"
+	end
 	exports.bro_core:AddSubMenu("wallet", {
-			parent = "bromenu",
-			Title = "Portefeuille",
-			Subtitle = firstname.." "..lastname.. " ("..birth..")",
-			buttons = {
+		parent = "bromenu",
+		Title = "Portefeuille",
+		Subtitle = Player.firstname.." "..Player.lastname.. " ("..Player.birth..")",
+		buttons = {
 				{
-					type = "button",
-					label = "Liquide",
-					style = {
-						RightLabel = exports.bro_core:Money(liquid)
-					},
-					actions = {
-						onSelected = function()
-							local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
-
-							if closestPlayer and closestPlayerDist <= 1.5  then
-								local amount = exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})
-								exports.bro_core:actionPlayer(2000, "Vous tendez les billets", "amb@prop_human_atm@female@base", "base",
-								function()
-									TriggerServerEvent("account:player:liquid:give", GetPlayerServerId(closestPlayer), amount)
-								end)
+					type ="separator",
+					label ="Argent",
+				},
+				{
+				type = "button",
+				label = "Liquide",
+				style = {
+					RightLabel = exports.bro_core:Money(Liquid)
+				},
+				{
+					type ="separator",
+					label ="Identité",
+				},
+				actions = {
+					onSelected = function()
+						local closestPlayer = exports.bro_core:GetClosestPlayer()
+						if closestPlayer ~= -1 then
+							local amount = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+							exports.bro_core:actionPlayer(2000, "Vous tendez les billets", "amb@prop_human_atm@female@base", "base",
+							function()
+								TriggerServerEvent("account:player:liquid:give", "", GetPlayerServerId(closestPlayer), amount)
+							end)
+						else
+							exports.bro_core:Notification("~r~Pas de joueur à proximité")
+						end
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Modifier identité",
+				actions = {
+					onSelected = function () 
+						TriggerServerEvent("bro:set", "firstname", exports.bro_core:OpenTextInput({ title="Prénom", maxInputLength=60, customTitle=true}),"")
+						TriggerServerEvent("bro:set", "lastname", exports.bro_core:OpenTextInput({ title="Nom", maxInputLength=60, customTitle=true}),"")
+						TriggerServerEvent("bro:set", "birth", exports.bro_core:OpenTextInput({ title="Format (01/01/1911)", maxInputLength=10, customTitle=true}),"")
+					end
+				}
+			},
+			{
+				type = "button",
+				label = "Montrer mon identité",
+				actions = {
+					onSelected = function()
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							TriggerServerEvent("bro:get", "bromenu:show")
+						end)
+					end
+				},
+			},
+			{
+				type ="separator",
+				label ="Permis",
+			},
+			{
+				type = "button",
+				label = "Montrer mon permis véhicule. "..permis,
+				actions = {
+					onSelected = function () 
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							TriggerServerEvent("vehicle:permis:get", "bromenu:permis", exports.bro_core:GetClosestPlayer())
+						end)
+					end
+				}
+			},
+			{
+				type = "button",
+				label = "Montrer mon permis PPA. "..ppa,
+				actions = {
+					onSelected = function () 
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							local closestPlayer = exports.bro_core:GetClosestPlayer()
+							if closestPlayer ~= -1 then
+								TriggerServerEvent("bro:permis:get", GetPlayerServerId(closestPlayer))
 							else
 								exports.bro_core:Notification("~r~Pas de joueur à proximité")
 							end
-						end
-					},
-				},
-				{
-					type = "button",
-					label = "Modifier identité",
-					actions = {
-						onSelected = function () 
-							TriggerServerEvent("bromenu:set", "firstname", exports.bro_core:OpenTextInput({ title="Prénom", maxInputLength=60, customTitle=true}),"")
-							TriggerServerEvent("bromenu:set", "lastname", exports.bro_core:OpenTextInput({ title="Nom", maxInputLength=60, customTitle=true}),"")
-							TriggerServerEvent("bromenu:set", "birth", exports.bro_core:OpenTextInput({ title="Format (01/01/1911)", maxInputLength=10, customTitle=true}),"")
-						end
-					}
-				},
-				{
-					type = "button",
-					label = "Montrer mon identité",
-					actions = {
-						onSelected = function()
-							exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
-							function()
-								TriggerServerEvent("bromenu:get", "bromenu:show")
-							end)
-						end
-					},
-				},
-				{
-					type = "button",
-					label = "Montrer mon permis",
-					actions = {
-						onSelected = function () 
-							exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
-							function()
-								TriggerServerEvent("vehicle:permis:get", "bro:permis")
-							end)
-						end
-					}
-				},
-			}
-		})
+						end)
+					end
+				}
+			},
+		}
+	})
+end)
+
+
+AddEventHandler("bromenu:liquid", function(liquid) 
+	Liquid = liquid
+	TriggerServerEvent("bro:get", "bromenu:wallet:open")
 end)
 
 
 AddEventHandler("bromenu:permis", function(permis) 
-	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
-	if closestPlayerPed and dist < 2 then
-		TriggerServerEvent("bro:permis:show", permis, GetPlayerServerId(closestPlayerPed))
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+	if closestPlayer ~= -1 then
+		TriggerServerEvent("bro:permis:show", permis, GetPlayerServerId(closestPlayer))
 	end
 end)
 
 
 AddEventHandler("bromenu:show", function(player) 
-	local closestPlayer, closestPlayerDist = exports.bro_core:GetClosestPlayer()
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
 
-	if closestPlayer and closestPlayerDist <= 1.5  then
-		TriggerServerEvent("bro:card:show", player, GetPlayerServerId(closestPlayerPed))
+	if closestPlayer ~= -1 then
+		TriggerServerEvent("bro:card:show", player, GetPlayerServerId(closestPlayer))
 	else
 		exports.bro_core:Notification("~r~Pas de joueur à proximité")
 	end
 end)
 
 
-AddEventHandler("bromenu:get", function(data) 
+AddEventHandler("bromenu:get", function(data)
 	firstname = data.firstname
 	lastname = data.lastname
 	birth = data.birth

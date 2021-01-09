@@ -96,10 +96,13 @@ end)
 
 
 AddEventHandler('account:player:liquid:give', function(cb, player, amount)
+	print(player)
+	print(amount)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local discordTo = exports.bro_core:GetDiscordFromSource(player)
 	local amount=amount
+
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
 		{
@@ -162,11 +165,14 @@ AddEventHandler('account:job:add', function(cb, job, amount, silent)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local job = job
+	local amount = amount
+	print(job)
+	print(amount)
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {
 			['@discord'] = discord
 		}, function(money)
-			if money > amount then
+			if money >= amount then
 				MySQL.Async.execute('UPDATE accounts, job_account SET accounts.amount = accounts.amount + @amount WHERE job_account.job = @job and job_account.account= accounts.id ', 
 				{
 					['@job'] = job,
@@ -176,10 +182,10 @@ AddEventHandler('account:job:add', function(cb, job, amount, silent)
 						['@discord'] = discord,
 						['@amount'] = amount
 					}, function(result)
-						TriggerClientEvent(cb, sourceValue, result)
 						if not silent then
 							TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
 						end
+						TriggerClientEvent(cb, sourceValue, result)
 					end)
 				end)
 			else

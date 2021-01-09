@@ -30,7 +30,7 @@ AddEventHandler("items:add", function (type, amount, message)
                 ['amount'] = amount,
                 ['type'] = type},
                 function(res)
-                  TriggerClientEvent("bf:Notification", sourceValue, message)
+                  TriggerClientEvent("bro_core:Notification", sourceValue, message)
                 end)
               else
                 MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
@@ -38,11 +38,11 @@ AddEventHandler("items:add", function (type, amount, message)
                 ['amount'] = amount,
                 ['type'] = type},
                 function(res)
-                  TriggerClientEvent("bf:Notification", sourceValue, message)
+                  TriggerClientEvent("bro_core:Notification", sourceValue, message)
                 end)
               end
             else
-              TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+              TriggerClientEvent("bro_core:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
             end
           end)
         end)
@@ -120,11 +120,11 @@ AddEventHandler("items:process", function (type, amount, typeTo, amountTo, messa
                       ['amount'] = amountTo,
                       ['type'] = typeTo},
                       function(res)
-                        TriggerClientEvent("bf:Notification", sourceValue, message)
+                        TriggerClientEvent("bro_core:Notification", sourceValue, message)
                       end)
               end)
           else
-            TriggerClientEvent("bf:Notification", sourceValue, "Vous n'avez pas assé d'items à transformé")
+            TriggerClientEvent("bro_core:Notification", sourceValue, "Vous n'avez pas assé d'items à transformé")
           end
         end)
       end)
@@ -186,9 +186,9 @@ RegisterNetEvent("items:give")
 
 -- source is global here, don't add to function
 AddEventHandler("items:give", function (type, amount, to)
-  local source = source
+  local sourceValue = source
   local to = to
-  local discord = exports.bro_core:GetDiscordFromSource(source) 
+  local discord = exports.bro_core:GetDiscordFromSource(sourceValue) 
   local discordTo = exports.bro_core:GetDiscordFromSource(to) 
   
   MySQL.ready(function ()
@@ -218,13 +218,13 @@ AddEventHandler("items:give", function (type, amount, to)
                   ['amount'] = amount,
                   ['type'] = type},
                   function(res)
-                    TriggerClientEvent("bf:Notification", sourceValue, "Vous avez donné ~g~" .. type.. " X " .. amount)
-                    TriggerClientEvent("bf:Notification", to, "Vous avez reçu un item")
+                    TriggerClientEvent("bro_core:Notification", sourceValue, "Vous avez donné ~g~" .. type.. " X " .. amount)
+                    TriggerClientEvent("bro_core:Notification", to, "Vous avez reçu un item")
                   end)
                 end)
             else
-              TriggerClientEvent("bf:Notification", sourceValue, "La personne a trop de ~r~poids")
-              TriggerClientEvent("bf:Notification", to, "Vous portez trop de poids !")
+              TriggerClientEvent("bro_core:Notification", sourceValue, "La personne a trop de ~r~poids")
+              TriggerClientEvent("bro_core:Notification", to, "Vous portez trop de poids !")
             end
           end)
         end)
@@ -279,17 +279,17 @@ AddEventHandler("item:vehicle:get", function (vehicle, item, amount)
                     ['amount'] = amount,
                   },
                   function(affectedRows)
-                    TriggerClientEvent("bf:Notification", sourceValue, "Item récupéré")
+                    TriggerClientEvent("bro_core:Notification", sourceValue, "Item récupéré")
                   end)
                 end)
             else
-              TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+              TriggerClientEvent("bro_core:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
             end
           end)
           end)
       end)
       else
-        TriggerClientEvent("bf:Notification", sourceValue, "~r~Il n'ya plus d'item dans le coffre")
+        TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Il n'ya plus d'item dans le coffre")
       end
     end)
   end)
@@ -316,7 +316,7 @@ AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
           ['vehicle'] = vehicle,
         }, function(vehicleId)
         if vehicleId == nil then
-          TriggerClientEvent("bf:Notification", sourceValue, "~r~Ce véhicule est volé")
+          TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Ce véhicule est volé")
         else
           MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, vehicle_item  WHERE vehicle_item.item= items.id and vehicle_item.vehicle_mod = @vehicle",
           {
@@ -345,18 +345,18 @@ AddEventHandler("item:vehicle:store", function (vehicle, item, amount)
                   ['amount'] = amount,
                 },
                 function(affectedRows)
-                  TriggerClientEvent("bf:Notification", sourceValue, "Item stocké")
+                  TriggerClientEvent("bro_core:Notification", sourceValue, "Item stocké")
                 end)
             end)
           else
-              TriggerClientEvent("bf:Notification", sourceValue, "~r~ Le véhicule est trop chargé")
+              TriggerClientEvent("bro_core:Notification", sourceValue, "~r~ Le véhicule est trop chargé")
             end
           end)
         end)
       end
       end)
       else
-        TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez plus d'item")
+        TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez plus d'item")
       end
     end)
   end)

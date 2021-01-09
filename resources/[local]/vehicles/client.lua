@@ -1,7 +1,8 @@
 DsVehicle = 0
 CurrentVehicle = 0
 Ped = GetPlayerPed(-1)
-
+LastHovered = nil
+Frames = 0
 Config = {}
 Config.parkings = {
 	{
@@ -78,6 +79,7 @@ Config.parkings = {
 		}
 	},
 }
+
 
 function DeleteGivenVehicle( veh, timeoutMax )
     local timeout = 0

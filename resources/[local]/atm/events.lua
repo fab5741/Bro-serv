@@ -11,7 +11,10 @@ AddEventHandler('atm:get', function(account, liquid)
 				label = "Retirer",
 				actions = {
 					onSelected = function()
-						TriggerServerEvent('atm:withdraw',  exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+						local nb = exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})
+						exports.bro_core:actionPlayer(4000, "ATM", "scenario", "PROP_HUMAN_ATM", function()
+							TriggerServerEvent('atm:withdraw',  nb)
+						end)
 						exports.bro_core:RemoveMenu("ATM")
 					end,
 				}
@@ -21,7 +24,10 @@ AddEventHandler('atm:get', function(account, liquid)
 				label = "Déposer",
 				actions = {
 					onSelected = function()
-						TriggerServerEvent('atm:deposit',  exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+						local nb =exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})
+						exports.bro_core:actionPlayer(4000, "ATM", "scenario", "PROP_HUMAN_ATM", function()
+							TriggerServerEvent('atm:deposit',  nb)
+						end)
 						exports.bro_core:RemoveMenu("ATM")
 					end,
 				}

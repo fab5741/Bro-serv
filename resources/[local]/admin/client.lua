@@ -84,3 +84,9 @@ RegisterCommand("weapon", function(source, args)
     )
 end)
 
+RegisterCommand("closest", function() 
+    print(exports.bro_core:GetClosestPed())
+    print(exports.bro_core:GetClosestPlayer())
+    print(GetPlayerServerId(exports.bro_core:GetClosestPlayer()))
+end)
+

@@ -41,7 +41,7 @@ AddEventHandler('shops:buy', function(type, amount, price)
 								end)
 							end)
 						else
-							TriggerClientEvent("bf:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
 						end
 					end)
 				end)

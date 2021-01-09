@@ -100,9 +100,9 @@ RegisterCommand('freezetime', function(source, args)
       if isAllowedToChange(source) then
           freezeTime = not freezeTime
           if freezeTime then
-              TriggerClientEvent('bf:Notification', source, 'Time is now ~b~frozen~s~.')
+              TriggerClientEvent('bro_core:Notification', source, 'Time is now ~b~frozen~s~.')
           else
-              TriggerClientEvent('bf:Notification', source, 'Time is ~y~no longer frozen~s~.')
+              TriggerClientEvent('bro_core:Notification', source, 'Time is ~y~no longer frozen~s~.')
           end
       else
           TriggerClientEvent('chatMessage', source, '', {255,255,255}, '^8Error: ^1You are not allowed to use this command.')
@@ -122,9 +122,9 @@ RegisterCommand('freezeweather', function(source, args)
       if isAllowedToChange(source) then
           DynamicWeather = not DynamicWeather
           if not DynamicWeather then
-              TriggerClientEvent('bf:Notification', source, 'Dynamic weather changes are now ~r~disabled~s~.')
+              TriggerClientEvent('bro_core:Notification', source, 'Dynamic weather changes are now ~r~disabled~s~.')
           else
-              TriggerClientEvent('bf:Notification', source, 'Dynamic weather changes are now ~b~enabled~s~.')
+              TriggerClientEvent('bro_core:Notification', source, 'Dynamic weather changes are now ~b~enabled~s~.')
           end
       else
           TriggerClientEvent('chatMessage', source, '', {255,255,255}, '^8Error: ^1You are not allowed to use this command.')
@@ -172,7 +172,7 @@ RegisterCommand('weather', function(source, args)
                   end
               end
               if validWeatherType then
-                  TriggerClientEvent('bf:Notification', source, 'Weather will change to: ~y~' .. string.lower(args[1]) .. "~s~.")
+                  TriggerClientEvent('bro_core:Notification', source, 'Weather will change to: ~y~' .. string.lower(args[1]) .. "~s~.")
                   CurrentWeather = string.upper(args[1])
                   newWeatherTimer = 10
                   TriggerEvent('bro:requestSync')
@@ -199,9 +199,9 @@ RegisterCommand('blackout', function(source)
       if isAllowedToChange(source) then
           blackout = not blackout
           if blackout then
-              TriggerClientEvent('bf:Notification', source, 'Blackout is now ~b~enabled~s~.')
+              TriggerClientEvent('bro_core:Notification', source, 'Blackout is now ~b~enabled~s~.')
           else
-              TriggerClientEvent('bf:Notification', source, 'Blackout is now ~r~disabled~s~.')
+              TriggerClientEvent('bro_core:Notification', source, 'Blackout is now ~r~disabled~s~.')
           end
           TriggerEvent('bro:requestSync')
       end
@@ -216,7 +216,7 @@ RegisterCommand('morning', function(source)
   if isAllowedToChange(source) then
       ShiftToMinute(0)
       ShiftToHour(9)
-      TriggerClientEvent('bf:Notification', source, 'Time set to ~y~morning~s~.')
+      TriggerClientEvent('bro_core:Notification', source, 'Time set to ~y~morning~s~.')
       TriggerEvent('bro:requestSync')
   end
 end)
@@ -228,7 +228,7 @@ RegisterCommand('noon', function(source)
   if isAllowedToChange(source) then
       ShiftToMinute(0)
       ShiftToHour(12)
-      TriggerClientEvent('bf:Notification', source, 'Time set to ~y~noon~s~.')
+      TriggerClientEvent('bro_core:Notification', source, 'Time set to ~y~noon~s~.')
       TriggerEvent('bro:requestSync')
   end
 end)
@@ -240,7 +240,7 @@ RegisterCommand('evening', function(source)
   if isAllowedToChange(source) then
       ShiftToMinute(0)
       ShiftToHour(18)
-      TriggerClientEvent('bf:Notification', source, 'Time set to ~y~evening~s~.')
+      TriggerClientEvent('bro_core:Notification', source, 'Time set to ~y~evening~s~.')
       TriggerEvent('bro:requestSync')
   end
 end)
@@ -252,7 +252,7 @@ RegisterCommand('night', function(source)
   if isAllowedToChange(source) then
       ShiftToMinute(0)
       ShiftToHour(23)
-      TriggerClientEvent('bf:Notification', source, 'Time set to ~y~night~s~.')
+      TriggerClientEvent('bro_core:Notification', source, 'Time set to ~y~night~s~.')
       TriggerEvent('bro:requestSync')
   end
 end)
@@ -307,7 +307,7 @@ RegisterCommand('time', function(source, args, rawCommand)
               else
                   newtime = newtime .. minute
               end
-              TriggerClientEvent('bf:Notification', source, 'Time was changed to: ~y~' .. newtime .. "~s~!")
+              TriggerClientEvent('bro_core:Notification', source, 'Time was changed to: ~y~' .. newtime .. "~s~!")
               TriggerEvent('bro:requestSync')
           else
               TriggerClientEvent('chatMessage', source, '', {255,255,255}, '^8Error: ^1Invalid syntax. Use ^0/time <hour> <minute> ^1instead!')

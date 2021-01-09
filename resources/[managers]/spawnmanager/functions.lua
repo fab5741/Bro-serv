@@ -104,7 +104,7 @@ function SpawnPlayer(x, y, z, weapons, health)
         TriggerServerEvent("player:spawned:clothes")
         TriggerServerEvent("needs:spawned")
 
-        Wait(0)
+        Wait(10000)
         if weapons ~= nil then
             for k,v in pairs(json.decode(weapons)) do
                 GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)

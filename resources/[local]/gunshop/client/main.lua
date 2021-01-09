@@ -14,6 +14,9 @@ Citizen.CreateThread(function()
 			},
 			exit = {
 				callback = function()
+					exports.bro_core:RemoveMenu("gunshop")
+					exports.bro_core:Key("E", "E", "", function()
+					end)
 				end
 			},
 		},

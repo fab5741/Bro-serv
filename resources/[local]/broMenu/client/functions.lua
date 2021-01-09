@@ -1,10 +1,12 @@
 
-function GiveToPlayer()
-	local closestPlayerPed, dist = exports.bro_core:GetClosestPlayer()
-	if closestPlayerPed and dist <=1 then
-		TriggerServerEvent("items:give", v.id, 1, GetPlayerServerId(closestPlayerPed))
+function GiveToPlayer(id)
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+	local nb = tonumber(exports.bro_core:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+
+	if closestPlayer ~= -1 then
+		TriggerServerEvent("items:give", id, nb, GetPlayerServerId(closestPlayer))
 	else 
-		exports.bro_core:Notification("Pas de joueur à portée")
+		exports.bro_core:Notification("~r~Pas de joueur à portée")
 	end
 end
 
@@ -25,7 +27,7 @@ function OpenMenuItem(item)
 		label = "Donner",
 		actions = {
 			onSelected = function() 
-				GiveToPlayer()
+				GiveToPlayer(item.id)
 			end
 		},
 	}

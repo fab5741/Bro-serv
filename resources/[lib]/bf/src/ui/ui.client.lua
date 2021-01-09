@@ -191,8 +191,8 @@ end
 --
 -- Events
 --
-RegisterNetEvent('bf:Notification')
-AddEventHandler('bf:Notification', Notification)
+RegisterNetEvent('bro_core:Notification')
+AddEventHandler('bro_core:Notification', Notification)
 
 RegisterNetEvent('bf:AdvancedNotification')
 AddEventHandler('bf:AdvancedNotification', AdvancedNotification)

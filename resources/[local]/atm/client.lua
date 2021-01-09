@@ -8,8 +8,8 @@ Citizen.CreateThread(function()
 			weight = 2,
 			enter = {
                 callback = function()
-                    exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
-                        TriggerServerEvent("atm:get", "atm:get")
+					exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
+						TriggerServerEvent("atm:get", "atm:get")
                     end)
 					exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
 				end
@@ -43,6 +43,8 @@ Citizen.CreateThread(function()
 			{ x = -1827.04,  y = 785.5159,  z = 138.020},
 			{ x = 1686.753,  y = 4815.809,  z = 42.008},
 			{ x = 1153.75,  y = -326.8,  z = 69.21},
+			{ x = 33.249336242676, y = -1348.1586914062, z= 29.497022628784},
+			{ x=1702.8286132812, y = 4933.603515625,z=42.063678741455}
 		}
 	})
 end) 

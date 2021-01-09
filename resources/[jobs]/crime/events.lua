@@ -42,7 +42,7 @@ AddEventHandler('crime:malette:sell', function(amount)
 	if amount ~= nil and amount >= tonumber(nbMalettes) then
 		TriggerServerEvent("account:player:liquid:add", "", nbMalettes * 50)
 		TriggerServerEvent("items:sub", 8, nbMalettes)
-		exports.bro_core:Text({text = "Vous avez vendu pour : ~g~ "..(nbMalettes*50).."$", time = 1000})
+		exports.bro_core:Notification("Vous avez vendu pour : "..exports.bro_core:Money(nbMalettes*50))
 	else
 		exports.bro_core:Notification("~r~Vous n'avez pas assez de malettes sur vous")
 	end

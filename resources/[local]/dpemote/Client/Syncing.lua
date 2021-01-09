@@ -11,7 +11,7 @@ if Config.SharedEmotesEnabled then
     RegisterCommand('nearby', function(source, args, raw)
         if #args > 0 then
             local emotename = string.lower(args[1])
-            target, distance = exports.bro_core:GetClosestPlayer()
+            target = exports.bro_core:GetClosestPlayer()
             if(distance and distance < 3) then
                 if DP.Shared[emotename] ~= nil then
                     dict, anim, ename = table.unpack(DP.Shared[emotename])
@@ -44,7 +44,7 @@ end)
 RegisterNetEvent("SyncPlayEmoteSource")
 AddEventHandler("SyncPlayEmoteSource", function(emote, player)
     -- Thx to Poggu for this part!
-    local pedInFront = GetPlayerPed(exports.bro_core:GetClosestPlayer())
+    local pedInFront = exports.bro_core:GetClosestPed()
     local heading = GetEntityHeading(pedInFront)
     local coords = GetOffsetFromEntityInWorldCoords(pedInFront, 0.0, 1.0, 0.0)
     if (DP.Shared[emote]) and (DP.Shared[emote].AnimationOptions) then

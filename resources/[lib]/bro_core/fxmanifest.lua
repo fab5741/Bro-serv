@@ -80,6 +80,7 @@ client_scripts {
 exports {
     -- client
     "GetClosestPlayer",
+    "GetClosestPed",
     "LoadAnimSet",
     "LoadModel",
     "actionPlayer",

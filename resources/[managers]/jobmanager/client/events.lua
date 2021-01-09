@@ -142,6 +142,7 @@ AddEventHandler("job:safe:open", function(job)
 end)
 
 AddEventHandler("job:safe:open2", function(amount)
+	print(job.job)
 	-- todo: test if chef de service
 	AccountAmount = amount
 	TriggerServerEvent("job:isChef", "job:safe:open3")
@@ -159,8 +160,8 @@ AddEventHandler("job:safe:open3", function(isChef)
 			label = "Retirer",
 			actions = {
 				onSelected = function()
-					local nb = exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true})
-					TriggerServerEvent('job:safe:withdraw', job.job, nb)
+					local nb = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+					TriggerServerEvent('job:safe:withdraw', nb)
 				end
 			}
 		}
@@ -170,7 +171,7 @@ AddEventHandler("job:safe:open3", function(isChef)
 			actions = {
 				onSelected = function()
 					local nb = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
-					TriggerServerEvent('account:job:add', "", job.job, nb)
+					TriggerServerEvent('job:safe:deposit', nb)
 				end
 			}
 		}
@@ -351,17 +352,70 @@ AddEventHandler("job:open:menu", function(job)
 			buttons[#buttons+1] = {
 				type = "button",
 				label = "Gestion service",
-				actions = {
-					onSelected = function()
-						TriggerServerEvent("job:isChef", "jobs:service:manage")
-					end
-				},
+				subMenu = "service"
 			}
 		end
 		exports.bro_core:AddMenu("job", {
 			Title = "Menu "..job.label,
 			Subtitle = "Job",
 			buttons = buttons
+		})
+
+		exports.bro_core:AddSubMenu("service", {
+			parent= "job",
+			Title = "Gestion service",
+			Subtitle = job.label,
+			buttons = {
+				{
+					type = "separator",
+					label = "Recrutements",
+				},
+				{
+					type = "button",
+					label = "Recruter",
+					actions = {
+						onSelected = function()
+							-- TODO - test if chef de service
+							RecruitClosestPlayer(job)
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Virer",
+					actions = {
+						onSelected = function()
+														-- TODO - test if chef de service
+							FireClosestPlayer()
+						end
+					},
+				},
+				{
+					type = "separator",
+					label = "Grades",
+				},
+				{
+					type = "button",
+					label = "Promouvoir",
+					actions = {
+						onSelected = function()
+														-- TODO - test if chef de service
+							PromoteClosestPlayer()
+						end
+					},
+				},
+				{
+					type = "button",
+					label = "Rétrograder",
+					actions = {
+						onSelected = function()
+														-- TODO - test if chef de service
+							DemmoteClosestPlayer()
+						end
+					},
+				},
+
+			}
 		})
 
 		if job.name == "lspd" then
@@ -438,7 +492,7 @@ AddEventHandler("job:open:menu", function(job)
 					label = "Donner Permis de Port d' Armes (PPA)",
 					actions = {
 						onSelected = function()
-							giveWeaponLicence()
+							GiveWeaponLicence()
 						end
 					},
 				},
@@ -624,11 +678,10 @@ AddEventHandler("job:open:menu", function(job)
 				label = "Facturer",
 				actions = {
 					onSelected = function()
-						print("FACTURE")
 						local motif = exports.bro_core:OpenTextInput({defaultText = "Réparation", customTitle = true, title= "Motif"})
 						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
-						local closestPlayer, dist = exports.bro_core:GetClosestPlayer()
-						if closestPlayer and dist <=1 then
+						local closestPlayer = exports.bro_core:GetClosestPlayer()
+						if closestPlayer ~= 1  then
 							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
 						else
 							exports.bro_core:Notification("~r~Pas de joueur à proximité")
@@ -835,7 +888,7 @@ end
 
 
 AddEventHandler("job:lsms:revive", function(isBleedout)
-	local coords = GetEntityCoords(Ped)
+	local coords = GetEntityCoords(GetPlayerPed(-1))
 
 	DoScreenFadeOut(800)
 
@@ -918,26 +971,11 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 	exports.bro_core:NextMenu("jobs-vehicles")
 end)
 
-
-AddEventHandler("jobs:service:manage", function(grade)
-	if grade >= 4 then
-		exports.bro_core:NextMenu("service")
-	else
-		exports.bro_core:Notification("~r~Vous n'êtes pas chef de service !")
-	end
-end)
-
 --lifecycle
 
 AddEventHandler("jobs:refresh", function(job)
 	refresh(job[1])
 end)
-
-
-AddEventHandler("jobs:recruit", function(job)
-	RecruitClosestPlayer(job)
-end)
-
 
 
 AddEventHandler("weapon:store", function(weapons)

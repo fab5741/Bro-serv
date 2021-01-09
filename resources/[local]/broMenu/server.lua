@@ -73,24 +73,41 @@ end)
 
 
 RegisterNetEvent('bro:permis:show')
-AddEventHandler('bro:permis:show', function(permis, peds)
-	 for k,v  in pairs(peds) do
-		TriggerClientEvent("bf:Notification", v, "Permis de conduire")
-		if permis < 1 then
-			TriggerClientEvent("bf:Notification", v, "~r~"..permis.." points")
-		else
-			TriggerClientEvent("bf:Notification", v,"~g~"..permis.." points")
-		end
-	 end
+AddEventHandler('bro:permis:show', function(permis, t)
+	TriggerClientEvent("bro_core:Notification", t, "Permis de conduire")
+	if permis < 1 then
+		TriggerClientEvent("bro_core:Notification", t, "~r~"..permis.." points")
+	else
+		TriggerClientEvent("bro_core:Notification", t,"~g~"..permis.." points")
+	end
 end)
 
 
 
 RegisterNetEvent('bro:card:show')
-AddEventHandler('bro:card:show', function(permis, peds)
-	 for k,v  in pairs(peds) do
-		TriggerClientEvent("bf:Notification", v, "Carte d'identité")
-		TriggerClientEvent("bf:Notification", v, player.firstname.." "..player.lastname)
-		TriggerClientEvent("bf:Notification", v, player.birth)
-	end
+AddEventHandler('bro:card:show', function(player, t)
+	print("SHOW CARD")
+	print(player.name)
+	print(t)
+	TriggerClientEvent("bro_core:Notification", t, "Carte d'identité")
+	TriggerClientEvent("bro_core:Notification", t, player.firstname.." "..player.lastname)
+	TriggerClientEvent("bro_core:Notification", t, player.birth)
+end)
+
+RegisterNetEvent('bro:permis:get')
+AddEventHandler('bro:permis:get', function(t)
+	local sourceValue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('select gun_permis from players where discord = @discord',
+        {['discord'] =  discord},
+		function(res)
+			TriggerClientEvent("bro_core:Notification", t, "Permis de Port Armes")
+            if res then
+				TriggerClientEvent("bro_core:Notification", t, "~b~Valide")
+			else
+				TriggerClientEvent("bro_core:Notification", t, "~r~Invalide")
+            end
+        end)
+    end)
 end)

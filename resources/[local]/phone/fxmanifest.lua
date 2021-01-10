@@ -47,7 +47,6 @@ files {
 }
 
 client_script {
-	"client/esxaddonsgcphone-c.lua",
 	"config.lua",
 	"client/animation.lua",
 	"client/client.lua",
@@ -58,7 +57,6 @@ client_script {
 
 server_script {
     '@mysql-async/lib/MySQL.lua',
-	"server/esxaddonsgcphone-s.lua",
 	"config.lua",
 	"server/server.lua",
 }

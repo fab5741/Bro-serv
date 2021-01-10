@@ -54,7 +54,8 @@ Citizen.CreateThread(function()
 								label = v.label.. " ~g~"..v.price.." $",
 								actions = {
 									onSelected = function()
-										TriggerServerEvent("shops:buy", v.type, 1, v.price)
+										local nb = tonumber(exports.bro_core:OpenTextInput({defaultText = "", customTitle = true, title= "Nombre?"}))
+										TriggerServerEvent("shops:buy", v.type, nb, v.price)
 									end
 								},
 							}
@@ -143,12 +144,12 @@ function robNpc(targetPed)
         TaskStandStill(targetPed, config.robLength * 1000)
         FreezeEntityPosition(targetPed, true)
 		TaskPlayAnim(targetPed, dict, 'handsup_standing_base', 8.0, -8, .01, 49, 0, 0, 0, 0)
-		exports.bro_core:Notification('Braquage en cours')
+		exports.bro_core:Notification('Braquage ~b~en cours')
 
 		-- If no luck, cops get averted
-		if math.random(1,2) == 1 then
-			TriggerServerEvent("job:avert:all", "LSPD", "Un braquage est en cours", true)
-		end
+	--	if math.random(1,2) == 1 then
+			TriggerServerEvent("job:avert:all", "lspd", "Un braquage est en cours", true, GetEntityCoords(GetPlayerPed(-1)))
+	--	end
 
 		TriggerEvent("bro_core:progressBar:create", config.robLength, "Braquage en cours")
 
@@ -160,8 +161,7 @@ function robNpc(targetPed)
 			local playerCoords = GetEntityCoords(PlayerPedId())
 			if(GetDistanceBetweenCoords(GetEntityCoords(targetPed), GetEntityCoords(GetPlayerPed(-1))) < config.robMaxDistance) then
 				-- add valise
-				TriggerServerEvent("items:add", 8, nb)
-				exports.bro_core:Notification('Valises d\'argent : +~g~'..nb)
+				TriggerServerEvent("job:inService:number", "shops:rob:add", "lspd")
 			else
 				exports.bro_core:Notification('~r~Vous vous êtes trop éloigné')
 				RobbedRecently = false
@@ -172,6 +172,14 @@ function robNpc(targetPed)
     end)
 end
 
+RegisterNetEvent("shops:rob:add")
+AddEventHandler("shops:rob:add", function(number)
+	if number > 0 then
+		exports.bro_core:Notification('Valises d\'argent : +~g~'..nb)
+	else
+		exports.bro_core:Notification("Pas assez de flics en ville")
+	end
+end)
 
 Citizen.CreateThread(function()
     while true do

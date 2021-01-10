@@ -76,7 +76,7 @@ AddEventHandler('job:isChef', function (cb)
         MySQL.Async.fetchScalar('SELECT grade FROM job_grades, players, jobs where jobs.id = job_grades.job and players.job_grade = job_grades.id and discord = @discord',
         {['discord'] =  discord},
         function(isChef)
-                TriggerClientEvent(cb, sourceValue, isChef)
+                TriggerClientEvent(cb, sourceValue, isChef >= 4 )
             end)
       end)
 end)
@@ -128,13 +128,13 @@ end)
 
 
 
-AddEventHandler('job:items:get', function (cb, job)
+AddEventHandler('job:items:get', function (cb)
     local sourceValue = source
-    local source = source
-	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+    local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+    print(job)
     MySQL.ready(function ()
-        MySQL.Async.fetchAll('select items.label, job_item.amount, job_item.item from job_item, items where job = @job and items.id = job_item.item',
-        {['@job'] = job},
+        MySQL.Async.fetchAll('select items.label, job_item.amount, job_item.item, items.weight from job_item, items, job_grades, players where items.id = job_item.item and job_grades.id = players.job_grade and players.discord = @discord and amount>0',
+        {['@discord'] = discord},
         function(items)
             TriggerClientEvent(cb, sourceValue, items)
         end)
@@ -145,7 +145,6 @@ end)
 
 AddEventHandler('job:items:withdraw', function (item, amount)
     local sourceValue = source
-    local source = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
         MySQL.Async.fetchScalar('select job_grades.job from players, job_grades where job_grades.id = players.job_grade and discord = @discord',
@@ -157,7 +156,7 @@ AddEventHandler('job:items:withdraw', function (item, amount)
                 ['@item'] = item
             },
             function(amountItems)
-                if amountItems > amount then
+                if amountItems >= amount then
                     MySQL.Async.execute('update job_item set amount = amount-@amount where job = @job and item = @item',
                     {
                         ['@job'] = job,
@@ -190,7 +189,7 @@ AddEventHandler('job:items:store', function (item, amount)
                 ['@item'] = item
             },
             function(amountItems)
-                if amountItems > amount then
+                if amountItems >= amount then
                     MySQL.Async.execute('INSERT INTO `job_item` (`job`, `item`, `amount`) VALUES (@job, @item, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount',
                     {
                         ['@job'] = job,
@@ -309,7 +308,7 @@ AddEventHandler("job:avert:all", function (job, message, silent, pos)
             if pos == true then
                 TriggerClientEvent("taxi:client:show", v, sourceValue)
             elseif pos ~= nil then
-                TriggerClientEvent('bro_core:Notification', v, message)
+                TriggerClientEvent('bro_core:Notification', v, message.. " " .. pos)
                 TriggerClientEvent('phone:receiveMessage', v, {
                         transmitter = "lspd",
                         receiver = "mynumber",
@@ -331,6 +330,11 @@ end)
 
 AddEventHandler("job:inService:number", function (cb, job)
     TriggerClientEvent(cb, source, #inService[job])
+end)
+
+
+AddEventHandler("job:service:get", function (job, cb)
+    cb(inService[job])
 end)
 
 

@@ -76,7 +76,7 @@ end)
 --====================================================================================
 function styleBlip(blip, type, number, player)
   local blipLabel = '#' .. number
-  local blipLabelPrefix = 'Phone GPS Location: '
+  local blipLabelPrefix = 'GPS Téléphone : '
 
   -- [[ type 0 ]] --
   if (type == 0) then
@@ -186,7 +186,7 @@ AddEventHandler("phone:receiveMessage", function(message)
   SendNUIMessage({event = 'newMessage', message = message})
   table.insert(messages, message)
   if message.owner == 0 then
-    local text = 'new_message'
+    local text = 'Vous avez reçu un SMS'
     if Config.ShowNumberNotification == true then
       text = message.transmitter
       for _,contact in pairs(contacts) do

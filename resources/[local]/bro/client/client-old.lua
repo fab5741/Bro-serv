@@ -14,6 +14,7 @@ config = {
 -- \ Config
 --
 
+
 --
 -- Variables
 --
@@ -69,15 +70,44 @@ local attached_weapons = {}
 -- \ Variables
 --
 
--- change menu texts
-Citizen.InvokeNative(GetHashKey("ADD_TEXT_ENTRY"), "FE_THDR_GTAO", "Le serveur des bros")
-
--- Load anim
-exports.bro_core:LoadAnimSet("missminuteman_1ig_2")
-
 
 -- Main loop
 Citizen.CreateThread(function()
+    -- change menu texts
+    Citizen.InvokeNative(GetHashKey("ADD_TEXT_ENTRY"), "FE_THDR_GTAO", "Le serveur des bros")
+
+    -- Load anim
+    exports.bro_core:LoadAnimSet("missminuteman_1ig_2")
+
+    --
+    -- Surender animation
+    --
+    exports.bro_core:Key("X", "X", "Se rendre", function()
+        if not handsup then
+            TaskPlayAnim(ped, "missminuteman_1ig_2", "handsup_enter", 8.0, 8.0, -1, 50, 0, false, false, false)
+            handsup = true
+        else
+            handsup = false
+            ClearPedTasks(ped)
+        end
+    end)
+    --
+    -- \ Surrender animation
+    --
+
+    --
+    -- Pointing finger
+    --
+    exports.bro_core:Key("B", "B", "Pointer du doigt", function()
+        if not mp_pointing then
+            Wait(200)
+            startPointing()
+            mp_pointing = true
+        else 
+            mp_pointing = false
+            stopPointing()
+        end
+    end)
     --
     -- / Pointing finger
     --
@@ -104,51 +134,82 @@ Citizen.CreateThread(function()
         --
         -- Pointing finger
         --
-        if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) and not mp_pointing then
-            stopPointing()
-        end
-        if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) then
-            if not IsPedOnFoot(PlayerPedId()) then
-                stopPointing()
-            else
-                local camPitch = GetGameplayCamRelativePitch()
-                if camPitch < -70.0 then
-                    camPitch = -70.0
-                elseif camPitch > 42.0 then
-                    camPitch = 42.0
-                end
-                camPitch = (camPitch + 70.0) / 112.0
+    --    if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) and not mp_pointing then
+      --      stopPointing()
+        --end
+        --if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) then
+          --  if not IsPedOnFoot(PlayerPedId()) then
+            --    stopPointing()
+           -- else
+             --   local camPitch = GetGameplayCamRelativePitch()
+               -- if camPitch < -70.0 then
+                 --   camPitch = -70.0
+               -- elseif camPitch > 42.0 then
+                --    camPitch = 42.0
+                --end
+               -- camPitch = (camPitch + 70.0) / 112.0
 
-                local camHeading = GetGameplayCamRelativeHeading()
-                local cosCamHeading = Cos(camHeading)
-                local sinCamHeading = Sin(camHeading)
-                if camHeading < -180.0 then
-                    camHeading = -180.0
-                elseif camHeading > 180.0 then
-                    camHeading = 180.0
-                end
-                camHeading = (camHeading + 180.0) / 360.0
+             --   local camHeading = GetGameplayCamRelativeHeading()
+               -- local cosCamHeading = Cos(camHeading)
+               -- local sinCamHeading = Sin(camHeading)
+               -- if camHeading < -180.0 then
+                --    camHeading = -180.0
+               -- elseif camHeading > 180.0 then
+                --    camHeading = 180.0
+               -- end
+               -- camHeading = (camHeading + 180.0) / 360.0
 
-                local blocked = 0
-                local nn = 0
+           --     local blocked = 0
+          --      local nn = 0
+--
+      --          local coords = GetOffsetFromEntityInWorldCoords(ped, (cosCamHeading * -0.2) - (sinCamHeading * (0.4 * camHeading + 0.3)), (sinCamHeading * -0.2) + (cosCamHeading * (0.4 * camHeading + 0.3)), 0.6)
+        --        local ray = Cast_3dRayPointToPoint(coords.x, coords.y, coords.z - 0.2, coords.x, coords.y, coords.z + 0.2, 0.4, 95, ped, 7);
+      --          nn,blocked,coords,coords = GetRaycastResult(ray)
 
-                local coords = GetOffsetFromEntityInWorldCoords(ped, (cosCamHeading * -0.2) - (sinCamHeading * (0.4 * camHeading + 0.3)), (sinCamHeading * -0.2) + (cosCamHeading * (0.4 * camHeading + 0.3)), 0.6)
-                local ray = Cast_3dRayPointToPoint(coords.x, coords.y, coords.z - 0.2, coords.x, coords.y, coords.z + 0.2, 0.4, 95, ped, 7);
-                nn,blocked,coords,coords = GetRaycastResult(ray)
+     --           Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Pitch", camPitch)
+     --           Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Heading", camHeading * -1.0 + 1.0)
+    --            Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isBlocked", blocked)
+    --            Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isFirstPerson", Citizen.InvokeNative(0xEE778F8C7E1142E2, Citizen.InvokeNative(0x19CAFA3C87F7C2FF)) == 4)
 
-                Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Pitch", camPitch)
-                Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Heading", camHeading * -1.0 + 1.0)
-                Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isBlocked", blocked)
-                Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isFirstPerson", Citizen.InvokeNative(0xEE778F8C7E1142E2, Citizen.InvokeNative(0x19CAFA3C87F7C2FF)) == 4)
-
-            end
-        end
+    --        end
+    --    end
         --
         -- \ Pointing finger
         --
 
+        --
+        -- Weapons on Back
+        --
+        -- this script puts certain large weapons on a player's back when it is not currently selected but still in there weapon wheel
+        -- by: minipunch
+        -- originally made for USA Realism RP (https://usarrp.net)
+
+        -- Add weapons to the 'compatable_weapon_hashes' table below to make them show up on a player's back (can use GetHashKey(...) if you don't know the hash) --
+        ---------------------------------------
+        -- attach if player has large weapon --
+        ---------------------------------------
+        for wep_name, wep_hash in pairs(SETTINGS.compatable_weapon_hashes) do
+            if HasPedGotWeapon(ped, wep_hash, false) then
+                if not attached_weapons[wep_name] then
+                    AttachWeapon(wep_name, wep_hash, SETTINGS.back_bone, SETTINGS.x, SETTINGS.y, SETTINGS.z, SETTINGS.x_rotation, SETTINGS.y_rotation, SETTINGS.z_rotation, isMeleeWeapon(wep_name))
+                end
+            end
+        end
+        --------------------------------------------
+        -- remove from back if equipped / dropped --
+        --------------------------------------------
+        for name, attached_object in pairs(attached_weapons) do
+            -- equipped? delete it from back:
+            if GetSelectedPedWeapon(ped) ==  attached_object.hash or not HasPedGotWeapon(ped, attached_object.hash, false) then -- equipped or not in weapon wheel
+            DeleteObject(attached_object.handle)
+            attached_weapons[name] = nil
+            end
+        end
+        --
+        -- \ Weapons on Back
+        --
      end
-end)
+end)	
 
 
 --
@@ -984,64 +1045,7 @@ Citizen.CreateThread(function()
 	end
 end)
 
-AddEventHandler('onResourceStart', function(resourceName)
-    if (GetCurrentResourceName() ~= resourceName) then
-      return
-    end
-    --
-    -- Surender animation
-    --
-    exports.bro_core:Key("X", "X", "Se rendre", function()
-        if not handsup then
-            TaskPlayAnim(ped, "missminuteman_1ig_2", "handsup_enter", 8.0, 8.0, -1, 50, 0, false, false, false)
-            handsup = true
-        else
-            handsup = false
-            ClearPedTasks(ped)
-        end
-    end)
-    --
-    -- \ Surrender animation
-    --
-
-    --
-    -- Pointing finger
-    --
-    exports.bro_core:Key("B", "B", "Pointer du doigt", function()
-        if not mp_pointing then
-            Wait(200)
-            startPointing()
-            mp_pointing = true
-        else 
-            mp_pointing = false
-            stopPointing()
-        end
-    end)
-    --
-    -- / Pointing finger
-    --
-  end)
-  
-  
-  AddEventHandler('onResourceStop', function(resourceName)
-    if (GetCurrentResourceName() ~= resourceName) then
-      return
-    end
-       --
-    -- Surender animation
-    --
-    exports.bro_core:Key("X", "X", "", nil)
-    --
-    -- \ Surrender animation
-    --
-
-    --
-    -- Pointing finger
-    --
-    exports.bro_core:Key("B", "B", "", nil)
-    --
-    -- / Pointing finger
-    --
-  end)
-  
-  
+--
+-- Register keys
+--
+--Keys.Register('E', 'E', 'Interaction')

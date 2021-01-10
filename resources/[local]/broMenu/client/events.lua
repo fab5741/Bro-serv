@@ -149,8 +149,8 @@ AddEventHandler("bromenu:open", function(job)
 			label = "Moteur",
 			actions = {
 				onSelected = function()		
-					if (IsPedSittingInAnyVehicle(ped)) then 
-						local vehicle = GetVehiclePedIsIn(ped,false)
+					if (IsPedSittingInAnyVehicle(GetPlayerPed(-1))) then 
+						local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1),true)
 						
 						if GetIsVehicleEngineRunning(vehicle) then
 							SetVehicleEngineOn(vehicle,false,false,false)

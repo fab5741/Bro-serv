@@ -29,7 +29,7 @@ end)
 
 AddEventHandler('crime:drug:poucave', function(posx, posy, posz)
 	--TriggerServerEvent('phone:startCall', 'lspd', "deal en cours", { x = posx, y = posy, z = posz })
-	TriggerServerEvent("job:avert:all", "lspd", "Deal en cours", true, { x = posx, y = posy, z = posz })
+	TriggerServerEvent("job:avert:all", "lspd", "Deal en cours", true, GetEntityCoords(GetPlayerPed(-1)))
 end)
 
 AddEventHandler('crime:drug:sell', function(price)

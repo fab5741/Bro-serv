@@ -142,7 +142,6 @@ AddEventHandler("job:safe:open", function(job)
 end)
 
 AddEventHandler("job:safe:open2", function(amount)
-	print(job.job)
 	-- todo: test if chef de service
 	AccountAmount = amount
 	TriggerServerEvent("job:isChef", "job:safe:open3")
@@ -187,9 +186,11 @@ AddEventHandler("job:safe:open4", function(items)
 	for k,v in ipairs(items) do
 		SafeButtons[#SafeButtons+1] = {
 			type="button",
-			label = v.label,
+			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
 			actions = {
 				onSelected = function()
+					local nb = tonumber(exports.bro_core:OpenTextInput({defaultText = "", customTitle = true, title= "Nombre?"}))
+					TriggerServerEvent("job:items:withdraw", v.item, nb)
 				end
 			},
 		}
@@ -197,33 +198,26 @@ AddEventHandler("job:safe:open4", function(items)
 	SafeButtons[#SafeButtons+1] = {
 			type = "button",
 			label = "Déposer",
-			actions = {
-				onSelected = function()
-					TriggerServerEvent("items:get", "job:safe:open:items")
-				end
-			}
+			subMenu = "safeitems"
 	}
-	exports.bro_core:AddMenu("safe", {
-		Title = "Coffre",
-		Subtitle = "Entreprise",
-		buttons = SafeButtons
-	})
+	TriggerServerEvent("items:get", "job:safe:open5")
 end)
 
-RegisterNetEvent("job:safe:open:items")
+RegisterNetEvent("job:safe:open5")
 
-AddEventHandler("job:safe:open:items", function(inventory)
+AddEventHandler("job:safe:open5", function(items)
 	local buttons = {}
 	local weight = 0
 	local maxWeight = 100
 
-	for k, v in ipairs (inventory) do
+	for k, v in ipairs (items) do
 		buttons[k] =     {
 			type = "button",
 			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
 			actions = {
 				onSelected = function() 
-					OpenMenuItem(v.item)
+					local nb = tonumber(exports.bro_core:OpenTextInput({defaultText = "", customTitle = true, title= "Nombre?"}))
+					TriggerServerEvent("job:items:store", v.item, nb)
 				end
 			},
 		}
@@ -235,6 +229,14 @@ AddEventHandler("job:safe:open:items", function(inventory)
 	else
 		Subtitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg"
 	end
+
+	
+	exports.bro_core:AddMenu("safe", {
+		Title = "Coffre",
+		Subtitle = "Entreprise",
+		buttons = SafeButtons
+	})
+
 	exports.bro_core:AddSubMenu("safeitems", {
 		parent = "safe",
 		Title = "Coffre",
@@ -242,6 +244,7 @@ AddEventHandler("job:safe:open:items", function(inventory)
 		buttons = buttons
 	})
 end)
+
 
 
 AddEventHandler("job:item:open", function(job)

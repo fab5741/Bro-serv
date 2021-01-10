@@ -114,12 +114,35 @@ AddEventHandler('phone:_internalAddMessage', function(transmitter, receiver, mes
     cb(_internalAddMessage(transmitter, receiver, message, owner))
 end)
 
-function addMessage(source, discord, phone_number, message)
+function addMessage(source, phone_number, message)
     local sourcePlayer = source
     local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
     if message ~= nil then
-        if phone_number == "taxi" or phone_number == "lspd" or phone_number == "lsms" then
-            TriggerEvent("job:avert:all", phone_number, "Appel reçu", true)
+        if phone_number == "lspd" or phone_number == "lsms" or phone_number == "taxi" or phone_number == "farm"  or phone_number == "wine"  or phone_number == "bennys" then
+            TriggerEvent("job:avert:all", phone_number, "~b~Appel reçu.", true)
+            TriggerEvent("job:service:get", phone_number, function(inService)
+                for k,v in ipairs(inService) do
+                    local discordTo = exports.bro_core:GetDiscordFromSource(v)
+                    MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
+                    {
+                        ['@discord'] =  discordTo}, function(player)
+                        MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
+                        {
+                            ['@transmitter'] = player,
+                            ['@receiver'] = phone_number,
+                            ['@message'] = message,
+                            ['@isRead'] = 0,
+                            ['@owner'] = 0
+                        }, function(id)
+                            MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
+                                ['@id'] = id
+                            }, function(res)   
+                                    TriggerClientEvent("phone:receiveMessage", v, res[1])
+                            end)
+                        end)
+                    end)
+                end
+            end)
 
             MySQL.ready(function ()
                     MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
@@ -131,7 +154,7 @@ function addMessage(source, discord, phone_number, message)
                             ['@receiver'] = player,
                             ['@message'] = message,
                             ['@isRead'] = 0,
-                            ['@owner'] = 0
+                            ['@owner'] = 1
                         }, function(id)
                             MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
                                 ['@id'] = id
@@ -140,15 +163,18 @@ function addMessage(source, discord, phone_number, message)
                             end)
                         end)
                     end)
+
                 end)
         else
             MySQL.ready(function ()
-                MySQL.Async.fetchScalar("SELECT players.discord FROM players WHERE players.phone_number = @phone_number", {
+                MySQL.Async.fetchScalar("SELECT players.gameId FROM players WHERE players.phone_number = @phone_number", {
                     ['@phone_number'] = phone_number
-                }, function(otherdiscord)
+                }, function(gameId)
                     MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
                     {['@discord'] =  discord},
                     function(myPhone)
+                        print(phone_number)
+                        print(myPhone)
                         MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
                         {
                             ['@transmitter'] = myPhone,
@@ -157,33 +183,28 @@ function addMessage(source, discord, phone_number, message)
                             ['@isRead'] = 0,
                             ['@owner'] = 0
                         }, function(id)
-                            MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
-                                ['@id'] = id
-                            }, function(res)
-                                MySQL.Async.fetchScalar("SELECT gameId from players WHERE `discord` = @discord", {
-                                    ['@discord'] = otherdiscord
-                                }, function(res)
-                                        if tonumber(osou) ~= nil then 
-                                            -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
-                                            TriggerClientEvent("phone:receiveMessage", tonumber(osou), res[1])
-                                        end
-                                    end) 
-                                end) 
-                            end)
-                        end)
-                        MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
-                        {
-                            ['@transmitter'] = phone_number,
-                            ['@receiver'] = myPhone,
-                            ['@message'] = message,
-                            ['@isRead'] = 1,
-                            ['@owner'] = 1
-                        }, function(id)
-                            MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
-                                ['@id'] = id
-                            }, function(res)   
-                                TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
-                        end)
+                            print(id)
+                            -- TriggerClientEvent("phone:allMessage", osou, getMessages(otherdiscord))
+                            MySQL.Async.insert("INSERT INTO phone_messages (`transmitter`, `receiver`,`message`, `isRead`,`owner`) VALUES(@transmitter, @receiver, @message, @isRead, @owner)", 
+                            {
+                                ['@transmitter'] = phone_number,
+                                ['@receiver'] = myPhone,
+                                ['@message'] = message,
+                                ['@isRead'] = 1,
+                                ['@owner'] = 1
+                            }, function(id)
+                                MySQL.Async.fetchAll("SELECT * from phone_messages WHERE `id` = @id", {
+                                    ['@id'] = id
+                                }, function(res)  
+                                    print(gameId)
+                                    print(sourcePlayer)
+                                    if gameId ~= -1 then
+                                        TriggerClientEvent("phone:receiveMessage", gameId, res[1])
+                                    end
+                                    TriggerClientEvent("phone:receiveMessage", sourcePlayer, res[1])
+                                end)
+                            end) 
+                        end) 
                     end)
                 end)
             end)
@@ -213,8 +234,7 @@ RegisterServerEvent('phone:sendMessage')
 AddEventHandler('phone:sendMessage', function(phoneNumber, message)
     local _source = source
     local sourcePlayer = tonumber(_source)
-	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
-    addMessage(sourcePlayer, discord, phoneNumber, message)
+    addMessage(sourcePlayer, phoneNumber, message)
 end)
 
 RegisterServerEvent('phone:deleteMessage')
@@ -323,9 +343,12 @@ function saveAppels (appelInfo)
     end
     if appelInfo.is_valid == true then
         local num = appelInfo.transmitter_num
-        if appelInfo.hidden == true then
+        if appelInfo.hidden == true or num == nil then
             num = "###-####"
         end
+        print("Second")
+        print(appelInfo.receiver_num)
+        print(num)
         MySQL.Async.insert("INSERT INTO phone_calls (`owner`, `num`,`incoming`, `accepts`) VALUES(@owner, @num, @incoming, @accepts)", {
             ['@owner'] = appelInfo.receiver_num,
             ['@num'] = num,
@@ -363,16 +386,15 @@ AddEventHandler('phone:register_FixePhone', function(phone_number, coords)
 end)
 
 RegisterServerEvent('phone:internal_startCall')
-AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOffer, extraData)
-    if Config.FixePhone[phone_number] ~= nil then
-        onCallFixePhone(source, phone_number, rtcOffer, extraData)
-        return
-    end
-    
+AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOffer, extraData)  
     local rtcOffer = rtcOffer
     if phone_number == nil or phone_number == '' then 
         print('BAD CALL NUMBER IS NIL')
         return
+    end
+
+    if phone_number == "lspd" or phone_number == "lsms" or phone_number == "taxi" or phone_number == "farm"  or phone_number == "wine"  or phone_number == "bennys" then
+        exports.bro_core:Notification("~r~Non disponible")
     end
 
     local hidden = string.sub(phone_number, 1, 1) == '#'
@@ -402,6 +424,8 @@ AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOf
                 rtcOffer = rtcOffer,
                 extraData = extraData
             }
+            print("phone_number")
+            print(phone_number)
             if extraData ~= nil and extraData.useNumber ~= nil then
                 AppelsEnCours[indexCall].srcPhone = extraData.useNumber
             end
@@ -445,10 +469,6 @@ RegisterServerEvent('phone:acceptCall')
 AddEventHandler('phone:acceptCall', function(infoCall, rtcAnswer)
     local id = infoCall.id
     if AppelsEnCours[id] ~= nil then
-        if PhoneFixeInfo[id] ~= nil then
-            onAcceptFixePhone(source, infoCall, rtcAnswer)
-            return
-        end
         AppelsEnCours[id].receiver_src = infoCall.receiver_src or AppelsEnCours[id].receiver_src
         if AppelsEnCours[id].transmitter_src ~= nil and AppelsEnCours[id].receiver_src~= nil then
             AppelsEnCours[id].is_accepts = true
@@ -467,10 +487,6 @@ AddEventHandler('phone:rejectCall', function (infoCall)
     local _source = source
     local id = infoCall.id
     if AppelsEnCours[id] ~= nil then
-        if PhoneFixeInfo[id] ~= nil then
-            onRejectFixePhone(source, infoCall)
-            return
-        end
         if AppelsEnCours[id].transmitter_src ~= nil then
             TriggerClientEvent('phone:rejectCall', AppelsEnCours[id].transmitter_src)
         end
@@ -582,70 +598,3 @@ AddEventHandler('phone:allUpdate', function()
         end)
     end)
 end)
-
-function onCallFixePhone (source, phone_number, rtcOffer, extraData)
-    local indexCall = lastIndexCall
-    lastIndexCall = lastIndexCall + 1
-
-    local hidden = string.sub(phone_number, 1, 1) == '#'
-    if hidden == true then
-        phone_number = string.sub(phone_number, 2)
-    end
-    local sourcePlayer = tonumber(source)
-	local discord = exports.bro_core:GetDiscordFromSource(sourcePlayer)
-    MySQL.ready(function ()
-		MySQL.Async.fetchScalar('select phone_number from  players where discord = @discord',
-        {['@discord'] =  discord},
-		function(srcPhone)
-            AppelsEnCours[indexCall] = {
-                id = indexCall,
-                transmitter_src = sourcePlayer,
-                transmitter_num = srcPhone,
-                receiver_src = nil,
-                receiver_num = phone_number,
-                is_valid = false,
-                is_accepts = false,
-                hidden = hidden,
-                rtcOffer = rtcOffer,
-                extraData = extraData,
-                coords = Config.FixePhone[phone_number].coords
-            }
-            if extraData ~= nil and extraData.useNumber ~= nil then
-                AppelsEnCours[indexCall].srcPhone = extraData.useNumber
-            end
-            PhoneFixeInfo[indexCall] = AppelsEnCours[indexCall]
-
-            TriggerClientEvent('phone:notifyFixePhoneChange', -1, PhoneFixeInfo)
-            TriggerClientEvent('phone:waitingCall', sourcePlayer, AppelsEnCours[indexCall], true)
-        end)
-    end)
-end
-
-function onAcceptFixePhone(source, infoCall, rtcAnswer)
-    local id = infoCall.id
-    
-    AppelsEnCours[id].receiver_src = source
-    if AppelsEnCours[id].transmitter_src ~= nil and AppelsEnCours[id].receiver_src~= nil then
-        AppelsEnCours[id].is_accepts = true
-        AppelsEnCours[id].forceSaveAfter = true
-        AppelsEnCours[id].rtcAnswer = rtcAnswer
-        PhoneFixeInfo[id] = nil
-        TriggerClientEvent('phone:notifyFixePhoneChange', -1, PhoneFixeInfo)
-        TriggerClientEvent('phone:acceptCall', AppelsEnCours[id].transmitter_src, AppelsEnCours[id], true)
-        SetTimeout(1000, function() -- change to +1000, if necessary.
-            TriggerClientEvent('phone:acceptCall', AppelsEnCours[id].receiver_src, AppelsEnCours[id], false)
-        end)
-        saveAppels(AppelsEnCours[id])
-    end
-end
-
-function onRejectFixePhone(source, infoCall, rtcAnswer)
-    local id = infoCall.id
-    PhoneFixeInfo[id] = nil
-    TriggerClientEvent('phone:notifyFixePhoneChange', -1, PhoneFixeInfo)
-    TriggerClientEvent('phone:rejectCall', AppelsEnCours[id].transmitter_src)
-    if AppelsEnCours[id].is_accepts == false then
-        saveAppels(AppelsEnCours[id])
-    end
-    AppelsEnCours[id] = nil 
-end

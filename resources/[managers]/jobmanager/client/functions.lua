@@ -210,7 +210,7 @@ function Refresh(job)
 															exports.bro_core:RemoveMenu("repair")
 															exports.bro_core:actionPlayer(15000, "Réparation en cours", "","",
 															function()
-																local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)								
+																local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), true)								
 																SetVehicleFixed(vehicle)
 																SetVehicleDeformationFixed(vehicle)
 																SetVehicleUndriveable(vehicle, false)

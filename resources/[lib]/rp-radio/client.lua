@@ -4,7 +4,7 @@ local Radio = {
     On = false,
     Enabled = true,
     Handle = nil,
-    Prop = `prop_cs_hand_radio`,
+    Prop = "prop_cs_hand_radio",
     Bone = 28422,
     Offset = vector3(0.0, 0.0, 0.0),
     Rotation = vector3(0.0, 0.0, 0.0),
@@ -149,7 +149,7 @@ function Radio:Toggle(toggle)
 
         local bone = GetPedBoneIndex(playerPed, self.Bone)
 
-        SetCurrentPedWeapon(playerPed, `weapon_unarmed`, true)
+        SetCurrentPedWeapon(playerPed, "weapon_unarmed", true)
         AttachEntityToEntity(self.Handle, playerPed, bone, self.Offset.x, self.Offset.y, self.Offset.z, self.Rotation.x, self.Rotation.y, self.Rotation.z, true, false, false, false, 2, true)
 
         SetModelAsNoLongerNeeded(self.Handle)
@@ -490,8 +490,8 @@ Citizen.CreateThread(function()
             local hasWeapon, currentWeapon = GetCurrentPedWeapon(playerPed, 1)
 
             -- Remove weapon in hand as we are using the radio
-            if currentWeapon ~= `weapon_unarmed` then
-                SetCurrentPedWeapon(playerPed, `weapon_unarmed`, true)
+            if currentWeapon ~= "weapon_unarmed" then
+                SetCurrentPedWeapon(playerPed, "weapon_unarmed", true)
             end
 
             -- Display help text

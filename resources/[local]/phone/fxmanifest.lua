@@ -62,6 +62,6 @@ server_script {
 }
 
 dependencies {
-	"bf",
+	"bro_core",
 	"screenshot-basic"
 }

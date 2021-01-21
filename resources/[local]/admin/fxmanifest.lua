@@ -3,7 +3,7 @@ game 'gta5'
 
 description '- Bro - Admin commands'
 version '0.1'
-dependency 'bf'
+dependency 'bro_core'
 
 ui_page 'html/index.html'
 

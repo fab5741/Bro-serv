@@ -105,7 +105,6 @@ function createMenus()
 						if motif == "oui" then
 							TriggerServerEvent("vehicle:sell", GetVehiclePedIsIn(GetPlayerPed(-1), true))
 							print(GetVehiclePedIsIn(GetPlayerPed(-1), true))
-							CurrentVehicle = 0
 							DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), true))
 							exports.bro_core:RemoveMenu("shops-sell")
 						end
@@ -153,6 +152,7 @@ function createMenus()
 						exports.bro_core:HelpPromt("Parking : ~INPUT_PICKUP~")
 						exports.bro_core:Key("E", "E", "Parking ("..v.zone..")", function()
 							if exports.bro_core:isPedDrivingAVehicle() then
+								vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 								exports.bro_core:AddMenu("parking-veh", {
 									Title = "Parking",
 									Subtitle = v.zone,
@@ -164,9 +164,8 @@ function createMenus()
 												onSelected = function()
 													exports.bro_core:actionPlayer(4000, "Stockage véhicule", "", "",
 													function()
-														TriggerServerEvent("vehicle:store", CurrentVehicle, v.zone)
-														CurrentVehicle = 0
-														DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), true))
+														TriggerServerEvent("vehicle:store", vehicle, v.zone)
+														DeleteEntity(vehicle)
 														exports.bro_core:RemoveMenu("parking-veh")
 													end)
 												end

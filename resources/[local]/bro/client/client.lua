@@ -21,10 +21,6 @@ config = {
 --global
 ped = GetPlayerPed(-1)
 
--- point finger
-local mp_pointing = false
-local keyPressed = false
-local once = true
 --handsup
 local handsup = false
 
@@ -72,8 +68,6 @@ local attached_weapons = {}
 -- change menu texts
 Citizen.InvokeNative(GetHashKey("ADD_TEXT_ENTRY"), "FE_THDR_GTAO", "Le serveur des bros")
 
--- Load anim
-exports.bro_core:LoadAnimSet("missminuteman_1ig_2")
 
 
 -- Main loop
@@ -100,53 +94,6 @@ Citizen.CreateThread(function()
         --
         -- \ Leg Shot
         --
-
-        --
-        -- Pointing finger
-        --
-        if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) and not mp_pointing then
-            stopPointing()
-        end
-        if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) then
-            if not IsPedOnFoot(PlayerPedId()) then
-                stopPointing()
-            else
-                local camPitch = GetGameplayCamRelativePitch()
-                if camPitch < -70.0 then
-                    camPitch = -70.0
-                elseif camPitch > 42.0 then
-                    camPitch = 42.0
-                end
-                camPitch = (camPitch + 70.0) / 112.0
-
-                local camHeading = GetGameplayCamRelativeHeading()
-                local cosCamHeading = Cos(camHeading)
-                local sinCamHeading = Sin(camHeading)
-                if camHeading < -180.0 then
-                    camHeading = -180.0
-                elseif camHeading > 180.0 then
-                    camHeading = 180.0
-                end
-                camHeading = (camHeading + 180.0) / 360.0
-
-                local blocked = 0
-                local nn = 0
-
-                local coords = GetOffsetFromEntityInWorldCoords(ped, (cosCamHeading * -0.2) - (sinCamHeading * (0.4 * camHeading + 0.3)), (sinCamHeading * -0.2) + (cosCamHeading * (0.4 * camHeading + 0.3)), 0.6)
-                local ray = Cast_3dRayPointToPoint(coords.x, coords.y, coords.z - 0.2, coords.x, coords.y, coords.z + 0.2, 0.4, 95, ped, 7);
-                nn,blocked,coords,coords = GetRaycastResult(ray)
-
-                Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Pitch", camPitch)
-                Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Heading", camHeading * -1.0 + 1.0)
-                Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isBlocked", blocked)
-                Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isFirstPerson", Citizen.InvokeNative(0xEE778F8C7E1142E2, Citizen.InvokeNative(0x19CAFA3C87F7C2FF)) == 4)
-
-            end
-        end
-        --
-        -- \ Pointing finger
-        --
-
      end
 end)
 
@@ -984,64 +931,100 @@ Citizen.CreateThread(function()
 	end
 end)
 
-AddEventHandler('onResourceStart', function(resourceName)
-    if (GetCurrentResourceName() ~= resourceName) then
-      return
-    end
-    --
-    -- Surender animation
-    --
-    exports.bro_core:Key("X", "X", "Se rendre", function()
-        if not handsup then
-            TaskPlayAnim(ped, "missminuteman_1ig_2", "handsup_enter", 8.0, 8.0, -1, 50, 0, false, false, false)
-            handsup = true
-        else
-            handsup = false
-            ClearPedTasks(ped)
-        end
-    end)
-    --
-    -- \ Surrender animation
-    --
 
-    --
-    -- Pointing finger
-    --
-    exports.bro_core:Key("B", "B", "Pointer du doigt", function()
-        if not mp_pointing then
-            Wait(200)
-            startPointing()
-            mp_pointing = true
-        else 
-            mp_pointing = false
+local once = true
+local oldval = false
+local oldvalped = false
+
+Citizen.CreateThread(function()
+    while true do
+        Wait(0)
+
+        exports.bro_core:LoadAnimSet("missminuteman_1ig_2")
+        --
+        -- Surender animation
+        --
+        if IsControlJustPressed(0, config.keys.surrender) then
+            if not handsup then
+                stopPointing()
+                TaskPlayAnim(ped, "missminuteman_1ig_2", "handsup_enter", 8.0, 8.0, -1, 50, 0, false, false, false)
+                handsup = true
+            else
+                handsup = false
+                ClearPedTasks(ped)
+            end
+        end
+        --
+        -- /Surrender
+        --
+        if once then
+            once = false
+        end
+
+        if not keyPressed then
+            if IsControlPressed(0, config.keys.pointing) and not mp_pointing and IsPedOnFoot(PlayerPedId()) then
+                Wait(200)
+                if not IsControlPressed(0, config.keys.pointing) then
+                    keyPressed = true
+                    startPointing()
+                    mp_pointing = true
+                else
+                    keyPressed = true
+                    while IsControlPressed(0, config.keys.pointing) do
+                        Wait(50)
+                    end
+                end
+            elseif (IsControlPressed(0, config.keys.pointing) and mp_pointing) or (not IsPedOnFoot(PlayerPedId()) and mp_pointing) then
+                keyPressed = true
+                mp_pointing = false
+                stopPointing()
+            end
+        end
+
+        if keyPressed then
+            if not IsControlPressed(0, config.keys.pointing) then
+                keyPressed = false
+            end
+        end
+        if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) and not mp_pointing then
             stopPointing()
         end
-    end)
-    --
-    -- / Pointing finger
-    --
-  end)
-  
-  
-  AddEventHandler('onResourceStop', function(resourceName)
-    if (GetCurrentResourceName() ~= resourceName) then
-      return
-    end
-       --
-    -- Surender animation
-    --
-    exports.bro_core:Key("X", "X", "", nil)
-    --
-    -- \ Surrender animation
-    --
+        if Citizen.InvokeNative(0x921CE12C489C4C41, PlayerPedId()) then
+            if not IsPedOnFoot(PlayerPedId()) then
+                stopPointing()
+            else
+                local ped = GetPlayerPed(-1)
+                local camPitch = GetGameplayCamRelativePitch()
+                if camPitch < -70.0 then
+                    camPitch = -70.0
+                elseif camPitch > 42.0 then
+                    camPitch = 42.0
+                end
+                camPitch = (camPitch + 70.0) / 112.0
 
-    --
-    -- Pointing finger
-    --
-    exports.bro_core:Key("B", "B", "", nil)
-    --
-    -- / Pointing finger
-    --
-  end)
-  
-  
+                local camHeading = GetGameplayCamRelativeHeading()
+                local cosCamHeading = Cos(camHeading)
+                local sinCamHeading = Sin(camHeading)
+                if camHeading < -180.0 then
+                    camHeading = -180.0
+                elseif camHeading > 180.0 then
+                    camHeading = 180.0
+                end
+                camHeading = (camHeading + 180.0) / 360.0
+
+                local blocked = 0
+                local nn = 0
+
+                local coords = GetOffsetFromEntityInWorldCoords(ped, (cosCamHeading * -0.2) - (sinCamHeading * (0.4 * camHeading + 0.3)), (sinCamHeading * -0.2) + (cosCamHeading * (0.4 * camHeading + 0.3)), 0.6)
+                local ray = Cast_3dRayPointToPoint(coords.x, coords.y, coords.z - 0.2, coords.x, coords.y, coords.z + 0.2, 0.4, 95, ped, 7);
+                nn,blocked,coords,coords = GetRaycastResult(ray)
+
+                Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Pitch", camPitch)
+                Citizen.InvokeNative(0xD5BB4025AE449A4E, ped, "Heading", camHeading * -1.0 + 1.0)
+                Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isBlocked", blocked)
+                Citizen.InvokeNative(0xB0A6CFD2C69C1088, ped, "isFirstPerson", Citizen.InvokeNative(0xEE778F8C7E1142E2, Citizen.InvokeNative(0x19CAFA3C87F7C2FF)) == 4)
+
+            end
+        end
+    end
+end)

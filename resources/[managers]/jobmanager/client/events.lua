@@ -685,7 +685,7 @@ AddEventHandler("job:open:menu", function(job)
 						local price = exports.bro_core:OpenTextInput({defaultText = "100", customTitle = true, title= "Prix"})
 						local closestPlayer = exports.bro_core:GetClosestPlayer()
 						if closestPlayer ~= 1  then
-							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, 2)
+							TriggerServerEvent("job:facture", GetPlayerServerId(closestPlayer), motif, price, job)
 						else
 							exports.bro_core:Notification("~r~Pas de joueur à proximité")
 						end
@@ -957,7 +957,6 @@ AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 						local playerPed = PlayerPedId() -- get the local player Ped
 
 						if not IsPedInAnyVehicle(playerPed) then
-							CurrentVehicle = v.id
 							exports.bro_core:spawnCar(v.name, true, nil, true)
 							TriggerServerEvent("account:money:sub", 10)
 							exports.bro_core:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
@@ -1175,34 +1174,35 @@ AddEventHandler('job:facture', function(amount, motif, job, sender)
 			LockAskingFacture = true
 			local notifReceivedAt = GetGameTimer()
 			exports.bro_core:AdvancedNotification({
-				text = "Facture de ~g~" .. exports.bro_core:Money(amount) .. "$.~n~ Motif : " .. motif.. "~n~Y pour accepter.~n~N pour refuser0",
-				title = job,
+				text = "Facture de ~g~" .. exports.bro_core:Money(tonumber(amount)) .. ".~n~ Motif : " .. motif.. "~n~~g~Y pour accepter.~n~~r~R pour refuser.",
+				title = job.name,
 				icon = "char_AGENT14"
 			})
 			while(true) do
 				Wait(0)
 
 				if (GetTimeDifference(GetGameTimer(), notifReceivedAt) > 15000) then
-					TriggerServerEvent('job:facture2', sender, 2)
-					exports.bro_core:Notification("Facture expirée")
+					TriggerServerEvent('job:facture2', sender, 2, job)
+					exports.bro_core:Notification("~r~Facture expirée")
 					LockAskingFacture = false
 					break
 				end
 
 				if IsControlPressed(1, Config.bindings.accept_fine) then
-					TriggerServerEvent("account:player:liquid:get:facture", "job:facture:accept", amount, sender)
+					TriggerServerEvent("account:player:liquid:get:facture", "job:facture:accept", amount, sender, job)
 					LockAskingFacture = false
 					break
 				end
 
 				if IsControlPressed(1, Config.bindings.refuse_fine) then
-					TriggerServerEvent('job:facture2', sender, 3)
+					print("REFUSE")
+					TriggerServerEvent('job:facture2', sender, 3, job)
 					LockAskingFacture = false
 					break
 				end
 			end
 		else
-			TriggerServerEvent('job:finesETA', sender, 1)
+			TriggerServerEvent('job:facture2', sender, 1, job)
 		end
 	end)
 end)
@@ -1210,14 +1210,13 @@ end)
 AddEventHandler("job:facture:accept", function(liquid, amount, sender, job)
 	amount = tonumber(amount)
 	if liquid >= amount then
-		TriggerServerEvent("account:player:liquid:add", "", amount*(-1))
-		TriggerServerEvent("account:job:add", "", job, amount*(1-Config.tva), true)
+		TriggerServerEvent("account:job:add", "", job.job, amount*(1-Config.tva), true)
 		TriggerServerEvent("account:job:add", "", 1, amount*Config.tva, true)
-		exports.bro_core:Notification("Facture de " .. amount .. "$ payée")
-		TriggerServerEvent('job:facture2', sender, 0)
+		exports.bro_core:Notification("Facture de ~g~" .. amount .. "$ payée")
+		TriggerServerEvent('job:facture2', sender, 0, job)
 	else
-		exports.bro_core:Notification("Vous n'avez pas assez d'argent")
-		TriggerServerEvent('job:facture2', sender, 3)
+		exports.bro_core:Notification("~r~Vous n'avez pas assez d'argent")
+		TriggerServerEvent('job:facture2', sender, 3, job)
 	end
 	LockAskingFacture = false
 end)

@@ -1093,9 +1093,7 @@ Config.bindings = {
     interact_position = 51, -- E
     use_job_menu = 166, -- F5
     accept_fine = 246, -- Y
-    refuse_fine = 45 -- R
+    refuse_fine = 140 -- R
 }
 
-Config.tva = {
-    0.20
-}
+Config.tva = 0.20

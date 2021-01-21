@@ -1,5 +1,4 @@
 DsVehicle = 0
-CurrentVehicle = 0
 Ped = GetPlayerPed(-1)
 LastHovered = nil
 Frames = 0

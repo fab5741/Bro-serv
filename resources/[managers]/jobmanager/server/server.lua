@@ -650,35 +650,35 @@ AddEventHandler("job:facture", function(t, motif, price, job)
     TriggerClientEvent('job:facture', t, price, motif, job, sourceValue)
     TriggerClientEvent("bro_core:AdvancedNotification", sourceValue, {
         icon = "CHAR_AGENT14",
-        title = job, false, 
+        title = job.name, false, 
         text = "Vous présentez une facture de  ~g~ "..price.."$"
     })
 end)
 
-AddEventHandler('job:facture2', function(officer, code)
+AddEventHandler('job:facture2', function(officer, code, job)
     if(code==1) then
         TriggerClientEvent("bro_core:AdvancedNotification", officer, {
             icon = "CHAR_AGENT14",
-            title = 'JOB', false, 
-            text = "Facture déjà en cours"
+            title = job.name, false, 
+            text = "~r~Facture déjà en cours"
         })
     elseif(code==2) then
         TriggerClientEvent("bro_core:AdvancedNotification", officer, {
             icon = "CHAR_AGENT14",
-            title = 'JOB', false, 
-            text = "Fin de la requête (facture)"
+            title =  job.name, false, 
+            text = "~r~Fin de la requête (facture)"
         })
     elseif(code==3) then
         TriggerClientEvent("bro_core:AdvancedNotification", officer, {
             icon = "CHAR_AGENT14",
-            title = 'JOB', false, 
-            text = "Facture refusée"
+            title =  job.name, false, 
+            text = "~r~Facture refusée"
         })
     elseif(code==0) then
         TriggerClientEvent("bro_core:AdvancedNotification", officer, {
             icon = "CHAR_AGENT14",
-            title = 'JOB', false, 
-            text = "Facture acceptée"
+            title =  job.name, false, 
+            text = "~g~Facture acceptée"
         })
 	end
 end)
@@ -744,6 +744,8 @@ AddEventHandler("job:repair:price", function (type, name)
                 elseif type == "motor" then
                     price = price *0.05
                 end
+                -- debug for server begin
+                price = price /2
                 TriggerClientEvent("bro_core:Notification", sourceValue, "Prix conseillé : ~g~"..price.." $")
             end)
         end)

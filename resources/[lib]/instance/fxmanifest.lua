@@ -4,7 +4,7 @@ game 'gta5'
 
 description 'Instance'
 
-dependency "bf"
+dependency "bro_core"
 
 version '1.1.0'
 

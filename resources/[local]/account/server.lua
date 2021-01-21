@@ -13,6 +13,8 @@ RegisterNetEvent("account:job:add")
 -- atm #4
 RegisterNetEvent("atm:get")
 
+LimitSuitcase = 50000
+
 -- Event Handlers
 -- Player #1
 AddEventHandler('account:player:get', function(cb)
@@ -75,6 +77,7 @@ AddEventHandler('account:player:liquid:add', function(cb, amount)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local amount=amount
+	print(amount)
 	MySQL.ready(function ()
 		MySQL.Async.insert(
 			'update players set liquid=liquid+@amount where discord = @discord',
@@ -83,9 +86,9 @@ AddEventHandler('account:player:liquid:add', function(cb, amount)
 				['@amount'] = amount,
 			}, function(id)
 				MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
-					if liquid > 50000 then
+					if liquid >= LimitSuitcase then
 						TriggerClientEvent("account:suitcase:on", sourceValue)
-					elseif liquid < 100000 then
+					elseif liquid < LimitSuitcase then
 						TriggerClientEvent("account:suitcase:off", sourceValue)
 					end
 					TriggerClientEvent(cb, sourceValue, id ~= nil)
@@ -116,9 +119,9 @@ AddEventHandler('account:player:liquid:give', function(cb, player, amount)
 						['@amount'] = amount,
 					}, function(id)
 						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
-							if liquid > 50000 then
+							if liquid >= LimitSuitcase then
 								TriggerClientEvent("account:suitcase:on", sourceValue)
-							elseif liquid < 100000 then
+							elseif liquid < LimitSuitcase then
 								TriggerClientEvent("account:suitcase:off", sourceValue)
 							end
 							TriggerClientEvent(cb, sourceValue, id ~= nil)
@@ -131,9 +134,9 @@ AddEventHandler('account:player:liquid:give', function(cb, player, amount)
 						['@amount'] = amount,
 					}, function(id)
 						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discordTo}, function(liquid)
-							if liquid > 50000 then
+							if liquid >= LimitSuitcase then
 								TriggerClientEvent("account:suitcase:on", player)
-							elseif liquid < 100000 then
+							elseif liquid < LimitSuitcase then
 								TriggerClientEvent("account:suitcase:off", player)
 							end
 							TriggerClientEvent(cb, sourceValue, id ~= nil)

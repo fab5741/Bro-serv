@@ -389,12 +389,12 @@ RegisterServerEvent('phone:internal_startCall')
 AddEventHandler('phone:internal_startCall', function(source, phone_number, rtcOffer, extraData)  
     local rtcOffer = rtcOffer
     if phone_number == nil or phone_number == '' then 
-        print('BAD CALL NUMBER IS NIL')
+        TriggerClientEvent("bro_core:Notification", source, "~r~Non disponible")
         return
     end
 
     if phone_number == "lspd" or phone_number == "lsms" or phone_number == "taxi" or phone_number == "farm"  or phone_number == "wine"  or phone_number == "bennys" then
-        exports.bro_core:Notification("~r~Non disponible")
+        TriggerClientEvent("bro_core:Notification", source, "~r~Non disponible")
     end
 
     local hidden = string.sub(phone_number, 1, 1) == '#'

@@ -95,21 +95,19 @@ AddEventHandler("bromenu:open", function(job)
 		label = "Verrouiller/Déverouiller",
 		actions = {
 			onSelected = function()
-				local vehicle = GetVehiclePedIsIn(ped, false)
+				local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-					if GetPedInVehicleSeat(vehicle, -1) == ped then
+					if GetPedInVehicleSeat(vehicle, -1) == GetPlayerPed(-1) then
 						TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
 					else
 						exports.bro_core:Notification("~r~Vous ne conduisez pas") 
 					end
 				else
-					local pos = GetEntityCoords(ped)
-					print(ped)
-					local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
+					local pos = GetEntityCoords(GetPlayerPed(-1))
+					local entityWorld = GetOffsetFromEntityInWorldCoords(GetPlayerPed(-1), 0.0, 20.0, 0.0)
 			
-					local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, ped, 0)
+					local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, GetPlayerPed(-1), 0)
 					local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
-					print(vehicle)
 					if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 						TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
 					else

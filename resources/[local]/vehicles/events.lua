@@ -354,7 +354,6 @@ function spawnACar(v, new, tpIn)
 		end
 	end
 	TriggerServerEvent("vehicle:saveId", vehicle, v.gameId)
-	CurrentVehicle = vehicle
 
 	if new == false then
 	--	Wait(2000)
@@ -389,11 +388,11 @@ function spawnACar(v, new, tpIn)
 --	print(v.x)
 --	print(v.y)
 --	print(v.z)
-	print(v.name)
+--	print(v.name)
 
 --	print("Health")
 --	print(v.bodyHealth)
-	print(v.engineHealth)
+--	print(v.engineHealth)
 --	print("Colours")
 --	print(v.primaryColour)
 --	print(v.secondaryColour)
@@ -409,7 +408,7 @@ function spawnACar(v, new, tpIn)
 --	print(v.numberPlateText)
 
 --	print("FUEL")
---	print(v.fuelLevel)
+--	print((v.fuelLevel+ v.fuelLevel)/2)
 --	print("DEBUG")
 		SetVehicleColours(vehicle, v.primaryColour, v.secondaryColour)
 		SetVehicleDirtLevel(vehicle, (v.dirtLevel+v.dirtLevel)/2)
@@ -422,7 +421,10 @@ function spawnACar(v, new, tpIn)
 		end
 		SetVehicleRoofLivery(vehicle, v.roofLivery)
 		SetVehicleWindowTint(vehicle, v.windowTint)
-		--SetVehicleFuelLevel(vehicle, (v.fuelLevel+ v.fuelLevel)/2)
+		if type(v.fuelLevel) == 'number' and v.fuelLevel >= 0 and v.fuelLevel <= 100 then
+			SetVehicleFuelLevel(vehicle, v.fuelLevel + 0.0)
+			DecorSetFloat(vehicle, Config.FuelDecor, GetVehicleFuelLevel(vehicle))
+		end
 	end
 end
 
@@ -497,7 +499,6 @@ end)
 
 RegisterNetEvent("vehicle:store:veh")
 AddEventHandler('vehicle:store:veh', function(address)
-	TriggerServerEvent("vehicle:store", CurrentVehicle, address)
-	CurrentVehicle = 0
+	TriggerServerEvent("vehicle:store", GetVehiclePedIsIn(GetPlayerPed(-1), false), address)
 	DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
 end)

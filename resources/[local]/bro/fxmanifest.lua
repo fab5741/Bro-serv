@@ -9,8 +9,7 @@ dependency "bro_core"
 
 client_scripts {
     'client/functions.lua',
-    'client/client.lua',
-    "lifetraffic.net.dll"
+    'client/client.lua'
 } 
 
 server_scripts {

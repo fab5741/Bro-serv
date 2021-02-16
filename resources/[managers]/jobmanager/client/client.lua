@@ -1,6 +1,18 @@
 VehicleLivraison = 0
 BeginInProgress = false
 NbSold = 0
+shieldActive = false
+shieldEntity = nil
+hadPistol = false
+
+-- ANIM
+animDict = "combat@gestures@gang@pistol_1h@beckon"
+animName = "0"
+
+prop = "prop_ballistic_shield"
+pistol = GetHashKey("WEAPON_PISTOL")
+
+
 -- police vars
 HandCuffed = false
 Ped = GetPlayerPed(-1)
@@ -83,4 +95,21 @@ Citizen.CreateThread(function()
 			Cuffing = false		
 		end
 	end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        if shieldActive then
+            local ped = GetPlayerPed(-1)
+            if not IsEntityPlayingAnim(ped, animDict, animName, 1) then
+                RequestAnimDict(animDict)
+                while not HasAnimDictLoaded(animDict) do
+                    Citizen.Wait(100)
+                end
+            
+                TaskPlayAnim(ped, animDict, animName, 8.0, -8.0, -1, (2 + 16 + 32), 0.0, 0, 0, 0)
+            end
+        end
+        Citizen.Wait(500)
+    end
 end)

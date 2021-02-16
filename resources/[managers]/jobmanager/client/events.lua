@@ -521,6 +521,23 @@ AddEventHandler("job:open:menu", function(job)
 						end
 					},
 				},
+				{
+					type = "separator",
+					label = "SWAT",
+				},
+				{
+					type = "button",
+					label = "Bouclier",
+					actions = {
+						onSelected = function()
+							if shieldActive then
+								DisableShield()
+							else
+								EnableShield()
+							end
+						end
+					},
+				},
 			}
 		elseif job.name == "lsms" then
 			buttons = {

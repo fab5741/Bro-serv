@@ -7,6 +7,7 @@ RegisterNetEvent("account:player:liquid:get")
 RegisterNetEvent("account:player:liquid:get:facture")
 RegisterNetEvent("account:player:liquid:add")
 RegisterNetEvent("account:player:liquid:give")
+RegisterNetEvent("account:player:liquid:check")
 -- Jobs #3
 RegisterNetEvent("account:job:get")
 RegisterNetEvent("account:job:add")
@@ -50,11 +51,11 @@ AddEventHandler('account:player:liquid:get', function(cb)
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
-		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+		MySQL.Async.fetchAll('SELECT liquid, dirty from players where discord = @discord',
 			{
 				['@discord'] = discord
-			}, function(liquid)
-			TriggerClientEvent(cb, sourceValue, liquid)
+			}, function(res)
+			TriggerClientEvent(cb, sourceValue, res[1].dirty + res[1].liquid)
 		end)
 	end)
 end)
@@ -73,27 +74,45 @@ AddEventHandler('account:player:liquid:get:facture', function(cb, amount, sender
 	end)
 end)
 
-AddEventHandler('account:player:liquid:add', function(cb, amount)
+AddEventHandler('account:player:liquid:add', function(cb, amount, dirty)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local amount=amount
 	print(amount)
 	MySQL.ready(function ()
-		MySQL.Async.insert(
-			'update players set liquid=liquid+@amount where discord = @discord',
-			{
-				['@discord'] = discord,
-				['@amount'] = amount,
-			}, function(id)
-				MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
-					if liquid >= LimitSuitcase then
-						TriggerClientEvent("account:suitcase:on", sourceValue)
-					elseif liquid < LimitSuitcase then
-						TriggerClientEvent("account:suitcase:off", sourceValue)
-					end
-					TriggerClientEvent(cb, sourceValue, id ~= nil)
-				end)
-		end)
+		if dirty then 
+			MySQL.Async.insert(
+				'update players set dirty=dirty+@amount where discord = @discord',
+				{
+					['@discord'] = discord,
+					['@amount'] = amount,
+				}, function(id)
+					MySQL.Async.fetchAll('SELECT dirty, liquid from players where discord = @discord', {['@discord'] = discord}, function(res)
+						if (res[1].liquid + res[1].dirty) >= LimitSuitcase then
+							TriggerClientEvent("account:suitcase:on", sourceValue)
+						elseif (res[1].liquid + res[1].dirty) < LimitSuitcase then
+							TriggerClientEvent("account:suitcase:off", sourceValue)
+						end
+						TriggerClientEvent(cb, sourceValue, id ~= nil)
+					end)
+			end)
+		else
+			MySQL.Async.insert(
+				'update players set liquid=liquid+@amount where discord = @discord',
+				{
+					['@discord'] = discord,
+					['@amount'] = amount,
+				}, function(id)
+					MySQL.Async.fetchAll('SELECT dirty, liquid from players where discord = @discord', {['@discord'] = discord}, function(res)
+						if (res[1].liquid + res[1].dirty) >= LimitSuitcase then
+							TriggerClientEvent("account:suitcase:on", sourceValue)
+						elseif (res[1].liquid + res[1].dirty) < LimitSuitcase then
+							TriggerClientEvent("account:suitcase:off", sourceValue)
+						end
+						TriggerClientEvent(cb, sourceValue, id ~= nil)
+					end)
+			end)
+		end
 	end)
 end)
 
@@ -105,49 +124,82 @@ AddEventHandler('account:player:liquid:give', function(cb, player, amount)
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local discordTo = exports.bro_core:GetDiscordFromSource(player)
 	local amount=amount
-
 	MySQL.ready(function ()
-		MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+		MySQL.Async.fetchAll('SELECT liquid, dirty from players where discord = @discord',
 		{
 			['@discord'] = discord
-		}, function(liquid)
-			if liquid >= amount then
+		}, function(res)
+
+			if (res[1].liquid + res[1].dirty) >= amount then
+				if amount > res[1].dirty then
+					dirty = res[1].dirty
+					liquid = amount - res[1].dirty
+				else
+					liquid = 0
+					dirty = amount
+				end
 				MySQL.Async.insert(
 					'update players set liquid=liquid-@amount where discord = @discord',
 					{
 						['@discord'] = discord,
-						['@amount'] = amount,
+						['@amount'] = liquid,
 					}, function(id)
-						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discord}, function(liquid)
-							if liquid >= LimitSuitcase then
-								TriggerClientEvent("account:suitcase:on", sourceValue)
-							elseif liquid < LimitSuitcase then
-								TriggerClientEvent("account:suitcase:off", sourceValue)
-							end
-							TriggerClientEvent(cb, sourceValue, id ~= nil)
+						MySQL.Async.insert(
+							'update players set dirty=dirty-@amount where discord = @discord',
+							{
+								['@discord'] = discord,
+								['@amount'] = dirty,
+							}, function(id)
+								MySQL.Async.fetchAll('SELECT liquid, dirty from players where discord = @discord', {['@discord'] = discord}, function(res)
+									if (res[1].liquid + res[1].dirty) >= LimitSuitcase then
+										TriggerClientEvent("account:suitcase:on", sourceValue)
+									elseif (res[1].liquid + res[1].dirty) < LimitSuitcase then
+										TriggerClientEvent("account:suitcase:off", sourceValue)
+									end
+									TriggerClientEvent(cb, sourceValue, id ~= nil)
+								end)
 						end)
 				end)
 				MySQL.Async.insert(
 					'update players set liquid=liquid+@amount where discord = @discord',
 					{
 						['@discord'] = discordTo,
-						['@amount'] = amount,
+						['@amount'] = liquid,
 					}, function(id)
-						MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord', {['@discord'] = discordTo}, function(liquid)
-							if liquid >= LimitSuitcase then
-								TriggerClientEvent("account:suitcase:on", player)
-							elseif liquid < LimitSuitcase then
-								TriggerClientEvent("account:suitcase:off", player)
-							end
-							TriggerClientEvent(cb, sourceValue, id ~= nil)
+						MySQL.Async.insert(
+							'update players set dirty=dirty+@amount where discord = @discord',
+							{
+								['@discord'] = discordTo,
+								['@amount'] = dirty,
+							}, function(id)
+								MySQL.Async.fetchAll('SELECT liquid, dirty from players where discord = @discord', {['@discord'] = discord}, function(res)
+									if (res[1].liquid + res[1].dirty) >= LimitSuitcase then
+										TriggerClientEvent("account:suitcase:on", sourceValue)
+									elseif (res[1].liquid + res[1].dirty) < LimitSuitcase then
+										TriggerClientEvent("account:suitcase:off", sourceValue)
+									end
+									TriggerClientEvent(cb, sourceValue, id ~= nil)
+								end)
 						end)
 				end)
 			else
-				TriggerClientEvent('bro_core:Notification', sourceValue, "~r~Vous n'avez pas assé de liquide")
+				TriggerClientEvent('bro_core:Notification', sourceValue, "~r~Vous n'avez pas assez de liquide")
 			end
 			TriggerClientEvent(cb, sourceValue, liquid)
 		end)
 
+	end)
+end)
+
+
+AddEventHandler('account:player:liquid:check', function()
+	local sourceValue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.fetchAll('SELECT dirty, liquid from players where discord = @discord', {['@discord'] = discord}, function(res)
+			TriggerClientEvent("bro_core:Notification", sourceValue,  "Sâle : ~r~ $ ".. res[1].dirty)
+			TriggerClientEvent("bro_core:Notification", sourceValue, "Propre : ~g~ $ ".. res[1].liquid)
+		end)
 	end)
 end)
 
@@ -211,11 +263,11 @@ AddEventHandler('atm:get', function(cb)
 		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, player_account, players where players.discord = @discord and players.id = player_account.player and accounts.id = player_account.account', {
 			['@discord'] = discord
 		}, function(amount)
-			MySQL.Async.fetchScalar('SELECT liquid from players where discord = @discord',
+			MySQL.Async.fetchAll('SELECT liquid, dirty from players where discord = @discord',
 				{
 					['@discord'] = discord
-				}, function(liquid)
-					TriggerClientEvent(cb, sourceValue, amount, liquid)
+				}, function(res)
+					TriggerClientEvent(cb, sourceValue, amount, res[1].liquid + res [1].dirty)
 			end)
 		end)
 	end)

@@ -33,14 +33,15 @@ AddEventHandler('crime:drug:poucave', function(posx, posy, posz)
 end)
 
 AddEventHandler('crime:drug:sell', function(price)
-	TriggerServerEvent("account:player:liquid:add", "", price)
+	TriggerServerEvent("account:player:liquid:add", "", price, true)
 	TriggerServerEvent("items:sub", 7, 1)
 end)
 
 -- malettes
 AddEventHandler('crime:malette:sell', function(amount)
+	print("sell")
 	if amount ~= nil and amount >= tonumber(nbMalettes) then
-		TriggerServerEvent("account:player:liquid:add", "", nbMalettes * 50)
+		TriggerServerEvent("account:player:liquid:add", "", nbMalettes * 50, true)
 		TriggerServerEvent("items:sub", 8, nbMalettes)
 		exports.bro_core:Notification("Vous avez vendu pour : "..exports.bro_core:Money(nbMalettes*50))
 	else

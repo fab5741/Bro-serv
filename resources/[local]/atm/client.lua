@@ -47,4 +47,45 @@ Citizen.CreateThread(function()
 			{ x=1702.8286132812, y = 4933.603515625,z=42.063678741455}
 		}
 	})
+
+	exports.bro_core:AddArea("bank", {
+		trigger = {
+			weight = 2,
+			enter = {
+                callback = function()
+					exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
+						TriggerServerEvent("atm:get", "bank:get")
+                    end)
+					exports.bro_core:HelpPromt("Banque : ~INPUT_PICKUP~")
+				end
+			},
+			exit = {
+                callback = function()
+                    exports.bro_core:RemoveMenu("bank")
+                    exports.bro_core:Key("E", "E", "Interaction", function()
+                    end)
+            	end
+			},
+		},
+		blip = {
+			text = "Banque",
+			colorId = 2,
+			imageId = 300,
+		},
+		locations = {
+			{ 
+				x =-2962.7800292969, y=482.77465820312, z= 15.703103065491
+			},
+			{
+				x=-112.68618774414,y=6469.8583984375,z=31.626710891724
+			},
+			{
+				x=1175.4284667969,y=2706.8161621094, z=38.094074249268
+			},
+			{
+				x=149.11099243164,y=-1040.4370117188,z=29.374076843262
+			}
+		}
+	})
+
 end) 

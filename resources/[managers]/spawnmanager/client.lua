@@ -50,7 +50,6 @@ AddEventHandler('player:saveCoords', function ()
             weapons[#weapons+1] = v
         end
     end
-    print(json.encode(weapons))
     TriggerServerEvent("player:saveCoordsServer", GetEntityCoords(GetPlayerPed(-1)), json.encode(weapons), GetEntityHealth(GetPlayerPed(-1)))
 end)
 

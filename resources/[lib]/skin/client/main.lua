@@ -136,7 +136,6 @@ AddEventHandler('skin:playerRegistered', function()
         if firstSpawn then
             ESX.TriggerServerCallback('skin:getPlayerSkin', function(skin, jobSkin)
                 if skin == nil then
-                    print("on lance l'éditeur")
                     TriggerEvent('nicoo_charcreator:CharCreator')
                     Citizen.Wait(100)
                     skinLoaded = true

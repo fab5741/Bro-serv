@@ -5,13 +5,14 @@ description '- Bro - Needs'
 
 version '0.0.1'
 
-dependency  'bf'
+dependency  'bro_core'
 
 client_script {
     'client.lua'
 }
 
 server_script {
+    '@mysql-async/lib/MySQL.lua',
     'server.lua'
 }
 

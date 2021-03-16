@@ -3,11 +3,15 @@ game 'gta5'
 
 description '- Bro - Accounting'
 
-dependency "bf"
+dependency "bro_core"
 
 version '0.1'
 
-server_script {
+client_scripts {
+    'client.lua'
+}
+
+server_scripts {
     '@mysql-async/lib/MySQL.lua',
     'server.lua'
 }

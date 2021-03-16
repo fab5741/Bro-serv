@@ -1,176 +1,49 @@
-local buttons = {}
-
-function clockIn(job)
-	TriggerServerEvent("player:get", "job:add:uniform")
+function ClockIn(job)
+	TriggerServerEvent("job:get:player", "job:add:uniform")
 	TriggerServerEvent("job:clock", true, job)
-	exports.bf:CloseMenu("lockers")
+	exports.bro_core:RemoveMenu("lockers")
+	TriggerServerEvent("scoreboard:ClockIn", job)
 end
 
-function clockOut(job)
+function ClockOut(job)
 	TriggerServerEvent("player:get", "job:remove:uniform")
 	TriggerServerEvent("job:clock", false, job)
-	exports.bf:CloseMenu("lockers")
+	exports.bro_core:RemoveMenu("lockers")
+	TriggerServerEvent("scoreboard:ClockIn", nil)
 end
 
 
 RegisterNetEvent("job:add:uniform")
 
 -- source is global here, don't add to function
-AddEventHandler('job:add:uniform', function(skin)
-	local clothes = {
-		recruit = {
-			male = {
-				tshirt_1 = 59,  tshirt_2 = 1,
-				torso_1 = 55,   torso_2 = 0,
-				decals_1 = 0,   decals_2 = 0,
-				arms = 41,
-				pants_1 = 25,   pants_2 = 0,
-				shoes_1 = 25,   shoes_2 = 0,
-				helmet_1 = 46,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			},
-			female = {
-				tshirt_1 = 36,  tshirt_2 = 1,
-				torso_1 = 48,   torso_2 = 0,
-				decals_1 = 0,   decals_2 = 0,
-				arms = 44,
-				pants_1 = 34,   pants_2 = 0,
-				shoes_1 = 27,   shoes_2 = 0,
-				helmet_1 = 45,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			}
-		},
-	
-		officer = {
-			male = {
-				tshirt_1 = 58,  tshirt_2 = 0,
-				torso_1 = 55,   torso_2 = 0,
-				decals_1 = 0,   decals_2 = 0,
-				arms = 41,
-				pants_1 = 25,   pants_2 = 0,
-				shoes_1 = 25,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			},
-			female = {
-				tshirt_1 = 35,  tshirt_2 = 0,
-				torso_1 = 48,   torso_2 = 0,
-				decals_1 = 0,   decals_2 = 0,
-				arms = 44,
-				pants_1 = 34,   pants_2 = 0,
-				shoes_1 = 27,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			}
-		},
-	
-		sergeant = {
-			male = {
-				tshirt_1 = 58,  tshirt_2 = 0,
-				torso_1 = 55,   torso_2 = 0,
-				decals_1 = 8,   decals_2 = 1,
-				arms = 41,
-				pants_1 = 25,   pants_2 = 0,
-				shoes_1 = 25,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			},
-			female = {
-				tshirt_1 = 35,  tshirt_2 = 0,
-				torso_1 = 48,   torso_2 = 0,
-				decals_1 = 7,   decals_2 = 1,
-				arms = 44,
-				pants_1 = 34,   pants_2 = 0,
-				shoes_1 = 27,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			}
-		},
-	
-		lieutenant = {
-			male = {
-				tshirt_1 = 58,  tshirt_2 = 0,
-				torso_1 = 55,   torso_2 = 0,
-				decals_1 = 8,   decals_2 = 2,
-				arms = 41,
-				pants_1 = 25,   pants_2 = 0,
-				shoes_1 = 25,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			},
-			female = {
-				tshirt_1 = 35,  tshirt_2 = 0,
-				torso_1 = 48,   torso_2 = 0,
-				decals_1 = 7,   decals_2 = 2,
-				arms = 44,
-				pants_1 = 34,   pants_2 = 0,
-				shoes_1 = 27,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			}
-		},
-	
-		boss = {
-			male = {
-				tshirt_1 = 58,  tshirt_2 = 0,
-				torso_1 = 55,   torso_2 = 0,
-				decals_1 = 8,   decals_2 = 3,
-				arms = 41,
-				pants_1 = 25,   pants_2 = 0,
-				shoes_1 = 25,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			},
-			female = {
-				tshirt_1 = 35,  tshirt_2 = 0,
-				torso_1 = 48,   torso_2 = 0,
-				decals_1 = 7,   decals_2 = 3,
-				arms = 44,
-				pants_1 = 34,   pants_2 = 0,
-				shoes_1 = 27,   shoes_2 = 0,
-				helmet_1 = -1,  helmet_2 = 0,
-				chain_1 = 0,    chain_2 = 0,
-				ears_1 = 2,     ears_2 = 0
-			}
-		},
-	
-		bullet_wear = {
-			male = {
-				bproof_1 = 11,  bproof_2 = 1
-			},
-			female = {
-				bproof_1 = 13,  bproof_2 = 1
-			}
-		},
-	
-		gilet_wear = {
-			male = {
-				tshirt_1 = 59,  tshirt_2 = 1
-			},
-			female = {
-				tshirt_1 = 36,  tshirt_2 = 1
-			}
-		}
-	}
-	TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), clothes.recruit.male)
-	giveBasicKit()
+AddEventHandler('job:add:uniform', function(job)
+	-- TODO: add prop, local prop_name = 'prop_cs_wrench'
+	exports.bro_core:actionPlayer(2000, "Vêtements", "amb@world_human_gardener_plant@male@enter", "enter",
+	function()
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			local skin = json.decode(job.skin)
+			local clothes
+			if skin.sex == 0 then
+				clothes = Config.jobs[job.name].clothes[job.grade].male
+			else
+				clothes = Config.jobs[job.name].clothes[job.grade].female
+			end
+			TriggerEvent('skinchanger:loadClothes', skin, clothes)
+		end)
+	end)
 end)
 
 RegisterNetEvent("job:remove:uniform")
 
 -- source is global here, don't add to function
 AddEventHandler('job:remove:uniform', function(skin)
-	RemoveAllPedWeapons(PlayerPedId())
-
-	TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), clothes)
-	TriggerServerEvent("job:breakService")
+	exports.bro_core:actionPlayer(2000, "Vêtements", "amb@world_human_gardener_plant@male@enter", "enter",
+	function()
+		if skin.clothes ~= nil then
+			TriggerEvent('skinchanger:loadClothes', json.decode(skin.skin), json.decode(skin.clothes))
+		else
+			TriggerEvent('skinchanger:loadSkin', json.decode(skin.skin))
+		end
+		TriggerServerEvent("job:breakService")
+	end)
 end)

@@ -1,6 +1,9 @@
 resource_manifest_version '77731fab-63ca-442c-a67b-abc70f28dfa5'
 
-dependency "bf"
+dependencies {
+	"bro_core",
+	"jobManager"
+}
 
 ui_page 'html/ui.html'
 files {
@@ -12,7 +15,10 @@ files {
 	'html/debounce.min.js'
 }
 
-client_script "client.lua"
+client_scripts {
+	"functions.lua",
+	"client.lua"
+}
 server_scripts{
 	"server.lua"
 }

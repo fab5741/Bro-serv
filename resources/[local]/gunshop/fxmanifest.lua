@@ -7,7 +7,7 @@ description 'ESX Weapon Shop'
 version '1.1.0'
 
 dependencies {
-	"bf",
+	"bro_core",
 	"jobManager"
 }
 

@@ -16,7 +16,7 @@ local function freezePlayer(id, freeze)
 
         FreezeEntityPosition(ped, false)
         --SetCharNeverTargetted(ped, false)
-        SetPlayerInvincible(player, false)
+     --   SetPlayerInvincible(player, false)
     else
         if IsEntityVisible(ped) then
             SetEntityVisible(ped, false)
@@ -37,11 +37,10 @@ end
 local spawnLock = false
 
 -- spawns the current player at a certain spawn point index (or a random one, for that matter)
-function spawnPlayer(x, y, z)     
+function SpawnPlayer(x, y, z, weapons, health)     
     if spawnLock then
         return
     end
-    
     spawnLock = true
 
     Citizen.CreateThread(function()
@@ -54,7 +53,6 @@ function spawnPlayer(x, y, z)
 
         -- freeze the local player
         freezePlayer(PlayerId(), true)
-       
         -- preload collisions for the spawnpoint
         RequestCollisionAtCoord(x, y, z)
 
@@ -73,8 +71,6 @@ function spawnPlayer(x, y, z)
             end
             Citizen.Wait(5)
         end
-
-    --    NetworkResurrectLocalPlayer(x, y, z, 0, true, true, false)
 
         -- gamelogic-style cleanup stuff
         ClearPedTasksImmediately(ped)
@@ -102,10 +98,18 @@ function spawnPlayer(x, y, z)
 
         ShutdownLoadingScreen()
         ShutdownLoadingScreenNui()
+        SetEntityHealth(GetPlayerPed(-1), health)
 
         TriggerServerEvent("player:spawned")
+        TriggerServerEvent("player:spawned:clothes")
         TriggerServerEvent("needs:spawned")
-        
-       spawnLock = false
+
+        Wait(10000)
+        if weapons ~= nil then
+            for k,v in pairs(json.decode(weapons)) do
+                GiveWeaponToPed(GetPlayerPed(-1), v, 100, false, false)
+            end
+        end
+        spawnLock = false
     end)
 end

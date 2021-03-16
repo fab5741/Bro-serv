@@ -2,18 +2,20 @@ fx_version 'adamant'
 games { 'gta5' }
 
 dependencies {
-    'bf',
+    'bro_core',
     'vehicles',
-    'lsms', 
-    'account'   
+    'lsms',
+    'account',
+    "items",
+    'spawnManager'
 }
 
 client_script {
     'config.lua',
     'client/cloackroom.lua',
     'client/functions.lua',
-    'client/events.lua',
     'client/menu.lua',
+    'client/events.lua',
     'client/jobs.lua',
     'client/client.lua',
 }

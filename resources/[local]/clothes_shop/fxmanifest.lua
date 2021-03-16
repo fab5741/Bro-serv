@@ -3,7 +3,7 @@ game 'gta5'
 
 description '- Bro - clothes - shop'
 dependencies  {
-    "bf", 
+    "bro_core", 
     "skin",
     "skinchanger"
 }

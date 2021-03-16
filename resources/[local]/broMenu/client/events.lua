@@ -1,331 +1,595 @@
-RegisterNetEvent('bf:open')
+RegisterNetEvent('bromenu:open')
+-- Portefeuille
+RegisterNetEvent('bromenu:liquid')
+RegisterNetEvent('bromenu:permis')
+RegisterNetEvent('bromenu:show')
+RegisterNetEvent('bromenu:get')
+RegisterNetEvent('bromenu:set')
+RegisterNetEvent('bromenu:account:get')
+-- Items
+RegisterNetEvent('bromenu:items')
+RegisterNetEvent('vehicle:items:open')
+-- Clothes
+RegisterNetEvent('bromenu:clothes:mask')
+RegisterNetEvent('bromenu:clothes:torse')
+RegisterNetEvent('bromenu:clothes:pants')
+RegisterNetEvent('bromenu:clothes:shoes')
+RegisterNetEvent('bromenu:clothes:reset')
 
-AddEventHandler("bf:open", function(job) 
-	job = job[1]
-	exports.bf:SetMenuValue("bro", {
-		menuTitle = job.label
+
+AddEventHandler("bromenu:open", function(job) 
+	if job[1] == nil then 
+		job = {
+			grade = "Chomeur",
+			label = ""
+		}
+	else
+		job = job[1]
+	end
+	local buttons = {}
+
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Inventaire",
+		subMenu = "items"
+	}
+
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Portefeuille",
+		subMenu = "wallet",
+	}
+
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Vehicule",
+		subMenu = "vehicle"
+	}
+
+	if not exports.bro_core:isPedDrivingAVehicle() then
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Vetements",
+			subMenu = "clothes"
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Quitter son travail",
+			actions = {
+				onSelected = function()
+					if  exports.bro_core:OpenTextInput({ maxInputLength = 10 , title = "Oui, pour confirmer", customTitle = true}) == "oui" then
+						-- on quitte le job
+						TriggerServerEvent("job:set:me", nil, "Chomeur")
+						Wait(1000)
+						TriggerServerEvent("job:get", "jobs:refresh")
+					end
+				end
+			},
+		}
+	end
+
+	exports.bro_core:AddMenu("bromenu", {
+		Title = "Bromenu",
+		Subtitle = job.grade.." "..job.label,
+		buttons = buttons
 	})
-	exports.bf:OpenMenu("bro")
+
+	exports.bro_core:AddSubMenu("items", {
+		parent = "bromenu",
+		buttons = buttons
+	})
+
+	exports.bro_core:AddSubMenu("wallet", {
+		parent = "bromenu",
+		buttons = buttons
+	})
+
+	-- trigger menu data loads
+	TriggerServerEvent("items:get", "bromenu:items")
+	TriggerServerEvent("account:player:liquid:get", "bromenu:liquid")
+
+	buttons = {}
+
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Verrouiller/Déverouiller",
+		actions = {
+			onSelected = function()
+				local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+					if GetPedInVehicleSeat(vehicle, -1) == GetPlayerPed(-1) then
+						TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
+					else
+						exports.bro_core:Notification("~r~Vous ne conduisez pas") 
+					end
+				else
+					local pos = GetEntityCoords(GetPlayerPed(-1))
+					local entityWorld = GetOffsetFromEntityInWorldCoords(GetPlayerPed(-1), 0.0, 20.0, 0.0)
+			
+					local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, GetPlayerPed(-1), 0)
+					local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+					if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+						TriggerServerEvent("vehicle:lock", "vehicle:lock", vehicle)
+					else
+						exports.bro_core:Notification("~r~Pas de voiture à portée")
+					end
+				end
+			end
+		}
+	}
+
+	buttons[#buttons+1] = 	{
+		type = "button",
+		label = "Inventaire coffre",
+		actions = {
+			onSelected = function()
+				local coords = GetEntityCoords(ped, true)
+				local pos = GetEntityCoords(ped)
+				local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
+				local entityWorld = GetOffsetFromEntityInWorldCoords(ped, 0.0, 20.0, 0.0)
+		
+				local rayHandle = CastRayPointToPoint(pos.x, pos.y, pos.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, ped, 0)
+				local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
+				local islocked = GetVehicleDoorLockStatus(vehicle)
+				if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
+					if (islocked == 1)then
+						TriggerServerEvent("items:vehicle:get", "vehicle:items:open", vehicle)
+					end
+				else
+					exports.bro_core:Notification("~r~Pas de voiture")
+				end
+			end
+		}
+	}
+	if exports.bro_core:isPedDrivingAVehicle() then
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Moteur",
+			actions = {
+				onSelected = function()		
+					if (IsPedSittingInAnyVehicle(GetPlayerPed(-1))) then 
+						local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1),true)
+						
+						if GetIsVehicleEngineRunning(vehicle) then
+							SetVehicleEngineOn(vehicle,false,false,false)
+							SetVehicleUndriveable(vehicle,true)
+						else
+							SetVehicleUndriveable(vehicle,false)
+							SetVehicleEngineOn(vehicle,true,false,false)
+						end
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Coffre",
+			actions = {
+				onSelected = function()
+					vehicle = GetVehiclePedIsIn(ped,true)
+					
+					local isopen = GetVehicleDoorAngleRatio(vehicle,5)
+					local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+					
+					if distanceToVeh <= interactionDistance then
+						if (isopen == 0) then
+						SetVehicleDoorOpen(vehicle,5,0,0)
+						else
+						SetVehicleDoorShut(vehicle,5,0)
+						end
+					else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Porte avant",
+			actions = {
+				onSelected = function()
+					vehicle = GetVehiclePedIsIn(ped,true)
+					local isopen = GetVehicleDoorAngleRatio(vehicle,0) and GetVehicleDoorAngleRatio(vehicle,1)
+					local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+					
+					if distanceToVeh <= interactionDistance then
+						if (isopen == 0) then
+						SetVehicleDoorOpen(vehicle,0,0,0)
+						SetVehicleDoorOpen(vehicle,1,0,0)
+						else
+						SetVehicleDoorShut(vehicle,0,0)
+						SetVehicleDoorShut(vehicle,1,0)
+						end
+					else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Porte arriéres",
+			actions = {
+				onSelected = function()
+					vehicle = GetVehiclePedIsIn(ped,true)
+					local isopen = GetVehicleDoorAngleRatio(vehicle,2) and GetVehicleDoorAngleRatio(vehicle,3)
+					local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+					
+					if distanceToVeh <= interactionDistance then
+						if (isopen == 0) then
+						SetVehicleDoorOpen(vehicle,2,0,0)
+						SetVehicleDoorOpen(vehicle,3,0,0)
+						else
+						SetVehicleDoorShut(vehicle,2,0)
+						SetVehicleDoorShut(vehicle,3,0)
+						end
+					else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+		buttons[#buttons+1] = 	{
+			type = "button",
+			label = "Capot",
+			actions = {
+				onSelected = function()
+						vehicle = GetVehiclePedIsIn(ped,true)
+							
+						local isopen = GetVehicleDoorAngleRatio(vehicle,4)
+						local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(vehicle), 1)
+						
+						if distanceToVeh <= interactionDistance then
+							if (isopen == 0) then
+							SetVehicleDoorOpen(vehicle,4,0,0)
+							else
+							SetVehicleDoorShut(vehicle,4,0)
+							end
+						else
+						exports.bro_core:Notification("~r~vous devez être dans un véhicule")
+					end
+				end
+			}
+		}
+	end
+
+	exports.bro_core:AddSubMenu("vehicle", {
+		parent= "bromenu",
+		Title = "Vehicule",
+		Subtitle = "Bromenu > Gestion véhicule",
+		buttons = buttons
+	})
+
+	exports.bro_core:AddSubMenu("clothes", {
+		parent= "bromenu",
+		Title = "Vêtements",
+		Subtitle = "Gestion",
+		buttons = {
+			{
+				type = "button",
+				label = "Se rhabiller",
+				actions = {
+					onSelected = function()
+						TriggerServerEvent("bro:skin:get", "bromenu:clothes:reset")
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Masque",
+				actions = {
+					onSelected = function()
+						TriggerEvent("bromenu:clothes:mask")
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Torse",
+				actions = {
+					onSelected = function()
+						TriggerEvent("bromenu:clothes:torse")
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Pontalon",
+				actions = {
+					onSelected = function()
+						TriggerEvent("bromenu:clothes:pants")
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Chaussures",
+				actions = {
+					onSelected = function()
+						TriggerEvent("bromenu:clothes:shoes")
+					end
+				},
+			}
+		}
+	})
+end)
+
+RegisterNetEvent("bromenu:wallet:open")
+AddEventHandler("bromenu:wallet:open", function(player)
+	Player= player
+	local ppa = ""
+	local permis = ""
+	if player.permis > 0 then
+		permis =  "(~b~"..player.permis.." pts~s~)"
+	else
+		permis =  "(~r~"..player.permis.." pts~s~)"
+	end
+	if player.gun_permis then
+		ppa = "~b~Valide"
+	else
+		ppa = "~r~Non Valide"
+	end
+	exports.bro_core:AddSubMenu("wallet", {
+		parent = "bromenu",
+		Title = "Portefeuille",
+		Subtitle = Player.firstname.." "..Player.lastname.. " ("..Player.birth..")",
+		buttons = {
+				{
+					type ="separator",
+					label ="Argent",
+				},
+				{
+				type = "button",
+				label = "Liquide",
+				style = {
+					RightLabel = exports.bro_core:Money(Liquid)
+				},
+				{
+					type ="separator",
+					label ="Identité",
+				},
+				actions = {
+					onSelected = function()
+						local closestPlayer = exports.bro_core:GetClosestPlayer()
+						if closestPlayer ~= -1 then
+							local amount = tonumber(exports.bro_core:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
+							exports.bro_core:actionPlayer(2000, "Vous tendez les billets", "amb@prop_human_atm@female@base", "base",
+							function()
+								TriggerServerEvent("account:player:liquid:give", "", GetPlayerServerId(closestPlayer), amount)
+							end)
+						else
+							exports.bro_core:Notification("~r~Pas de joueur à proximité")
+						end
+					end
+				},
+			},
+			{
+				type = "button",
+				label = "Modifier identité",
+				actions = {
+					onSelected = function () 
+						TriggerServerEvent("bro:set", "firstname", exports.bro_core:OpenTextInput({ title="Prénom", maxInputLength=60, customTitle=true}),"")
+						TriggerServerEvent("bro:set", "lastname", exports.bro_core:OpenTextInput({ title="Nom", maxInputLength=60, customTitle=true}),"")
+						TriggerServerEvent("bro:set", "birth", exports.bro_core:OpenTextInput({ title="Format (01/01/1911)", maxInputLength=10, customTitle=true}),"")
+					end
+				}
+			},
+			{
+				type = "button",
+				label = "Montrer mon identité",
+				actions = {
+					onSelected = function()
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							TriggerServerEvent("bro:get", "bromenu:show")
+						end)
+					end
+				},
+			},
+			{
+				type ="separator",
+				label ="Permis",
+			},
+			{
+				type = "button",
+				label = "Montrer mon permis véhicule. "..permis,
+				actions = {
+					onSelected = function () 
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							TriggerServerEvent("vehicle:permis:get", "bromenu:permis", exports.bro_core:GetClosestPlayer())
+						end)
+					end
+				}
+			},
+			{
+				type = "button",
+				label = "Montrer mon permis PPA. "..ppa,
+				actions = {
+					onSelected = function () 
+						exports.bro_core:actionPlayer(2000, "Vous sortez votre carte", "amb@prop_human_atm@female@base", "base",
+						function()
+							local closestPlayer = exports.bro_core:GetClosestPlayer()
+							if closestPlayer ~= -1 then
+								TriggerServerEvent("bro:permis:get", GetPlayerServerId(closestPlayer))
+							else
+								exports.bro_core:Notification("~r~Pas de joueur à proximité")
+							end
+						end)
+					end
+				}
+			},
+		}
+	})
 end)
 
 
-RegisterNetEvent('bf:liquid')
-
-AddEventHandler("bf:liquid", function(liquid) 
-  local buttons = {}
-	buttons[1] =     {
-		text = "Liquide : " .. liquid.. " $",
-	}
-	buttons[2] =     {
-		text = "Identité",
-		exec = {
-			callback = function()
-				TriggerServerEvent("bro:get", "bro:get")
-			end
-		}
-	}
-	buttons[3] =     {
-		text = "Montrer carte d'identité",
-		exec = {
-			callback = function()
-				TriggerServerEvent("bro:get", "bro:show")
-			end
-		}
-	}
-	buttons[4] =     {
-		text = "Montrer permis",
-		exec = {
-			callback = function()
-				TriggerServerEvent("vehicle:permis:get", "bro:permis")
-			end
-		}
-	}
-	exports.bf:SetMenuButtons("bro-wallet", buttons)
-	exports.bf:NextMenu("bro-wallet")
+AddEventHandler("bromenu:liquid", function(liquid) 
+	Liquid = liquid
+	TriggerServerEvent("bro:get", "bromenu:wallet:open")
 end)
 
-RegisterNetEvent('bro:permis')
 
-AddEventHandler("bro:permis", function(permis) 
-	peds = exports.bf:GetPlayerServerIdInDirection(5.0)
-	if peds ~= false then
-		TriggerServerEvent("bro:permis:show", permis, peds)
+AddEventHandler("bromenu:permis", function(permis) 
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+	if closestPlayer ~= -1 then
+		TriggerServerEvent("bro:permis:show", permis, GetPlayerServerId(closestPlayer))
 	end
 end)
 
-RegisterNetEvent('bro:show')
 
-AddEventHandler("bro:show", function(player) 
-	peds = exports.bf:GetPlayerServerIdInDirection(5.0)
-	if peds ~= false then
-		TriggerServerEvent("bro:permis:show", permis, peds)
+AddEventHandler("bromenu:show", function(player) 
+	local closestPlayer = exports.bro_core:GetClosestPlayer()
+
+	if closestPlayer ~= -1 then
+		TriggerServerEvent("bro:card:show", player, GetPlayerServerId(closestPlayer))
+	else
+		exports.bro_core:Notification("~r~Pas de joueur à proximité")
 	end
 end)
 
-RegisterNetEvent('bro:get')
 
-AddEventHandler("bro:get", function(data) 
+AddEventHandler("bromenu:get", function(data)
 	firstname = data.firstname
 	lastname = data.lastname
 	birth = data.birth
-	exports.bf:SetMenuValue("bro-wallet-character",
-	{
-		menuTitle = firstname.." ".. lastname.. " ("..birth.. ")",
-	})
-	exports.bf:NextMenu("bro-wallet-character")
 end)
 
 
 
-
-RegisterNetEvent('bro:set')
-
-AddEventHandler("bro:set", function() 
-	exports.bf:SetMenuValue("bro-wallet-character",
+AddEventHandler("bromenu:set", function() 
+	exports.bro_core:SetMenuValue("bro-wallet-character",
 	{
 		menuTitle = firstname.." ".. lastname.. " ("..birth.. ")",
 	})
 end)
 
-RegisterNetEvent('bf:account:get')
 
-AddEventHandler("bf:account:get", function(account) 
+AddEventHandler("bromenu:account:get", function(account) 
 	account = account
 end)
 
-RegisterNetEvent('bf:job')
-
-AddEventHandler("bf:job", function(job)
-	CloseMenu()
-	SendNUIMessage({
-		title = player.firstname.. " " .. player.lastname,
-		subtitle = job[1].job.. " (" .. job[1].grade ..")",
-		buttons = buttonsCategories,
-		action = "setAndOpen"
-	})
-	
-	anyMenuOpen.menuName = "playermenu"
-	anyMenuOpen.isActive = true
-end)
-
-function GetPlayers()
-    local players = {}
-
-    for i = 0, 31 do
-        if NetworkIsPlayerActive(i) then
-            table.insert(players, i)
-        end
-    end
-
-    return players
-end
-
-function GetClosestPlayer()
-	local players = GetPlayers()
-	local closestDistance = -1
-	local closestPlayer = -1
-	local ply = PlayerPedId()
-	local plyCoords = GetEntityCoords(ply, 0)
-	
-	for index,value in ipairs(players) do
-		local target = GetPlayerPed(value)
-		if(target ~= ply) then
-			local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-			local distance = Vdist(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"])
-			if(closestDistance == -1 or closestDistance > distance) then
-				closestPlayer = value
-				closestDistance = distance
-			end
-		end
-	end
-	
-	return closestPlayer, closestDistance
-end
-
-
-RegisterNetEvent('bf:items')
-
-AddEventHandler("bf:items", function(inventory)
+AddEventHandler("bromenu:items", function(inventory)
 	local buttons = {}
 	local weight = 0
 	local maxWeight = 100
 
 	for k, v in ipairs (inventory) do
 		buttons[k] =     {
-			text = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
-			exec = {
-				callback = function() 
-					local buttons = {}
-					buttons[1] =     {
-						text = "Utiliser",
-						exec = {
-							callback = function() 
-								TriggerServerEvent("items:use", v.item, 1)
-							end
-						},
-					}
-					buttons[2] =     {
-						text = "Donner",
-						exec = {
-							callback = function() 
-								local distMin = 18515151515151515151515
-								local current = nil
+			type = "button",
+			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			subMenu = "item"..v.id
+		}
+		weight = weight + (v.amount*v.weight)
+	end
+	Subtitle = ""
+	if weight > (3/4*maxWeight) then
+		Subtitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg"
+	else
+		Subtitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg"
+	end
+	exports.bro_core:AddSubMenu("items", {
+			parent = "bromenu",
+			Title = "Inventaire",
+			Subtitle = Subtitle,
+			buttons = buttons
+		})
 
-								
-								local player = GetClosestPlayer()
-								local me = GetPlayerServerId(i)
-								local coords = GetEntityCoords(GetPlayerPed(i))
-								local mycoords = GetEntityCoords(GetPlayerPed(player))
-								local dist = Vdist(mycoords, coords)
-								if dist < 10  then
-									TriggerServerEvent("items:give", v.id, 1, player)
-								end
-							end
-						},
-					}
-					exports.bf:SetMenuButtons("bro-items-item", buttons)
-					exports.bf:NextMenu("bro-items-item")
+		for k, v in ipairs (inventory) do
+			OpenMenuItem(v)
+		end
+end)
+
+AddEventHandler("vehicle:items:open", function(inventory)
+	local buttons = {}
+	local weight = 0
+	local maxWeight = 100
+
+	for k, v in ipairs (inventory) do
+		buttons[k] =     {
+			type="button",
+			label = v['label'].. " X ".. tostring(v['amount']).. ' ( ' .. tostring(v['amount']*v['weight'])..'kg )',
+			actions = {
+				onSelected = function()
+					if lockGetCar == false then
+						if not  IsPedInAnyVehicle(pedPed, false) then
+							local nb = tonumber(exports.bro_core:OpenTextInput({customTitle = true, title = "Nombre", maxInputLength=10}))
+							exports.bro_core:actionPlayer(4000, "Stockage", "amb@world_human_gardener_plant@male@enter", "enter", function()
+								TriggerServerEvent("item:vehicle:get", v.vehicle_mod, v.id, nb)
+							end)
+						else
+							exports.bro_core:Notification("~r~Vous ne pouvez stocker en véhicule")
+						end
+					else
+						exports.bro_core:Notification("~r~Stockage en cours")
+					end
 				end
 			},
 		}
 		weight = weight + (v.amount*v.weight)
 	end
-	exports.bf:SetMenuButtons("bro-items", buttons)
-	if weight > (3/4*maxWeight) then
-		exports.bf:SetMenuValue("bro-items", {
-			menuTitle = "Poids max ~r~("..weight.."/"..maxWeight..")kg",
-		})
-	else
-		exports.bf:SetMenuValue("bro-items", {
-			menuTitle = "Poids max ~g~("..weight.."/"..maxWeight..")kg",
-		})
-	end
-	exports.bf:NextMenu("bro-items")
+	exports.bro_core:AddMenu("items", {
+		Title = "Inventaire",
+		Subtitle = "Cofre",
+		buttons = buttons
+	})
 end)
 
-
--- surrender anim
-Citizen.CreateThread(function()
-    local dict = "missminuteman_1ig_2"
-    
-	RequestAnimDict(dict)
-	while not HasAnimDictLoaded(dict) do
-		Citizen.Wait(100)
-	end
-    local handsup = false
-	while true do
-		Citizen.Wait(0)
-		if IsControlJustPressed(1, 323) then --Start holding X
-            if not handsup then
-                TaskPlayAnim(GetPlayerPed(-1), dict, "handsup_enter", 8.0, 8.0, -1, 50, 0, false, false, false)
-                handsup = true
-            else
-                handsup = false
-                ClearPedTasks(GetPlayerPed(-1))
-            end
-        end
-    end
-end)
-
-
-RegisterNetEvent('bf:vehicles')
-
-AddEventHandler("bf:vehicles", function(vehicles)
-	local buttons = {}
-	for k, v in ipairs (vehicles) do
-		local parking = v.parking
-
-		if v.parking == "" then
-			parking = "Volé"
-		elseif v.parking == "depot" then
-			parking = "Fourrière"
-		elseif v.parking == "global" then
-			parking = "Parking global"
-		end
-		buttons[k] =     {
-			text =  v.label.. " ("..parking..")",
-			exec = {
-				callback = function() 
-					if v.parking == "" then
-						local playerPed = PlayerPedId() -- get the local player ped
-
-						if not IsPedInAnyVehicle(playerPed) then
-							local vehicleName = v.name
-							currentVehicle = v.id
-							-- load the model
-							RequestModel(vehicleName)
-
-							-- wait for the model to load
-							while not HasModelLoaded(vehicleName) do
-								Wait(500) -- often you'll also see Citizen.Wait
-							end
-							local pos = GetEntityCoords(playerPed) -- get the position of the local player ped
-
-							ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
-							-- create the vehicle
-							local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
-
-							-- set the player ped into the vehicle's driver seat
-							SetPedIntoVehicle(playerPed, vehicle, -1)
-
-							-- give the vehicle back to the game (this'll make the game decide when to despawn the vehicle)
-							SetEntityAsNoLongerNeeded(vehicle)
-
-							-- release the model
-							SetModelAsNoLongerNeeded(vehicleName)
-
-							TriggerServerEvent("account:money:sub", 10)
-													
-							exports.bf:Notification("L'assurance vous rembourse le véhicule volé. Vous payez ~g~ 10 $ ~s~ de franchise.")
-							exports.bf:CloseMenu("bro-vehicles")
-						else
-							exports.bf:Notification("Vous êtes déjà dans un véhicle")
-						end
-					end
-				end
-			},
-		}
-	end
-	exports.bf:SetMenuButtons("bro-vehicles", buttons)
-	exports.bf:NextMenu("bro-vehicles")
-end)
 
 --clothes event
-RegisterNetEvent('bromenu:koszulka')
-AddEventHandler('bromenu:koszulka', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		print(skin)
-		local clothesSkin = {
-		['tshirt_1'] = 15, ['tshirt_2'] = 0,
-		['torso_1'] = 15, ['torso_2'] = 0,
-		['arms'] = 15, ['arms_2'] = 0
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
-	end)
-end)
-RegisterNetEvent('bromenu:spodnie')
-AddEventHandler('bromenu:spodnie', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		local clothesSkin = {
-		['pants_1'] = 21, ['pants_2'] = 0
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+AddEventHandler('bromenu:clothes:mask', function()
+	exports.bro_core:actionPlayer(2000, "Vêtements", clothes_dict, clothes_anim,
+	function()
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			local clothesSkin = {
+			['mask_1'] = 0, ['mask_2'] = 0,
+			}
+			TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+		end)
 	end)
 end)
 
-RegisterNetEvent('bromenu:buty')
-AddEventHandler('bromenu:buty', function()
-	TriggerEvent('skinchanger:getSkin', function(skin)
-		local clothesSkin = {
-		['shoes_1'] = 34, ['shoes_2'] = 0
-		}
-		TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+AddEventHandler('bromenu:clothes:torse', function()
+	exports.bro_core:actionPlayer(2000, "Vêtements", clothes_dict, clothes_anim,
+	function()
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			local clothesSkin = {
+				['tshirt_1'] = 15, ['tshirt_2'] = 0,
+				['torso_1'] = 15, ['torso_2'] = 0,
+				['arms'] = 15, ['arms_2'] = 0
+				}
+				TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+		end)
+	end)
+end)
+AddEventHandler('bromenu:clothes:pants', function()
+	exports.bro_core:actionPlayer(2000, "Vêtements", clothes_dict, clothes_anim,
+	function()
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			local clothesSkin = {
+				['pants_1'] = 21, ['pants_2'] = 0
+				}
+				TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+		end)
+	end)
+end)
+AddEventHandler('bromenu:clothes:shoes', function()
+	exports.bro_core:actionPlayer(2000, "Vêtements", clothes_dict, clothes_anim,
+	function()
+		TriggerEvent('skinchanger:getSkin', function(skin)
+			local clothesSkin = {
+				['shoes_1'] = 34, ['shoes_2'] = 0
+				}
+				TriggerEvent('skinchanger:loadClothes', skin, clothesSkin)
+		end)
 	end)
 end)
 
-RegisterNetEvent('bromenu:skin:reset')
-AddEventHandler('bromenu:skin:reset', function(skin)
+AddEventHandler('bromenu:clothes:reset', function(skin)
+	exports.bro_core:actionPlayer(2000, "Vêtements", clothes_dict, clothes_anim,
+	function()
 		TriggerEvent('skinchanger:loadSkin', json.decode(skin))
+	end)
 end)
 
 
@@ -334,11 +598,10 @@ AddEventHandler('onResourceStop', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
 	  return
 	end
-	exports.bf:RemoveMenu("bro")
-	exports.bf:RemoveMenu("bro-wallet")
-	exports.bf:RemoveMenu("bro-items")
-	exports.bf:RemoveMenu("bro-items-item")
-	exports.bf:RemoveMenu("bro-wallet-character")
-	exports.bf:RemoveMenu("bro-vehicles")
-	exports.bf:RemoveMenu("bro-clothes")
+	exports.bro_core:RemoveMenu("wallet")
+	exports.bro_core:RemoveMenu("items")
+	exports.bro_core:RemoveMenu("vehicle")
+	exports.bro_core:RemoveMenu("clothes")
+	exports.bro_core:RemoveMenu("bromenu")
 end)
+

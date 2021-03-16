@@ -220,19 +220,19 @@ RageUI.CreateWhile(1.0, mainMenu, nil, function()
 		RageUI.HeritageWindow(CharacterMom, CharacterDad)
 
 		RageUI.List(Locales[Config.Locale]['heritage_mother_item'], Config.MotherList, actionMother, Locales[Config.Locale]['heritage_mother_item_desc'], {}, true, function(hovered,active,selected, Index)
-        end, function(Index, Item)
+		end, function(Index, Item)
         	actionMother = Index
         	CharacterMom = Index
-        	Character['mom'] = Index
-			SetPedHeadBlendData(GetPlayerPed(-1), CharacterMom, CharacterDad, nil, CharacterMom, CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
-        end)
+			Character['mom'] = CharacterMom +20
+			SetPedHeadBlendData(GetPlayerPed(-1), Character['mom'], CharacterDad, nil, Character['mom'], CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
+	end)
 
         RageUI.List(Locales[Config.Locale]['heritage_father_item'], Config.FatherList, actionFather, Locales[Config.Locale]['heritage_father_item_desc'], {}, true, function(hovered,active,selected, Index)
         end, function(Index, Item)
         	actionFather = Index
         	CharacterDad = Index
-        	Character['dad'] = Index
-			SetPedHeadBlendData(GetPlayerPed(-1), CharacterMom, CharacterDad, nil, CharacterMom, CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
+			Character['dad'] = Index
+			SetPedHeadBlendData(GetPlayerPed(-1), Character['mom'], CharacterDad, nil, Character['mom'], CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
         end)
 
         RageUI.UISliderHeritage(Locales[Config.Locale]['resemblance_item'], actionRessemblance, Locales[Config.Locale]['resemblance_item_desc'], function(Hovered, Selected, Active, Heritage, Index)
@@ -240,7 +240,7 @@ RageUI.CreateWhile(1.0, mainMenu, nil, function()
         		actionRessemblance = Index
         		ShapeMixData = Index/10
         		Character['face'] = Index/10
-				SetPedHeadBlendData(GetPlayerPed(-1), CharacterMom, CharacterDad, nil, CharacterMom, CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
+				SetPedHeadBlendData(GetPlayerPed(-1), Character['mom'], CharacterDad, nil, Character['mom'], CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
         	end
         end, amount)
 
@@ -249,7 +249,7 @@ RageUI.CreateWhile(1.0, mainMenu, nil, function()
         		actionSkin = Index
         		SkinMixData = Index/10
         		Character['skin'] = Index/10
-				SetPedHeadBlendData(GetPlayerPed(-1), CharacterMom, CharacterDad, nil, CharacterMom, CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
+				SetPedHeadBlendData(GetPlayerPed(-1), Character['mom'], CharacterDad, nil, Character['mom'], CharacterDad, nil, ShapeMixData, SkinMixData, nil, true)
         	end
         end, amount)
 	end, function() end)

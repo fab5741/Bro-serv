@@ -1,152 +1,55 @@
 RegisterNetEvent('shops:buy')
+MaxWeight = 100
 
-AddEventHandler('shops:buy', function(type, amount, shop_item)
+AddEventHandler('shops:buy', function(type, amount, price)
 	local sourceValue = source
-	local amounte = tonumber(amount)
-	local typee = tonumber(type)
-	local shop_item = shop_item
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+
+	local amount = amount
 
 	local tva = 0.2
-	local price = 0
-	if type == 13 then
-		price = 5
-	elseif type == 14 then 
-		price =5
-	elseif type == 19 then 
-		price =5
-	end
-
 	MySQL.ready(function ()
-		MySQL.Async.fetchScalar('select liquid from players where discord = @discord',
+		MySQL.Async.fetchAll('select liquid, id from players where discord = @discord',
 		{['discord'] =  discord},
-		function(liquid)
-			local pricee = (amounte * price)
-			if liquid >= pricee then
-				MySQL.Async.fetchScalar('select amount from shop_item where id = @shop_item',
-				{['@shop_item'] = shop_item},
-				function(amountInShop)
-					if amountInShop >= amounte then
-						MySQL.Async.execute('UPDATE shop_item SET amount=amount-@amount where id = @shop_item',
-						{['amount'] = amounte,
-						['type'] = typee,
-						['shop_item'] = shop_item},
-						function(res)
-							MySQL.Async.execute('UPDATE players SET players.liquid=players.liquid-@price where players.discord = @discord',
-							{['discord'] =  discord,
-							['price'] = pricee},
+		function(player)
+			local pricee = (amount * price)
+			if player[1].liquid >= pricee then
+				MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, player_item  WHERE player_item.item= items.id and player_item.player = @player",
+				{
+					['@player'] = player[1].id,
+				}, function(weight)
+					if weight == nil then
+						weight = 0
+						end
+						MySQL.Async.fetchScalar("SELECT weight FROM `items` WHERE id = @type",
+						{
+						['@type'] = type,
+						}, function(newWeight)
+						weight = (newWeight*amount)+weight
+						if weight <= MaxWeight then
+							MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount) ON DUPLICATE KEY UPDATE amount=amount+@amount;',
+							{
+								['id'] = player[1].id,
+								['amount'] = amount,
+								['type'] = type
+							},
 							function(res)
-								MySQL.Async.fetchAll('SELECT * FROM player_item,players where players.discord = @discord and player_item.player = players.id and player_item.item = @type',
-								{['discord'] =  discord,
-								['amount'] = amounte,
-								['type'] = typee},
-								function(res)
-									if res[1] then
-										MySQL.Async.execute('UPDATE player_item, players SET player_item.amount=player_item.amount+@amount where players.discord = @discord and player_item.player = players.id and player_item.item = @type',
-										{['discord'] =  discord,
-										['amount'] = amounte,
-										['type'] = typee},
-										function(res)
-											MySQL.Async.fetchScalar('select shop from shop_item where id = @shop_item',
-											{['@shop_item'] = shop_item},
-											function(shop)
-												MySQL.Async.execute('UPDATE shops set money = money + @money where id = @shop',
-												{
-													['@shop'] = shop,
-													['@money'] = pricee *(1-tva),
-												},
-												function(res)
-													MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
-													{['@discord'] =  discord, ['@price'] = pricee * tva},
-													function(numRows)
-														TriggerClientEvent("bf:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
-													end)
-												end)
-											end)
-										end)
-									else
-										MySQL.Async.fetchAll('select id from players where players.discord = @discord',
-										{['discord'] =  discord},
-										function(res)
-											MySQL.Async.execute('INSERT INTO `player_item` (`player`, `item`, `amount`) VALUES (@id, @type, @amount);',
-											{['id'] = res[1].id,
-											['amount'] = amounte,
-											['type'] = typee},
-											function(res)
-												MySQL.Async.fetchScalar('select shop from shop_item where id = @shop_item',
-												{['@shop_item'] = shop_item},
-												function(shop)
-													MySQL.Async.execute('UPDATE shops set money = money + @money where id = @shop',
-													{
-														['@shop'] = shop,
-														['@money'] = pricee *(1-tva),
-													},
-													function(res)
-														MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
-														{['@discord'] =  discord, ['@price'] = pricee * tva},
-														function(numRows)
-															TriggerClientEvent("bf:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
-														end)
-													end)
-												end)
-											end)
-										end)
-									end
+								MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
+								{['@discord'] =  discord, ['@price'] = pricee * tva},
+								function(numRows)
+									TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
 								end)
 							end)
-						end)
-					else
-						TriggerClientEvent("bf:Notification", sourceValue, "~r~Le magasin n'a pas assez de stock")
-					end
+						else
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~ Vous êtes déjà trop chargé !")
+						end
+					end)
 				end)
 			else
-				TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez pas assez d'argent. ~r~"..pricee.." $")
+				TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez pas assez d'argent. ~r~"..pricee.." $")
 			end
         end)
       end)
-end)
-
-RegisterNetEvent('shops:rob')
-AddEventHandler('shops:rob', function(id)
-	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
-	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select money from shops where id = @id', {['id'] = id},
-		function(res)
-			print(res[1])
-			if res[1] ~= nil  and res[1].money ~= nil then
-				local amount = res[1].money * (math.random(40, 80)/100)
-				MySQL.Async.fetchAll('UPDATE players set liquid=liquid+@amount where discord = @discord',
-				{['discord'] =  discord,
-				['amount'] = amount},
-				function(res2)
-					MySQL.Async.execute('UPDATE shops SET money=money-@amount where id = @id', {['id'] = id, ['@amount'] = amount},
-					 function(res3)
-						TriggerClientEvent("bf:Notification", sourceValue, "vous avez braqué pour ~g~" .. amount.." $")
-					end)		
-				end)
-			else
-				TriggerClientEvent("bf:Notification", sourceValue, "Error")
-			end
-        end)
-	end)
-end)
-
-RegisterNetEvent('shops:items:get')
-AddEventHandler('shops:items:get', function(cb, shop)
-	local sourceValue = source
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
-
-	local shop = shop
-	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select shop_item.id, items.label, items.id as item from shop_item, items where shop = @shop and shop_item.item = items.id',
-        {['@shop'] =  shop},
-		function(res)
-			print("get")
-			TriggerClientEvent(cb, sourceValue, res)
-		end)
-	end)
 end)
 
 RegisterNetEvent('shops:sell')
@@ -155,16 +58,16 @@ AddEventHandler('shops:sell', function(shop, type, amount)
 	local sourceValue = source
 	local amounte = tonumber(amount)
 	local typee = tonumber(type)
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	local maxInShop = 100
 
 	local price = 0
-	if type == 13 then
+	if type == 3 then
 		price = 3
-	elseif type == 14 then 
+	elseif type == 5 then 
 		price =3
-	elseif type == 19 then 
-		price =3
+	else
+		price =10
 	end
 
 	MySQL.ready(function ()
@@ -210,23 +113,23 @@ AddEventHandler('shops:sell', function(shop, type, amount)
 														['@money'] = pricee,
 													},
 													function(res)
-														TriggerClientEvent("bf:Notification", sourceValue, "~g~Vente effectuée pour ~r~"..pricee.." $")
+														TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Vente effectuée pour ~r~"..pricee.." $")
 													end)
 												end)
 											end)
 										end)
 									end)
 								else
-									TriggerClientEvent("bf:Notification", sourceValue, "Le magazsin à déjà trop de stock. ~r~Max : "..maxInShop)
+									TriggerClientEvent("bro_core:Notification", sourceValue, "Le magazsin à déjà trop de stock. ~r~Max : "..maxInShop)
 								end
 							end)
 						else
-							TriggerClientEvent("bf:Notification", sourceValue, "~r~Vous n'avez rien à vendre")
+							TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez rien à vendre")
 						end
 				end)
 			else
 				--TODO ; gouv money help
-				TriggerClientEvent("bf:Notification", sourceValue, "~r~Le magasin n'a pas assez d'argent. ~r~"..pricee.." $")
+				TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Le magasin n'a pas assez d'argent. ~r~"..pricee.." $")
 			end
         end)
       end)
@@ -238,7 +141,7 @@ RegisterNetEvent('shops:stock')
 AddEventHandler('shops:stock', function(shop, type)
 	local sourceValue = source
 	local typee = tonumber(type)
-	local discord = exports.bf:GetDiscordFromSource(sourceValue)
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 
 	MySQL.ready(function ()
 		MySQL.Async.fetchScalar('select amount from shop_item where shop=@shop and item = @type',
@@ -246,7 +149,7 @@ AddEventHandler('shops:stock', function(shop, type)
 			['@shop'] = shop,
 			['@type'] = type
 		},function(amount_Shop)
-			TriggerClientEvent("bf:Notification", sourceValue, "Stock : ".. amount_Shop)
+			TriggerClientEvent("bro_core:Notification", sourceValue, "Stock : ".. amount_Shop)
 		end)
 	end)
 end)

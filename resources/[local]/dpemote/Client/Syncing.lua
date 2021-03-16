@@ -11,8 +11,8 @@ if Config.SharedEmotesEnabled then
     RegisterCommand('nearby', function(source, args, raw)
         if #args > 0 then
             local emotename = string.lower(args[1])
-            target, distance = GetClosestPlayer()
-            if(distance ~= -1 and distance < 3) then
+            target = exports.bro_core:GetClosestPlayer()
+            if(distance and distance < 3) then
                 if DP.Shared[emotename] ~= nil then
                     dict, anim, ename = table.unpack(DP.Shared[emotename])
                     TriggerServerEvent("ServerEmoteRequest", GetPlayerServerId(target), emotename)
@@ -44,7 +44,7 @@ end)
 RegisterNetEvent("SyncPlayEmoteSource")
 AddEventHandler("SyncPlayEmoteSource", function(emote, player)
     -- Thx to Poggu for this part!
-    local pedInFront = GetPlayerPed(GetClosestPlayer())
+    local pedInFront = exports.bro_core:GetClosestPed()
     local heading = GetEntityHeading(pedInFront)
     local coords = GetOffsetFromEntityInWorldCoords(pedInFront, 0.0, 1.0, 0.0)
     if (DP.Shared[emote]) and (DP.Shared[emote].AnimationOptions) then
@@ -83,8 +83,8 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(5)
         if IsControlJustPressed(1, 246) and isRequestAnim then
-        target, distance = GetClosestPlayer()
-            if(distance ~= -1 and distance < 3) then
+        target, distance = exports.bro_core:GetClosestPlayer()
+            if(distance and distance < 3) then
                 if DP.Shared[requestedemote] ~= nil then
                     _,_,_,otheremote = table.unpack(DP.Shared[requestedemote])
                 elseif DP.Dances[requestedemote] ~= nil then
@@ -139,37 +139,4 @@ function SimpleNotify(message)
     SetNotificationTextEntry("STRING")
     AddTextComponentString(message)
     DrawNotification(0,1)
-end
-
-function GetClosestPlayer()
-    local players = GetPlayers()
-    local closestDistance = -1
-    local closestPlayer = -1
-    local ply = GetPlayerPed(-1)
-    local plyCoords = GetEntityCoords(ply, 0)
-
-    for index,value in ipairs(players) do
-        local target = GetPlayerPed(value)
-        if(target ~= ply) then
-            local targetCoords = GetEntityCoords(GetPlayerPed(value), 0)
-            local distance = GetDistanceBetweenCoords(targetCoords["x"], targetCoords["y"], targetCoords["z"], plyCoords["x"], plyCoords["y"], plyCoords["z"], true)
-            if(closestDistance == -1 or closestDistance > distance) then
-                closestPlayer = value
-                closestDistance = distance
-            end
-        end
-    end
-    return closestPlayer, closestDistance
-end
-
-function GetPlayers()
-    local players = {}
-
-    for i = 0, 255 do
-        if NetworkIsPlayerActive(i) then
-            table.insert(players, i)
-        end
-    end
-
-    return players
 end

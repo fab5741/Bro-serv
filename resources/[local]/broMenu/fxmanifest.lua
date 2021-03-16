@@ -6,15 +6,17 @@ description '- Bro -'
 version '0.0.1'
 
 dependencies {
-    'bf',
+    'bro_core',
     'account',
     'items',
     'vehicles',
-    'jobManager'
+    'jobManager',
+    'crime',
+    'needs'
 }
 
 client_script  {
-    'client/menu.lua',
+    'client/functions.lua',
     'client/events.lua',
     'client/client.lua'
 } 

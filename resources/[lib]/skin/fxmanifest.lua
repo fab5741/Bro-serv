@@ -4,7 +4,7 @@ game 'gta5'
 
 description 'ESX Skin'
 
-dependency "bf"
+dependency "bro_core"
 
 version '1.1.0'
 

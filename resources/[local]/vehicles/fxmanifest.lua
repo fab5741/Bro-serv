@@ -5,14 +5,18 @@ description '- Bro - Vehicles'
 
 version '0.0.1'
 
-dependency "bf"
+dependencies {
+    "bro_core", 
+    "account"
+}
 
-client_script {
+client_scripts {
+    'menu.lua',
     'events.lua',
     'client.lua'
 }
 
-server_script {
+server_scripts {
     '@mysql-async/lib/MySQL.lua',
     'server.lua'
 }

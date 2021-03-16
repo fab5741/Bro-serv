@@ -45,7 +45,6 @@ Citizen.CreateThread(function()
     end
     if takePhoto ~= true then
       if IsControlJustPressed(1, Config.KeyOpenClose) then -- On key press, will open the phone
-        print("open phone")
           TooglePhone()
       end
       if menuIsOpen == true then
@@ -77,7 +76,7 @@ end)
 --====================================================================================
 function styleBlip(blip, type, number, player)
   local blipLabel = '#' .. number
-  local blipLabelPrefix = 'Phone GPS Location: '
+  local blipLabelPrefix = 'GPS Téléphone : '
 
   -- [[ type 0 ]] --
   if (type == 0) then
@@ -158,154 +157,6 @@ RegisterNetEvent('phone:setEnableApp')
 AddEventHandler('phone:setEnableApp', function(appName, enable)
   SendNUIMessage({event = 'setEnableApp', appName = appName, enable = enable })
 end)
-
---====================================================================================
---  Fixed call management
---====================================================================================
-function startFixeCall (fixeNumber)
-  local number = ''
-  DisplayOnscreenKeyboard(1, "FMMC_MPM_NA", "", "", "", "", "", 10)
-  while (UpdateOnscreenKeyboard() == 0) do
-    DisableAllControlActions(0);
-    Wait(0);
-  end
-  if (GetOnscreenKeyboardResult()) then
-    number =  GetOnscreenKeyboardResult()
-  end
-  if number ~= '' then
-    TriggerEvent('phone:autoCall', number, {
-      useNumber = fixeNumber
-    })
-    PhonePlayCall(true)
-  end
-end
-
-function TakeAppel (infoCall)
-  TriggerEvent('phone:autoAcceptCall', infoCall)
-end
-
-RegisterNetEvent("phone:notifyFixePhoneChange")
-AddEventHandler("phone:notifyFixePhoneChange", function(_PhoneInCall)
-  PhoneInCall = _PhoneInCall
-end)
-
---[[
-  Displays information when the player is near a fixed phone (Static location phone like MRPD Desk Phone)
---]]
-function showFixePhoneHelper (coords)
-  for number, data in pairs(Config.FixePhone) do
-    local dist = GetDistanceBetweenCoords(
-      data.coords.x, data.coords.y, data.coords.z,
-      coords.x, coords.y, coords.z, 1)
-    if dist <= 2.5 then
-      SetTextComponentFormat("STRING")
-      AddTextComponentString(_U('use_fixed', data.name, number))
-      DisplayHelpTextFromStringLabel(0, 0, 0, -1)
-      if IsControlJustPressed(1, Config.KeyTakeCall) then
-        startFixeCall(number)
-      end
-      break
-    end
-  end
-end
-
-RegisterNetEvent('phone:register_FixePhone')
-AddEventHandler('phone:register_FixePhone', function(phone_number, data)
-  Config.FixePhone[phone_number] = data
-end)
-
-local registeredPhones = {}
-Citizen.CreateThread(function()
-  if not Config.AutoFindFixePhones then return end
-  while not ESX do Citizen.Wait(0) end
-  while true do
-    local playerPed = GetPlayerPed(-1)
-    local coords = GetEntityCoords(playerPed)
-    for _, key in pairs({'p_phonebox_01b_s', 'p_phonebox_02_s', 'prop_phonebox_01a', 'prop_phonebox_01b', 'prop_phonebox_01c', 'prop_phonebox_02', 'prop_phonebox_03', 'prop_phonebox_04'}) do
-      local closestPhone = GetClosestObjectOfType(coords.x, coords.y, coords.z, 25.0, key, false)
-      if closestPhone ~= 0 and not registeredPhones[closestPhone] then
-        local phoneCoords = GetEntityCoords(closestPhone)
-        number = ('0%.2s-%.2s%.2s'):format(math.abs(phoneCoords.x*100), math.abs(phoneCoords.y * 100), math.abs(phoneCoords.z *100))
-        if not Config.FixePhone[number] then
-          TriggerServerEvent('phone:register_FixePhone', number, phoneCoords)
-        end
-        registeredPhones[closestPhone] = true
-      end
-    end
-    Citizen.Wait(1000)
-  end
-end)
-
-Citizen.CreateThread(function ()
-  local mod = 0
-  while true do
-     
-    local playerPed   = PlayerPedId()
-    local coords      = GetEntityCoords(playerPed)
-    local inRangeToActivePhone = false
-    local inRangedist = 0
-    for i, _ in pairs(PhoneInCall) do 
-        local dist = GetDistanceBetweenCoords(
-          PhoneInCall[i].coords.x, PhoneInCall[i].coords.y, PhoneInCall[i].coords.z,
-          coords.x, coords.y, coords.z, 1)
-        if (dist <= soundDistanceMax) then
-          DrawMarker(1, PhoneInCall[i].coords.x, PhoneInCall[i].coords.y, PhoneInCall[i].coords.z,
-              0,0,0, 0,0,0, 0.1,0.1,0.1, 0,255,0,255, 0,0,0,0,0,0,0)
-          inRangeToActivePhone = true
-          inRangedist = dist
-          if (dist <= 1.5) then 
-            SetTextComponentFormat("STRING")
-            AddTextComponentString('key_answer')
-            DisplayHelpTextFromStringLabel(0, 0, 1, -1)
-            if IsControlJustPressed(1, Config.KeyTakeCall) then
-              PhonePlayCall(true)
-              TakeAppel(PhoneInCall[i])
-              PhoneInCall = {}
-              StopSoundJS('ring2.ogg')
-            end
-          end
-          break
-        end
-    end
-    if inRangeToActivePhone == false then
-      showFixePhoneHelper(coords)
-    end
-    if inRangeToActivePhone == true and currentPlaySound == false then
-      PlaySoundJS('ring2.ogg', 0.2 + (inRangedist - soundDistanceMax) / -soundDistanceMax * 0.8 )
-      currentPlaySound = true
-    elseif inRangeToActivePhone == true then
-      mod = mod + 1
-      if (mod == 15) then
-        mod = 0
-        SetSoundVolumeJS('ring2.ogg', 0.2 + (inRangedist - soundDistanceMax) / -soundDistanceMax * 0.8 )
-      end
-    elseif inRangeToActivePhone == false and currentPlaySound == true then
-      currentPlaySound = false
-      StopSoundJS('ring2.ogg')
-    end
-    Citizen.Wait(0)
-  end
-end)
-
-function PlaySoundJS (sound, volume)
-  print("playSound")
-  SendNUIMessage({ event = 'playSound', sound = sound, volume = volume })
-end
-
-function SetSoundVolumeJS (sound, volume)
-  SendNUIMessage({ event = 'setSoundVolume', sound = sound, volume = volume})
-end
-
-function StopSoundJS (sound)
-  SendNUIMessage({ event = 'stopSound', sound = sound})
-end
-
-RegisterNetEvent("phone:forceOpenPhone")
-AddEventHandler("phone:forceOpenPhone", function(_myPhoneNumber)
-  if menuIsOpen == false then
-    TooglePhone()
-  end
-end)
  
 --====================================================================================
 --  Events
@@ -335,7 +186,7 @@ AddEventHandler("phone:receiveMessage", function(message)
   SendNUIMessage({event = 'newMessage', message = message})
   table.insert(messages, message)
   if message.owner == 0 then
-    local text = 'new_message'
+    local text = 'Vous avez reçu un SMS'
     if Config.ShowNumberNotification == true then
       text = message.transmitter
       for _,contact in pairs(contacts) do
@@ -370,7 +221,6 @@ end
 --  Function client | Messages
 --====================================================================================
 function sendMessage(num, message)
-  print(num)
   print(message)
   TriggerServerEvent('phone:sendMessage', num, message)
 end
@@ -513,7 +363,6 @@ end
 --====================================================================================
 
 RegisterNUICallback('startCall', function (data, cb)
-  print("START CALL")
   startCall(data.numero, data.rtcOffer, data.extraData)
   cb()
 end)
@@ -593,14 +442,15 @@ end)
 RegisterNUICallback('reponseText', function(data, cb)
   local limit = data.limit or 255
   local text = data.text or ''
-
-  cb(json.encode({text = tostring(exports.bf:OpenTextInput())}))
+  local text = exports.bro_core:OpenTextInput()
+  if text ~= nil then
+    cb(json.encode({text = tostring(text)}))
+  end
 end)
 --====================================================================================
 --  Event - Messages
 --====================================================================================
 RegisterNUICallback('getMessages', function(data, cb)
-  print(messages)
   cb(json.encode(messages))
 end)
 RegisterNUICallback('sendMessage', function(data, cb)
@@ -631,12 +481,9 @@ end)
 --  Event - Contacts
 --====================================================================================
 RegisterNUICallback('addContact', function(data, cb) 
-  print("add  contact")
-
   TriggerServerEvent('phone:addContact', data.display, data.phoneNumber)
 end)
 RegisterNUICallback('updateContact', function(data, cb)
-  print("update  contact")
   TriggerServerEvent('phone:updateContact', data.id, data.display, data.phoneNumber)
 end)
 RegisterNUICallback('deleteContact', function(data, cb)

@@ -1,11 +1,87 @@
-zoneType =0
-zone = "global"
-dsVehicle = 0
-currentVehicle = 0
+DsVehicle = 0
+Ped = GetPlayerPed(-1)
+LastHovered = nil
+Frames = 0
+Config = {}
+Config.parkings = {
+	{
+		zone = "global",
+		locations = {
+			{
+				x=236.14970397949,
+				y=-779.75360107422,
+				z=30.804173355103
+			},
+		}
+	},
+	{
+		zone = "farm",
+		locations = {
+			{
+				x=2035.1791992188,
+				y=4989.015625,
+				z=39.695823669434
+			}
+		}
+	},
+	{
+		zone = "wine",
+		locations = {
+			{
+				x=-1924.4694824219,
+				y=2041.6114501953,
+				z=140.73466491699
+			}
+		}
+	},
+	{
+		zone = "bennys",
+		locations = {
+			{
+				x=-190.4766998291,
+				y=-1289.2463378906,
+				z=31.295963287354
+			}
+		}
+	},
+	{
+		zone = "lsms",
+		locations = {
+			{
+				x=339.56744384766,
+				y=-562.45819091797,
+				z=28.743431091309
+			}
+		}
+	},
+	{
+		zone = "lspd",
+		red = 77,
+		green = 166,
+		blue = 255,
+		locations = {
+			{
+				x=449.6057434082,
+				y=-1014.3215942383,
+				z=28.56
+						}
+		}
+	},
+	{
+		zone = "taxi",
+		locations = {
+			{
+				x=911.46813964844,
+				y=-169.29028320312,
+				z=74.229537963867
+			}
+		}
+	},
+}
 
 
 function DeleteGivenVehicle( veh, timeoutMax )
-    local timeout = 0 
+    local timeout = 0
 
     SetEntityAsMissionEntity( veh, true, true )
     DeleteVehicle( veh )
@@ -14,442 +90,42 @@ function DeleteGivenVehicle( veh, timeoutMax )
         Notify( "~r~Failed to delete vehicle, trying again..." )
 
         -- Fallback if the vehicle doesn't get deleted
-        while ( DoesEntityExist( veh ) and timeout < timeoutMax ) do 
+        while ( DoesEntityExist( veh ) and timeout < timeoutMax ) do
             DeleteVehicle( veh )
 
             -- The vehicle has been banished from the face of the Earth!
-            if ( not DoesEntityExist( veh ) ) then 
+            if ( not DoesEntityExist( veh ) ) then
                 Notify( "~g~Vehicle deleted." )
-            end 
+            end
 
             -- Increase the timeout counter and make the system wait
-            timeout = timeout + 1 
+            timeout = timeout + 1
             Citizen.Wait( 500 )
-        end 
-    else 
+        end
+    else
         Notify( "~g~Vehicle deleted." )
-    end 
-end 
+    end
+end
 
 -- Create blips
 Citizen.CreateThread(function()
-	--shops
-	exports.bf:AddMenu("shops", {
-		title = "Concessionnaire",
-		position = 1,
-	})
-
-	exports.bf:AddArea("shops", {
-		marker = {
-			type = 1,
-			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
-		},
-		trigger = {
-			weight = 2,
-			enter = {
-				callback = function()
-					exports.bf:HelpPromt("Concessionnaire : ~INPUT_PICKUP~")
-					zoneType = "shops"
-					zone = "global"
-				end
-			},
-			exit = {
-				callback = function()
-					zoneType = nil
-					zone = nil
-				end
-			}
-		},
-		blip = {
-			text = "Concessionnaire",
-			colorId = 1,
-			imageId = 326,
-		},
-		locations = {
-			{
-				x =-43.67,
-				y=-1109.33,
-				z=26.0
-			}
-		},
-	})
-
-	--- shop for job
-
-	exports.bf:AddMenu("shops-job", {
-		title = "Concessionnaire",
-		position = 1,
-	})
-
-	exports.bf:AddArea("shops-job", {
-		marker = {
-			type = 1,
-			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
-		},
-		trigger = {
-			weight = 2,
-			enter = {
-				callback = function()
-					exports.bf:HelpPromt("Concessionnaire entreprise : ~INPUT_PICKUP~")
-					zoneType = "shops-job"
-					zone = "global"
-				end
-			},
-			exit = {
-				callback = function()
-					zoneType = nil
-					zone = nil
-				end
-			}
-		},
-		blip = {
-			text = "Concessionnaire entreprise",
-			colorId = 1,
-			imageId = 326,
-		},
-		locations = {
-			{
-				x =375.50732421875,
-				y=-1612.0445556641,
-				z=29.291933059692
-			}
-		},
-	})
-	-- parkings
-	exports.bf:AddMenu("parking-veh", {
-		title = "Parking",
-		position = 1,
-	})
-	exports.bf:AddMenu("parking-foot", {
-		title = "Parking",
-		menuTitle = "Retirer",
-		position = 1,
-	})
-	exports.bf:AddArea("parkings", {
-		marker = {
-			type = 1,
-			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
-		},
-		trigger = {
-			weight = 2,
-			enter = {
-				callback = function()
-					exports.bf:HelpPromt("Parking : ~INPUT_PICKUP~")
-					zoneType = "parking"
-					zone = "global"
-				end
-			},
-			exit = {
-				callback = function()
-					zoneType = nil
-					zone = nil
-				end
-			}
-		},
-		blip = {
-			text = "Parking",
-			colorId = 2,
-			imageId = 357,
-		},
-		locations = {
-			{
-				x =234.68,
-				y=-782.73,
-				z=29.9
-			},
-			{
-				x =316.07934570312,
-				y=-540.31567382812,
-				z=28.743453979492
-			}
-		},
-	})
-
-	--depots
-	exports.bf:AddMenu("depots", {
-		title = "Fourrière",
-		position = 1,
-	})
-	exports.bf:AddArea("depots", {
-		marker = {
-			type = 1,
-			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
-		},
-		trigger = {
-			weight = 1,
-			enter = {
-				callback = function()
-					TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:depot")
-				end
-			},
-			exit = {
-				callback = function()
-					zoneType = nil
-					zone = nil
-				end
-			}
-		},
-		blip = {
-			text = "Fourrière",
-			colorId = 2,
-			imageId = 326,
-		},
-		locations = {
-			{
-				x =383.04083251953,
-				y=-1622.9884033203,
-				z=29.291938781738
-			}
-		},
-	})
-	--Permis de conduire
-	exports.bf:AddArea("ds", {
-		marker = {
-			type = 1,
-			weight = 1,
-			height = 1,
-			red = 255,
-			green = 255,
-			blue = 153,
-		},
-		trigger = {
-			weight = 1,
-			enter = {
-				callback = function()
-					TriggerServerEvent("vehicle:permis:get", "vehicle:permis:get:ds")
-				end
-			},
-			exit = {
-				callback = function()
-					zoneType = nil
-					zone = nil
-				end
-			}
-		},
-		blip = {
-			text = "Auto-école",
-			colorId = 4,
-			imageId = 326,
-		},
-		locations = {
-			{
-				x =240.02340698242,
-				y=-1380.71,
-				z=33.740024
-			}
-		},
-	})
-
-	exports.bf:AddArea("checkpoints-1", {
-		marker = {
-			type = 1,
-			weight = 8,
-			height = 3,
-			red = 255,
-			green = 255,
-			blue = 153,
-			showDistance = 60
-		},
-		trigger = {
-			weight = 4,
-			active = {
-				callback = function()
-					TriggerEvent('vehicle:belt', "ds:belt")
-					exports.bf:DisableArea("checkpoints-1")
-					exports.bf:EnableArea("checkpoints-2")
-				end
-			},
-		},
-		blip = {
-			text = "CheckPoint 1",
-			colorId = 24,
-			imageId = 309,
-		},
-		locations = {
-			{
-				x = 175.87483215332,
-				y = -1401.7551269531,
-				z = 28.833745956421
-			}
-		},
-	})
-	exports.bf:AddArea("checkpoints-2", {
-		marker = {
-			type = 1,
-			weight = 8,
-			height = 3,
-			red = 255,
-			green = 255,
-			blue = 153,
-			showDistance = 60
-		},
-		trigger = {
-			weight = 4,
-			active = {
-				callback = function()
-					TriggerEvent('vehicle:belt', "ds:belt")
-					exports.bf:DisableArea("checkpoints-2")
-					exports.bf:EnableArea("checkpoints-3")
-				end
-			},
-		},
-		blip = {
-			text = "CheckPoint 2",
-			colorId = 24,
-			imageId = 309,
-		},
-		locations = {
-			{
-				x = 446.39315795898,
-				y = -1613.5487060547,
-				z = 28.838726043701
-			}
-		},
-	})
-	exports.bf:AddArea("checkpoints-3", {
-		marker = {
-			type = 1,
-			weight = 8,
-			height = 3,
-			red = 255,
-			green = 255,
-			blue = 153,
-			showDistance = 60
-		},
-		trigger = {
-			weight = 4,
-			active = {
-				callback = function()
-					exports.bf:DisableArea("checkpoints-3")
-
-					if 	IsVehicleDamaged(dsVehicle --[[ Vehicle ]]) then
-						-- TODO: donner le permis
-						exports.bf:Notification("Vous avez endommagé le véhicule !")
-					else
-						TriggerServerEvent("vehicle:permis:give")
-						exports.bf:Notification("Vous avez le permis de conduire !")
-					end
-					ds = false
-
-					-- TASK_LEAVE_VEHICLE
-					TaskLeaveVehicle(
-						GetPlayerPed(-1) --[[ Ped ]], 
-						dsVehicle --[[ Vehicle ]]
-					)
-					Wait(2000)
-
-					-- delete vehicle
-					DeleteGivenVehicle( dsVehicle, 10 )
-
-				end
-			},
-		},
-		blip = {
-			text = "CheckPoint 2",
-			colorId = 24,
-			imageId = 309,
-		},
-		locations = {
-			{
-				x = 229.88786315918,
-				y = -1404.20935058597,
-				z = 29.751350402832
-			}
-		},
-	})
-	exports.bf:DisableArea("checkpoints-1")
-	exports.bf:DisableArea("checkpoints-2")
-	exports.bf:DisableArea("checkpoints-3")
-	local price = 100
-	exports.bf:AddMenu("ds", {
-		title = "Auto-école",
-		position = 1,
-		buttons = {
-			{
-				text = "Permis de conduire (~g~"..price.." $~s~)",
-				exec = {
-					callback = function ()
-						TriggerServerEvent("vehicle:ds", "vehicle:ds", price)
-					end
-				},
-			}
-		}
-	})
+	removeMenus()
+	createMenus()
 end)
-
-local menuOpened = 0
 
 -- detect parking enter
 Citizen.CreateThread(function()
-	local notification = false
 	while true do
 		Citizen.Wait(0)
-		if zoneType == "shops" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("vehicle:shop:get:all", "vehicle:shop")	
-		elseif zoneType == "shops-job" and IsControlJustPressed(1, 51) then
-				TriggerServerEvent("vehicle:shop:job:get:all", "vehicle:job:shop")		
-		elseif zoneType == "parking" and IsControlJustPressed(1, 51) then
-			if exports.bf:isPedDrivingAVehicle() then
-				exports.bf:SetMenuValue("parking-veh", {
-					buttons = {
-						{
-							text = "Stocker : " .. zone,
-							exec = {
-								callback = function()
-									TriggerServerEvent("vehicle:store", currentVehicle, zone)
-									currentVehicle = 0
-								
-									DeleteEntity(GetVehiclePedIsIn(GetPlayerPed(-1), false))
-									exports.bf:CloseMenu("parking-veh")
-								end
-							},
-						}
-					}
-				})
-
-				exports.bf:OpenMenu("parking-veh")
-			else
-				TriggerServerEvent("vehicle:parking:get:all", zone, "vehicle:foot")
-			end
-		elseif zoneType == "depots" and IsControlJustPressed(1, 51) then
-			if exports.bf:isPedDrivingAVehicle() then
-				exports.bf:Notification('~r~Tu ne peux pas récupérer de voiture en conduisant.')
-			else
-				TriggerServerEvent("vehicle:depots:get:all", "vehicle:depots")
-			end
-		elseif zoneType == "ds" and IsControlJustPressed(1, 51) then
-			if exports.bf:isPedDrivingAVehicle() then
-				exports.bf:Notification('~r~Tu ne peux pas passer le permis de voiture en conduisant.')
-			else
-				exports.bf:OpenMenu("ds")
-			end
-		end
-
-		if ds then
-			local ped = GetPlayerPed(-1)
-			vehicle = GetVehiclePedIsIn(ped, false)
-			if vehicle ~= dsVehicle then
-				exports.bf:Notification('Vous êtes descendu de la voiture. Permis annulé')
-				exports.bf:DisableArea("checkpoints-1")
-				exports.bf:DisableArea("checkpoints-2")
-				exports.bf:DisableArea("checkpoints-3")
-				ds = false
+		if Ds then
+			local Ped = GetPlayerPed(-1)
+			local vehicle = GetVehiclePedIsIn(Ped, false)
+			if vehicle ~= DsVehicle then
+				exports.bro_core:Notification('Vous êtes descendu de la voiture. Permis annulé')
+				exports.bro_core:DisableArea("checkpoints-1")
+				exports.bro_core:DisableArea("checkpoints-2")
+				exports.bro_core:DisableArea("checkpoints-3")
+				Ds = false
 			end
 		end
 	end
@@ -457,10 +133,167 @@ end)
 
 
 -- update vehicles states
---Citizen.CreateThread(function()
---	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
---	while true do
---		Wait(3000)
---		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
---	end
---end)
+Citizen.CreateThread(function()
+	TriggerServerEvent("vehicle:player:get", "vehicle:spawn")
+	while true do
+		Wait(10000)
+		TriggerServerEvent("vehicle:player:get", "vehicle:refresh")
+		TriggerServerEvent("vehicle:job:get", "vehicle:refresh")
+	end
+end)
+
+
+--[[ SEAT SHUFFLE ]]--
+--[[ BY JAF ]]--
+
+local disableShuffle = true
+function disableSeatShuffle(flag)
+	disableShuffle = flag
+end
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(0)
+		if IsPedInAnyVehicle(GetPlayerPed(-1), false) and disableShuffle then
+			if GetPedInVehicleSeat(GetVehiclePedIsIn(GetPlayerPed(-1), false), 0) == GetPlayerPed(-1) then
+				if GetIsTaskActive(GetPlayerPed(-1), 165) then
+					SetPedIntoVehicle(GetPlayerPed(-1), GetVehiclePedIsIn(GetPlayerPed(-1), false), 0)
+				end
+			end
+		end
+	end
+end)
+
+RegisterNetEvent("SeatShuffle")
+AddEventHandler("SeatShuffle", function()
+	if IsPedInAnyVehicle(GetPlayerPed(-1), false) then
+		disableSeatShuffle(false)
+		Citizen.Wait(5000)
+		disableSeatShuffle(true)
+	else
+		CancelEvent()
+	end
+end)
+
+RegisterCommand("seat", function(source, args, raw) --change command here
+    TriggerEvent("SeatShuffle")
+end, false) --False, allow everyone to run it
+
+-- grip offroad
+local GripAmount = 5.8000001907349 -- Max amount = 9.8000001907349 | Default = 5.8000001907349 (Grip amount when on drift)
+
+
+Citizen.CreateThread(function()
+	while true do
+		local veh = GetVehiclePedIsIn(PlayerPedId())
+
+		if veh == 0 then -- Player isnt in a vehicle
+			Citizen.Wait(500)
+
+		else -- Player is in a vehicle
+
+			local material_id = GetVehicleWheelSurfaceMaterial(veh, 1)
+			local wheel_type = GetVehicleWheelType(veh)
+
+			if wheel_type == 3 or wheel_type == 4 or wheel_type == 6 then -- If have Off-road/Suv's/Motorcycles wheel grip its equal
+			else
+				if material_id == 4 or material_id == 1 or material_id == 3 then -- All road (sandy/los santos/paleto bay)
+					-- On road
+					SetVehicleGravityAmount(veh, 9.8000001907349)
+				else
+					-- Off road
+					if GripAmount >= 9.8000001907349 then
+						GripAmount = 5.8000001907349
+					end
+
+					SetVehicleGravityAmount(veh, GripAmount)
+				end
+			end
+
+			Citizen.Wait(200)
+		end
+	end
+end)
+
+local blacklistedModels = {
+}
+
+local turnEngineOn = false
+
+-- [[ THREAD ]] --
+	-- Todo: Make sure the vehicle is not a boat, bike, plane, heli or blacklisted
+
+	Citizen.CreateThread(function()
+		while true do
+			Citizen.Wait(0)
+
+			local veh = GetVehiclePedIsIn(Ped)
+			if DoesEntityExist(veh) then
+				disableAirControl(Ped, veh)
+				disableVehicleRoll(Ped, veh)
+			end
+
+
+		end
+	end)
+
+
+	-- [[ FUNCTIONS ] --
+	function resetVehicle(veh)
+		FreezeEntityPosition(veh,false)
+		SetVehicleOnGroundProperly(veh)
+		SetVehicleEngineOn(veh,turnEngineOn)
+	end
+
+	function disableAirControl(Ped, veh)
+		if not IsThisModelBlacklisted(veh) then
+			if IsPedSittingInAnyVehicle(Ped) then
+				if GetPedInVehicleSeat(veh, -1) == Ped then
+					if IsEntityInAir(veh) then
+						DisableControlAction(0, 59)
+						DisableControlAction(0, 60)
+					end
+				end
+			end
+		end
+	end
+
+	function disableVehicleRoll(Ped, veh)
+		local roll = GetEntityRoll(veh)
+
+		if not IsThisModelBlacklisted(veh) then
+			if GetPedInVehicleSeat(veh, -1) == Ped then
+				if (roll > 75.0 or roll < -75.0) then
+					DisableControlAction(2,59,true)
+					DisableControlAction(2,60,true)
+					if not IsEntityInAir(veh) and GetEntitySpeed(veh) < 0.15 then
+						Wait(2000)
+						destroyPeDsVehicle(Ped)
+					end
+				end
+			end
+		end
+	end
+
+	function IsThisModelBlacklisted(veh)
+		local model = GetEntityModel(veh)
+
+		for i = 1, #blacklistedModels do
+			if model == GetHashKey(blacklistedModels[i]) then
+				return true
+			end
+		end
+		return false
+	end
+
+	function destroyPeDsVehicle(Ped)
+		local veh = GetVehiclePedIsIn(Ped)
+		FreezeEntityPosition(veh,true)
+		SetVehicleEngineOn(veh, false)
+	end
+
+	function drawNotification(text)
+		SetNotificationTextEntry("STRING")
+		AddTextComponentString(text)
+		DrawNotification(true, false)
+	end

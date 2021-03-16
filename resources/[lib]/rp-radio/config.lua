@@ -1,8 +1,8 @@
 radioConfig = {
     Controls = {
         Activator = { -- Open/Close Radio
-            Name = "INPUT_REPLAY_START_STOP_RECORDING_SECONDARY", -- Control name
-            Key = 289, -- F2
+            Name = "INPUT_SELECT_CHARACTER_FRANKLIN", -- Control name
+            Key = 167, -- F6
         },
         Secondary = {
             Name = "INPUT_SPRINT",
@@ -30,11 +30,11 @@ radioConfig = {
         },
         Broadcast = {
             Name = "INPUT_VEH_PUSHBIKE_SPRINT", -- Control name
-            Key = 137, -- Caps Lock
+            Key = 37, -- Caps Lock
         },
         ToggleClicks = { -- Toggle radio click sounds
             Name = "INPUT_SELECT_WEAPON", -- Control name
-            Key = 37, -- Tab
+            Key = 137, -- Tab
         }
     },
     Frequency = {
@@ -48,5 +48,5 @@ radioConfig = {
         List = {}, -- Frequency list, Don't touch
         Access = {}, -- List of freqencies a player has access to
     },
-    AllowRadioWhenClosed = false -- Allows the radio to be used when not open (uses police radio animation) 
+    AllowRadioWhenClosed = true -- Allows the radio to be used when not open (uses police radio animation) 
 }

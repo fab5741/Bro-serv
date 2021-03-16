@@ -1,667 +1,347 @@
-function menus() 
-	exports.bf:AddMenu("lsms", {
-		title = "Menu LSMS",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "SOIN",
-				exec = {
-					callback = function()
-						reviveClosestPlayer()
-					end
-				},
-			},
-		},
-		{
-			text = "Vehicules",
-			exec = {
-				callback = function()
-					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
-				end
-			},
-		},
-	})
-	exports.bf:AddMenu("lspd", {
-		title = "Menu LSPD",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "Animations",
-				openMenu = "lspd-animations"
-			},
-			{
-				text = "Citoyen",
-				openMenu = "lspd-citizens"
-			},
-			{
-				text = "Vehicules",
-				openMenu = "lspd-veh"
-			},
-			{
-				text = "Objets",
-				openMenu = "lspd-props"
-			},
-			{
-				text = "Vehicules",
-				exec = {
-					callback = function()
-						TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 2)
-					end
-				},
-			},
-			{
-				text = "Gestion service",
-				exec = {
-					callback = function()
-						TriggerServerEvent("job:isChef", "jobs:service:manage")
-					end
-				},
-			},
-		},	
-	})
-	exports.bf:AddMenu("jobs-vehicles", {
-		title = "Menu  assurance",
-		menuTitle = "Job",
-		position = 1,
-	})
-	
-	exports.bf:AddMenu("newspapers", {
-		title = "Menu Livreurs de journaux",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "Stopper les livraisons",
-				exec = {
-					callback = function()
-						beginInProgress = false
-						-- on nettoie la merde
-						exports.bf:RemoveArea("begin-current")
-						vehicleLivraison = 0
-						ClearAllBlipRoutes()
-					end
-				},
-			},
-		},
-	})
-	exports.bf:AddMenu("lspd-animations", {
-		title = "LSPD",
-		menuTitle = "Animations",
-		position = 1,
-		buttons = {
-			{
-				text = "Traffic",
-				exec = {
-					callback = function()
-						DoTraffic()
-					end
-				},
-			},
-			{
-				text = "Notes",
-				exec = {
-					callback = function()
-						Note()
-					end
-				},
-			},
-			{
-				text = "Standby",
-				exec = {
-					callback = function()
-						StandBy()
-					end
-				},
-			},
-			{
-				text = "Standby2",
-				exec = {
-					callback = function()
-						StandBy2()
-					end
-				},
-			},
-			{
-				text = "Annuler l'animation",
-				exec = {
-					callback = function()
-						CancelEmote()
-					end
-				},
-			},
-		},
-	})
-	exports.bf:AddMenu("lspd-citizens", {
-		title = "LSPD",
-		menuTitle = "Animations",
-		position = 1,
-		buttons = {
-			{
-				text = "Enelever armes",
-				exec = {
-					callback = function()
-						RemoveWeapons()
-					end
-				},
-			},
-			{
-				text = "Menotter",
-				exec = {
-					callback = function()
-						ToggleCuff()
-					end
-				},
-			},
-			{
-				text = "Porter",
-				exec = {
-					callback = function()
-						DragPlayer()
-					end
-				},
-			},
-			{
-				text = "Amendes",
-				openMenu = "lspd-citizens-fines"
-			},
-		},
-	})
+function RemoveMenuPaint(max, type, nb) 
+	exports.bro_core:RemoveMenu("custom-paint"..nb.."-"..type)
+end
 
-	exports.bf:AddMenu("lspd-citizens-fines", {
-		title = "LSPD",
-		menuTitle = "Amendes",
-		position = 1,
-		buttons = {
-			{
-				text = "Infraction légére (250 $)",
-				exec = {
-					callback = function()
-						Fines(250)
-					end
-				},
-			},
-			{
-				text = "Infraction moyenne (500 $)",
-				exec = {
-					callback = function()
-						Fines(500)
-					end
-				},
-			},
-			{
-				text = "Infraction lourde (1000 $)",
-				exec = {
-					callback = function()
-						Fines(1000)
-					end
-				},
-			},
-		},
-	})
+function RemoveMenuMod(type) 
+	exports.bro_core:RemoveMenu("custom-mod-"..type)
+end
 
-	exports.bf:AddMenu("lspd-veh", {
-		title = "LSPD",
-		menuTitle = "Vehicules",
-		position = 1,
-		buttons = {
-			{
-				text = "Supprimer",
-				exec = {
-					callback = function()
-						DropVehicle()
-					end
-				},
-			},
-			{
-				text = "Herses",
-				exec = {
-					callback = function()
-						SpawnSpikesStripe()
-					end
-				},
-			},
-		},
-	})
+function CustomMenuRemove()
+	exports.bro_core:RemoveMenu("custom")
+	exports.bro_core:RemoveMenu("custom-paint1")
+	exports.bro_core:RemoveMenu("custom-paint2")
 
-
-	exports.bf:AddMenu("lspd-props", {
-		title = "LSPD",
-		menuTitle = "Amendes",
-		position = 1,
-		buttons = {
-			{
-				text = "Barrière",
-				exec = {
-					callback = function()
-						SpawnProps("prop_mp_barrier_01b")
-					end
-				},
-			},
-			{
-				text = "Barrière 2",
-				exec = {
-					callback = function()
-						SpawnProps("prop_barrier_work05")
-					end
-				},
-			},
-			{
-				text = "Cone lumineux",
-				exec = {
-					callback = function()
-						SpawnProps("prop_air_conelight")
-					end
-				},
-			},
-			{
-				text = "Barrière 3",
-				exec = {
-					callback = function()
-						SpawnProps("prop_barrier_work06a")
-					end
-				},
-			},
-			{
-				text = "Cabine",
-				exec = {
-					callback = function()
-						SpawnProps("prop_tollbooth_1")
-					end
-				},
-			},
-			{
-				text = "Cone 1",
-				exec = {
-					callback = function()
-						SpawnProps("prop_mp_cone_01")
-					end
-				},
-			},
-			{
-				text = "Cone 2",
-				exec = {
-					callback = function()
-						SpawnProps("prop_mp_cone_04")
-					end
-				},
-			},
-			{
-				text = "Enlever dernier",
-				exec = {
-					callback = function()
-						RemoveLastProps()
-					end
-				},
-			},
-			{
-				text = "Enlever tout",
-				exec = {
-					callback = function()
-						RemoveAllProps()
-					end
-				},
-			},
-		},
-	})
-
-	exports.bf:AddMenu("lspd-service", {
-		title = "Menu LSMS",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "SOIN",
-				exec = {
-					callback = function()
-						closest = GetClosestPlayer()
-						revivePlayer(closest)
-					end
-				},
-			},
-		},
-		{
-			text = "Vehicules",
-			exec = {
-				callback = function()
-					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
-				end
-			},
-		},
-	})
-
-	exports.bf:AddMenu("bennys", {
-		title = "Menu Benny's",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-			{
-				text = "Réparer voiture",
-				exec = {
-					callback = function()
-						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-						SetVehicleFixed(vehicle)
-						SetVehicleDeformationFixed(vehicle)
-						SetVehicleUndriveable(vehicle, false)
-						ClearPedTasksImmediately(playerPed)
-						exports.bf:Notification("Véhicle réparé")
-						exports.bf:CloseMenu("repair")
-					end
-				},
-			},
-		},
-	})
-
-    -- job center
-    buttons = {}
-    for k, v in pairs(config.center.jobs) do
-        buttons[#buttons+1] = {
-            text = v.label,
-            exec = {
-                callback = function()
-					TriggerServerEvent("job:set", 18, "Livreur de journaux")
-					Wait(100)
-					TriggerServerEvent("job:get", "jobs:refresh")
-					exports.bf:CloseMenu("center")
-                end
-            },
-        }
-    end
-
-    exports.bf:AddMenu("center", {
-        title = "LSJC",
-        menuTitle = "Prendre un emploi",
-        position = 1,
-        buttons = buttons
-	})
-
-
-	exports.bf:AddMenu("repair", {
-        title = "Réparation",
-		position = 1,
-		buttons = {
-			{
-				text = "Réparer carrosserie (10$)",
-				exec = {
-					callback = function()
-						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-
-						SetVehicleFixed(vehicle)
-						SetVehicleDeformationFixed(vehicle)
-						SetVehicleUndriveable(vehicle, false)
-						ClearPedTasksImmediately(playerPed)
-						TriggerServerEvent("account:player:liquid:add", "", -10.0)
-						exports.bf:Notification("Véhicle réparé")
-						exports.bf:CloseMenu("repair")
-					end
-				},
-			},
-		}
-	})
-	exports.bf:AddMenu("custom", {
-        title = "Customisation",
-		position = 1,
-		buttons = {
-			{
-				text = "Peinture",
-				openMenu = "custom-paint"
-			},
-			{
-				text = "Spoilers",
-				openMenu = "custom-mod-0"
-			},
-			{
-				text = "Bumpers (devant)",
-				openMenu = "custom-mod-1"
-			},
-			{
-				text = "Bumpers (arriére)",
-				openMenu = "custom-mod-2"
-			},
-			{
-				text = "Side Skirt",
-				openMenu = "custom-mod-3"
-			},
-			{
-				text = "Exhaust",
-				openMenu = "custom-mod-4"
-			},
-			{
-				text = "Frame",
-				openMenu = "custom-mod-5"
-			},
-			{
-				text = "Grille",
-				openMenu = "custom-mod-6"
-			},
-			{
-				text = "Hood",
-				openMenu = "custom-mod-7"
-			},
-			{
-				text = "Fender",
-				openMenu = "custom-mod-8"
-			},
-			{
-				text = "Right Fender",
-				openMenu = "custom-mod-9"
-			},
-			{
-				text = "Toit",
-				openMenu = "custom-mod-10"
-			},
-		--	{
-		--		text = "Moteur",
-			--	openMenu = "custom-mod-11"
-		--	},
-		--	{
-		--		text = "Freins",
-		--		openMenu = "custom-mod-12"
-		--	},
-		--	{
-		--		text = "Transmission",
-		--		openMenu = "custom-mod-13"
-		--	},
-		--	{
-		--		text = "Klaxon",
-		--		openMenu = "custom-mod-14"
-		--	},
-		---	{
-			--	text = "Suspension",
-		--		openMenu = "custom-mod-15"
-			--},
-		--	{
-			--	text = "Blindage",
-		----		openMenu = "custom-mod-16"
-			--},
-		---	{
-			--	text = "Turbo",
-	--			openMenu = "custom-mod-18"
-			--},
-			{
-				text = "Roues",
-				openMenu = "custom-mod-19"
-			},
-			{
-				text = "Roues avant (moto)",
-				openMenu = "custom-mod-23"
-			},
-			{
-				text = "",
-				openMenu = "custom-mod-50"
-			},
-		}
-	})
-	
-	exports.bf:AddMenu("custom-paint", {
-        title = "Customisation",
-		position = 1,
-		buttons = {
-			{
-				text = "Normal",
-				openMenu = "custom-paint-0"
-			},
-			{
-				text = "Metallic",
-				openMenu = "custom-paint-1"
-			},
-			{
-				text = "Pearl",
-				openMenu = "custom-paint-2"
-			},
-			{
-				text = "Mat",
-				openMenu = "custom-paint-3"
-			},
-			{
-				text = "Metal",
-				openMenu = "custom-paint-4"
-			},
-			{
-				text = "Chrome",
-				openMenu = "custom-paint-5"
-			},
-		}
-	})
-
-	function addMenuPaint(max, type) 
-		buttons = {}
-		for i = 0,max do
-			buttons[#buttons+1] = {
-				text = i,
-				hover = {
-					callback = function()
-						vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-						SetVehicleModKit(
-							vehicle, 
-							0
-						)
-						SetVehicleModColor_1(
-							vehicle, 
-							type, 
-							i, 
-							0 -- always 0
-						)
-					end
-				},
-			}
-		end
-		exports.bf:AddMenu("custom-paint-"..type, {
-			title = "Peinture type"..type,
-			position = 1,
-			buttons = buttons
-		})	
+	for i = 1,2 do
+		RemoveMenuPaint(75, 0, i)	
+		RemoveMenuPaint(75, 1, i)	
+		RemoveMenuPaint(75, 2, i)		
+		RemoveMenuPaint(20, 3, i)		
+		RemoveMenuPaint(5, 4, i)		
+		RemoveMenuPaint(0, 5, i)	
 	end
 
-	addMenuPaint(75, 0)	
-	addMenuPaint(75, 1)	
-	addMenuPaint(75, 2)	
-	addMenuPaint(20, 3)	
-	addMenuPaint(5, 4)	
-	addMenuPaint(0, 5)	
 
-	function addMenuMod(type) 
-		buttons = {}
-		vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-
-		SetVehicleModKit(
-			vehicle --[[ Vehicle ]], 
-			0 --[[ integer ]]
-		)
-		local max = GetNumVehicleMods(vehicle, type)
-		for i = 0,max do
-			buttons[#buttons+1] = {
-				text = i,
-				hover = {
-					callback = function()
-
-						SetVehicleMod(
-							vehicle, 
-							type, 
-							i, 
-							false -- always 0
-						)
-					end
-				},
-			}
-		end
-		exports.bf:AddMenu("custom-mod-"..type, {
-			title = "Mod "..type,
-			position = 1,
-			buttons = buttons
-		})	
-	end
 
 	for i = 0,19 do
-		addMenuMod(i)
+		RemoveMenuMod(i)
 	end
-	addMenuMod(23)
-	addMenuMod(50)
+	RemoveMenuMod(23)
+	RemoveMenuMod(50)
+end
 
-
-	exports.bf:AddMenu("taxi", {
-		title = "Menu Taxi",
-		menuTitle = "Job",
-		position = 1,
-		buttons = {
-		{
-			text = "Vehicules",
-			exec = {
-				callback = function()
-					TriggerServerEvent("vehicles:jobs:get:all", "jobs:assurance:vehicles", 3)
+function AddMenuPaint(max, type, nb)
+	local buttons = {}
+	for i = 0,max do
+		buttons[#buttons+1] = {
+			type = "button",
+			label = i,
+			actions = {
+				onSelected = function()
+					local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+					SetVehicleModKit(
+						vehicle, 
+						0
+					)
+					if nb == 1 then
+						SetVehicleModColor_1(
+							vehicle,
+							type,
+							i,
+							0 -- always 0
+						)
+					elseif nb == 2 then
+						SetVehicleModColor_2(
+							vehicle,
+							type,
+							i
+						)
+					end
 				end
 			},
-		},
-		{
-			text = "Gestion service",
-			exec = {
-				callback = function()
-					TriggerServerEvent("job:isChef", "jobs:service:manage")
-				end
-			},
-		},
-	}
+		}
+	end
+	exports.bro_core:AddSubMenu("custom-paint"..nb.."-"..type, {
+		parent = "paint"..nb,
+		Title = "Peinture type"..type,
+		Subtitle = "Customisations > Preintures > "..type,
+		buttons = buttons
 	})
+end
 
-	exports.bf:AddMenu("service", {
-		title = "Menu Service",
-		menuTitle = "Job",
-		position = 1,
+function AddMenuMod(type) 
+	local buttons = {}
+	local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+
+	SetVehicleModKit(
+		vehicle --[[ Vehicle ]], 
+		0 --[[ integer ]]
+	)
+	local max = GetNumVehicleMods(vehicle, type)
+	for i = 0,max do
+		buttons[#buttons+1] = {
+			type = "button",
+			label = i,
+			actions = {
+				onSelected = function()
+					SetVehicleMod(
+						vehicle,
+						type,
+						i,
+						false -- always 0
+					)
+				end
+			},
+		}
+	end
+	exports.bro_core:AddSubMenu("custom-mod-"..type, {
+		parent = "custom",
+		Title = "Mod "..type,
+		Subtitle = "Customisations > "..type,
+		buttons = buttons
+	})
+end
+
+function CustomMenu()
+
+	exports.bro_core:AddMenu("custom", {
+        Title = "Bennys",
+        Subtitle = "Customisation",
 		buttons = {
 			{
-				text = "Recruter",
-				exec = {
-					callback = function()
-						TriggerServerEvent("job:get", "job:recruit")
-					end
-				},
+				type = "separator",
+				label = "Peintures"
 			},
 			{
-				text = "Promouvoir",
-				exec = {
-					callback = function()
-						promoteClosestPlayer()
-					end
-				},
+				type= "button",
+				label = "Peinture",
+				subMenu = "paint1",
 			},
 			{
-				text = "Rétrograder",
-				exec = {
-					callback = function()
-						demoteClosestPlayer()
-					end
-				},
+				type= "button",
+				label = "Peinture 2",
+				subMenu = "paint2",
 			},
 			{
-				text = "Virer",
-				exec = {
-					callback = function()
-						fireClosestPlayer()
+				type = "separator",
+				label = "Carroserie"
+			},
+			{
+				type= "button",
+				label = "Spoilers",
+				subMenu = "custom-mod-0"
+			},
+			{
+				type= "button",
+				label = "Bumpers (devant)",
+				subMenu = "custom-mod-1"
+			},
+			{
+				type= "button",
+				label = "Bumpers (arriére)",
+				subMenu = "custom-mod-2"
+			},
+			{
+				type= "button",
+				label = "Side Skirt",
+				subMenu = "custom-mod-3"
+			},
+			{
+				type= "button",
+				label = "Exhaust",
+				subMenu = "custom-mod-4"
+			},
+			{
+				type= "button",
+				label = "Frame",
+				subMenu = "custom-mod-5"
+			},
+			{
+				type= "button",
+				label = "Grille",
+				subMenu = "custom-mod-6"
+			},
+			{
+				type= "button",
+				label = "Hood",
+				subMenu = "custom-mod-7"
+			},
+			{
+				type= "button",
+				label = "Fender",
+				subMenu = "custom-mod-8"
+			},
+			{
+				type= "button",
+				label = "Right Fender",
+				subMenu = "custom-mod-9"
+			},
+			{
+				type= "button",
+				label = "Toit",
+				subMenu = "custom-mod-10"
+			},
+			{
+				type = "separator",
+				label = "Améliorations"
+			},
+			{
+				type= "button",
+				label = "Moteur",
+				subMenu = "custom-mod-11"
+			},
+			{
+				type= "button",
+				label = "Freins",
+				subMenu = "custom-mod-12"
+			},
+			{
+				type= "button",
+				label = "Transmission",
+				subMenu = "custom-mod-13"
+			},
+			{
+				type= "button",
+				label = "Klaxon",
+				subMenu = "custom-mod-14"
+			},
+			{
+				label = "Suspension",
+				subMenu = "custom-mod-15"
+			},
+			{
+				type= "button",
+				label = "Blindage",
+				subMenu = "custom-mod-16"
+			},
+			{
+				type= "button",
+				label = "Turbo",
+				subMenu = "custom-mod-18"
+			},
+			{
+				type = "separator",
+				label = "Roues"
+			},
+			{
+				type= "button",
+				label = "Roues",
+				subMenu = "custom-mod-19"
+			},
+			{
+				type= "button",
+				label = "Roues avant (moto)",
+				subMenu = "custom-mod-23"
+			},
+			{
+				type= "button",
+				label = "valider",
+				actions = {
+					onSelected = function()
+						SetVehicleModKit(
+							vehicle --[[ Vehicle ]], 
+							0 --[[ integer ]]
+						)
+						local mods = {
+
+						}
+						for i = 0,49 do
+							mods[i] = GetVehicleMod(
+								vehicle --[[ Vehicle ]], 
+								i --[[ integer ]]
+							)
+						end
+						exports.bro_core:PrintTable(mods)
+						TriggerServerEvent("vehicle:mods:save" , vehicle, mods)
 					end
-				},
+				}
+			}
+		}
+	})
+	exports.bro_core:AddSubMenu("paint1", {
+		parent = "custom",
+		Title = "bennys",
+		Subtitle = "Customisations > Peintures > Principale",
+		buttons = {
+			{
+				type= "button",
+				label = "Normal",
+				subMenu = "custom-paint1-0"
+			},
+			{
+				type= "button",
+				label = "Metallic",
+				subMenu = "custom-paint1-1"
+			},
+			{
+				type= "button",
+				label = "Pearl",
+				subMenu = "custom-paint1-2"
+			},
+			{
+				type= "button",
+				label = "Mat",
+				subMenu = "custom-paint1-3"
+			},
+			{
+				type= "button",
+				label = "Metal",
+				subMenu = "custom-paint1-4"
+			},
+			{
+				type= "button",
+				label = "Chrome",
+				subMenu = "custom-paint1-5"
 			},
 		}
 	})
-
+	exports.bro_core:AddSubMenu("paint2", {
+		parent = "custom",
+		Title = "bennys",
+		Subtitle = "Customisations > Peintures > Secondaire",
+		buttons = {
+			{
+				type= "button",
+				label = "Normal",
+				subMenu = "custom-paint2-0"
+			},
+			{
+				type= "button",
+				label = "Metallic",
+				subMenu = "custom-paint2-1"
+			},
+			{
+				type= "button",
+				label = "Pearl",
+				subMenu = "custom-paint2-2"
+			},
+			{
+				type= "button",
+				label = "Mat",
+				subMenu = "custom-paint2-3"
+			},
+			{
+				type= "button",
+				label = "Metal",
+				subMenu = "custom-paint2-4"
+			},
+			{
+				type= "button",
+				label = "Chrome",
+				subMenu = "custom-paint2-5"
+			},
+		}
+	})
+	for i = 1,2 do
+		AddMenuPaint(75, 0, i)	
+		AddMenuPaint(75, 1, i)	
+		AddMenuPaint(75, 2, i)		
+		AddMenuPaint(20, 3, i)		
+		AddMenuPaint(5, 4, i)		
+		AddMenuPaint(0, 5, i)	
+	end
+	for i = 0,19 do
+		AddMenuMod(i)
+	end
+	AddMenuMod(23)
+	AddMenuMod(50)
 end

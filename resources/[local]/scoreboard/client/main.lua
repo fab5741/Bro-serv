@@ -10,15 +10,7 @@ local Keys = {
 	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
 
-
 local idVisable = true
-
-
-Citizen.CreateThread(function()
-	Citizen.Wait(2000)
-	-- TODO find conected players
---	UpdatePlayerTable(connectedPlayers)
-end)
 
 Citizen.CreateThread(function()
 	Citizen.Wait(500)
@@ -28,14 +20,23 @@ Citizen.CreateThread(function()
 		uptime = 'unknown',
 		playTime = '00h 00m'
 	})
+	TriggerServerEvent("scoreboard:playerConnected")
 end)
 
+--
+-- EVENTS
+--
+
 RegisterNetEvent('scoreboard:updateConnectedPlayers')
+RegisterNetEvent('scoreboard:updatePing')
+RegisterNetEvent('scoreboard:toggleID')
+RegisterNetEvent('uptime:tick')
+
+
 AddEventHandler('scoreboard:updateConnectedPlayers', function(connectedPlayers)
 	UpdatePlayerTable(connectedPlayers)
 end)
 
-RegisterNetEvent('scoreboard:updatePing')
 AddEventHandler('scoreboard:updatePing', function(connectedPlayers)
 	SendNUIMessage({
 		action  = 'updatePing',
@@ -43,7 +44,6 @@ AddEventHandler('scoreboard:updatePing', function(connectedPlayers)
 	})
 end)
 
-RegisterNetEvent('scoreboard:toggleID')
 AddEventHandler('scoreboard:toggleID', function(state)
 	if state then
 		idVisable = state
@@ -57,7 +57,6 @@ AddEventHandler('scoreboard:toggleID', function(state)
 	})
 end)
 
-RegisterNetEvent('uptime:tick')
 AddEventHandler('uptime:tick', function(uptime)
 	SendNUIMessage({
 		action = 'updateServerInfo',
@@ -65,42 +64,28 @@ AddEventHandler('uptime:tick', function(uptime)
 	})
 end)
 
+--
+-- Functions
+--
 function UpdatePlayerTable(connectedPlayers)
-	local formattedPlayerList, num = {}, 1
+	local formattedPlayerList = {}
 	local ems, police, taxi, mechanic, cardealer, estate, players = 0, 0, 0, 0, 0, 0, 0
 
 	for k,v in pairs(connectedPlayers) do
 
-		if num == 1 then
-			table.insert(formattedPlayerList, ('<tr><td>%s</td><td>%s</td><td>%s</td>'):format(v.name, v.id, v.ping))
-			num = 2
-		elseif num == 2 then
-			table.insert(formattedPlayerList, ('<td>%s</td><td>%s</td><td>%s</td>'):format(v.name, v.id, v.ping))
-			num = 3
-		elseif num == 3 then
-			table.insert(formattedPlayerList, ('<td>%s</td><td>%s</td><td>%s</td></tr>'):format(v.name, v.id, v.ping))
-			num = 1
-		end
-
+		table.insert(formattedPlayerList, ('<tr><td>%s</td><td>%s</td><td>%s</td>'):format(v.name, k, v.ping))
 		players = players + 1
 
-		if v.job == 'ambulance' then
+		print(v.job)
+		if v.job == 'lsms' then
 			ems = ems + 1
-		elseif v.job == 'police' then
+		elseif v.job == 'lspd' then
 			police = police + 1
 		elseif v.job == 'taxi' then
 			taxi = taxi + 1
-		elseif v.job == 'mechanic' then
+		elseif v.job == 'bennys' then
 			mechanic = mechanic + 1
-		elseif v.job == 'cardealer' then
-			cardealer = cardealer + 1
-		elseif v.job == 'realestateagent' then
-			estate = estate + 1
 		end
-	end
-
-	if (num == 1) or (num == 2) then
-		table.insert(formattedPlayerList, '</tr>')
 	end
 
 	SendNUIMessage({

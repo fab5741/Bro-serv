@@ -29,14 +29,14 @@
   "RTCConfig": {
     "iceServers": [{
       "urls": ["turn:barrax.needrp.net"],
-      "username": "gcphone",
-      "credential": "gcphone"
+      "username": "phone",
+      "credential": "phone"
     }]
   },
 
   "//": "REQUIRES https://github.com/citizenfx/screenshot-basic otherwise set enableTakePhoto to false. Thanks to @GLDmACK for his Upload Service!!!", 
   "enableTakePhoto": true,
-  "fileUploadService_Url": "https://gcphone.herokuapp.com/uploads/upload",
+  "fileUploadService_Url": "https://phone.herokuapp.com/uploads/upload",
   "fileUploadService_Field": "image",
 
   "background": {
@@ -92,47 +92,46 @@
   },
 
   "serviceCall": [{
-      "display": "Police",
+      "display": "LSPD",
       "icon": "/html/static/img/icons_app/police.png",
       "subMenu": [{
           "title": "Send Message",
-          "eventName": "esx_addons_gcphone:call",
+          "eventName": "phone:call",
           "type": {
-            "number": "police"
-          }
-        },
-        {
-          "title": "Call Police Station",
-          "eventName": "gcphone:autoCallNumber",
-          "type": {
-            "number": "911"
+            "number": "lspd"
           }
         }
       ]
     },
     {
-      "display": "Ambulance",
+      "display": "LSMS",
       "backgroundColor": "red",
       "subMenu": [{
         "title": "Send Message",
-        "eventName": "esx_addons_gcphone:call",
+        "eventName": "phone:call",
         "type": {
-          "number": "ambulance"
+          "number": "lsms"
         }
       }]
     }
   ],
 
   "defaultContacts": [{
-      "number": "ambulance",
-      "display": "Ambulance",
+      "number": "lsms",
+      "display": "LSMS",
       "icon": "/html/static/img/icons_app/bank.png"
     },
     {
-      "number": "police",
-      "display": "Police",
+      "number": "lspd",
+      "display": "LSPD",
       "backgroundColor": "blue",
       "letter": "P"
+    },
+    {
+      "number": "taxi",
+      "display": "Taxi",
+      "backgroundColor": "yellow",
+      "letter": "T"
     }
   ],
 

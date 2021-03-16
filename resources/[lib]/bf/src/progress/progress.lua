@@ -31,3 +31,24 @@ AddEventHandler("bf:progress:delete", function(name, color)
         color = color,
     })
 end)
+
+
+RegisterNetEvent("bf:progressBar:create")
+
+AddEventHandler("bf:progressBar:create", function(time, text)
+	SendNUIMessage({
+		action = "ui",
+		display = true,
+		time = time,
+		text = text
+	})
+end)
+
+RegisterNetEvent("bf:progressBar:delete")
+
+AddEventHandler("bf:progressBar:delete", function()
+	SendNUIMessage({
+		action = "ui",
+		display = false
+	})
+end)

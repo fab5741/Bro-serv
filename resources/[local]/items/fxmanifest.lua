@@ -5,6 +5,8 @@ description '- Bro - ATM commands'
 
 version '0.0.1'
 
+dependency "bro_core"
+
 client_script {
     'client.lua'
 }

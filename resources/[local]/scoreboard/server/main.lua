@@ -1,60 +1,51 @@
 local connectedPlayers = {}
 
---ESX.RegisterServerCallback('scoreboard:getConnectedPlayers', function(source, cb)
---	cb(connectedPlayers)
---end)
+RegisterNetEvent("scoreboard:playerConnected")
+RegisterNetEvent("scoreboard:clockIn")
 
-AddEventHandler('job:setJob', function(playerId, job, lastJob)
-	connectedPlayers[playerId].job = job.name
-
+AddEventHandler('scoreboard:clockIn', function(job)
+	connectedPlayers[source].job = job
 	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
 end)
 
-AddEventHandler('playerConnecting', function(OnPlayerConnecting)
-	AddPlayerToScoreboard(xPlayer, true)
+AddEventHandler('scoreboard:playerConnected', function()
+	connectedPlayers[source] = {
+		name = GetPlayerName(source),
+		ping = GetPlayerPing(source)
+	}
+	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
 end)
 
-AddEventHandler('playerDropped', function(playerId)
-	connectedPlayers[playerId] = nil
+AddEventHandler('playerDropped', function()
+	connectedPlayers[source] = nil
+	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
+end)
 
+AddEventHandler('scoreboard:updatePlayers', function()
 	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
 end)
 
 Citizen.CreateThread(function()
+--	for k,v in ipairs(exports.bro_core:GetPlayersPed()) do
+--		connectedPlayers[#connectedPlayers+1] = {
+--			name = GetPlayerName(v),
+--			id = k,
+--			ping = GetPlayerPing(v)
+--		}
+--	end
+--	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
 	while true do
 		Citizen.Wait(5000)
 		UpdatePing()
 	end
 end)
 
-AddEventHandler('onResourceStart', function(resource)
-	if resource == GetCurrentResourceName() then
-		Citizen.CreateThread(function()
-			Citizen.Wait(1000)
-			AddPlayersToScoreboard()
-		end)
-	end
-end)
-
-function AddPlayerToScoreboard(player, update)
-	connectedPlayers[player] = {}
-
-	if update then
-		TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
-	end
-
-end
-
-function AddPlayersToScoreboard()
-	exports.bf:GetPlayersId()
-
-	TriggerClientEvent('scoreboard:updateConnectedPlayers', -1, connectedPlayers)
-end
-
 function UpdatePing()
-	for k,v in pairs(connectedPlayers) do
-		v.ping = GetPlayerPing(k)
-		TriggerClientEvent('status:updatePing', k, v.ping)
+	if #connectedPlayers > 0 then
+		for k,v in pairs(connectedPlayers) do
+			v.ping = GetPlayerPing(k)
+			TriggerClientEvent('status:updatePing', k, v.ping)
+		end
+		TriggerClientEvent('scoreboard:updatePing', -1, connectedPlayers)
 	end
-	TriggerClientEvent('scoreboard:updatePing', -1, connectedPlayers)
 end

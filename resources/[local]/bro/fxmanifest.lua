@@ -5,11 +5,11 @@ description '- Bro -'
 
 version '0.0.1'
 
-dependency "bf"
+dependency "bro_core"
 
 client_scripts {
-    'client/client.lua',
-    "lifetraffic.net.dll"
+    'client/functions.lua',
+    'client/client.lua'
 } 
 
 server_scripts {

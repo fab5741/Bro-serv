@@ -1,46 +1,25 @@
-config = {}
 liquid = 0
 account = 0
 
 -- main loop
 Citizen.CreateThread(function()
-	exports.bf:AddMenu("atm", {
-		title = "ATM ",
-		position = 1,
-		buttons = {
-			{
-				text = "Retirer",
-				exec = {
-					callback = function()
-						TriggerServerEvent('atm:withdraw',  exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
-						exports.bf:CloseMenu("atm")
-					end
-				},
-			},
-			{
-				text = "Déposer",
-				exec = {
-					callback = function()
-						TriggerServerEvent('atm:deposit',  exports.bf:OpenTextInput({ title="Montant", maxInputLength=25, customTitle=true}))
-						exports.bf:CloseMenu("atm")
-					end
-				},
-			},
-		},
-	})
-	exports.bf:AddArea("atm", {
+	exports.bro_core:AddArea("ATM", {
 		trigger = {
 			weight = 2,
 			enter = {
-				callback = function()
-					exports.bf:HelpPromt("ATM : ~INPUT_PICKUP~")
-					zoneType = "atm"
+                callback = function()
+					exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
+						TriggerServerEvent("atm:get", "atm:get")
+                    end)
+					exports.bro_core:HelpPromt("ATM : ~INPUT_PICKUP~")
 				end
 			},
 			exit = {
-				callback = function()
-					zoneType = nil
-				end
+                callback = function()
+                    exports.bro_core:RemoveMenu("ATM")
+                    exports.bro_core:Key("E", "E", "Interaction", function()
+                    end)
+            	end
 			},
 		},
 		blip = {
@@ -64,12 +43,49 @@ Citizen.CreateThread(function()
 			{ x = -1827.04,  y = 785.5159,  z = 138.020},
 			{ x = 1686.753,  y = 4815.809,  z = 42.008},
 			{ x = 1153.75,  y = -326.8,  z = 69.21},
+			{ x = 33.249336242676, y = -1348.1586914062, z= 29.497022628784},
+			{ x=1702.8286132812, y = 4933.603515625,z=42.063678741455}
 		}
 	})
-	while true do
-		Citizen.Wait(0)
-		if zoneType == "atm" and IsControlJustPressed(1, 51) then
-			TriggerServerEvent("account:player:liquid:get", "atm:liquid")
-		end
-	end
-end)
+
+	exports.bro_core:AddArea("bank", {
+		trigger = {
+			weight = 2,
+			enter = {
+                callback = function()
+					exports.bro_core:Key("E", "E", "Ouvrir ATM", function()
+						TriggerServerEvent("atm:get", "bank:get")
+                    end)
+					exports.bro_core:HelpPromt("Banque : ~INPUT_PICKUP~")
+				end
+			},
+			exit = {
+                callback = function()
+                    exports.bro_core:RemoveMenu("bank")
+                    exports.bro_core:Key("E", "E", "Interaction", function()
+                    end)
+            	end
+			},
+		},
+		blip = {
+			text = "Banque",
+			colorId = 2,
+			imageId = 300,
+		},
+		locations = {
+			{ 
+				x =-2962.7800292969, y=482.77465820312, z= 15.703103065491
+			},
+			{
+				x=-112.68618774414,y=6469.8583984375,z=31.626710891724
+			},
+			{
+				x=1175.4284667969,y=2706.8161621094, z=38.094074249268
+			},
+			{
+				x=149.11099243164,y=-1040.4370117188,z=29.374076843262
+			}
+		}
+	})
+
+end) 

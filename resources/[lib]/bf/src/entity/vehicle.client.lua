@@ -58,8 +58,7 @@ end
 --
 -- Spawn A car
 --
-function spawnCar(vehicleName, keep, pos, direct, notp)
-    print(notp)
+function spawnCar(vehicleName, keep, pos, direct, notp, heading)
     -- check if the vehicle actually exists
     if not IsModelInCdimage(vehicleName) or not IsModelAVehicle(vehicleName) then
         return false
@@ -79,10 +78,14 @@ function spawnCar(vehicleName, keep, pos, direct, notp)
         pos = GetEntityCoords(playerPed) -- get the position of the local player ped
     end
 
-    ClearAreaOfVehicles(pos.x, pos.y, pos.z, 5.0, false, false, false, false, false)
+    if heading == nil then
+        heading = GetEntityHeading(playerPed)
+    end
+
+    ClearAreaOfVehicles(pos.x, pos.y, pos.z, 10.0, false, false, false, false, false)
 
     -- create the vehicle
-    local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, GetEntityHeading(playerPed), true, false)
+    local vehicle = CreateVehicle(vehicleName, pos.x, pos.y, pos.z, heading, true, false)
 
     SetVehicleOnGroundProperly(vehicle)
 	SetVehicleHasBeenOwnedByPlayer(vehicle,true)
@@ -95,7 +98,6 @@ function spawnCar(vehicleName, keep, pos, direct, notp)
 
 
     if not notp then
-        print(notp)
         if direct then
             SetPedIntoVehicle(playerPed, vehicle, -1)
         else

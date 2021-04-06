@@ -48,11 +48,11 @@ AddEventHandler("property:safe:get", function(cb, property)
     local sourceValue = source
     local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     MySQL.ready(function ()
-        MySQL.Async.fetchScalar('select liquid from properties where id = @property', {
+        MySQL.Async.fetchAll('select liquid, dirty from properties where id = @property', {
             ['@property'] = property.id,
         }, function(liquid)
             -- TODO pay property
-            TriggerClientEvent(cb, sourceValue, liquid, property)
+            TriggerClientEvent(cb, sourceValue, liquid[1].liquid + liquid[1].dirty, property)
         end)
     end)
 end)
@@ -62,27 +62,33 @@ AddEventHandler("property:safe:withdraw", function(property, nb)
     local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local nb = nb
     MySQL.ready(function ()
-        MySQL.Async.fetchScalar('select liquid from properties where id = @property', {
+        MySQL.Async.fetchAll('select liquid, dirty from properties where id = @property', {
             ['@property'] = property.id,
-        }, function (liquid)
-            print(liquid)
-            print(nb)
-            if liquid >= nb then
-                MySQL.Async.execute('update players set liquid = liquid+@nb where discord = @discord', {
+        }, function (res)
+            if res[1].liquid + res[1].dirty >= nb then
+                if res[1].dirty >= nb then
+                    dirty = nb
+                else
+                    dirty = res[1].dirty
+                    liquid = nb - dirty
+                end
+                MySQL.Async.execute('update players set liquid = liquid+@liquid, dirty = dirty + @dirty where discord = @discord', {
                     ['@discord'] = discord,
-                    ['@nb'] = nb
-                }, function()
-                    MySQL.Async.execute('update properties set liquid = liquid-@nb where id = @property', {
+                    ['liquid'] = liquid,
+                    ['dirty'] = dirty},
+                 function()
+                    MySQL.Async.execute('update properties set liquid = liquid-@liquid, dirty = dirty - @dirty where id = @property', {
                         ['@property'] = property.id,
-                        ['@nb'] = nb
-                    }, function()
+                        ['liquid'] = liquid,
+                        ['dirty'] = dirty},
+                     function()
                         -- TODO pay property
                         TriggerClientEvent("bro_core:Notification", sourceValue, "Argent retiré. " .. exports.bro_core:Money(nb))
 
                     end)
                 end)
             else
-                exports.bro_core:Notification("~r~Vous n'avez pas assez d'argent dans le coffre")
+                TriggerClientEvent("bro_core:Notification", sourceValue, "~r~Vous n'avez pas assez d'argent dans le coffre")
             end
         end)
     end)
@@ -94,17 +100,25 @@ AddEventHandler("property:safe:add", function(property, nb)
     local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
     local nb = nb
     MySQL.ready(function ()
-        MySQL.Async.fetchScalar('select liquid from players where discord = @discord', {
+        MySQL.Async.fetchAll('select liquid, dirty from players where discord = @discord', {
             ['@discord'] = discord,
-        }, function (liquid)
-            if liquid >= nb then
-                MySQL.Async.execute('update players set liquid = liquid-@nb where discord = @discord', {
-                    ['@discord'] = discord,
-                    ['@nb'] = nb
-                }, function()
-                    MySQL.Async.execute('update properties set liquid = liquid+@nb where id = @property', {
+        }, function (res)
+            if res[1].dirty + res[1].liquid >= nb then
+                if res[1].dirty >= nb then
+                    dirty = nb
+                else
+                    dirty = res[1].dirty
+                    liquid = nb - dirty
+                end
+                MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@liquid, dirty=dirty-@dirty where discord = @discord',
+                {['discord'] =  discord,
+                ['liquid'] = liquid,
+                ['dirty'] = dirty},
+                function(res3)
+                    MySQL.Async.execute('update properties set liquid=liquid+@liquid, dirty=dirty+@dirty where id = @property', {
                         ['@property'] = property.id,
-                        ['@nb'] = nb
+                        ['liquid'] = liquid,
+                        ['dirty'] = dirty
                     }, function()
                         -- TODO pay property
                         TriggerClientEvent("bro_core:Notification", sourceValue, "Argent déposé. " .. exports.bro_core:Money(nb))

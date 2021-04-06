@@ -8,7 +8,6 @@ version '1.0.4'
 
 dependency {
 	"bro_core",
-	"instance",
 	"vehicles"
 }
 

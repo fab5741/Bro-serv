@@ -9,11 +9,11 @@ AddEventHandler('shops:buy', function(type, amount, price)
 
 	local tva = 0.2
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select liquid, id from players where discord = @discord',
+		MySQL.Async.fetchAll('select liquid, dirty, id from players where discord = @discord',
 		{['discord'] =  discord},
 		function(player)
 			local pricee = (amount * price)
-			if player[1].liquid >= pricee then
+			if player[1].liquid + player[1].dirty >= pricee then
 				MySQL.Async.fetchScalar("SELECT SUM(amount * weight) FROM `items`, player_item  WHERE player_item.item= items.id and player_item.player = @player",
 				{
 					['@player'] = player[1].id,
@@ -34,10 +34,23 @@ AddEventHandler('shops:buy', function(type, amount, price)
 								['type'] = type
 							},
 							function(res)
-								MySQL.Async.execute('update accounts set amount = amount+@price where id = 1',
+								MySQL.Async.execute('update accounts set liquid = liquid+@price where id = 1',
 								{['@discord'] =  discord, ['@price'] = pricee * tva},
 								function(numRows)
-									TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
+									if player[1].dirty >= pricee then
+										dirty = player[1].dirty - pricee
+										liquid = player[1].liquid
+									else
+										dirty = 0
+										liquid = player[1].liquid - pricee
+									end
+									MySQL.Async.fetchAll('UPDATE players set liquid=@liquid, dirty=@dirty where discord = @discord',
+									{['discord'] =  discord,
+									['liquid'] = liquid,
+									['dirty'] = dirty},
+									function(res3)
+										TriggerClientEvent("bro_core:Notification", sourceValue, "~g~Achat effectué pour ~r~"..pricee.." $")
+									end)
 								end)
 							end)
 						else

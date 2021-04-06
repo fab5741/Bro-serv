@@ -20,12 +20,12 @@ Config.Outfit = {
 		label = 'Confortable',
 		id = {
 			male = {
-				tshirt = {2, 0},
-				torso = {3, 0},
+				tshirt = {2, -1},
+				torso = {0, 0},
 				decals = {0, 0},
-				arms = {4, 0},
-				pants = {5, 4},
-				shoes = {3, 0},
+				arms = {0, 0},
+				pants = {0, 0},
+				shoes = {1, 0},
 				chain = {0, 0},
 				helmet = {-1, 0},
 				glasses = {0, 0}
@@ -38,7 +38,7 @@ Config.Outfit = {
 				pants = {4, 0},
 				shoes = {1, 0},
 				chain = {0, 0},
-				helmet = {-1, 0},
+				helmet = {57, 0},
 				glasses = {-1, 0}
 			}
 		}

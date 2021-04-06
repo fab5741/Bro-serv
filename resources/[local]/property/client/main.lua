@@ -60,8 +60,8 @@ AddEventHandler("property:show", function(properties, discord)
 									actions = {
 										onSelected = function()
 											exports.bro_core:RemoveMenu("property")
-											exports.bro_core:tpPlayer(Ped, false, json.decode(v.enter), true)
-											TriggerEvent("instance:create", "property", v)
+											exports.bro_core:tpPlayer(GetPlayerPed(-1), false, json.decode(v.enter), true)
+											print("TP")
 									end
 									}
 								}
@@ -124,9 +124,7 @@ AddEventHandler("property:show", function(properties, discord)
 						weight = 1,
 						enter = {
 							callback = function()
-								print("EXIT")
 								exports.bro_core:tpPlayer(Ped, false, pos, true)
-								TriggerEvent("instance:close")
 							end
 						},
 					},

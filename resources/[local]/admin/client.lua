@@ -36,6 +36,7 @@ end)
 -- Coords
 RegisterCommand('coords', function(source, args, rawCommand)
 	local coords = GetEntityCoords(PlayerPedId())
+    print(coords)
 	SendNUIMessage({
 		coords = ""..coords.x..","..coords.y..","..coords.z..""
 	})
@@ -89,4 +90,3 @@ RegisterCommand("closest", function()
     print(exports.bro_core:GetClosestPlayer())
     print(GetPlayerServerId(exports.bro_core:GetClosestPlayer()))
 end)
-

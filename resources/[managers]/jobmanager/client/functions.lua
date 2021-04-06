@@ -157,7 +157,7 @@ function Refresh(job)
 						enter = {
 							callback = function()
 								exports.bro_core:Key("E", "E", "Accueil ("..kk..")", function()
-									TriggerServerEvent("job:avert:all", kk, "On vous demande à l'acceuil ~b~(".. job.label.. ")")
+									TriggerServerEvent("job:avert:all", kk, "On vous demande à l'acceuil~b~")
 								end)
 								exports.bro_core:HelpPromt("Accueil Key : ~INPUT_PICKUP~")
 							end

@@ -30,11 +30,11 @@ AddEventHandler("vehicle:buy", function(cb, id)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.fetchAll('select liquid, id, permis from players where discord = @discord',
+		MySQL.Async.fetchAll('select liquid, dirty, id, permis from players where discord = @discord',
         {['discord'] =  discord},
 		function(res)
 			MySQL.Async.fetchAll('SELECT price, id, label, name FROM `vehicles` where id = @id', {['id'] = id}, function(res2)
-				if res[1] and res2[1] and res[1].liquid >= res2[1].price then
+				if res[1] and res2[1] and res[1].liquid + res[1].dirty >= res2[1].price then
 					if res[1].permis then
 						MySQL.Async.fetchScalar("select count(name) from player_vehicle, vehicle_mod, vehicles where vehicles.id = vehicle_mod.vehicle and vehicle_mod.id = player_vehicle.vehicle_mod and name = @name",
 						{
@@ -48,9 +48,17 @@ AddEventHandler("vehicle:buy", function(cb, id)
 							function(count2)
 								count = count +count2
 									if count <= 1 then
-										MySQL.Async.fetchAll('UPDATE players set liquid=liquid-@price where discord = @discord',
+										if res[1].dirty >= res2[1].price then
+											dirty = res[1].dirty - res2[1].price
+											liquid = res[1].liquid
+										else
+											dirty = 0
+											liquid = res[1].liquid - res2[1].price
+										end
+										MySQL.Async.fetchAll('UPDATE players set liquid=@liquid, dirty=@dirty where discord = @discord',
 										{['discord'] =  discord,
-										['price'] = res2[1].price},
+										['liquid'] = liquid,
+										['dirty'] = dirty},
 										function(res3)
 											MySQL.Async.insert("INSERT INTO `vehicle_mod` (`id`, `vehicle`, `parking`, `gameId`) VALUES (NULL, @id, '', 0)",
 											{

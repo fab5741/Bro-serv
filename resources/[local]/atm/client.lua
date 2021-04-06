@@ -44,7 +44,10 @@ Citizen.CreateThread(function()
 			{ x = 1686.753,  y = 4815.809,  z = 42.008},
 			{ x = 1153.75,  y = -326.8,  z = 69.21},
 			{ x = 33.249336242676, y = -1348.1586914062, z= 29.497022628784},
-			{ x=1702.8286132812, y = 4933.603515625,z=42.063678741455}
+			{ x=1702.8286132812, y = 4933.603515625,z=42.063678741455},
+			{
+				x=147.75595092773,y=-1035.2989501953,z=29.3431224823
+			}
 		}
 	})
 
@@ -88,4 +91,38 @@ Citizen.CreateThread(function()
 		}
 	})
 
+	    exports.bro_core:AddArea("check-cash", {
+        trigger = {
+            weight = 2,
+            enter = {
+                callback = function()
+                    exports.bro_core:Key("E", "E", "Vérifier vos  billets", function()
+						TriggerServerEvent("cash:check")
+                    end)
+                    exports.bro_core:HelpPromt("Vérifier vos billets : ~INPUT_PICKUP~")
+                end
+            },
+            exit = {
+                callback = function()
+                    exports.bro_core:RemoveMenu("check-cash")
+                    exports.bro_core:Key("E", "E", "Interaction", function()
+                    end)
+                end
+            },
+        },
+        blip = {
+            text = "Pacifique Banque",
+            colorId = 2,
+            imageId = 300,
+        },
+        locations = {
+            { 
+                x=144.17407226562,y=-1039.6257324219,z=29.367866516113,
+				x=-104.06541442871,y=6468.0927734375,z=31.626707077026,
+				x=-1180.6627197266,y=2707.5939941406,z=38.087829589844,
+				x=-2962.6733398438,y=477.14196777344,z=15.696918487549,
+				x=458.69140625,y=-976.02423095703,z=24.914701461792
+            },
+        }
+    })
 end) 

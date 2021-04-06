@@ -87,3 +87,45 @@ function getGroundZ(x, y, z)
 	return groundZ
   end
   
+
+
+  
+-- Open Gui and Focus NUI
+function openGui()
+	SendNUIMessage({openMeter = true})
+  end
+  
+  -- Close Gui and disable NUI
+  function closeGui()
+	SendNUIMessage({openMeter = false})
+	meterOpen = false
+  end
+  
+  function GetRandomWalkingNPC()
+	  local search = {}
+	  local peds   = exports.bro_core:GetPedsInAround({
+	  range = 100
+   })
+	  for i=1, #peds, 1 do
+		  if IsPedHuman(peds[i]) and IsPedWalking(peds[i]) and not IsPedAPlayer(peds[i]) then
+			  table.insert(search, peds[i])
+		  end
+	  end
+  
+	  if #search > 0 then
+		  return search[GetRandomIntInRange(1, #search)]
+	  end
+  
+	  for i=1, 250, 1 do
+		  local ped = GetRandomPedAtCoord(0.0, 0.0, 0.0, math.huge + 0.0, math.huge + 0.0, math.huge + 0.0, 26)
+  
+		  if DoesEntityExist(ped) and IsPedHuman(ped) and IsPedWalking(ped) and not IsPedAPlayer(ped) then
+			  table.insert(search, ped)
+		  end
+	  end
+  
+	  if #search > 0 then
+		  return search[GetRandomIntInRange(1, #search)]
+	  end
+  end
+  

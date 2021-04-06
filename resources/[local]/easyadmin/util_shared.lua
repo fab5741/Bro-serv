@@ -12,6 +12,7 @@ permissions = {
 	["anon"] = false,
 	["mute"] = false,
 	["teleport.everyone"] = false,
+	["warn"] = false,
 }
 
 
@@ -55,6 +56,15 @@ function string.split(inputstr, sep)
 	end
 	return t
 end
+
+function string.reverse(s)
+	local r = ""
+	for p,c in utf8.codes(s) do
+		r = utf8.char(c)..r
+	end
+	return r
+end
+
 
 --- http://www.lua.org/pil/11.5.html
 function Set (list)

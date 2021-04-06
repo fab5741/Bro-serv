@@ -3,7 +3,7 @@ game 'gta5'
 
 description '- Bro - Accounting'
 
-dependency "bro_core"
+dependency {"bro_core", "jobManager"}
 
 version '0.1'
 

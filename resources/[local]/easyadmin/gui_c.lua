@@ -89,6 +89,11 @@ Citizen.CreateThread(function()
 		menuWidth = GetResourceKvpInt("ea_menuwidth")
 		menuOrientation = handleOrientation(GetResourceKvpString("ea_menuorientation"))
 	end 
+	local subtitle = "~b~Admin Menu"
+	if settings.updateAvailable then
+		subtitle = "~g~UPDATE "..settings.updateAvailable.." AVAILABLE!"
+	end
+
 	mainMenu = NativeUI.CreateMenu("EasyAdmin", "~b~Admin Menu", menuOrientation, 0)
 	
 	_menuPool:Add(mainMenu)
@@ -177,8 +182,11 @@ function GenerateMenu() -- this is a big ass function
 		menuWidth = GetResourceKvpInt("ea_menuwidth")
 		menuOrientation = handleOrientation(GetResourceKvpString("ea_menuorientation"))
 	end 
-	
-	mainMenu = NativeUI.CreateMenu("EasyAdmin", "~b~Admin Menu", menuOrientation, 0)
+	local subtitle = "~b~Admin Menu"
+	if settings.updateAvailable then
+		subtitle = "~g~UPDATE "..settings.updateAvailable.." AVAILABLE!"
+	end
+	mainMenu = NativeUI.CreateMenu("EasyAdmin", subtitle, menuOrientation, 0)
 	_menuPool:Add(mainMenu)
 	
 		mainMenu:SetMenuWidthOffset(menuWidth)	
@@ -401,6 +409,47 @@ function GenerateMenu() -- this is a big ass function
 			thisItem.Activated = function(ParentMenu,SelectedItem)
 				TriggerServerEvent("EasyAdmin:TakeScreenshot", thePlayer.id)
 			end
+		end
+
+		if permissions["warn"] then
+			local thisWarnMenu = _menuPool:AddSubMenu(thisPlayer,GetLocalisedText("warnplayer"),"",true)
+			thisWarnMenu:SetMenuWidthOffset(menuWidth)
+			
+			local thisItem = NativeUI.CreateItem(GetLocalisedText("reason"),GetLocalisedText("warnreasonguide"))
+			thisWarnMenu:AddItem(thisItem)
+			WarnReason = GetLocalisedText("noreason")
+			thisItem:RightLabel(WarnReason)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128 + 1)
+				
+				while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+					Citizen.Wait( 0 )
+				end
+				
+				local result = GetOnscreenKeyboardResult()
+				
+				if result and result ~= "" then
+					WarnReason = result
+					thisItem:RightLabel(result) -- this is broken for now
+				else
+					WarnReason = GetLocalisedText("noreason")
+				end
+			end
+			
+			local thisItem = NativeUI.CreateItem(GetLocalisedText("confirmwarn"),GetLocalisedText("confirmwarnguide"))
+			thisWarnMenu:AddItem(thisItem)
+			thisItem.Activated = function(ParentMenu,SelectedItem)
+				if WarnReason == "" then
+					WarnReason = GetLocalisedText("noreason")
+				end
+				TriggerServerEvent("EasyAdmin:warnPlayer", thePlayer.id, WarnReason)
+				BanTime = 1
+				BanReason = ""
+				_menuPool:CloseAllMenus()
+				Citizen.Wait(800)
+				GenerateMenu()
+				playermanagement:Visible(true)
+			end	
 		end
 		
 		_menuPool:ControlDisablingEnabled(false)
@@ -874,9 +923,10 @@ Citizen.CreateThread( function()
 			
 			if (not RedM and IsControlJustPressed(0,103) or (RedM and IsControlJustReleased(0, Controls["VehExit"]))) then
 				local targetPed = PlayerPedId()
+				local targetPlayer = -1
 				local targetx,targety,targetz = table.unpack(GetEntityCoords(targetPed, false))
-	
-				spectatePlayer(GetPlayerPed(PlayerId()),GetPlayerFromServerId(PlayerId()),GetPlayerName(PlayerId()))
+				print("pressed E")
+				spectatePlayer(targetPed,targetPlayer,GetPlayerName(targetPlayer))
 				TriggerEvent('EasyAdmin:FreezePlayer', false)
 				--SetEntityCoords(PlayerPedId(), oldCoords.x, oldCoords.y, oldCoords.z, 0, 0, 0, false)
 				if not RedM then

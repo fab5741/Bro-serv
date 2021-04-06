@@ -37,30 +37,35 @@ function changeModel(skin)
             SetPedComponentVariation(GetPlayerPed(-1), 4, 61, 4, 2) -- pants
             SetPedComponentVariation(GetPlayerPed(-1), 6, 34, 0, 2) -- shoes
 
-            Character['arms'] = 15
-            Character['torso_1'] = 15
-            Character['tshirt_1'] = 15
-            Character['pants_1'] = 61
-            Character['pants_2'] = 4
-            Character['shoes_1'] = 34
+            Character['arms'] = 0
+            Character['torso_1'] = 0
+            Character['tshirt_1'] = 2
+            Character['tshirt_2'] = 0
+            Character['pants_1'] = 0
+            Character['shoes_1'] = 1
             Character['glasses_1'] = 0
+            Character['helmet'] = 0
+            Character['chain'] = 0
+			
         elseif skin == 'mp_f_freemode_01' then
             SetPedComponentVariation(GetPlayerPed(-1), 3, 15, 0, 2) -- arms
-            SetPedComponentVariation(GetPlayerPed(-1), 3, 5, 0, 2) -- torso
-            SetPedComponentVariation(GetPlayerPed(-1), 3, 15, 0, 2) -- tshirt
+            SetPedComponentVariation(GetPlayerPed(-1), 11, 5, 0, 2) -- torso
+            SetPedComponentVariation(GetPlayerPed(-1), 8, 15, 0, 2) -- tshirt
             SetPedComponentVariation(GetPlayerPed(-1), 4, 57, 0, 2) -- pants
-            SetPedComponentVariation(GetPlayerPed(-1), 1, 35, 0, 2) -- shoes
-            Character['arms'] = 3
-            Character['torso_1'] = 3
-            Character['tshirt_1'] = 3
-            Character['pants_1'] = 4
+            SetPedComponentVariation(GetPlayerPed(-1), 6, 35, 0, 2) -- shoes
+
+            Character['arms'] = 15
+            Character['torso_1'] = 5
+            Character['tshirt_1'] = 15
+            Character['pants_1'] = 57
             Character['pants_2'] = 0
-            Character['shoes_1'] = 1
+            Character['shoes_1'] = 35
             Character['glasses_1'] = -1
         end
 		SetModelAsNoLongerNeeded(model)
     end
 end
+
 
 Apperance = {
 	{

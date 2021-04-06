@@ -138,7 +138,7 @@ end)
 
 AddEventHandler("job:safe:open", function(job)
 	job = job[1]
-	TriggerServerEvent("account:job:get", "job:safe:open2", job.job)
+	TriggerServerEvent("job:safe:get", "job:safe:open2", job.job)
 end)
 
 AddEventHandler("job:safe:open2", function(amount)
@@ -175,6 +175,7 @@ AddEventHandler("job:safe:open3", function(isChef)
 			}
 		}
 	end
+	print("safe")
 	TriggerServerEvent("job:items:get", "job:safe:open4")
 end)
 
@@ -304,9 +305,6 @@ AddEventHandler("job:item:open2", function(items)
 	exports.bro_core:NextMenu("safes-items")
 end)
 
-
-
-
 AddEventHandler("job:open:menu", function(job)
 	job = job[1]
 	if job.name == "lspd" or job.name == "lsms" or job.name == "farm" or job.name == "wine"  or job.name == "taxi"  or job.name=="bennys" or job.name=="newspapers" then
@@ -420,7 +418,7 @@ AddEventHandler("job:open:menu", function(job)
 
 			}
 		})
-
+		
 		if job.name == "lspd" then
 			exports.bro_core:AddSubMenu("fines", {
 				parent= "job",
@@ -676,9 +674,10 @@ AddEventHandler("job:open:menu", function(job)
 			}
 		elseif job.name == "newspapers" then
 			buttons[#buttons+1] = {
-				text = "Stopper les livraisons",
-				exec = {
-					callback = function()
+				type = "button",
+				label = "Stopper les livraisons",
+				actions = {
+					onSelected = function()
 						BeginInProgress = false
 						-- on nettoie la merde
 						exports.bro_core:RemoveArea("begin-current")
@@ -688,6 +687,7 @@ AddEventHandler("job:open:menu", function(job)
 				},
 			}
 		end
+
 		if job.name == "lspd" or job.name == "lsms" or job.name == "bennys" or job.name == "farm" or job.name == "wine" or job.name == "taxi" then
 			buttons[#buttons+1] = {
 				type = "separator",
@@ -870,8 +870,6 @@ AddEventHandler("job:open:menu", function(job)
 	end
 end)
 
-
-
 AddEventHandler("job:parking", function(vehicles)
 	local buttons = {
 
@@ -887,7 +885,6 @@ AddEventHandler("job:parking", function(vehicles)
 	}
 	end
 end)
-
 
 AddEventHandler("job:parking:get", function(name, id)
 	local playerPed = PlayerPedId() -- get the local player Ped
@@ -905,7 +902,6 @@ function RespawnPed(Ped, coords, heading)
 	ClearPedBloodDamage(Ped)
 	TriggerEvent('playerSpawned') -- compatibility with old scripts, will be removed soon
 end
-
 
 AddEventHandler("job:lsms:revive", function(isBleedout)
 	local coords = GetEntityCoords(GetPlayerPed(-1))
@@ -951,9 +947,6 @@ AddEventHandler("job:lsms:revive", function(isBleedout)
 	Wait(0)
 end)
 
-
-
-
 AddEventHandler("jobs:assurance:vehicles", function(vehicles)
 	local buttons = {}
 	for k, v in ipairs (vehicles) do
@@ -995,7 +988,6 @@ end)
 AddEventHandler("jobs:refresh", function(job)
 	refresh(job[1])
 end)
-
 
 AddEventHandler("weapon:store", function(weapons)
 	local buttons = {}
@@ -1101,7 +1093,6 @@ AddEventHandler("weapon:store", function(weapons)
 	})
 end)
 
-
 AddEventHandler("weapon:store:store", function(isOk, weapon)
 	if isOk then
 		if not HasPedGotWeapon(GetPlayerPed(-1), GetHashKey(weapon), false) then
@@ -1120,11 +1111,9 @@ AddEventHandler("weapon:store:store", function(isOk, weapon)
 	end
 end)
 
-
 AddEventHandler('job:removeWeapons', function()
     RemoveAllPedWeapons(PlayerPedId(), true)
 end)
-
 
 AddEventHandler('job:handcuff', function()
 	HandCuffed = not HandCuffed
@@ -1144,7 +1133,6 @@ AddEventHandler('job:handcuff', function()
 		ClearPedTasksImmediately(PlayerPedId())
 	end
 end)
-
 
 local lockAskingFine = false
 AddEventHandler('job:payFines', function(amount, sender)
@@ -1212,7 +1200,6 @@ AddEventHandler('job:facture', function(amount, motif, job, sender)
 				end
 
 				if IsControlPressed(1, Config.bindings.refuse_fine) then
-					print("REFUSE")
 					TriggerServerEvent('job:facture2', sender, 3, job)
 					LockAskingFacture = false
 					break
@@ -1237,7 +1224,6 @@ AddEventHandler("job:facture:accept", function(liquid, amount, sender, job)
 	end
 	LockAskingFacture = false
 end)
-
 
 -- On nettoie le caca
 AddEventHandler('onResourceStop', function(resourceName)

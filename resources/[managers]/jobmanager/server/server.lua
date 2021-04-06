@@ -51,7 +51,7 @@ RegisterServerEvent('job:facture2')
 RegisterNetEvent("job:sell")
 RegisterNetEvent("job:repair:price")
 RegisterNetEvent("job:safe:withdraw")
-
+RegisterNetEvent("job:safe:get")
 AddEventHandler('job:get', function (cb)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
@@ -101,8 +101,6 @@ AddEventHandler('job:set:me', function (grade, notif)
       end)
 end)
 
-
-
 AddEventHandler('job:set', function (player, gradee, notif, notif2)
     local sourceValue = source
     local discord = exports.bro_core:GetDiscordFromSource(player)
@@ -126,8 +124,6 @@ AddEventHandler('job:set', function (player, gradee, notif, notif2)
     end)
 end)
 
-
-
 AddEventHandler('job:items:get', function (cb)
     local sourceValue = source
     local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
@@ -140,8 +136,6 @@ AddEventHandler('job:items:get', function (cb)
         end)
       end)
 end)
-
-
 
 AddEventHandler('job:items:withdraw', function (item, amount)
     local sourceValue = source
@@ -172,7 +166,6 @@ AddEventHandler('job:items:withdraw', function (item, amount)
         end)
     end)
 end)
-
 
 AddEventHandler('job:items:store', function (item, amount)
     local sourceValue = source
@@ -206,7 +199,6 @@ AddEventHandler('job:items:store', function (item, amount)
     end)
 end)
 
-
 -- time for each paycheck
 local moneyDutyTime = 10 *1000 *60
 
@@ -219,32 +211,32 @@ Citizen.CreateThread(function()
             MySQL.Async.fetchAll('select players.gameId, jobs.id as job, job_grades.salary, players.id as player from players, jobs, job_grades where jobs.id = job_grades.job and onDuty = 1 and players.job_grade= job_grades.id',{},
             function(res)
                 for k,v in pairs(res) do
-                    MySQL.Async.fetchScalar('select amount from job_account, accounts where job_account.job = @job and accounts.id = job_account.account ',
-                        {['@job'] = v.job},
-                    function(amount)
-                        v.salary = v.salary/6
-                        if amount > v.salary then
-                            MySQL.Async.execute('update job_account, accounts set amount = amount - @salary where job_account.job = @job and accounts.id = job_account.account',{
-                                ['@salary'] = v.salary,
-                                ['@job'] = v.job
-                            },
-                            function(affectedRows)
-                                MySQL.Async.execute('update accounts, player_account set amount = amount + @salary where player_account.player = @player and player_account.account = accounts.id',{
+                    MySQL.Async.fetchScalar('select accounts.liquid from job_account, jobs, accounts where jobs.id = @job and jobs.id = job_account.job and accounts.id = job_account.account',
+                        {['job'] = v.job},
+                        function(liquid)                        
+                            v.salary = v.salary/6
+                            if (liquid ) > v.salary then
+                                MySQL.Async.execute('update job_account, accounts set liquid = liquid - @salary where job_account.job = @job and accounts.id = job_account.account',{
                                     ['@salary'] = v.salary,
-                                    ['@player'] = v.player
+                                    ['@job'] = v.job
                                 },
                                 function(affectedRows)
-                                    if affectedRows == 1 then
-                                        -- TriggerClientEvent("phone:account:get", sourceValue)
-                                        TriggerClientEvent('bro_core:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
-                                    else
-                                        TriggerClientEvent('bro_core:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
-                                    end
+                                    MySQL.Async.execute('update accounts, player_account set liquid = liquid + @salary where player_account.player = @player and player_account.account = accounts.id',{
+                                        ['@salary'] = v.salary,
+                                        ['@player'] = v.player
+                                    },
+                                    function(affectedRows)
+                                        if affectedRows == 1 then
+                                            -- TriggerClientEvent("phone:account:get", sourceValue)
+                                            TriggerClientEvent('bro_core:Notification', v.gameId, "Vous avez reçu votre paie. ~g~"..v.salary.." $")
+                                        else
+                                            TriggerClientEvent('bro_core:Notification', v.gameId, "Vous n'avez pas reçu votre paie. ~r~"..v.salary.." $")
+                                        end
+                                    end)
                                 end)
-                            end)
-                        else
-                            TriggerClientEvent('bro_core:Notification', v.gameId, "~r~Vous n'avez pas reçu votre paie, la société, n'a pas assez de fond pour vous payer !")
-                        end
+                            else
+                                TriggerClientEvent('bro_core:Notification', v.gameId, "~r~Vous n'avez pas reçu votre paie, la société, n'a pas assez de fond pour vous payer !")
+                            end
                     end)
                 end
             end)
@@ -781,52 +773,84 @@ AddEventHandler('playerDropped', function (reason)
   --- safe
 
 AddEventHandler('job:safe:deposit', function (amount)
-    local sourceValue = source
-    local amount = tonumber(amount)
+	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
-
-    MySQL.ready(function ()
-        MySQL.Async.fetchScalar('select liquid from players where discord = @discord', {
+	MySQL.ready(function ()
+		MySQL.Async.fetchAll('select jobs.liquid, jobs.dirty  from players, job_grades, jobs where players.job_grade = job_grades.id and job_grades.job = jobs.id and players.discord = @discord', {
 			['@discord'] = discord
-		}, function(money)
-			if money >= amount then
-				MySQL.Async.execute('UPDATE accounts, job_account, players, job_grades SET accounts.amount = accounts.amount + @amount where accounts.id = job_account.account and players.job_grade = job_grades.id and job_grades.job = job_account.job and players.discord = @discord', 
+		}, function(res)
+			if (res[1].liquid + res[1].dirty) >= amount then
+				if amount > res[1].dirty then
+					dirty = res[1].dirty
+					liquid = amount - res[1].dirty
+				else
+					liquid = amount - dirty
+					dirty = amount
+				end
+                print("LIQ/dirt")
+                print(liquid)
+                print(dirty)
+				MySQL.Async.execute('update players, job_grades, jobs set jobs.liquid = jobs.liquid+@liquid, jobs.dirty= jobs.dirty + @dirty where players.job_grade = job_grades.id and job_grades.job = jobs.id and players.discord = @discord',
 				{
                     ['@discord'] = discord,
-					['@amount'] = amount
+					['@liquid'] = liquid,
+					['@dirty'] = dirty,
 				}, function(result)
-					MySQL.Async.execute('UPDATE players SET liquid = liquid - @amount WHERE discord = @discord', {
+					MySQL.Async.execute('UPDATE players SET liquid = liquid - @liquid, dirty = dirty - @dirty WHERE discord = @discord', {
 						['@discord'] = discord,
-						['@amount'] = amount
+                        ['@liquid'] = liquid,
+                        ['@dirty'] = dirty,
 					}, function(result)
-						TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez déposé ~g~"..amount.."$")
+						TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
 					end)
 				end)
 			else
-				TriggerClientEvent('bro_core:Notification', sourceValue,  "~r~Vous n'avez pas cet argent")
+				TriggerClientEvent('bro_core:Notification', sourceValue,  "~r~L'entreprise n'a pas assez d'argent")
 			end
 		end)
-    end)
+	end)
 end)
 
-
+AddEventHandler('job:safe:get', function(cb, job)
+	local sourceValue = source
+	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
+	MySQL.ready(function ()
+		MySQL.Async.fetchScalar('SELECT liquid + dirty from jobs where id = @job', {
+			['@job'] = job
+		}, function(res)
+			TriggerClientEvent(cb, sourceValue, res)
+		end)
+	end)
+end)
   
 AddEventHandler('job:safe:withdraw', function(amount)
 	local sourceValue = source
 	local discord = exports.bro_core:GetDiscordFromSource(sourceValue)
 	MySQL.ready(function ()
-		MySQL.Async.fetchScalar('SELECT accounts.amount from accounts, job_account, players, job_grades where accounts.id = job_account.account and players.job_grade = job_grades.id and job_grades.job = job_account.job and players.discord = @discord', {
+		MySQL.Async.fetchAll('select jobs.liquid, jobs.dirty  from players, job_grades, jobs where players.job_grade = job_grades.id and job_grades.job = jobs.id and players.discord = @discord', {
 			['@discord'] = discord
-		}, function(money)
-			if money >= amount then
-				MySQL.Async.execute('UPDATE accounts, job_account, players, job_grades SET accounts.amount = accounts.amount - @amount where accounts.id = job_account.account and players.job_grade = job_grades.id and job_grades.job = job_account.job and players.discord = @discord', 
+		}, function(res)
+			if (res[1].liquid + res[1].dirty) >= amount then
+				if amount > res[1].dirty then
+					dirty = res[1].dirty
+					liquid = amount - res[1].dirty
+				else
+					liquid = amount - dirty
+					dirty = amount
+				end
+                print("LIQ/dirt")
+                print(liquid)
+                print(dirty)
+				MySQL.Async.execute('update players, job_grades, jobs set jobs.liquid = jobs.liquid-@liquid, jobs.dirty= jobs.dirty - @dirty where players.job_grade = job_grades.id and job_grades.job = jobs.id and players.discord = @discord',
 				{
                     ['@discord'] = discord,
-					['@amount'] = amount
+					['@liquid'] = liquid,
+					['@dirty'] = dirty,
 				}, function(result)
-					MySQL.Async.execute('UPDATE players SET liquid = liquid + @amount WHERE discord = @discord', {
+					MySQL.Async.execute('UPDATE players SET liquid = liquid + @liquid, dirty = dirty + @dirty WHERE discord = @discord', {
 						['@discord'] = discord,
-						['@amount'] = amount
+                        ['@liquid'] = liquid,
+                        ['@dirty'] = dirty,
 					}, function(result)
 						TriggerClientEvent('bro_core:Notification', sourceValue, "Vous avez retiré ~g~"..amount.."$")
 					end)

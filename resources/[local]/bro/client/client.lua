@@ -1028,3 +1028,131 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+
+
+--
+-- Wheel chair
+--
+RegisterCommand('me', function(source, args)
+    local string = ""
+    local i = 1
+    while args[i] do
+        string = string .. " " .. tostring(args[i])
+        i = i+1
+    end
+        local playerPed = PlayerPedId()
+        local playerPos = GetEntityCoords(playerPed)
+        Citizen.CreateThread(function()
+            local gameTime = GetGameTimer()
+            local display = true
+            while(display) do
+                playerPos = GetEntityCoords(playerPed)
+                exports.bro_core:Show3DText({ text = "** ".. string .. " **", x= playerPos.x, y= playerPos.y, z= playerPos.z})
+                if GetGameTimer() - gameTime >= 2000 then
+                    display = false
+                end
+                Wait(0)
+            end
+        end)
+end, false)
+
+-- grow beard
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(60 * 1000)
+        TriggerEvent('skinchanger:getSkin', function(skinData)
+            if skinData ~= nil then
+                if skinData['beard_2'] < 10 then
+                    skinData['beard_2'] = skinData['beard_2'] + 1
+                    TriggerEvent('skinchanger:loadSkin', skinData)
+                    TriggerEvent('skin:save', skinData)
+                 --   TriggerServerEvent('esx_skin:save', skinData)
+                end
+            end
+        end)
+    end
+end)
+
+RegisterNetEvent('SimpleBeardGrowth:shave')
+AddEventHandler('SimpleBeardGrowth:shave', function()
+    TriggerEvent('skinchanger:getSkin', function(skinData)
+        if skinData ~= nil then
+            skinData['beard_2'] = 1
+            TriggerEvent('skinchanger:loadSkin', skinData)
+            TriggerEvent('skin:save', skinData)
+--         TriggerServerEvent('esx_skin:save', skinData)
+        end
+    end)
+end)
+
+RegisterCommand('shave', function(source, args, rawCommand)
+	TriggerEvent("SimpleBeardGrowth:shave")
+end)
+
+--[[
+----------------------------------------------------------------------------
+____________________________________________________________________________					
+						AUTHOR : Soig
+
+			Plus aucune armes droppées par les PNJ
+			Peds wont drop weapons no more
+____________________________________________________________________________					
+---------------------------------------------------------------------------
+]]--
+
+function SetWeaponDrops()
+	local handle, ped = FindFirstPed()
+	local finished = false
+
+	repeat
+		if not IsEntityDead(ped) then
+			SetPedDropsWeaponsWhenDead(ped, false)
+		end
+		finished, ped = FindNextPed(handle)
+	until not finished
+
+	EndFindPed(handle)
+end
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(1000)
+		SetWeaponDrops()
+	end
+end)
+
+local isSprinting, isSwimming, isUnderwater = false, false, false
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(100) -- check every 100 ticks, performance matters
+		local letSleep = true
+		local stamina = GetPlayerSprintStaminaRemaining(PlayerId())
+		if isSprinting then
+			letSleep = false
+			if stamina == 100 then
+				if not isSwimming and not isUnderwater then
+					RequestAnimDict("re@construction")
+					while not HasAnimDictLoaded("re@construction") do
+					Citizen.Wait(100)
+					end			
+					TaskPlayAnim(PlayerPedId(), "re@construction", "out_of_breath", 8.0, 8.0,-1, 32, 0, false, false, false)
+				end
+			end
+		end
+		if letSleep then
+		Citizen.Wait(500)
+		end
+	end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+	local lPed = GetPlayerPed(-1)
+	isSprinting = IsPedSprinting(lPed)
+	isSwimming = IsPedSwimming(lPed)
+	isUnderwater = IsPedSwimmingUnderWater(lPed)
+        Citizen.Wait(500)
+    end
+end)
